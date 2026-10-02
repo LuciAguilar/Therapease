@@ -1,0 +1,56 @@
+# .NET / Visual Studio / Rider / VS Code local
+**/[Bb]in/
+**/[Oo]bj/
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Pruebas, cobertura, trazas y temporales
+**/TestResults/
+**/coverage/
+**/playwright-report/
+**/test-results/
+*.coverage
+*.coveragexml
+*.trx
+*.log
+tmp/
+temp/
+
+# Entornos y secretos: solo el ejemplo ficticio se publica
+.env
+.env.*
+!.env.example
+**/secrets/
+**/Secrets/
+**/credentials*.json
+**/secrets*.json
+appsettings.Local.json
+appsettings.*.local.json
+*.secret
+*.secrets
+*.pfx
+*.p12
+*.key
+*.pem
+
+# Respaldos y datos locales; no van al repo publico
+backups/
+*.dump
+*.backup
+*.bak
+*.sql.gz
+*.sql.enc
+*.dump.enc
+*.db
+*.sqlite
+*.sqlite3
+
+# Sistema operativo
+Thumbs.db
+Desktop.ini
+.DS_Store

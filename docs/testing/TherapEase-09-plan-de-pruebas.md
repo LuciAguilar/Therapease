@@ -1,0 +1,338 @@
+# TherapEase — Plan de pruebas por caso de uso
+
+**Continuidad del 01-oct-2026:** Lucía aprobó el plan B00 corregido, ADR-06 y la consulta Q03 sin pantalla; confirmó la fidelidad de ADR-01…05 corregidos, eligió repositorio público y documentación seleccionada, sin antecedentes de escritorio. Ver [guía de equipo](../../README.md). LCA y R04 siguen abiertos; no se acredita revisión humana ni pruebas aún pendientes.
+
+**v0.1 · 30-sep-2026 · Borrador elaborado por Claude a petición de Lucía.** Lucía decide su contenido y lo entrega a Codex como contexto de 09. Base: 08B (HU, CU y alternos S1–S6), 08C, 08D, 07B–07C y Q01–Q20. **Solo datos ficticios (R04).**
+
+**Adenda de Lucía para 09 (30-sep-2026):** este plan es referencia de trabajo, sin nueva ronda de auditoría. Miguel y Dulce escriben unitarias de su código; Lucía escribe y ejecuta integración crítica Q03/Q06/Q07/Q20 con Testcontainers, recorrido Q16, seguridad y B08. Miguel o Dulce revisa las pruebas de Lucía. Dulce confirmó retirar la pantalla de auditoría; Lucía indicó directorio de pacientes vigentes por defecto y filtro autorizado de bajas. Las pruebas de captura/protección Q03 permanecen; las de interfaz HU14/CU10 quedan desplazadas. Los campos del directorio siguen pendientes de Dulce con Usuaria.
+
+## 0. Cómo se usa
+
+| Quién | Qué prueba | Proyecto | Herramientas |
+| --- | --- | --- | --- |
+| **Miguel** | Unitarias de backend: reglas de Domain y Application, sin base de datos (con dobles de los puertos). | `TherapEase.UnitTests` | xUnit |
+| **Dulce** | Unitarias de la capa Web (PageModel) y checklist visual de cada pantalla. | `TherapEase.UnitTests` + checklist en el PR | xUnit |
+| **Lucía (QA)** | Arquitectura, integración con PostgreSQL desechable, recorrido completo, seguridad y evidencia final. | `TherapEase.IntegrationTests`, `TherapEase.E2ETests`, CI | xUnit + Testcontainers, Playwright, k6, Astra |
+
+- **Terminado:** el PR lleva las unitarias de su autor; Lucía agrega o actualiza las suyas del cambio; CI en verde; revisión cruzada. Las pruebas de Lucía las revisa Miguel o Dulce (autor ≠ revisor, 07C).
+- **★ = corte mínimo B00–B04.** Cada prueba entra cuando se construye su bloque (B01–B08).
+- **Pendiente** = depende de una decisión aún abierta (sección 6); se escribe cuando se decida.
+- Nombres de prueba en español sin tildes (07A), p. ej. `Agendar_ConCruceConCitaActiva_Rechaza`.
+- **Valores canario:** usar una contraseña y un contacto ficticios fáciles de buscar (p. ej. `Canario#Prueba1`, `canario@ficticio.test`) para comprobar después que no aparecen en registros (S-21).
+- No se añaden herramientas nuevas sin ADR (07A). Si Dulce quiere probar JavaScript con otra herramienta, primero ADR.
+
+## 1. Miguel — unitarias de backend
+
+### Identidad: CU01, CU02, CU11 (B01) ★
+
+| ID | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- |
+| M-01 | Desactivar o degradar al único superusuario activo → rechaza. Con dos activos → permite uno. | HU02, CU02 A1 |
+| M-02 | Alta con nombre de usuario duplicado o rol inexistente → rechaza. Alta válida → `DebeCambiarContrasena = true`. | HU02, CU02 A2 |
+| M-03 | Si el registro del evento de auditoría falla → el servicio no confirma el cambio. | HU02, CU02 A6, S4 |
+| M-04 | Cambio propio ordinario exige la contraseña actual; primera entrada con temporal pide solo la nueva; nunca permite cambiar la de otro usuario. | HU15, CU11 |
+| M-05 | Los eventos de usuario, rol y contraseña no contienen contraseña ni hash. | Q03, Q04 |
+
+### Pacientes: CU03, CU04 (B02) ★
+
+| ID | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- |
+| M-06 | Registrar sin nombre o sin ámbito → rechaza. Con uno o dos ámbitos → válido. Ámbito repetido → rechaza. | HU04, CU03 A2 |
+| M-07 | Buscar coincidencias por nombre → devuelve las posibles; un homónimo sigue pudiendo registrarse. | HU04, CU03 A1 |
+| M-08 | Actualizar con una versión anterior → conflicto, sin sobrescribir. | HU06, Q07 |
+| M-09 | Actualizar por el flujo ordinario una ficha dada de baja → rechaza e informa su condición. | CU04 A4 |
+| M-10 | Baja → `Condicion = Baja`, `FechaBaja` e `IdUsuarioBaja` llenos. Recuperar → `Vigente` y ambos vacíos. | 08C regla 7, Q20 |
+| M-11 | Baja de paciente con citas activas → rechaza. **Pendiente.** | HU07, CU04 A2 |
+| M-12 | Alta y actualización llenan fecha y usuario de `EntidadAuditable`. | 08C |
+
+### Citas y pago: CU05–CU09 (B03–B06)
+
+| ID | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- |
+| M-13 ★ | Cita activa solo si está agendada **y** vigente (probar las 4 combinaciones). | Q06 |
+| M-14 ★ | Agendar con inicio ≥ fin, paciente inexistente o de baja, o ámbito que el paciente no tiene → rechaza. | HU09, CU06 A1 |
+| M-15 ★ | Cruce: solapada con una activa → rechaza, aunque sea de otro ámbito. Cancelada o de baja → no bloquea. Contigua (10–11 y 11–12) → permite. **Pendiente** la contigua. | HU09, CU06 A2 |
+| M-16 ★ | Una cita nueva queda agendada, vigente y con pago pendiente. **Pendiente** el pago inicial. | 08C §2 |
+| M-17 ★ | El pago solo acepta Pagado o Pendiente. | HU13, CU09 A6 |
+| M-18 | Reprogramar conserva el pago. Cita cancelada, de baja o con paciente de baja → rechaza. | HU10, CU07 A3–A4 |
+| M-19 | Cancelar → cancelada, conserva pago y condición. | HU11, Q20 |
+| M-20 | Baja de cita → conserva estado y pago. | HU12 |
+| M-21 | Recuperar: agendada con paciente de baja → rechaza; agendada con cruce → rechaza; cancelada → vigente pero sigue cancelada; ya vigente → informa. | HU12, CU08 |
+| M-22 ★ | Si el guardado falla, el servicio devuelve error, nunca éxito. | Q08, S4 |
+
+### Transversales
+
+| ID | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- |
+| M-23 ★ | «10:00 en Hermosillo» se convierte en el instante correcto y de vuelta. Una fecha sin hora no se convierte en instante. | Q09 |
+| M-24 | El evento de auditoría lleva actor, momento, tipo e Id del registro, acción y campos; nunca valores de contacto. | Q03, Q04 |
+
+## 2. Dulce — capa Web e interfaz
+
+### Unitarias de PageModel (con servicios de aplicación falsos)
+
+| ID | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- |
+| D-01 ★ | Formularios de acceso, paciente, cita y contraseña con campos obligatorios vacíos → mensaje de validación y no se llama al servicio. | CU03 A2, CU06 A1 |
+| D-02 ★ | El servicio responde «conflicto» → la página avisa y conserva lo capturado. | Q07, S3 |
+| D-03 ★ | El servicio responde error o resultado incierto → nunca muestra «guardado»; muestra «revisa antes de repetir». | Q08, S5 |
+| D-04 ★ | Éxito → confirmación solo tras respuesta correcta. | Q08 |
+| D-05 ★ | El PageModel solo usa servicios de Application, nunca el acceso a datos. (También lo vigila A-01.) | 07A |
+| D-06 | Cambio de contraseña: sin campo «actual» en la primera entrada; con él en el cambio ordinario. | HU15 |
+
+### Checklist visual por pantalla (según el PDF de pantallas)
+
+| ID | Qué revisar | Origen |
+| --- | --- | --- |
+| D-07 ★ | Login: mensaje de error genérico; nunca «el usuario no existe». | CU01 A1 |
+| D-08 ★ | El menú muestra opciones según el rol (Usuarios solo para superusuario); no muestra Auditoría. Ocultar no protege: eso lo prueba Lucía (S-11 a S-13). | Decisión 09; 08B §1.2 |
+| D-09 ★ | B02: búsqueda/lista mínima de pacientes vigentes, estado vacío y acceso a ficha autorizada. | HU05, Q20 |
+| D-15 | B07: directorio completo de vigentes por defecto, información relevante validada, filtro por ámbito y filtro autorizado de bajas. | HU05, Q20, decisión 09 |
+| D-10 ★ | Agenda: con la zona horaria del equipo cambiada, las horas siguen en Hermosillo. Estado vacío. Canceladas solo con su filtro. | HU08, Q09 |
+| D-11 | Detalle de cita: interruptor Pagado/Pendiente; confirmación antes de cancelar y de dar de baja. | HU11–HU13 |
+| D-12 | Mensajes emergentes: guardado, faltan datos, conflicto, incierto, confirmar baja. | S3–S5 |
+| D-13 ★ | JavaScript nunca inserta datos con `innerHTML` (usar `textContent`); los formularios conservan el token antifalsificación de Razor. | 05B, 07B |
+| D-14 | Se dice «paciente», nunca «cliente»; «Dar de baja», nunca «Eliminar». | §2 v0.4 |
+
+## 3. Lucía — funcionales (integración y recorrido)
+
+Integración: xUnit + Testcontainers, con el esquema creado por **las migraciones reales**. Recorrido: Playwright.
+
+### B00 — Validación de arquitectura (LCA) ★
+
+| ID | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- |
+| A-01 | Prueba automática de límites: Web → solo Application; Domain sin dependencias; Pacientes no depende de Citas; coordinador de CU04 fuera de ambos; sin ciclos. | 07A, 07C |
+| A-02 | Las migraciones crean el esquema desde cero sin errores con un usuario distinto del de la aplicación; las credenciales de migración no se usan en ejecución normal. | 07B |
+| A-03 | Insertar por SQL directo dos citas activas solapadas → **la base** las rechaza (no solo el código). | Q06, 05C |
+| A-04 | La imagen Docker arranca, responde la comprobación de salud y corre sin privilegios. | 05E |
+| A-05 | Respaldo cifrado, huella SHA-256 correcta y restauración en PostgreSQL desechable con los mismos datos. | Q10, 05E |
+| A-06 | Lucía registra la decisión de visibilidad del repositorio antes de crearlo y mide minutos de CI por PR, indicando visibilidad, tipo de runner y duración por trabajo. | R01, 07C, ajuste B00 del 01-oct |
+| A-07 | Con PostgreSQL/Testcontainers y el usuario real de la aplicación: `INSERT` en `EventoAuditoria` permitido; `UPDATE`, `DELETE` y cambio de esquema denegados. | Q03, 07B; S-22–S-23 |
+
+### CU01 — Acceder y cerrar sesión (B01) ★
+
+| ID | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- |
+| L-CU01-01 | Credenciales válidas → entra con su rol (Usuaria y superusuario). | HU01 |
+| L-CU01-02 | Salir en el navegador A → la sesión del navegador B deja de funcionar en su siguiente solicitud. | Q02, 07B |
+| L-CU01-03 | Salida repetida o con sesión vencida → sin error y sin acceso. | CU01 A8 |
+
+### CU02 — Gestionar usuarios (B01) ★
+
+| ID | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- |
+| L-CU02-01 | Crear usuario → recibe contraseña temporal → al entrar, solo puede ir a cambiarla. | HU02 |
+| L-CU02-02 | Nombre de usuario duplicado → rechaza. | CU02 A2 |
+| L-CU02-03 | Desactivar → sus sesiones abiertas se cierran y ya no puede entrar. | HU02, CU01 A4 |
+| L-CU02-04 | Cambiar rol → en la siguiente solicitud ya no tiene los permisos anteriores. | CU02 A7 |
+| L-CU02-05 | Los dos últimos superusuarios se desactivan o degradan mutuamente al mismo tiempo → queda al menos uno activo. | HU02, CU02 A1 |
+| L-CU02-06 | Restablecer contraseña → cierra sus sesiones y la temporal obliga a cambiarla. Si levanta el bloqueo: **pendiente**. | HU03 |
+| L-CU02-07 | Cada acción genera su evento sin contraseña; si el evento no se guarda, el cambio tampoco. | Q03, S4 |
+
+### CU11 — Cambiar contraseña propia (B01) ★
+
+| ID | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- |
+| L-CU11-01 | Cambio con la actual correcta → cambia y cierra las demás sesiones. | HU15 |
+| L-CU11-02 | Actual incorrecta o nueva inválida → no cambia. **Pendiente** las reglas de la nueva. | CU11 A1 |
+| L-CU11-03 | El evento se registra sin contraseña. | Q03 |
+
+### CU03 — Registrar, buscar y consultar paciente (B02) ★
+
+| ID | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- |
+| L-CU03-01 | Registrar con uno y con dos ámbitos → consultable y auditado. | HU04 |
+| L-CU03-02 | Nombre ya existente → muestra coincidencias; se puede abrir la existente o registrar un homónimo. | HU04, CU03 A1 |
+| L-CU03-03 | La búsqueda ordinaria no muestra pacientes de baja. | HU05, Q20 |
+| L-CU03-04 | Doble clic en Guardar o reenvío → no crea dos fichas. | S5 |
+| L-CU03-05 | Directorio sin filtro de bajas → solo vigentes; con filtro autorizado → bajas consultables sin alterar fichas. | HU05, Q20, decisión 09 |
+| L-CU03-06 | Sin sesión o sin permiso para bajas → el directorio no revela fichas ni permite el filtro de bajas por URL/envío directo. | Q01, Q20 |
+
+### CU04 — Actualizar, dar de baja y recuperar paciente (B02, B06)
+
+| ID | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- |
+| L-CU04-01 ★ | Dos usuarios editan la misma ficha → el segundo recibe aviso de conflicto; nada se pierde en silencio. | Q07 |
+| L-CU04-02 ★ | Cortar la respuesta después de guardar → al consultar, el dato es coherente y no se anunció éxito. | Q08 |
+| L-CU04-03 | Baja → sale de listas y búsquedas, aparece en «Pacientes de baja» y sigue en la base. | Q20 |
+| L-CU04-04 | Recuperar → vuelve a las listas; se limpian los datos de baja; el evento histórico se conserva. | Q20, 08C |
+| L-CU04-05 | Baja con citas activas → rechazada. **Pendiente.** | CU04 A2 |
+| L-CU04-06 | Dar de baja al paciente mientras se le agenda una cita, al mismo tiempo y repetido muchas veces → nunca queda una cita activa de un paciente de baja. | CU06 A3 |
+| L-CU04-07 | Retirar un ámbito con citas. **Pendiente.** | CU04 A5 |
+
+### CU05 — Consultar agenda (B03) ★
+
+| ID | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- |
+| L-CU05-01 | Muestra solo las activas del periodo; canceladas con filtro; de baja nunca. | HU08 |
+| L-CU05-02 | Navegador con otra zona horaria (p. ej. Ciudad de México y Madrid) → mismas horas de Hermosillo. | Q09 |
+| L-CU05-03 | Periodo sin citas → estado vacío. | CU05 A1 |
+
+### CU06 — Agendar cita (B03) ★
+
+| ID | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- |
+| L-CU06-01 | Cita válida → guardada con pago pendiente y auditada. | HU09 |
+| L-CU06-02 | Solapada con una activa, aunque sea de otro ámbito → rechaza. | Q06 |
+| L-CU06-03 | Contigua (una termina 11:00, otra empieza 11:00) → permitida. **Pendiente.** | 08B §1.1 |
+| L-CU06-04 | Solapada con una cancelada o de baja → permitida. | Q06 |
+| L-CU06-05 | 2 y 10 solicitudes simultáneas por el mismo horario → se guarda exactamente una. | Q06, R02 |
+| L-CU06-06 | Agendar desde un equipo en otra zona horaria → al consultarla, la hora de Hermosillo está intacta. | HU09 CA4, Q09 |
+| L-CU06-07 | **Extra:** citas en las fechas de cambio de horario de EE. UU. y del resto de México (Hermosillo no cambia) → la hora no se desplaza. | Q09 |
+| L-CU06-08 | Paciente de baja o ámbito que no tiene → rechaza. | CU06 A1 |
+| L-CU06-09 | Respuesta interrumpida y reintento → no existe una segunda cita. | S5 |
+
+### CU07 — Reprogramar o cancelar cita (B05)
+
+| ID | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- |
+| L-CU07-01 | Reprogramar a un hueco libre → nuevo horario, mismo pago, auditado. | HU10 |
+| L-CU07-02 | Reprogramar a un hueco ocupado → rechaza y conserva el horario anterior. | HU10, Q06 |
+| L-CU07-03 | Dos reprogramaciones simultáneas de la misma cita → una recibe aviso de conflicto. | Q07 |
+| L-CU07-04 | Cancelar → libera el horario (se puede agendar otra ahí), conserva el pago y no queda de baja. | HU11, Q20 |
+| L-CU07-05 | Reprogramar una cita cancelada o de baja → rechaza. | CU07 A3 |
+| L-CU07-06 | Reprogramar desde otra zona horaria → la nueva hora de Hermosillo queda intacta. | HU10 CA4 |
+
+### CU08 — Dar de baja y recuperar cita (B06)
+
+| ID | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- |
+| L-CU08-01 | Baja → fuera de la agenda, visible en «Citas de baja», estado y pago intactos. | HU12 |
+| L-CU08-02 | Recuperar una agendada con horario libre y paciente vigente → vuelve. | HU12 |
+| L-CU08-03 | Recuperar una agendada con cruce → rechaza y sigue de baja. | HU12 CA2 |
+| L-CU08-04 | Recuperar una agendada con paciente de baja → rechaza. | HU12 CA2 |
+| L-CU08-05 | Recuperar una cancelada → vigente pero cancelada; no ocupa horario. | CU08 A2 |
+| L-CU08-06 | Recuperar mientras otro agenda ese mismo horario, al mismo tiempo → nunca quedan dos activas solapadas. | Q06 |
+
+### CU09 — Estado de pago (B04) ★
+
+| ID | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- |
+| L-CU09-01 | Cambiar Pendiente ↔ Pagado → guardado y auditado. | HU13 |
+| L-CU09-02 | Uno cambia el pago y otro reprograma la misma cita a la vez → aviso de conflicto. | CU09 A1 |
+| L-CU09-03 | Cancelar o dar de baja no cambia el pago (verificar en la base). | HU13 CA3 |
+| L-CU09-04 | Enviar a mano un valor distinto de Pagado/Pendiente → rechaza. | CU09 A6 |
+| L-CU09-05 | Corregir el pago de una cita cancelada o de baja. **Pendiente.** | CU09 A3–A4 |
+
+### Q03 — Auditoría en base (captura desde B01; sin pantalla CU10 en 09)
+
+| ID | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- |
+| L-Q03-01 ★ | Cada cambio de paciente, cita, pago y usuario genera exactamente un evento con actor, momento, registro/campo y hecho. | Q03 |
+| L-Q03-02 ★ | Si el evento no se puede guardar → el cambio tampoco se guarda. | Q03, S4 |
+| L-Q03-03 ★ | El usuario de aplicación puede insertar eventos, pero `UPDATE`/`DELETE` se deniegan en PostgreSQL. La consulta técnica autorizada devuelve únicamente actor, momento, registro/campo y hecho. | Q03, 07B, B00 aprobado |
+| L-Q03-04 ★ | Consulta técnica aprobada por Lucía: comando de lectura → servidor valida superusuario activo; sin sesión, sesión revocada o rol sin permiso → denegación, sin eventos. No hay operación de edición ni borrado. | Q03, Q01–Q02, B00 aprobado |
+
+Lucía aprobó el 01-oct la consulta sin pantalla de B00 mediante un comando de lectura que llama al servidor y exige permiso actual de superusuario. Q03 conserva su meta; implementación y pruebas siguen pendientes.
+
+### Recorrido completo Q16 (desde B04) ★
+
+| ID | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- |
+| L-Q16-01 | Playwright en cada PR: entrar → registrar paciente → agendar cita → marcar pagada → salir. | Q16 |
+| L-Q16-02 | El mismo recorrido con un superusuario. | Q16 |
+
+## 4. Lucía — exclusivas de seguridad
+
+Referencia: OWASP Top 10:2025, ASVS 5.0 aplicable y 07B. «Todas las rutas» = lista de páginas y formularios protegidos, que se actualiza en cada PR.
+
+### Autenticación y sesiones (B01) ★
+
+| ID | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- |
+| S-01 | 5 fallos → bloqueo de 15 min; la contraseña correcta durante el bloqueo no entra; al terminar, se vuelve a evaluar. | 07B, CU01 A2–A3 |
+| S-02 | Usuario inexistente, contraseña incorrecta y usuario bloqueado reciben exactamente el mismo mensaje. | CU01 A1 |
+| S-03 | Muchos intentos fallidos en paralelo no permiten más de 5 antes del bloqueo. | CU01 A3 |
+| S-04 | La cookie de sesión tiene `HttpOnly`, `Secure` y `SameSite=Lax`. | 07B |
+| S-05 | Copiar la cookie, salir y reutilizarla → no funciona. | Q02, 07B |
+| S-06 | Cookie manipulada o ausente → pide acceso sin mostrar datos. | CU01 A6 |
+| S-07 | Con contraseña temporal, entrar por URL directa a pacientes o citas → redirige al cambio de contraseña. | CU01 A5 |
+| S-08 | En la base, las contraseñas solo existen como hash de Identity; nunca en texto ni en SHA-256 simple. | Q19 |
+| S-09 | **Extra:** la redirección después del login (`returnUrl`) solo acepta rutas internas; un enlace a un sitio externo se ignora. | ASVS |
+| S-10 | **Extra:** después de salir, el botón «atrás» no muestra páginas protegidas (sin caché). | Q02 |
+
+### Autorización (todas las operaciones) ★
+
+| ID | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- |
+| S-11 | Sin sesión: cada página y cada envío protegido de «todas las rutas» → denegado, también por URL directa. | Q01, S1 |
+| S-12 | Usuaria intenta usar Usuarios y roles por URL o envío directo → denegado. | 08B §1.2 |
+| S-13 | Un rol de prueba sin permisos (luego, el capturista) intenta pago, bajas y auditoría por URL y envío directo → denegado. | Q17, HU13 CA4 |
+| S-14 | **Extra:** enviar campos de más en un formulario (p. ej. `EstadoPago` al reprogramar, `IdUsuarioAlta`, `Condicion`, `Rol`) → se ignoran. | 07B |
+| S-15 | Abrir o editar por URL un Id inexistente o de baja → no revela datos. | S2 |
+
+### Entradas y salidas
+
+| ID | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- |
+| S-16 | Enviar un formulario sin token antifalsificación o con el de otra sesión → rechazado. | 07B |
+| S-17 | Nombre de paciente con `<script>` o `"><img src=x onerror=...>` → se muestra como texto en la lista, el panel y la auditoría; no se ejecuta. | 07B |
+| S-18 | Buscar con `' OR 1=1 --` y variantes → sin error ni resultados de más. Revisar que no haya SQL armado con texto del usuario. | 05E A05 |
+| S-19 | Envío directo con datos inválidos, saltando la validación del navegador → el servidor rechaza. | 07B |
+| S-20 | Provocar un error → mensaje genérico, sin detalles técnicos, rutas ni datos. | Q04 |
+
+### Datos, auditoría y registros
+
+| ID | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- |
+| S-21 | Tras correr toda la suite, buscar los valores canario en registros técnicos, errores y eventos → no aparecen. | Q04 |
+| S-22 | Con el usuario de base de datos de la app, intentar modificar, borrar o alterar la tabla de auditoría → denegado. | Q03, 07B |
+| S-23 | El usuario de la app no puede cambiar el esquema; las migraciones usan otro usuario. | 07B |
+| S-24 | Revisar filas de auditoría → sin contacto, contraseña ni texto clínico. | Q03 |
+| S-25 | El conjunto de datos de la demo es completamente ficticio. | Q05, R04 |
+
+### Secretos, configuración e infraestructura
+
+| ID | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- |
+| S-26 | Buscar secretos en el repositorio (incluido el historial) y en la imagen Docker → ninguno. | Q19, 07B |
+| S-27 | `.env.example` solo tiene nombres y valores ficticios. | 07B |
+| S-28 | La conexión a Neon usa `SSL Mode=VerifyFull` (revisión de configuración, sin conectar desde CI). | 07B, 07C |
+| S-29 | HTTP redirige a HTTPS; en producción hay HSTS. | Q19 |
+| S-30 | Cabeceras de seguridad básicas (tipo de contenido, protección contra incrustación en marcos, política de contenido). **Pendiente:** Lucía decide cuáles exigir. | ASVS |
+| S-31 | Reiniciar el contenedor → las sesiones siguen siendo válidas (claves de Data Protection en PostgreSQL) y no hay claves en disco. | 05D, 07B |
+| S-32 | El proceso del contenedor no corre como administrador. | 05E |
+
+### Dependencias y revisión de vulnerabilidades
+
+| ID | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- |
+| S-33 | La CI audita paquetes NuGet y falla ante una vulnerabilidad alta. | 05E A03 |
+| S-34 | Acciones de GitHub fijadas por SHA; imagen base fijada por digest. | 07B |
+| S-35 | Revisión de vulnerabilidades con Astra sobre código y configuración; los hallazgos altos se corrigen antes de la demo. Si se revisa la app publicada, antes se necesita la autorización de Lucía para publicar. | Prompt maestro §10, §12 |
+
+### Antes de datos reales (futuro)
+
+| ID | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- |
+| S-36 | TOTP obligatorio, código inválido o reutilizado → no entra; recuperación por pérdida de la app probada. | HU-F06, CU-F14 |
+| S-37 | Revisión completa de R04 antes de cualquier dato real. | R04, 08D D04 |
+
+## 5. Lucía — evidencia final (B08)
+
+| ID | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- |
+| N-01 | k6 con 4 usuarios, 100 pacientes y 1,000 citas ficticias → al menos 95 % en ≤3 s, incluido un acceso tras suspensión. | Q12 |
+| N-02 | Restaurar un respaldo y comparar → pérdida máxima de 24 h de cambios. | Q10 |
+| N-03 | Recuperación cronometrada desde la detección del fallo → máximo 24 h. | Q11 |
+| N-04 | Persona ajena al equipo: registra paciente, agenda y marca pagada sin ayuda; se anotan sus dificultades. | Q13 |
+| N-05 | Demo de 30 min sin interrupciones (calentamiento documentado). | Q14 |
+| N-06 | Otro integrante prepara el entorno solo con la documentación. | Q15 |
+| N-07 | Si falla el respaldo diario, se abre o actualiza una incidencia asignada a Lucía. | 05E |
+
+## 6. Decisiones pendientes que cambian pruebas
+
+| Decisión | Pruebas afectadas | Quién decide |
+| --- | --- | --- |
+| ¿Se permiten citas contiguas? | M-15, L-CU06-03 | Dulce con Usuaria |
+| ¿El pago empieza en Pendiente? | M-16 | Dulce con Usuaria |
+| ¿Se impide dar de baja a un paciente con citas activas? | M-11, L-CU04-05 | Dulce con Usuaria |
+| ¿Qué pasa al retirar un ámbito con citas? | L-CU04-07 | Dulce con Usuaria |
+| ¿Se corrige el pago de una cita cancelada o de baja? | L-CU09-05 | Dulce con Usuaria |
+| ¿Restablecer la contraseña levanta el bloqueo? | L-CU02-06 | Lucía con Miguel |
+| Reglas de la contraseña nueva | L-CU11-02 | Lucía con Miguel |
+| Cabeceras de seguridad exigidas | S-30 | Lucía |
+| ¿Quién escribe los PageModel, Dulce o Miguel? | Sección 2 | Equipo |
+| ¿Qué campos son información relevante del directorio? | D-15, L-CU03-05–06 | Dulce con Usuaria |
+| Resuelto el 01-oct: consulta técnica sin pantalla de B00 para superusuario activo aprobada | L-Q03-03–04, S-22–S-24 | Lucía aprobó y prueba; Miguel implementa y revisa las pruebas de Lucía |
