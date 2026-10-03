@@ -1,0 +1,18 @@
+**/bin/
+**/obj/
+**/TestResults/
+.git/
+.github/
+.vs/
+.idea/
+.vscode/
+docs/
+tests/
+infra/
+scripts/
+
+# Secretos y configuracion local: nunca entran a la imagen
+.env
+.env.*
+**/secrets/
+**/credentials*.json

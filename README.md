@@ -102,3 +102,33 @@ La solución, `.csproj`, migraciones y comandos reales para arrancar los añadir
 ## 9. Revisión y publicación de T1
 
 T1 está publicado en el repositorio público y aprobado por Lucía. **Antes del primer PR de Miguel, Lucía debe activar en `main` la protección de rama con una revisión y la protección contra secretos.** Su activación sigue pendiente de verificación. La revisión de Miguel/Dulce de documentos permanece pendiente y no bloquea; código y pruebas desde B00 requieren autor y revisor distintos y aprobación final de Lucía. LCA y R04 siguen abiertos.
+
+## 10. Construir, probar y ejecutar
+
+Requiere el SDK indicado en `global.json` (.NET 10). Visual Studio solo abre estos proyectos desde la versión 2026 (18.0 o superior); Visual Studio 2022 no carga ese SDK y muestra «The SDK 'Microsoft.NET.Sdk' specified could not be found». VS Code y la terminal funcionan con el SDK instalado. Desde la raíz del repositorio:
+
+```bash
+dotnet build TherapEase.sln
+dotnet test TherapEase.sln
+dotnet run --project src/Web
+```
+
+La aplicación escucha en `http://localhost:5052` y expone `/salud`. Los proyectos de integración y E2E están creados sin pruebas: las escribe Lucía.
+
+Imagen Docker (requiere Docker Desktop; salud y usuario sin privilegios se declaran en el `Dockerfile`):
+
+```bash
+docker build -t therapease:local .
+docker run --rm -p 8080:8080 therapease:local
+```
+
+**Dependencias entre proyectos permitidas** (la prueba automática de límites de Lucía las verifica):
+
+| Proyecto | Puede referenciar |
+| --- | --- |
+| `TherapEase.Domain` | nada |
+| `TherapEase.Application` | Domain |
+| `TherapEase.Infrastructure` | Application, Domain |
+| `TherapEase.Web` | Application; Infrastructure solo para componer la inyección de dependencias en el arranque |
+
+Los módulos (Identidad, Pacientes, Citas, Auditoria) son carpetas y espacios de nombres dentro de cada capa, por ejemplo `TherapEase.Application.Pacientes`. Dentro de cada módulo viven su servicio, su contrato y su puerto de persistencia (uno por módulo, no por entidad). Lo común está en `Compartido`, como `RespuestaServicio<T>`, el resultado uniforme de los servicios. El coordinador de CU04 va en `TherapEase.Application.Coordinadores`, fuera de Pacientes y Citas. Citas puede usar el contrato público de Pacientes; Pacientes no usa Citas.
