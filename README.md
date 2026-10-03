@@ -135,6 +135,17 @@ $env:ConnectionStrings__TherapEase = "Host=localhost;Port=55432;Database=therape
 
 Las migraciones las aplica solo `therapease_migrador`; la aplicación se conecta con `therapease_app`, que no puede cambiar el esquema, borrar pacientes o citas, ni modificar `EventoAuditoria`. Una migración nueva se crea con `dotnet ef migrations add <Nombre> --project src/Infrastructure --startup-project src/Web --output-dir Persistencia/Migraciones`; si crea una tabla, debe incluir sus `GRANT` explícitos para `therapease_app`, y se revisa su SQL (`dotnet ef migrations script`) antes del PR. La base impone por sí misma que dos citas activas no se crucen y que no exista una cita activa de un paciente de baja.
 
+**Identidad y acceso.** Los usuarios y roles los administra ASP.NET Core Identity; los roles `Usuaria` y `Superusuario` los siembra la migración. Con la aplicación configurada (`ConnectionStrings__TherapEase`), el primer superusuario se crea con un procedimiento de operador (propuesta pendiente de decisión de Lucía): entrega una contraseña temporal por la salida estándar, una sola vez, sin correo ni contraseña fija en el código.
+
+```powershell
+dotnet run --project src/Web -- --crear-superusuario <nombre-de-usuario>
+dotnet run --project src/Web -- --restablecer-superusuario <nombre-de-usuario>
+```
+
+El segundo comando es la recuperación cuando ningún superusuario puede entrar; no levanta un bloqueo vigente (cinco fallos bloquean 15 minutos). La cookie de sesión es `HttpOnly`, `Secure` y `SameSite=Lax`; cada solicitud revalida el sello y el estado del usuario contra la base, y todo lo que no declare otra política exige sesión válida.
+
+**Consulta técnica de auditoría (Q03, sin pantalla).** Solo lectura, solo superusuario activo con sesión vigente: `GET /api/auditoria/eventos?desde=<instante>&hasta=<instante>` con opcionales `tipoRegistro` (`Paciente`, `Cita`, `Usuario`), `idRegistro` y `limite` (1 a 500, 100 por defecto). Los instantes llevan zona, por ejemplo `2026-10-01T00:00:00Z`; sin zona se rechazan. Responde `401` sin sesión, `403` sin permiso y `400` ante un filtro inválido. Devuelve en JSON el actor, el momento, el registro y los campos afectados, la acción y el hecho, nunca valores. El comando que inicia sesión y llama a este servicio queda pendiente de que existan las pantallas de acceso (ver «PageModel pendiente» en la sección 3).
+
 **Dependencias entre proyectos permitidas** (la prueba automática de límites de Lucía las verifica):
 
 | Proyecto | Puede referenciar |
@@ -144,4 +155,19 @@ Las migraciones las aplica solo `therapease_migrador`; la aplicación se conecta
 | `TherapEase.Infrastructure` | Application, Domain |
 | `TherapEase.Web` | Application; Infrastructure solo para componer la inyección de dependencias en el arranque |
 
-Los módulos (Identidad, Pacientes, Citas, Auditoria) son carpetas y espacios de nombres dentro de cada capa, por ejemplo `TherapEase.Application.Pacientes`. Dentro de cada módulo viven su servicio, su contrato y su puerto de persistencia (uno por módulo, no por entidad). Lo común está en `Compartido`, como `RespuestaServicio<T>`, el resultado uniforme de los servicios. El coordinador de CU04 va en `TherapEase.Application.Coordinadores`, fuera de Pacientes y Citas. Citas puede usar el contrato público de Pacientes; Pacientes no usa Citas.
+**Estructura de carpetas.** Cada capa se organiza primero por módulo (Identidad, Pacientes, Citas, Auditoria y lo común en `Compartido`), porque `AGENTS.md` y ADR-03 piden módulos por capacidad y la prueba de límites los detecta por el segundo segmento del espacio de nombres, por ejemplo `TherapEase.Application.Pacientes`. Dentro de cada módulo, el código se separa por tipo, igual que en Rectoría, y el espacio de nombres sigue la carpeta:
+
+| Capa | Carpeta dentro del módulo | Qué contiene |
+| --- | --- | --- |
+| Domain | `Entidades` y `Entidades/Enums` | Solo datos: entidades y enumeraciones. |
+| Domain | `Reglas` | Las operaciones sobre las entidades (`ReglasDePaciente`, `ReglasDeCita`, `HoraHermosillo`). |
+| Domain | `Excepciones`, `Constantes` | Excepciones de regla de negocio y constantes. |
+| Application | `Interfaces/Repositorios` | Puertos de persistencia (uno por módulo) y `IUnidadDeTrabajo`. |
+| Application | `Interfaces/Servicios` | Contratos de los servicios y de lo que implementa Infrastructure (sesión, usuario actual). |
+| Application | `Servicios` | Implementaciones de los servicios. |
+| Application | `Modelos`, `Constantes` | DTO y resultados (`RespuestaServicio<T>`), mensajes. |
+| Infrastructure | `Entidades`, `Configuraciones`, `Repositorios`, `Servicios`, `Constantes` | Entidades de Identity, mapeo de EF, implementación de puertos y adaptadores. |
+| Infrastructure | `Data`, `Migraciones`, `Configuracion` | Contexto de EF, migraciones y registro de dependencias (no pertenecen a un módulo). |
+| Web | `Pages`, `Endpoints`, `Seguridad`, `Comandos`, `Configuracion`, `Salud` | Pantallas, rutas técnicas, cookie y políticas, comandos de operador, composición y sonda de salud. |
+
+Los setters de las entidades son `internal`: solo las clases de `Reglas` del propio dominio las modifican, así ninguna otra capa salta una regla. El coordinador de CU04 va en `TherapEase.Application.Coordinadores`, fuera de Pacientes y Citas. Citas puede usar el contrato público de Pacientes; Pacientes no usa Citas; Identidad usa Auditoría y Auditoría no usa Identidad.
