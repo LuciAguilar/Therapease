@@ -122,6 +122,19 @@ docker build -t therapease:local .
 docker run --rm -p 8080:8080 therapease:local
 ```
 
+**Base de datos local y migraciones** (PostgreSQL desechable con datos ficticios; el puerto 55432 evita chocar con un PostgreSQL ya instalado). Sustituye `<clave>` por contraseñas locales que no subas a Git:
+
+```powershell
+docker run -d --name therapease-pg -e POSTGRES_PASSWORD=<clave> -e POSTGRES_DB=therapease_ficticia -p 55432:5432 postgres:17
+Get-Content scripts/db/crear-roles.sql -Raw | docker exec -i therapease-pg psql -U postgres -v ON_ERROR_STOP=1 -v base=therapease_ficticia -v clave_migrador=<clave> -v clave_app=<clave> -f -
+$env:ConnectionStrings__Migraciones = "Host=localhost;Port=55432;Database=therapease_ficticia;Username=therapease_migrador;Password=<clave>"
+dotnet tool restore
+dotnet ef database update --project src/Infrastructure --startup-project src/Web
+$env:ConnectionStrings__TherapEase = "Host=localhost;Port=55432;Database=therapease_ficticia;Username=therapease_app;Password=<clave>"
+```
+
+Las migraciones las aplica solo `therapease_migrador`; la aplicación se conecta con `therapease_app`, que no puede cambiar el esquema, borrar pacientes o citas, ni modificar `EventoAuditoria`. Una migración nueva se crea con `dotnet ef migrations add <Nombre> --project src/Infrastructure --startup-project src/Web --output-dir Persistencia/Migraciones`; si crea una tabla, debe incluir sus `GRANT` explícitos para `therapease_app`, y se revisa su SQL (`dotnet ef migrations script`) antes del PR. La base impone por sí misma que dos citas activas no se crucen y que no exista una cita activa de un paciente de baja.
+
 **Dependencias entre proyectos permitidas** (la prueba automática de límites de Lucía las verifica):
 
 | Proyecto | Puede referenciar |

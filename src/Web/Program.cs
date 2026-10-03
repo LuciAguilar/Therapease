@@ -1,3 +1,4 @@
+using TherapEase.Infrastructure;
 using TherapEase.Web.Salud;
 
 var indiceSalud = Array.IndexOf(args, "--salud");
@@ -10,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
 builder.Services.AddHealthChecks();
+builder.Services.AgregarPersistencia(builder.Configuration.GetConnectionString("TherapEase"));
 
 var app = builder.Build();
 
