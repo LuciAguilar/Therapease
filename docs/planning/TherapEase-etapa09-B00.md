@@ -1,69 +1,94 @@
-# TherapEase — 09/B00 · Plan breve y registro de validación
+# TherapEase — 09/B00 · Plan y estado de validación
 
-**Estado:** B00 iniciado por autorización expresa de Lucía el 30-sep-2026; plan corregido aprobado por Lucía el 01-oct. Elaboración/LCA abierta; no hay decisión de pasar a Construcción. R04 abierto: únicamente datos ficticios. La aprobación del plan no acredita resultados ejecutables.
+**Actualización documental: 04-oct-2026.** B00 está iniciado; Elaboración/LCA y R04 continúan abiertos. No hay autorización de B01, Construcción, datos reales o despliegue.
 
-**Actualización del 01-oct-2026:** Lucía aprobó todos los puntos documentales, confirmó la fidelidad de ADR-01…05 tras las cuatro correcciones del contraste con 04, aprobó ADR-06 y la consulta Q03, eligió repositorio público y autorizó instalar .NET 10. No consta revisión humana de Miguel o Dulce; sigue pendiente sin atribuirla a esta aprobación. La documentación antigua no irá al repositorio; sí el proyecto StarUML y la selección de trabajo de 09. Se avisará a Lucía antes de comenzar a preparar el repositorio.
+## 1. Estado y documentación
 
-**Decisión T1 del 01-oct:** Lucía aprobó guía, `AGENTS.md`, ADR-01…06 corregidos y B00 corregido. Solo ella aprueba. Revisión documental inicial de Miguel/Dulce pendiente y no bloqueante: comunican cambios a Lucía, quien consulta a Claude y confirma. Desde B00, cada PR de código o pruebas requiere revisor distinto del autor y aprobación final de Lucía; Miguel o Dulce revisa las pruebas de Lucía. Antes de publicar, mostrar lista final y esperar su OK; primer push por Lucía.
+- T1 fue aprobado y publicado el 01-oct-2026; su commit base fue `174afe0b6764f2415427f28b04d4627ce4c33b16`.
+- PR [#1](https://github.com/LuciAguilar/Therapease/pull/1): B00 pasos 1–3, revisado en `e418010882f9827ece2a1500d28f27490b45c585`. Correcciones pendientes; sin aprobación o fusión acreditadas.
+- [Informe de ajustes](../reviews/TherapEase-09-B00-revision-PR01.md): alcance, cambios que deben hacer Miguel/Dulce y mejoras opcionales. No incluye explicaciones personales ni el plan de siguientes pasos.
+- [Guía de equipo](../../README.md): responsabilidades, documentación y preparación del entorno. [AGENTS.md](../../AGENTS.md) es la fuente única de reglas.
+- PR #2 reúne el informe de ajustes, la guía/README, el plan B00 y el plan de pruebas. **Orden de fusión: primero PR #1; después PR #2 actualizado sobre main.** La entrega documental no cierra los ajustes del código.
 
-## REPARTO — decisión de Lucía para 09
+## 2. Responsabilidades y forma de trabajo
 
-- **Miguel y Dulce** escriben las pruebas unitarias de su propio código en el mismo PR.
-- **Lucía (QA)** dirige la estrategia y convierte criterios de aceptación y Q en casos de prueba. Escribe y ejecuta integración de reglas críticas **Q03, Q06, Q07 y Q20** con PostgreSQL desechable/Testcontainers; recorrido Playwright Q16; seguridad OWASP/07B y Astra; y B08 (k6, recuperación, uso y demostración). Revisa PR críticos y evidencia.
-- **Miguel o Dulce revisa las pruebas que escriba Lucía.** Autor y revisor son personas distintas. El [plan de pruebas por CU](../testing/TherapEase-09-plan-de-pruebas.md), entregado por Lucía, es la referencia de trabajo de 09; esta decisión no requiere nueva ronda de auditoría de ese plan.
-
-**Producto informado por Dulce y confirmado por Lucía:** no se desarrollará pantalla de auditoría; los eventos siguen registrándose en la base y Q03 se prueba. En su lugar habrá una pantalla de **directorio de pacientes**, con vigentes por defecto y filtro autorizado de bajas. Los campos visibles siguen pendientes de Dulce con Usuaria. La captura Q03 se exige desde B01; la consulta de auditoría HU14/CU10/B07 del plan de 08 queda desplazada del alcance de interfaz de 09.
-
-## Tandas de 09 — plan aprobado; prioridades de producto pendientes
-
-| Tanda | Trabajo y puerta |
+| Persona | Responsabilidad |
 | --- | --- |
-| **09A — B00** | Entorno, límites, stack y pruebas críticas ejecutables; Claude audita la evidencia y Lucía decide LCA antes de Construcción. |
-| **09B — B01–B04** | Solo tras la decisión de LCA: identidad, paciente, cita y pago; pruebas por PR y recorrido Q16 desde B04. Corte y prioridades sujetos a Dulce con Usuaria. |
-| **09C — B05–B07** | Si hay capacidad y prioridad: cambios de agenda, bajas y directorio de pacientes; captura Q03 transversal, sin pantalla de auditoría. |
-| **09D — B08** | Evidencia final que alcance a ejecutarse: rendimiento, recuperación, uso y demostración; sin declarar metas no medidas. |
+| Miguel | Solución, proyectos, carpetas internas, backend, persistencia, migraciones e Identity. Unitarias propias en cada PR. Corrige el PR #1 y documenta comandos/resultados. |
+| Dulce | Frontend, PageModel y unitarias propias; valida las políticas pendientes y prioridades con la usuaria. |
+| Lucía | Arquitectura, seguridad, estrategia de QA, integración crítica, recorrido y evidencia final. Revisa los cambios críticos y toma la decisión de LCA. |
 
-## Plan de B00
+Cada integrante organiza sus herramientas y revisiones a su modo; la documentación aporta contexto y soporte. Las reglas de seguridad, datos, pruebas y revisión son obligatorias para todo el equipo y están en AGENTS. Las pruebas de Lucía requieren revisión de Miguel o Dulce; ninguna revisión asistida sustituye a la revisión humana.
 
-1. **Base y límites.** Lucía crea el repo público y Codex lo clona en una carpeta nueva, vacía antes del clon y separada del archivo histórico y de `T1-preview`. Copiar solo los diez documentos, `AGENTS.md`, `CLAUDE.md` con solo `@AGENTS.md`, `.env.example` ficticio, `.gitignore` de .NET y carpetas base. Skills se adaptan en PR posterior y no bloquean. Lucía revisa la lista y da OK antes de publicar; hace el primer push y después protege `main` con una revisión y protección contra secretos. Miguel crea solución .NET 10, proyectos y carpetas internas. Construir y ejecutar Razor Pages mínimo y su imagen Docker con salud y proceso sin privilegios. Lucía escribe y ejecuta límites de capas/módulos y coordinador CU04; Miguel revisa. Con CI operativa Lucía mide minutos por PR A-06, visibilidad, runner y duración por trabajo; sin atribuir consumo aún no medido.
-2. **Datos e integridad.** Miguel implementa migraciones EF Core/Npgsql y escribe unitarias de su código. Lucía escribe y ejecuta integración con xUnit, Testcontainers y PostgreSQL desechable para Q03/Q06/Q07/Q20: esquema real, cruce y dos reservas simultáneas, colisión de versiones, baja/recuperación y auditoría atómica. Comprueba **solo inserción en `EventoAuditoria`** usando el usuario real de la aplicación: `INSERT` permitido y `UPDATE`/`DELETE` denegados, junto con la prohibición de alterar el esquema; las migraciones se ejecutan con otro usuario y esas credenciales no se usan en ejecución normal. También cubre interrupción antes/después del commit, hora de Hermosillo y carrera entre cita y baja del paciente. Miguel o Dulce revisa sus pruebas. Los mocks solo cubren lógica aislada.
-3. **Identidad y seguridad.** Miguel implementa Identity y cookies y escribe sus unitarias. Lucía escribe y ejecuta pruebas de seguridad con cuentas ficticias: acceso sin sesión o permiso, bloqueo de cinco fallos/15 min, contraseña temporal, salida y revocación, cambio de rol, último superusuario concurrente, hash y ausencia de secretos/datos privados. Revisa `HttpOnly`, `Secure`, `SameSite=Lax`, antifalsificación y TLS previsto; Q19 de transporte exige comprobación ejecutable local o en entorno de prueba. Astra se usa en la revisión de seguridad correspondiente. Miguel o Dulce revisa las pruebas de Lucía.
-4. **Recuperación y decisión.** Lucía prueba `pg_dump` cifrado y restauración en PostgreSQL desechable con datos ficticios; compara registros y mide desde detección hasta servicio restablecido para Q10–Q11. Registra comandos, entorno, versiones, resultados, fallos y revisión de otra persona. Claude audita los entregables que correspondan; Lucía decide LCA y eventual paso a Construcción con evidencia completa.
+## 3. Condiciones resueltas y propuestas de producto
 
-## Q03 — consulta sin pantalla aprobada documentalmente
+- Condiciones de identidad resueltas: longitud mínima de contraseña, caducidad de sesión, comando local de primer superusuario y conservación del bloqueo al restablecer; incorporar al AGENTS del repositorio conforme al informe de ajustes. PageModel a cargo de Dulce.
+- El bloqueo PostgreSQL se conserva: nunca puede quedar una cita activa de un paciente de baja. Solo queda provisional la política para las citas existentes al dar de baja: impedir la baja o cancelar primero.
+- Pago inicial «Pendiente» y citas contiguas siguen provisionales, pendientes de Dulce con la usuaria. Aprobar el PR parcial no decide esas políticas.
+- No se implementa pantalla de auditoría. Q03 registra eventos y permite consulta técnica autorizada. Directorio de pacientes: vigentes por defecto y filtro de bajas; campos visibles pendientes.
+- Corte B00–B04 al 04-dic-2026: propuesta que Dulce valida con la usuaria. B05–B07 dependen de prioridad y capacidad; B08 reúne evidencia realmente obtenida.
 
-Lucía aprobó conservar `ConsultarEventosAutorizados` como operación técnica de **solo lectura**, invocable mediante un comando documentado que llama al servidor. El servidor comprueba la sesión de Identity y el rol de **superusuario activo** en cada solicitud; el rol de aplicación no equivale al superusuario de PostgreSQL. No se concede acceso directo a la base desde el cliente ni se crean pantallas de auditoría.
+## 4. Evidencia parcial del PR #1
 
-La operación permite filtrar por periodo y registro mediante consultas parametrizadas y devuelve únicamente actor, momento, registro/campo y hecho. No ofrece edición ni borrado ni incluye contraseñas, contactos o valores clínicos. Miguel implementa la operación y el comando; Lucía prueba lectura autorizada y denegación sin sesión, con sesión revocada o sin el permiso, además de la protección de eventos en PostgreSQL. **Concreción aprobada el 01-oct; implementación y pruebas pendientes. Q03 conserva su meta vigente.**
+**Fecha:** revisión del 03–04-oct-2026. **Commit:** `e418010882f9827ece2a1500d28f27490b45c585`. Entorno local: Windows, SDK .NET 10.0.401, Docker 29.8.1 con contenedores Linux; PostgreSQL 17 desechable mediante Testcontainers 4.15.0, xUnit 2.9.3. Solo datos ficticios.
 
-## Preparación documental del repositorio
-
-Los seis archivos antiguos en `Docs/` son dos PDF y cuatro PNG: **no se publicarán**, por decisión de Lucía del 01-oct que sustituye el traslado previsto a `docs/legacy/desktop/`. `architecture/adr/` sí se incorpora. El proyecto editable StarUML se incluye con la advertencia de que antecede al cambio de pantalla. La selección y tareas de cada persona están en [la guía de equipo](../../README.md). `tmp/` queda excluida. Antes de publicar se revisan los archivos seleccionados, incluido StarUML, y se anonimiza la usuaria en las copias públicas si no consta su aceptación de aparecer. Esta elección no acredita un consentimiento no recibido.
-
-T1 se prepara en el clon nuevo de [LuciAguilar/Therapease](https://github.com/LuciAguilar/Therapease), en `Therapease/repo` bajo la carpeta GitHub indicada por Lucía. Ella creó el repo vacío y proporcionó la URL; Codex lo clonó por HTTPS porque SSH no verificó la clave del servidor. `AGENTS.md` concentra reglas; skills aplazadas a un PR posterior. La carpeta histórica con `.git`, antecedentes y `Docs/` queda fuera. No se utilizó la vista previa prevista; no hay commits o push.
-
-**Respaldo — opción A decidida, implementación pendiente:** repo privado aparte solo para respaldo diario. Conservar `pg_dump` cifrado, huella SHA-256, retención de 14 días, restauración desechable e incidencia a Lucía ante fallo. Nota ADR-05 propuesta para Claude: no crear aún ese repo ni conectar Neon. B00 prueba recuperación con datos ficticios en PostgreSQL desechable. La ayuda posterior solicitada para herramientas locales y cuentas Render/Neon no configura infraestructura ni acredita despliegue. [Fuente oficial sobre artefactos](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/download-workflow-artifacts).
-
-## Resultado de prevalidación — 30-sep-2026
-
-| Comprobación ejecutada | Resultado observado | Estado |
+| Comprobación | Resultado registrado | Límite |
 | --- | --- | --- |
-| `dotnet --info` / `dotnet --list-sdks` | SDK 8.0.425 y 9.0.318; .NET 10 no está instalado. | El stack candidato .NET 10 no se puede compilar aún en este equipo. |
-| `docker version` inicial | Cliente 29.4.1; sin conexión al daemon. El servicio `com.docker.service` estaba detenido. | Se inició Docker Desktop para continuar la prevalidación. |
-| `docker version` fuera del sandbox, tras iniciar Docker Desktop | Cliente y servidor Docker 29.4.1; contexto `desktop-linux`, servidor Linux/amd64 operativo. | Prerrequisito de Testcontainers disponible; aún no hay proyecto ni prueba PostgreSQL ejecutable. |
-| Inventario local de `src/`, `tests/`, `scripts/`, `infra/`, `.github/` | No existen todavía; la carpeta tiene Git local sin commits ni remoto. | No hay solución, migraciones ni pruebas de B00 que ejecutar; su creación corresponde a Miguel y el repositorio a Lucía. |
+| Build de siete proyectos | 0 errores y 0 advertencias | Corresponde al SHA indicado, no a futuras correcciones. |
+| Unitarias del PR | 149 pasan, sin fallos ni omitidas | Integración y E2E del PR están vacíos; no cuentan como pruebas ejecutadas. |
+| QA adicional con PostgreSQL/Testcontainers | 11 pasan, sin fallos ni omitidas | Borrador local fuera del repositorio, pendiente de incorporación y revisión por otra persona. No lo ejecuta actualmente la CI del repo. |
+| Docker | Imagen construida, proceso UID 1654 y salud observados | Salud comprueba el proceso, no disponibilidad de base o acceso funcional. |
+| HTTP | `/salud` 200, auditoría sin sesión 401, inicio público 200 sin datos privados | Comprobación local; no acredita TLS o navegación completa. |
+| Límites | Inspección parcial sin infracciones encontradas | Falta prueba automática A-01 y código real de CU04. |
+| NuGet directo y transitivo | Consulta sin vulnerabilidades reportadas en PR y borrador QA | Resultado de esa consulta; no equivale a auditoría completa de seguridad. |
 
-**Evidencia pendiente:** SDK .NET 10; salida de build/tests con PostgreSQL/Testcontainers; arranque y salud de imagen Docker; resultados Q06–Q11/Q19 y límites de módulos; recuperación cronometrada; revisión de autor distinto; auditoría de Claude; decisión expresa de Lucía. Docker está disponible, pero no se declara aprobado ninguno de esos controles.
+Las 11 comprobaciones cubrieron migraciones y usuario separado; auditoría de solo inserción; cruces y dos reservas concurrentes; versiones de edición; baja/recuperación de paciente sin citas activas; último superusuario y dos desactivaciones concurrentes; bloqueo tras cinco fallos; permisos/revocación en API; y reversión del alta de usuario si falla su auditoría.
 
-## Decisiones y pendientes
+Las cookies de QA se generaron y enviaron manualmente por HTTP local: no prueban el formulario de acceso, navegador, atributos recibidos de cookie, antifalsificación o TLS. Los 15 minutos se comprobaron en configuración sin esperar su expiración. Las carreras cubren dos transacciones coordinadas, no carga ni todos los órdenes posibles. La reversión de un alta no prueba todas las operaciones. Los resultados adicionales requieren revisión/adopción de Lucía y revisión de Miguel o Dulce antes de incorporarse a su PR de pruebas.
 
-- **Aprobado previamente:** monorepo documental, stack candidato, PostgreSQL/Testcontainers para integración, datos ficticios, responsabilidades y revisión por persona distinta.
-- **Decisión de Lucía:** reparto QA, uso del plan de pruebas sin nueva auditoría, plan B00 corregido, ADR-06, fidelidad de ADR-01…05 corregidos, consulta Q03, repositorio público e instalación de .NET 10. La selección documental y guía de equipo sintetizan estos acuerdos; no sustituyen el diseño/migraciones de Miguel.
-- **Pendiente:** Dulce y Usuaria validan corte B00–B04, prioridades, campos y pantallas antes del frontend afectado; Lucía y Miguel definen arranque/recuperación sin correo y efecto del restablecimiento sobre bloqueo; R04 y TOTP antes de datos reales.
-- **Antes de publicar:** revisión documental inicial pendiente y no bloqueante; entrega de lista final y OK de Lucía antes de publicar; primer push por ella. Repo vacío clonado por HTTPS y archivos T1 para revisión. Skills en PR posterior. .NET 10 instalado y Docker comprobado, sin pruebas B00 aún. LCA y R04 siguen abiertos; solo datos ficticios y revisión distinta para código/pruebas.
+Los comandos y salidas completos siguen conservados localmente. El PR de pruebas publicará el código y la evidencia reproducible necesarios, con datos ficticios y sin secretos. Esta actualización documental no ejecutó nuevas pruebas de código.
 
-## Entorno local comprobado — 01-oct-2026
+## 5. Pendientes ejecutables de B00
 
-- `winget install --id Microsoft.DotNet.SDK.10 --exact --source winget ...`: instalador oficial, hash verificado, instalado correctamente; `dotnet --list-sdks` confirmó SDK **10.0.401** junto a 8.0.425/9.0.318.
-- Docker Desktop iniciado; comprobación fuera del sandbox confirmó cliente y servidor **29.8.1**. Git **2.52.0.windows.1**, VS Code **1.140.0** y StarUML **6.3.4** detectados. No se actualizaron Git/editor/StarUML.
-- Estas salidas validan prerrequisitos; no ejecutan solución, migraciones, PostgreSQL/Testcontainers ni cierran Q/LCA.
+| Tema | Comprobación que falta |
+| --- | --- |
+| A-01 y CU04 | Prueba automática de capas/módulos, ausencia de ciclos y coordinador real fuera de Pacientes/Citas. Una carpeta vacía no demuestra el límite. |
+| A-04, Docker | America/Hermosillo disponible dentro de la imagen y reproducción por otra persona. |
+| Q03/Q20 | Comando autenticado sin pantalla, filtros/contenido seguro y cambio/evento atómicos en las otras operaciones. |
+| Q06 | Recuperar cita agendada, carrera cita/baja y estados alternos mediante servicios, con política de producto resuelta. |
+| Q07 | Aviso de conflicto sin sobrescribir y cobertura de otros registros. |
+| Q08 | Interrupciones antes/después del commit, resultado incierto, reintentos y duplicados. |
+| Q09 | Conversión explícita a Hermosillo desde otras zonas; distinguir fecha sin hora de instante. |
+| Q10–Q11 | Respaldo cifrado, huella, restauración desechable, comparación de datos y recuperación cronometrada desde detección. |
+| Identity/Q19 | Acceso mínimo con PageModel, cookies reales en navegador, salida/cambio/restablecimiento, roles/sello siguiente solicitud, expiración, antifalsificación, TLS y revisión de hashes/configuración/secretos. |
+| A-06 y protección | Medir minutos, runner y duración cuando exista CI. Main con una revisión comprobado el 03-oct; protección contra secretos aún sin verificar. |
+| QA y decisión | Incorporar las 11 pruebas en IntegrationTests en PR de Lucía, revisar con Miguel/Dulce y decidir LCA con evidencia completa. |
+
+Estos pendientes no bloquean por sí solos el PR parcial #1; sí impiden declarar terminado B00. CI se exige desde B01 y el recorrido Q16 completo desde B04, conforme a AGENTS.
+
+## 6. Siguientes pasos compartidos
+
+1. Miguel corrige su PR #1: descripción, AGENTS y contenido técnico del README. Dulce registra las respuestas de producto obtenidas; si falta alguna, conserva el pendiente.
+2. Comprobar el nuevo SHA, README y build; registrar la revisión humana. Lucía decide aprobación y Squash and merge del PR #1.
+3. Después de fusionar #1, actualizar #2 sobre el main resultante. Integrar la guía en README conservando las secciones técnicas de Miguel: construcción/arranque, base de datos local y migraciones, identidad, consulta Q03, dependencias y estructura. Resolver diferencias y actualizar estados y enlaces antes de que Lucía decida la fusión del #2.
+4. Incorporar las 11 pruebas adicionales en el PR propio de Lucía, revisado por Miguel o Dulce, y reproducir su evidencia. No acreditar una revisión aún no recibida.
+5. Completar las comprobaciones pendientes de §5. LCA solo se decide con resultados completos y aprobación expresa de Lucía.
+
+## 7. Plan de validación autorizado
+
+1. **Base y límites:** Miguel crea solución/proyectos y valida arranque Razor Pages/Docker. Lucía escribe y ejecuta límites de capas y módulos, incluido CU04; Miguel revisa. Con CI operativa se miden minutos A-06.
+2. **Datos:** Miguel implementa persistencia/migraciones y unitarias. Lucía prueba Q03/Q06/Q07/Q20 con PostgreSQL desechable/Testcontainers: usuario de aplicación puede insertar pero no modificar/borrar EventoAuditoria ni alterar esquema; migrador separado; cruces, versiones, bajas, cambio/evento atómicos, carreras y commit.
+3. **Identidad y seguridad:** Miguel implementa Identity; Dulce, PageModel mínimo. Lucía prueba cuentas ficticias, bloqueo, temporal, revocación, cambio de rol, último superusuario concurrente, secretos, cookies y transporte Q19. Miguel o Dulce revisa sus pruebas.
+4. **Recuperación y decisión:** Lucía prueba pg_dump cifrado y restauración con comparación y tiempos para Q10–Q11; registra resultados, fallos y revisión distinta. Completar estas pruebas no cierra LCA sin su decisión.
+
+## 8. Consulta Q03 y respaldo
+
+`ConsultarEventosAutorizados` es consulta técnica de solo lectura mediante comando documentado que llama al servidor. En cada solicitud se valida sesión Identity y rol de superusuario activo; no hay acceso directo desde cliente a PostgreSQL. Filtros de periodo/registro parametrizados; salida solo actor, momento, registro/campo y hecho, sin valores clínicos, contactos o credenciales. No permite editar o borrar. Aprobada documentalmente el 01-oct; validación completa pendiente.
+
+Respaldo: opción A resuelta, repositorio privado aparte para el respaldo diario. Conservar pg_dump cifrado, SHA-256, retención de 14 días, restauración desechable e incidencia asignada a Lucía ante fallo. La nota ADR-05 sigue como propuesta de implementación pendiente de revisión y decisión. No crear ese repo, conectar Neon ni desplegar. B00 prueba recuperación desechable sin nube.
+
+## 9. Publicación y límites
+
+El informe de ajustes está en `docs/reviews/`; B00 en `docs/planning/`; el plan de pruebas en `docs/testing/`; la guía es la entrada del README. Las reglas están en AGENTS y los ADR en `docs/architecture/adr/`. El StarUML aprobado de 08 antecede al cambio de pantalla; no autoriza construir la pantalla de auditoría retirada. Las skills adaptadas siguen para un PR posterior.
+
+R04 permanece abierto y se usan únicamente datos ficticios. No iniciar B01, cerrar LCA o desplegar sin resultados y decisión expresa. Publicar documentos, aprobar el PR parcial y cerrar LCA son decisiones distintas.

@@ -1,10 +1,10 @@
 # TherapEase — Plan de pruebas por caso de uso
 
-**Continuidad del 01-oct-2026:** Lucía aprobó el plan B00 corregido, ADR-06 y la consulta Q03 sin pantalla; confirmó la fidelidad de ADR-01…05 corregidos, eligió repositorio público y documentación seleccionada, sin antecedentes de escritorio. Ver [guía de equipo](../../README.md). LCA y R04 siguen abiertos; no se acredita revisión humana ni pruebas aún pendientes.
+**Actualización: 04-oct-2026.** Referencia de pruebas de 09 basada en HU/CU y alternos de 08B, modelos de 08C, trazabilidad de 08D, reglas 07B–07C y Q01–Q20. Usar únicamente datos ficticios. Las reglas compartidas están en [AGENTS.md](../../AGENTS.md); las herramientas y organización de trabajo de cada integrante son libres, las reglas de seguridad/datos/pruebas/revisión son obligatorias.
 
-**v0.1 · 30-sep-2026 · Borrador elaborado por Claude a petición de Lucía.** Lucía decide su contenido y lo entrega a Codex como contexto de 09. Base: 08B (HU, CU y alternos S1–S6), 08C, 08D, 07B–07C y Q01–Q20. **Solo datos ficticios (R04).**
+PageModel a cargo de Dulce con sus unitarias. Las cuatro condiciones de Identity están resueltas e indicadas en el informe de ajustes; Miguel las incorpora a AGENTS mediante PR #1. Las 11 comprobaciones adicionales de QA siguen fuera del repo y pendientes de incorporación y revisión en el PR propio de Lucía. Sus resultados y límites están en [B00](../planning/TherapEase-etapa09-B00.md). La incorporación de esas pruebas no se acredita por actualizar este plan.
 
-**Adenda de Lucía para 09 (30-sep-2026):** este plan es referencia de trabajo, sin nueva ronda de auditoría. Miguel y Dulce escriben unitarias de su código; Lucía escribe y ejecuta integración crítica Q03/Q06/Q07/Q20 con Testcontainers, recorrido Q16, seguridad y B08. Miguel o Dulce revisa las pruebas de Lucía. Dulce confirmó retirar la pantalla de auditoría; Lucía indicó directorio de pacientes vigentes por defecto y filtro autorizado de bajas. Las pruebas de captura/protección Q03 permanecen; las de interfaz HU14/CU10 quedan desplazadas. Los campos del directorio siguen pendientes de Dulce con Usuaria.
+No se implementa pantalla de auditoría. Q03 conserva los eventos y consulta técnica autorizada. El directorio muestra pacientes vigentes por defecto con filtro de bajas; campos visibles y las políticas marcadas al final siguen pendientes de Dulce con la usuaria. [Guía del equipo](../../README.md). B00/LCA y R04 permanecen abiertos.
 
 ## 0. Cómo se usa
 
@@ -114,7 +114,7 @@ Integración: xUnit + Testcontainers, con el esquema creado por **las migracione
 
 | ID | Qué hacer → qué debe pasar | Origen |
 | --- | --- | --- |
-| L-CU01-01 | Credenciales válidas → entra con su rol (Usuaria y superusuario). | HU01 |
+| L-CU01-01 | Credenciales válidas → entra con su rol (la usuaria y superusuario). | HU01 |
 | L-CU01-02 | Salir en el navegador A → la sesión del navegador B deja de funcionar en su siguiente solicitud. | Q02, 07B |
 | L-CU01-03 | Salida repetida o con sesión vencida → sin error y sin acceso. | CU01 A8 |
 
@@ -127,7 +127,7 @@ Integración: xUnit + Testcontainers, con el esquema creado por **las migracione
 | L-CU02-03 | Desactivar → sus sesiones abiertas se cierran y ya no puede entrar. | HU02, CU01 A4 |
 | L-CU02-04 | Cambiar rol → en la siguiente solicitud ya no tiene los permisos anteriores. | CU02 A7 |
 | L-CU02-05 | Los dos últimos superusuarios se desactivan o degradan mutuamente al mismo tiempo → queda al menos uno activo. | HU02, CU02 A1 |
-| L-CU02-06 | Restablecer contraseña → cierra sus sesiones y la temporal obliga a cambiarla. Si levanta el bloqueo: **pendiente**. | HU03 |
+| L-CU02-06 | Restablecer contraseña → cierra sus sesiones y la temporal obliga a cambiarla; no levanta el bloqueo vigente, conforme a [AGENTS.md](../../AGENTS.md). | HU03; decisión de Lucía 04-oct |
 | L-CU02-07 | Cada acción genera su evento sin contraseña; si el evento no se guarda, el cambio tampoco. | Q03, S4 |
 
 ### CU11 — Cambiar contraseña propia (B01) ★
@@ -135,7 +135,7 @@ Integración: xUnit + Testcontainers, con el esquema creado por **las migracione
 | ID | Qué hacer → qué debe pasar | Origen |
 | --- | --- | --- |
 | L-CU11-01 | Cambio con la actual correcta → cambia y cierra las demás sesiones. | HU15 |
-| L-CU11-02 | Actual incorrecta o nueva inválida → no cambia. **Pendiente** las reglas de la nueva. | CU11 A1 |
+| L-CU11-02 | Actual incorrecta o nueva que incumple la longitud aprobada → no cambia; no se exige composición adicional. Condiciones en [AGENTS.md](../../AGENTS.md). | CU11 A1; decisión de Lucía 04-oct |
 | L-CU11-03 | El evento se registra sin contraseña. | Q03 |
 
 ### CU03 — Registrar, buscar y consultar paciente (B02) ★
@@ -257,7 +257,7 @@ Referencia: OWASP Top 10:2025, ASVS 5.0 aplicable y 07B. «Todas las rutas» = l
 | ID | Qué hacer → qué debe pasar | Origen |
 | --- | --- | --- |
 | S-11 | Sin sesión: cada página y cada envío protegido de «todas las rutas» → denegado, también por URL directa. | Q01, S1 |
-| S-12 | Usuaria intenta usar Usuarios y roles por URL o envío directo → denegado. | 08B §1.2 |
+| S-12 | la usuaria intenta usar Usuarios y roles por URL o envío directo → denegado. | 08B §1.2 |
 | S-13 | Un rol de prueba sin permisos (luego, el capturista) intenta pago, bajas y auditoría por URL y envío directo → denegado. | Q17, HU13 CA4 |
 | S-14 | **Extra:** enviar campos de más en un formulario (p. ej. `EstadoPago` al reprogramar, `IdUsuarioAlta`, `Condicion`, `Rol`) → se ignoran. | 07B |
 | S-15 | Abrir o editar por URL un Id inexistente o de baja → no revela datos. | S2 |
@@ -325,14 +325,14 @@ Referencia: OWASP Top 10:2025, ASVS 5.0 aplicable y 07B. «Todas las rutas» = l
 
 | Decisión | Pruebas afectadas | Quién decide |
 | --- | --- | --- |
-| ¿Se permiten citas contiguas? | M-15, L-CU06-03 | Dulce con Usuaria |
-| ¿El pago empieza en Pendiente? | M-16 | Dulce con Usuaria |
-| ¿Se impide dar de baja a un paciente con citas activas? | M-11, L-CU04-05 | Dulce con Usuaria |
-| ¿Qué pasa al retirar un ámbito con citas? | L-CU04-07 | Dulce con Usuaria |
-| ¿Se corrige el pago de una cita cancelada o de baja? | L-CU09-05 | Dulce con Usuaria |
-| ¿Restablecer la contraseña levanta el bloqueo? | L-CU02-06 | Lucía con Miguel |
-| Reglas de la contraseña nueva | L-CU11-02 | Lucía con Miguel |
+| ¿Se permiten citas contiguas? | M-15, L-CU06-03 | Dulce con la usuaria |
+| ¿El pago empieza en Pendiente? | M-16 | Dulce con la usuaria |
+| ¿Se impide la baja o se cancelan primero las citas existentes? El bloqueo de cita activa con paciente de baja se conserva. | M-11, L-CU04-05 | Dulce con la usuaria |
+| ¿Qué pasa al retirar un ámbito con citas? | L-CU04-07 | Dulce con la usuaria |
+| ¿Se corrige el pago de una cita cancelada o de baja? | L-CU09-05 | Dulce con la usuaria |
+| Resuelto el 04-oct: restablecimiento no levanta el bloqueo vigente | L-CU02-06 | Lucía aprobó; Miguel implementa; Lucía prueba |
+| Resuelto el 04-oct: contraseña mínima de 12 caracteres sin composición | L-CU11-02 | Lucía aprobó; Miguel implementa; Lucía prueba |
 | Cabeceras de seguridad exigidas | S-30 | Lucía |
-| ¿Quién escribe los PageModel, Dulce o Miguel? | Sección 2 | Equipo |
-| ¿Qué campos son información relevante del directorio? | D-15, L-CU03-05–06 | Dulce con Usuaria |
+| Resuelto el 04-oct: Dulce escribe los PageModel y sus unitarias | Sección 2 | Lucía confirmó; revisión distinta y aprobación final de Lucía |
+| ¿Qué campos son información relevante del directorio? | D-15, L-CU03-05–06 | Dulce con la usuaria |
 | Resuelto el 01-oct: consulta técnica sin pantalla de B00 para superusuario activo aprobada | L-Q03-03–04, S-22–S-24 | Lucía aprobó y prueba; Miguel implementa y revisa las pruebas de Lucía |
