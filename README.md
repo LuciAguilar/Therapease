@@ -102,3 +102,74 @@ La solución, `.csproj`, migraciones y comandos reales para arrancar los añadir
 ## 9. Revisión y publicación de T1
 
 T1 está publicado en el repositorio público y aprobado por Lucía. **Antes del primer PR de Miguel, Lucía debe activar en `main` la protección de rama con una revisión y la protección contra secretos.** Su activación sigue pendiente de verificación. La revisión de Miguel/Dulce de documentos permanece pendiente y no bloquea; código y pruebas desde B00 requieren autor y revisor distintos y aprobación final de Lucía. LCA y R04 siguen abiertos.
+
+## 10. Construir, probar y ejecutar
+
+Requiere el SDK indicado en `global.json` (.NET 10). Visual Studio solo abre estos proyectos desde la versión 2026 (18.0 o superior); Visual Studio 2022 no carga ese SDK y muestra «The SDK 'Microsoft.NET.Sdk' specified could not be found». VS Code y la terminal funcionan con el SDK instalado. Desde la raíz del repositorio:
+
+```bash
+dotnet build TherapEase.sln
+dotnet test TherapEase.sln
+dotnet run --project src/Web
+```
+
+La aplicación escucha en `http://localhost:5052` y expone `/salud`. Los proyectos de integración y E2E están creados sin pruebas: las escribe Lucía.
+
+Imagen Docker (requiere Docker Desktop; salud y usuario sin privilegios se declaran en el `Dockerfile`):
+
+```bash
+docker build -t therapease:local .
+docker run --rm -p 8080:8080 therapease:local
+```
+
+**Base de datos local y migraciones** (PostgreSQL desechable con datos ficticios; el puerto 55432 evita chocar con un PostgreSQL ya instalado). Sustituye `<clave>` por contraseñas locales que no subas a Git:
+
+```powershell
+docker run -d --name therapease-pg -e POSTGRES_PASSWORD=<clave> -e POSTGRES_DB=therapease_ficticia -p 55432:5432 postgres:17
+Get-Content scripts/db/crear-roles.sql -Raw | docker exec -i therapease-pg psql -U postgres -v ON_ERROR_STOP=1 -v base=therapease_ficticia -v clave_migrador=<clave> -v clave_app=<clave> -f -
+$env:ConnectionStrings__Migraciones = "Host=localhost;Port=55432;Database=therapease_ficticia;Username=therapease_migrador;Password=<clave>"
+dotnet tool restore
+dotnet ef database update --project src/Infrastructure --startup-project src/Web
+$env:ConnectionStrings__TherapEase = "Host=localhost;Port=55432;Database=therapease_ficticia;Username=therapease_app;Password=<clave>"
+```
+
+Las migraciones las aplica solo `therapease_migrador`; la aplicación se conecta con `therapease_app`, que no puede cambiar el esquema, borrar pacientes o citas, ni modificar `EventoAuditoria`. Una migración nueva se crea con `dotnet ef migrations add <Nombre> --project src/Infrastructure --startup-project src/Web --output-dir Migraciones`; si crea una tabla, debe incluir sus `GRANT` explícitos para `therapease_app`, y se revisa su SQL (`dotnet ef migrations script`) antes del PR.
+
+**Reglas de citas implementadas.** Activa = agendada y vigente; solo las activas bloquean horarios. La base impone por sí misma que dos citas activas no se crucen y que nunca exista una cita activa de un paciente de baja (restricción de exclusión y triggers de `EsquemaInicial`); esa protección se conserva. Cancelar no es baja y conserva el pago. Ninguna cita se cancela ni se recupera automáticamente. **Provisional, pendiente de validar con la usuaria (Dulce):** (1) la política para las citas existentes al dar de baja a un paciente: hoy la baja se rechaza mientras haya citas activas, y la alternativa sería cancelarlas primero; (2) el pago inicial «Pendiente»; (3) las citas seguidas sin hueco, que hoy se permiten porque el intervalo es `[inicio, fin)`. Lo provisional es la política de atención a las citas existentes, no el bloqueo de la base.
+
+**Identidad y acceso.** Los usuarios y roles los administra ASP.NET Core Identity; los roles `Usuaria` y `Superusuario` los siembra la migración. Con la aplicación configurada (`ConnectionStrings__TherapEase`), el primer superusuario se crea con un comando que se ejecuta solo en la máquina del operador: entrega una contraseña temporal únicamente por su consola, una sola vez, sin escribirla en los registros del servidor, sin correo y sin contraseña fija en el código. Condiciones decididas por Lucía: la contraseña tiene mínimo 12 caracteres y no exige combinaciones de letras, números o símbolos, y la sesión caduca tras 30 minutos sin actividad. Documentarlas no acredita que sus mecanismos estén completamente probados: hoy solo existen las pruebas unitarias de Miguel.
+
+```powershell
+dotnet run --project src/Web -- --crear-superusuario <nombre-de-usuario>
+dotnet run --project src/Web -- --restablecer-superusuario <nombre-de-usuario>
+```
+
+El segundo comando es la recuperación cuando ningún superusuario puede entrar; como todo restablecimiento de contraseña, conserva el bloqueo vigente en lugar de levantarlo (cinco fallos bloquean como máximo 15 minutos). La cookie de sesión es `HttpOnly`, `Secure` y `SameSite=Lax`; cada solicitud revalida el sello y el estado del usuario contra la base, y todo lo que no declare otra política exige sesión válida.
+
+**Consulta técnica de auditoría (Q03, sin pantalla).** Solo lectura, solo superusuario activo con sesión vigente: `GET /api/auditoria/eventos?desde=<instante>&hasta=<instante>` con opcionales `tipoRegistro` (`Paciente`, `Cita`, `Usuario`), `idRegistro` y `limite` (1 a 500, 100 por defecto). Los instantes llevan zona, por ejemplo `2026-10-01T00:00:00Z`; sin zona se rechazan. Responde `401` sin sesión, `403` sin permiso y `400` ante un filtro inválido. Devuelve en JSON el actor, el momento, el registro y los campos afectados, la acción y el hecho, nunca valores. El comando que inicia sesión y llama a este servicio queda pendiente de que existan las pantallas de acceso: Dulce implementa los `PageModel` y escribe sus unitarias en el mismo PR.
+
+**Dependencias entre proyectos permitidas** (regla acordada; hoy ninguna prueba automática la verifica, porque la prueba de límites de Lucía aún no existe):
+
+| Proyecto | Puede referenciar |
+| --- | --- |
+| `TherapEase.Domain` | nada |
+| `TherapEase.Application` | Domain |
+| `TherapEase.Infrastructure` | Application, Domain |
+| `TherapEase.Web` | Application; Infrastructure solo para componer la inyección de dependencias en el arranque |
+
+**Estructura de carpetas.** Cada capa se organiza primero por módulo (Identidad, Pacientes, Citas, Auditoria y lo común en `Compartido`), porque `AGENTS.md` y ADR-03 piden módulos por capacidad; el espacio de nombres sigue el patrón `TherapEase.<Capa>.<Módulo>`, por ejemplo `TherapEase.Application.Pacientes`. Dentro de cada módulo, el código se separa por tipo y el espacio de nombres sigue la carpeta:
+
+| Capa | Carpeta dentro del módulo | Qué contiene |
+| --- | --- | --- |
+| Domain | `Entidades` y `Entidades/Enums` | Solo datos: entidades y enumeraciones. |
+| Domain | `Reglas` | Las operaciones sobre las entidades (`ReglasDePaciente`, `ReglasDeCita`, `HoraHermosillo`). |
+| Domain | `Excepciones`, `Constantes` | Excepciones de regla de negocio y constantes. |
+| Application | `Interfaces/Repositorios` | Puertos de persistencia (uno por módulo) y `IUnidadDeTrabajo`. |
+| Application | `Interfaces/Servicios` | Contratos de los servicios y de lo que implementa Infrastructure (sesión, usuario actual). |
+| Application | `Servicios` | Implementaciones de los servicios. |
+| Application | `Modelos`, `Constantes` | DTO y resultados (`RespuestaServicio<T>`), mensajes. |
+| Infrastructure | `Entidades`, `Configuraciones`, `Repositorios`, `Servicios`, `Constantes` | Entidades de Identity, mapeo de EF, implementación de puertos y adaptadores. |
+| Infrastructure | `Data`, `Migraciones`, `Configuracion` | Contexto de EF, migraciones y registro de dependencias (no pertenecen a un módulo). |
+| Web | `Pages`, `Endpoints`, `Seguridad`, `Comandos`, `Configuracion`, `Salud` | Pantallas, rutas técnicas, cookie y políticas, comandos de operador, composición y sonda de salud. |
+
+Los setters de las entidades son `internal`: solo las clases de `Reglas` del propio dominio las modifican, así ninguna otra capa salta una regla. El coordinador de CU04 va en `TherapEase.Application.Coordinadores`, fuera de Pacientes y Citas. Citas puede usar el contrato público de Pacientes; Pacientes no usa Citas; Identidad usa Auditoría y Auditoría no usa Identidad.
