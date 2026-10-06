@@ -1,54 +1,46 @@
 # TherapEase — Guía de arranque del equipo en 09
 
-**Fecha:** 01-oct-2026. Guía aprobada por Lucía, junto con `AGENTS.md`, ADR-01…06 corregidos y B00 corregido. Solo Lucía aprueba. La revisión de Miguel/Dulce de esta documentación inicial queda pendiente y no bloquea: sus cambios se comunican a Lucía, quien consulta a Claude y confirma. No se acredita una revisión no recibida.
+**Actualización documental: 04-oct-2026.** La base de esta guía, AGENTS, ADR-01…06 y el plan B00 fueron aprobados el 01-oct. Esta actualización separa ajustes para el equipo de las notas personales y alinea el estado parcial de B00. Los cambios de documentación inicial pueden comunicarse a Lucía; no se acredita una revisión no recibida.
 
 **T1 aprobado y publicado:** Lucía aprobó los 22 archivos de documentación, reglas y carpetas base el 01-oct-2026 y realizó el primer push a [LuciAguilar/Therapease](https://github.com/LuciAguilar/Therapease), repositorio público. La validación ejecutable de B00 y la decisión de cierre de LCA siguen pendientes.
 
 ## 1. Estado y alcance
 
 - **Autorizado:** iniciar 09 por B00, implementar lo necesario para validar el stack y registrar evidencia. Lucía aprobó el plan corregido, ADR-06, la fidelidad de ADR-01…05 corregidos y la consulta Q03 sin pantalla. Eligió repositorio público y autorizó instalar .NET 10.
-- **Pendiente:** ejecución de B00, revisión por otra persona, auditoría de su evidencia y decisión expresa de Lucía para cerrar LCA y pasar a Construcción. No confundir implementación de validación con autorización de B01–B08.
+- **Avance parcial incorporado:** PR #1 corregido, revisado por Lucía y fusionado en main con `41123f2d2c115a05ff1df944457195a7f671cc17`. Incluye solución/proyectos, backend inicial, migraciones e identidad. Hay resultados parciales, resumidos en B00; la validación completa sigue pendiente. B01–B08 no quedan autorizados por esta fusión.
 - **Producto:** primer recorrido previsto: acceso → paciente → cita → pago pagado/pendiente, sin montos ni cobros. B00–B04 al 04-dic-2026 es un corte propuesto que Dulce debe validar con la usuaria. B05–B07 dependen de prioridad y capacidad; B08 recoge evidencia realmente obtenida.
 - **Cambio vigente:** no hay pantalla de auditoría. Q03 registra eventos en base y permite consulta técnica autorizada de solo lectura. El directorio muestra pacientes vigentes por defecto y filtro autorizado de bajas; sus campos visibles siguen pendientes.
 - **Datos:** solo ficticios. R04 sigue abierto. Expediente, notas, reportes, capturista, correo e integraciones están diferidos. TOTP es obligatorio antes de datos reales, con revisión del impacto en ADR-05.
-- **Gobierno:** Codex propone, Claude audita y solo Lucía aprueba. Desde B00 cada PR de código o pruebas exige revisor distinto del autor y aprobación final de Lucía; Miguel o Dulce revisa las pruebas de Lucía. La revisión documental inicial no bloquea T1 ni el trabajo autorizado.
+- **Forma de trabajo:** solo Lucía elabora con Codex y audita con Claude. Miguel y Dulce eligen herramientas, asistentes y organización de sus revisiones; la documentación les sirve de contexto y soporte. Las reglas compartidas de revisión entre personas y aprobación están en [AGENTS.md](AGENTS.md).
 
-## 2. Qué documentación llevar al repositorio
+## 2. Mapa de documentos del repositorio
 
-Diez archivos, contando esta guía, los dos archivos de ADR y el proyecto StarUML, más archivos y carpetas base de T1. Las rutas siguientes son las de la entrega para revisión; su copia no constituye aprobación para publicar.
-
-**Destino obligatorio y ejecutado para el clon:** carpeta nueva y vacía antes de clonar, `Therapease/repo` bajo la carpeta GitHub indicada por Lucía. La carpeta histórica conserva su `.git`, archivo histórico y `Docs/` antigua (misma carpeta que `docs/` en Windows). En el clon se crea `docs/` en minúsculas y se copian exclusivamente los diez documentos y elementos de T1, ajustando enlaces y anonimización. No se copia el árbol histórico completo.
-
-| Archivo local | Destino previsto | Para qué sirve |
+| Documento | Ruta en el repo | Para qué sirve |
 | --- | --- | --- |
-| Esta guía | `README.md` | Entrada para todo el equipo: estado, tareas, enlace a reglas y orden de lectura. |
-| [Requisitos arquitectónicos](docs/requirements/TherapEase-requisitos-arquitectonicos.md) | `docs/requirements/` | Q01–Q20, restricciones y criterios medibles; fuente de las metas. |
-| [08B — Historias y casos](docs/requirements/TherapEase-etapa08-casos-historias.md) | `docs/requirements/` | Permisos, criterios de aceptación, camino básico y alternos CU01–CU11. |
-| [08C — Modelos e interfaces](docs/requirements/TherapEase-etapa08-modelos-interfaces.md) | `docs/requirements/` | Entidades, relaciones, reglas y propuestas de pantallas/campos. |
-| [08D — Backlog y trazabilidad](docs/planning/TherapEase-etapa08-backlog-trazabilidad.md) | `docs/planning/` | B00–B08, prioridades pendientes y relación de trabajo con Q/R/ADR. |
-| [Plan y evidencia B00](docs/planning/TherapEase-etapa09-B00.md) | `docs/planning/` | Validaciones que deben ejecutarse y puerta de LCA; resultados actuales. |
-| [Plan de pruebas por persona y CU](docs/testing/TherapEase-09-plan-de-pruebas.md) | `docs/testing/` | Casos de Miguel, Dulce y Lucía; funcionales, seguridad y evidencia final. |
-| [ADR-01…05](docs/architecture/adr/ADR-01-a-05-provisionales.md) | `docs/architecture/adr/` | Decisiones arquitectónicas, corregidas y aceptadas por Lucía. |
-| [ADR-06](docs/architecture/adr/ADR-06-monorepo.md) | `docs/architecture/adr/` | Monorepo, organización y validación de límites. |
-| [StarUML editable](docs/diagrams/TherapEase-08C-StarUML.mdj) | `docs/diagrams/` | Dominio y casos de uso; se abre con StarUML. |
+| Reglas compartidas | [AGENTS.md](AGENTS.md) | Seguridad, datos, pruebas, revisión y límites obligatorios para todos. |
+| Entrada del equipo | [README.md](README.md) | Guía, responsabilidades y preparación del entorno; conserva también los comandos técnicos. |
+| Requisitos arquitectónicos | [docs/requirements/TherapEase-requisitos-arquitectonicos.md](docs/requirements/TherapEase-requisitos-arquitectonicos.md) | Q01–Q20 y criterios medibles. |
+| Historias y casos de uso | [docs/requirements/TherapEase-etapa08-casos-historias.md](docs/requirements/TherapEase-etapa08-casos-historias.md) | Permisos, aceptación y caminos básicos/alternos. |
+| Modelos e interfaces | [docs/requirements/TherapEase-etapa08-modelos-interfaces.md](docs/requirements/TherapEase-etapa08-modelos-interfaces.md) | Entidades, relaciones y propuestas de pantallas/campos. |
+| Backlog y trazabilidad | [docs/planning/TherapEase-etapa08-backlog-trazabilidad.md](docs/planning/TherapEase-etapa08-backlog-trazabilidad.md) | B00–B08 y relación con Q/R/ADR. |
+| Plan y estado B00 | [docs/planning/TherapEase-etapa09-B00.md](docs/planning/TherapEase-etapa09-B00.md) | Resultados, pendientes, siguientes pasos y puerta LCA. |
+| Plan de pruebas | [docs/testing/TherapEase-09-plan-de-pruebas.md](docs/testing/TherapEase-09-plan-de-pruebas.md) | Casos por persona y caso de uso. |
+| Ajustes del PR #1 | [docs/reviews/TherapEase-09-B00-revision-PR01.md](docs/reviews/TherapEase-09-B00-revision-PR01.md) | Correcciones concretas y mejoras propuestas para Miguel/Dulce. |
+| ADR-01…05 | [docs/architecture/adr/ADR-01-a-05-provisionales.md](docs/architecture/adr/ADR-01-a-05-provisionales.md) | Decisiones arquitectónicas y sus límites. |
+| ADR-06 | [docs/architecture/adr/ADR-06-monorepo.md](docs/architecture/adr/ADR-06-monorepo.md) | Monorepo y validación de dependencias. |
+| StarUML | [docs/diagrams/TherapEase-08C-StarUML.mdj](docs/diagrams/TherapEase-08C-StarUML.mdj) | Dominio y casos de uso editables; antecedente de 08, anterior al cambio de pantalla. |
 
-**T1 — preparación inicial:** además de los diez documentos, incluir [AGENTS.md](AGENTS.md), `CLAUDE.md` con solo `@AGENTS.md`, `.env.example` con valores ficticios y `.gitignore` para .NET que excluya `.env` y secretos. Crear carpetas base `src/Web`, `src/Application`, `src/Domain`, `src/Infrastructure`, `tests/`, `docs/requirements`, `docs/planning`, `docs/testing`, `docs/architecture/adr`, `docs/diagrams`, `.github/workflows`, `scripts` e `infra`, con `.gitkeep` donde estén vacías. **Skills aplazadas a un PR posterior; no bloquean a Miguel/Dulce y no se copian versiones heredadas.** Solución, proyectos, migraciones y carpetas internas siguen a cargo de Miguel. No crear el repo privado de respaldo, flujos de CI o conexiones de nube en T1.
-
-**Se conserva localmente:** el archivo histórico completo (`ESTADO.md`, `REVISIONES.md`, prompt maestro y notas de Obsidian), antecedentes de escritorio, `Contexto.txt`, `siifd-comentarios.skill` y `tmp/`. El PDF de pantallas anterior no se necesita: su contenido vigente está en 08C y su pantalla de auditoría quedó retirada. Los resúmenes de Obsidian no sustituyen los seis documentos de trabajo seleccionados.
-
-Antes de publicar, ajustar enlaces a sus destinos y retirar o sustituir enlaces al archivo local excluido. Revisar nombres/contactos en los diez archivos, incluido el JSON de StarUML: si no consta aceptación de la usuaria de aparecer, usar un alias consistente en las copias públicas. La elección de repositorio público no acredita ese consentimiento. Los originales locales se conservan.
-
-**Precedencia:** las adendas de 09 y decisiones del 01-oct rigen los cambios de auditoría, directorio y reparto. El StarUML sigue siendo el antecedente gráfico aprobado de 08: no está actualizado al cambio de pantalla y no autoriza construirla. Cualquier propuesta o pendiente marcado en 08B/08C/08D sigue pendiente, salvo aprobación expresa registrada.
+Las adendas de 09 y las decisiones incorporadas a AGENTS rigen el trabajo vigente. Las propuestas de producto marcadas como pendientes siguen pendientes hasta recibir una respuesta; los diagramas de 08 no validan por sí solos el frontend de 09.
 
 ## 3. Qué hace cada persona primero
 
 | Persona | Ahora, durante B00 | Entrega y siguiente paso |
 | --- | --- | --- |
-| **Lucía** | Crear repositorio público y solo carpetas base/documentación seleccionada; escribir y ejecutar límites, integración crítica y seguridad de B00. Revisar arquitectura, PR críticos y evidencia. | Plan y pruebas con comandos, resultados y revisión distinta. Decide LCA con evidencia; su disponibilidad reducida no transfiere estas tareas. |
-| **Miguel** | Tras disponer del repo y SDK: solución, proyectos, carpetas internas y aplicación Razor Pages mínima; contratos Application, coordinador CU04, persistencia, migraciones, Identity y mecanismos críticos necesarios para B00. Unitarias propias en el mismo PR. | Build, arranque/salud, comandos reproducibles y backend que Lucía pueda probar con PostgreSQL/Testcontainers. Revisa la prueba de límites de Lucía; él o Dulce revisa sus demás pruebas. |
-| **Dulce** | Leer 08B/08C, validar con la usuaria los pendientes que afectan B00–B04, fijar prioridades y proponer estados de pantalla y contratos con Miguel. Preparar Razor/HTML/CSS/JavaScript para la validación mínima de B00. | Registrar respuestas reales y decisiones pendientes; unitarias de su código y checklist visual. Tras decisión de LCA, frontend de B01–B04 según prioridades acordadas. |
+| **Lucía** | Revisar los cambios críticos y la evidencia parcial; preparar límites, integración crítica y seguridad de B00. Revisar esta actualización documental antes de fusionarla. | PR propio de las 11 pruebas adicionales con revisión de Miguel/Dulce; completar evidencia y decidir LCA. |
+| **Miguel** | PR #1 corregido y fusionado. Continuar la validación de B00 con sus unitarias propias y atender los pendientes ejecutables del plan. | Nuevo commit identificable, build y comandos/resultados. Mantener el bloqueo PostgreSQL. Revisa la prueba de límites; él o Dulce revisa las demás pruebas de Lucía. |
+| **Dulce** | Validar con la usuaria las políticas provisionales de citas/pago, campos y prioridades. Coordinar contratos con Miguel y preparar PageModel/Razor mínimo para comprobar el acceso de B00. | Registrar respuestas y pendientes reales, unitarias propias y checklist visual. El frontend posterior depende de la decisión LCA y las prioridades acordadas. |
 
-**PageModel pendiente:** Miguel y Dulce deben acordar quién escribe esa parte de servidor de las pantallas antes de repartirla. Su autor escribe las unitarias en el PR; la guía no asigna por omisión todo PageModel a Dulce.
+**PageModel asignado:** Lucía confirmó el 04-oct-2026 que lo escribe Dulce. Unitarias en el mismo PR, revisión distinta y aprobación de Lucía, conforme a [AGENTS.md](AGENTS.md).
 
 Orden de lectura compartido: esta guía → B00 → 08D. Después Miguel: ADR → requisitos → 08B/08C → pruebas §1 y B00. Dulce: 08B/08C → pruebas §2 → requisitos aplicables. Lucía: requisitos → plan de pruebas §§3–5 → B00. Cada tarea debe citar su B/HU/CU/Q y criterio de aceptación.
 
@@ -66,14 +58,14 @@ Ver [AGENTS.md — Reglas por cambio](AGENTS.md).
 | --- | --- | --- |
 | Prioridad/corte B00–B04, campos del directorio y paciente, contacto de tutor, ámbitos, duplicados, valor inicial del pago y corrección tras cancelar/baja | Dulce con la usuaria | Pantallas y reglas afectadas. Las propuestas de 08C no son respuestas recibidas. |
 | Baja de paciente con citas activas; retirar un ámbito con citas y recuperación posterior | Dulce con la usuaria; Miguel implementa; Lucía prueba | Política funcional antes de implementarla. B00 valida los invariantes aprobados sin adjudicar una regla pendiente. |
-| Primer superusuario y recuperación sin correo; si restablecer levanta bloqueo | Miguel propone; Lucía decide | Flujos correspondientes; ninguna contraseña fija en código ni servicio de correo supuesto. |
-| Autor de PageModel | Miguel y Dulce | División del trabajo y sus unitarias. |
-| Opción A del respaldo decidida: repo privado aparte, dedicado al respaldo diario | Codex redacta nota ADR-05; Claude audita; Lucía decide implementación | Nota propuesta para auditoría; no crear aún el repo ni conectar Neon. Conservar `pg_dump` cifrado, SHA-256, 14 días, restauración desechable e incidencia a Lucía ante fallo. No frena B00 desechable. |
-| Revisión de documentación inicial | Miguel o Dulce informa a Lucía; ella consulta con Claude y confirma cambios | Pendiente y no bloqueante; guía, AGENTS y ADR corregidos ya aprobados por Lucía. |
+| Resuelto el 04-oct: primer superusuario por comando local y restablecimiento sin levantar bloqueo | Lucía aprobó; Miguel implementa; Lucía prueba | Condiciones en [AGENTS.md](AGENTS.md); sin contraseña fija ni correo supuesto. |
+| Resuelto el 04-oct: PageModel a cargo de Dulce | Lucía confirmó; Dulce implementa y escribe unitarias | Revisión distinta y aprobación de Lucía. |
+| Opción A del respaldo decidida: repo privado aparte, dedicado al respaldo diario | Lucía revisa la nota de implementación ADR-05 con su método personal y decide | Nota propuesta para auditoría; no crear aún el repo ni conectar Neon. Conservar `pg_dump` cifrado, SHA-256, 14 días, restauración desechable e incidencia a Lucía ante fallo. No frena B00 desechable. |
+| Revisión de documentación inicial | Miguel o Dulce comunica observaciones con su propio método; Lucía confirma cambios | Pendiente y no bloqueante; guía, AGENTS y ADR corregidos ya aprobados por Lucía. |
 | Revisión de código/pruebas, resultados B00 y decisión LCA | Autor distinto del revisor en cada PR; aprobación final de Lucía | Miguel/Dulce revisa pruebas de Lucía. Construcción continúa pendiente de evidencia y decisión LCA. |
 | Acceso, procedencia, conservación y eliminación de datos reales; TOTP | Lucía con la usuaria y responsables técnicos | R04 sigue abierto: no utilizar datos reales. |
 
-GitHub permite descargar artefactos a personas autenticadas con lectura del repositorio; en uno público ese acceso no restringe el respaldo al equipo. El cifrado no convierte el artefacto en privado. [Fuente oficial: descarga de artefactos](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/download-workflow-artifacts). Lucía eligió la opción A: la concreción se redactó como nota posterior de ADR-05 para Claude. No se ha creado el repo de respaldo ni configurado el flujo.
+GitHub permite descargar artefactos a personas autenticadas con lectura del repositorio; en uno público ese acceso no restringe el respaldo al equipo. El cifrado no convierte el artefacto en privado. [Fuente oficial: descarga de artefactos](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/download-workflow-artifacts). La opción A tiene una nota posterior de implementación en ADR-05, pendiente de revisión y decisión de Lucía. No se ha creado el repo de respaldo ni configurado el flujo.
 
 ## 7. Cómo dejar trabajo revisable sin depender de una llamada
 
@@ -93,15 +85,19 @@ Abrir PowerShell y comprobar las herramientas. .NET SDK y Docker son necesarios 
 
 Fuentes: [instalar .NET en Windows](https://learn.microsoft.com/en-us/dotnet/core/install/windows), [Docker Desktop para Windows](https://docs.docker.com/desktop/setup/install/windows-install/), [Git](https://git-scm.com/downloads), [VS Code](https://code.visualstudio.com/download) y [StarUML](https://staruml.io/download/).
 
-La solución, `.csproj`, migraciones y comandos reales para arrancar los añadirá Miguel; en T1 aún no existe una aplicación que ejecutar. No instalar PostgreSQL de producción para B00: Testcontainers crea bases desechables con Docker. EF Core/Npgsql, Identity, xUnit y Playwright se incorporarán como dependencias de los proyectos; su preparación no se sustituye instalando SDK o creando carpetas.
+El PR #1 fusionado ya incluye solución, `.csproj`, migraciones y aplicación mínima; no acredita todavía B00 completo. Los comandos técnicos de Miguel se conservan en [§10 — Construir, probar y ejecutar](#10-construir-probar-y-ejecutar). No instalar PostgreSQL de producción para B00: Testcontainers crea bases desechables con Docker. Las dependencias ya declaradas en los proyectos no se sustituyen instalando SDK o creando carpetas.
 
-`.env.example` contiene solo ejemplos ficticios. Copiar a `.env` únicamente para configuración local y nunca publicarlo; ASP.NET Core no carga ese archivo automáticamente: Miguel documentará cómo proporciona la configuración al servidor y a Testcontainers. Los nombres de conexiones del ejemplo son propuestos y deben alinearse con el código.
+`.env.example` contiene solo ejemplos ficticios. Copiar a `.env` únicamente para configuración local y nunca publicarlo; ASP.NET Core no carga ese archivo automáticamente. La configuración del servidor y las conexiones locales se documentan en §10.
 
 **Render y Neon:** no se necesitan para B00. No crear cuentas ni aceptar condiciones hasta que Lucía autorice el despliegue. B00 utiliza PostgreSQL desechable mediante Testcontainers y Docker; las conexiones a servicios de nube y el respaldo diario siguen pendientes de su autorización.
 
-## 9. Revisión y publicación de T1
+## 9. Estado y orden de integración
 
-T1 está publicado en el repositorio público y aprobado por Lucía. **Antes del primer PR de Miguel, Lucía debe activar en `main` la protección de rama con una revisión y la protección contra secretos.** Su activación sigue pendiente de verificación. La revisión de Miguel/Dulce de documentos permanece pendiente y no bloquea; código y pruebas desde B00 requieren autor y revisor distintos y aprobación final de Lucía. LCA y R04 siguen abiertos.
+T1 fue publicado y aprobado. La protección de main con una revisión se comprobó el 03-oct; protección contra secretos todavía sin verificar. Las reglas de revisión de código/pruebas están en AGENTS. B00/LCA y R04 siguen abiertos.
+
+**Estado de integración:** PR #1 ya fusionado en main (`41123f2`). PR #3, rama `revision/etapa09`, actualizado sobre esa base para revisión y decisión final de Lucía. Esta guía conserva íntegra la sección técnica de Miguel (§10): construcción/arranque, base de datos local y migraciones, identidad, consulta Q03, dependencias y estructura. Los acuerdos aprobados y los pendientes de B00 se conservan.
+
+Consultar [B00 — siguientes pasos compartidos](docs/planning/TherapEase-etapa09-B00.md#6-siguientes-pasos-compartidos) para el avance y los pendientes de integración y pruebas.
 
 ## 10. Construir, probar y ejecutar
 
