@@ -1,6 +1,6 @@
 # TherapEase — 09/B00 · Plan y estado de validación
 
-**Actualización documental: 04-oct-2026.** B00 está iniciado; Elaboración/LCA y R04 continúan abiertos. No hay autorización de B01, Construcción, datos reales o despliegue.
+**Actualización documental: 06-oct-2026.** B00 está iniciado; Elaboración/LCA y R04 continúan abiertos. No hay autorización de B01, Construcción, datos reales o despliegue.
 
 ## 1. Estado y documentación
 
@@ -8,7 +8,7 @@
 - PR [#1](https://github.com/LuciAguilar/Therapease/pull/1): B00 pasos 1–3. Revisión original en `e418010`; correcciones comprobadas en `b60eba42edeb2fa8cdbea08ad1a4e51b041c21b0`. Lucía revisó/aprobó y fusionó con Squash and merge; commit en main: `41123f2d2c115a05ff1df944457195a7f671cc17`.
 - [Informe de ajustes](../reviews/TherapEase-09-B00-revision-PR01.md): alcance, cambios que deben hacer Miguel/Dulce y mejoras opcionales. No incluye explicaciones personales ni el plan de siguientes pasos.
 - [Guía de equipo](../../README.md): responsabilidades, documentación y preparación del entorno. [AGENTS.md](../../AGENTS.md) es la fuente única de reglas.
-- PR [#3](https://github.com/LuciAguilar/Therapease/pull/3), rama `revision/etapa09`, reúne el informe de ajustes, guía/README, B00 y plan de pruebas; actualizado sobre main tras #1 y pendiente de revisión/fusión por Lucía. La integración documental no cierra B00 ni LCA.
+- PR [#3](https://github.com/LuciAguilar/Therapease/pull/3), rama `revision/etapa09`, reunió el informe de ajustes, guía/README, B00 y plan de pruebas; fusionado el 06-oct-2026 en `8baf8fbc34890d4710c2b78e920f10b8d3e92cb3`. La integración documental no cierra B00 ni LCA.
 
 ## 2. Responsabilidades y forma de trabajo
 
@@ -36,7 +36,7 @@ Cada integrante organiza sus herramientas y revisiones a su modo; la documentaci
 | --- | --- | --- |
 | Build de siete proyectos | 0 errores y 0 advertencias | Corresponde al SHA indicado, no a futuras correcciones. |
 | Unitarias del PR | 149 pasan, sin fallos ni omitidas | Integración y E2E del PR están vacíos; no cuentan como pruebas ejecutadas. |
-| QA adicional con PostgreSQL/Testcontainers | 11 pasan, sin fallos ni omitidas | Borrador local fuera del repositorio, pendiente de incorporación y revisión por otra persona. No lo ejecuta actualmente la CI del repo. |
+| QA adicional con PostgreSQL/Testcontainers | 11 pasan, sin fallos ni omitidas | En la revisión original era un borrador externo. Incorporación local y nueva ejecución del 06-oct en §4.1; revisión humana y publicación pendientes. Sin CI nueva. |
 | Docker | Imagen construida, proceso UID 1654 y salud observados | Salud comprueba el proceso, no disponibilidad de base o acceso funcional. |
 | HTTP | `/salud` 200, auditoría sin sesión 401, inicio público 200 sin datos privados | Comprobación local; no acredita TLS o navegación completa. |
 | Límites | Inspección parcial sin infracciones encontradas | Falta prueba automática A-01 y código real de CU04. |
@@ -44,11 +44,17 @@ Cada integrante organiza sus herramientas y revisiones a su modo; la documentaci
 
 Las 11 comprobaciones cubrieron migraciones y usuario separado; auditoría de solo inserción; cruces y dos reservas concurrentes; versiones de edición; baja/recuperación de paciente sin citas activas; último superusuario y dos desactivaciones concurrentes; bloqueo tras cinco fallos; permisos/revocación en API; y reversión del alta de usuario si falla su auditoría.
 
-Las cookies de QA se generaron y enviaron manualmente por HTTP local: no prueban el formulario de acceso, navegador, atributos recibidos de cookie, antifalsificación o TLS. Los 15 minutos se comprobaron en configuración sin esperar su expiración. Las carreras cubren dos transacciones coordinadas, no carga ni todos los órdenes posibles. La reversión de un alta no prueba todas las operaciones. Los resultados adicionales requieren revisión/adopción de Lucía y revisión de Miguel o Dulce antes de incorporarse a su PR de pruebas.
+Las cookies de QA se generaron y enviaron manualmente por HTTP local: no prueban el formulario de acceso, navegador, atributos recibidos de cookie, antifalsificación o TLS. Los 15 minutos se comprobaron en configuración sin esperar su expiración. Las pruebas de concurrencia cubren dos transacciones coordinadas, no carga ni todos los órdenes posibles. La reversión de un alta no prueba todas las operaciones. Los resultados adicionales requieren revisión/adopción de Lucía y revisión de Miguel o Dulce antes de incorporarse a su PR de pruebas.
 
 Los comandos y salidas completos siguen conservados localmente. El PR de pruebas publicará el código y la evidencia reproducible necesarios, con datos ficticios y sin secretos. Esta actualización documental no ejecutó nuevas pruebas de código.
 
 **Comprobación de las correcciones:** el nuevo SHA `b60eba4` cambió solo README y AGENTS; build Release de siete proyectos correcto, 0 errores/advertencias. Miguel declara 149 unitarias correctas para ese SHA; no se repitieron las pruebas de esta tabla en la actualización documental. La fusión en `41123f2` incorpora ese código, sin convertir la evidencia parcial en cierre de B00.
+
+## 4.1. Identity en servidor — ejecución local del 06-oct
+
+Base `8baf8fbc34890d4710c2b78e920f10b8d3e92cb3`. En la rama existente `revision/etapa09` se incorporaron las 11 comprobaciones y se añadieron 26 casos: **37 pasan, 0 fallos, 0 omitidos**, con PostgreSQL desechable/Testcontainers. Se probaron servicios de Identity, revocación, permisos, bloqueo/expiración controlada, temporal, atomicidad y último superusuario concurrente. Secretos/configuración revisados con alcance acotado; detalle y limitaciones en [evidencia de Identity](../testing/TherapEase-09-B00-evidencia-identidad.md).
+
+**Estado al 07-oct:** correcciones menores de la auditoría aplicadas; comentarios conservados y 37 pruebas repetidas con Docker, todas correctas. El manifiesto local identifica la entrega y su guardado en Git. Revisión de Miguel o Dulce, aprobación final y publicación pendientes; no hay un PR nuevo. Formularios/cookies reales, antifalsificación y HTTPS siguen pendientes; recuperación Q10–Q11 es el siguiente bloque autorizado. No cambia el backend ni cierra B00/LCA.
 
 ## 5. Pendientes ejecutables de B00
 
@@ -57,22 +63,22 @@ Los comandos y salidas completos siguen conservados localmente. El PR de pruebas
 | A-01 y CU04 | Prueba automática de capas/módulos, ausencia de ciclos y coordinador real fuera de Pacientes/Citas. Una carpeta vacía no demuestra el límite. |
 | A-04, Docker | America/Hermosillo disponible dentro de la imagen y reproducción por otra persona. |
 | Q03/Q20 | Comando autenticado sin pantalla, filtros/contenido seguro y cambio/evento atómicos en las otras operaciones. |
-| Q06 | Recuperar cita agendada, carrera cita/baja y estados alternos mediante servicios, con política de producto resuelta. |
+| Q06 | Recuperar cita agendada, concurrencia cita/baja y estados alternos mediante servicios, con política de producto resuelta. |
 | Q07 | Aviso de conflicto sin sobrescribir y cobertura de otros registros. |
 | Q08 | Interrupciones antes/después del commit, resultado incierto, reintentos y duplicados. |
 | Q09 | Conversión explícita a Hermosillo desde otras zonas; distinguir fecha sin hora de instante. |
 | Q10–Q11 | Respaldo cifrado, huella, restauración desechable, comparación de datos y recuperación cronometrada desde detección. |
 | Identity/Q19 | Acceso mínimo con PageModel, cookies reales en navegador, salida/cambio/restablecimiento, roles/sello siguiente solicitud, expiración, antifalsificación, TLS y revisión de hashes/configuración/secretos. |
 | A-06 y protección | Medir minutos, runner y duración cuando exista CI. Main con una revisión comprobado el 03-oct; protección contra secretos aún sin verificar. |
-| QA y decisión | Incorporar las 11 pruebas en IntegrationTests en PR de Lucía, revisar con Miguel/Dulce y decidir LCA con evidencia completa. |
+| QA y decisión | 11 pruebas incorporadas y ampliadas localmente a 37; falta revisión Miguel/Dulce y aprobación/publicación. Decidir LCA con toda la evidencia pendiente, no solo Identity. |
 
 Estos pendientes no bloquean por sí solos el PR parcial #1; sí impiden declarar terminado B00. CI se exige desde B01 y el recorrido Q16 completo desde B04, conforme a AGENTS.
 
 ## 6. Siguientes pasos compartidos
 
 1. **Completado:** Miguel corrigió descripción, AGENTS y README del PR #1; correcciones y build comprobados. Lucía revisó/aprobó y fusionó #1 en main (`41123f2`). Las políticas de producto pendientes no se resolvieron por esa aprobación.
-2. **Integración documental:** PR #3 actualizado sobre ese main, con la guía y la sección técnica de Miguel íntegra. Lucía revisa y decide su fusión; no sustituye la decisión de LCA.
-3. Incorporar las 11 pruebas adicionales en el PR propio de Lucía, revisado por Miguel o Dulce, y reproducir su evidencia. No acreditar una revisión aún no recibida.
+2. **Completado:** PR #3 fusionado en `8baf8fb`, con la guía y la sección técnica de Miguel íntegra. Esta fusión documental no sustituye la decisión de LCA.
+3. **Preparado localmente:** las 11 pruebas adicionales están incorporadas y ampliadas a 37, con nueva ejecución. Revisar esta entrega, completar después recuperación Q10–Q11 y publicar un PR con el alcance acordado; Miguel o Dulce revisa las pruebas de Lucía. No se acredita revisión todavía no recibida.
 4. Dulce registra las respuestas de producto obtenidas; si falta alguna, conserva el pendiente. Continuar las tareas independientes autorizadas de B00.
 5. Completar las comprobaciones pendientes de §5. LCA solo se decide con resultados completos y aprobación expresa de Lucía.
 
@@ -85,10 +91,10 @@ Los estados se indican por tarea: tener implementación o evidencia parcial no c
    - **Pendiente:** Lucía escribe y ejecuta la prueba automática de límites, incluido CU04; Miguel la revisa. Miguel implementa el coordinador CU04. Comprobar Hermosillo dentro de la imagen y reproducción por otra persona. Medir minutos A-06 cuando opere CI.
 2. **Datos — validación pendiente.**
    - **Completado:** persistencia, migraciones, usuarios separados de PostgreSQL y unitarias iniciales de Miguel, incorporados al PR #1 fusionado.
-   - **Pendiente; se puede adelantar sin PageModel:** Lucía incorpora y amplía las comprobaciones Q03/Q06/Q07/Q20 con PostgreSQL desechable/Testcontainers: auditoría solo de inserción, migrador separado, cruces, versiones, bajas, cambio/evento atómicos, carreras y commit. Ya hay evidencia parcial (§4); falta incorporarla al repo y la revisión de Miguel o Dulce. Las pruebas de políticas funcionales aún abiertas requieren la respuesta de producto correspondiente.
+   - **Pendiente; se puede adelantar sin PageModel:** Lucía incorpora y amplía las comprobaciones Q03/Q06/Q07/Q20 con PostgreSQL desechable/Testcontainers: auditoría solo de inserción, migrador separado, cruces, versiones, bajas, cambio/evento atómicos, pruebas de concurrencia y commit. Ya hay evidencia parcial (§4); falta incorporarla al repo y la revisión de Miguel o Dulce. Las pruebas de políticas funcionales aún abiertas requieren la respuesta de producto correspondiente.
 3. **Identidad y seguridad — validación pendiente.**
    - **Completado:** mecanismos iniciales de Identity de Miguel y condiciones documentales aprobadas, incorporados al PR #1 fusionado. No equivale a validación completa de Q19.
-   - **Pendiente; se puede adelantar sin PageModel:** Lucía prueba cuentas ficticias y servicios de servidor: bloqueo y su expiración, contraseña temporal y restricción de acceso, revocación, cambio de rol y último superusuario concurrente; revisa secretos, hashes y configuración. Completa las comprobaciones parciales de §4 con Testcontainers y datos ficticios; Miguel o Dulce revisa sus pruebas.
+   - **Ejecución local completada; revisión pendiente:** comprobaciones de servidor, hashes, bloqueo/expiración controlada, temporal, revocación, permisos, rol y último superusuario concurrente, más revisión acotada de secretos/configuración (§4.1). Las 37 pruebas incluyen las 11 anteriores; no sustituyen las verificaciones pendientes de navegador/transporte. Miguel o Dulce aún debe revisarlas; aprobación/publicación pendientes.
    - **Pendiente de Dulce:** PageModel mínimo de acceso con sus unitarias. Después Lucía prueba el formulario real, cookies emitidas/recibidas en navegador, antifalsificación y los recorridos de salida/cambio/restablecimiento. Los atributos Secure y el transporte Q19 requieren también un entorno local HTTPS verificable; no autorizan nube. Las cookies generadas manualmente no sustituyen estas pruebas.
 4. **Recuperación y decisión — pendiente.**
    - **Pendiente; se puede adelantar sin PageModel:** Lucía prueba Q10–Q11: pg_dump cifrado, huella SHA-256 y restauración en otro PostgreSQL desechable, comparación de datos y tiempos desde detección; registra resultados y fallos. Solo datos ficticios y entorno local/Testcontainers, sin repo de respaldo o conexiones de nube. Miguel o Dulce revisa sus pruebas.

@@ -71,6 +71,12 @@ El repo público contiene aplicación y documentación; el privado alojará el f
 
 **Límite actual:** no crear aún el repo de respaldo ni conectar con Neon. B00 puede continuar con PostgreSQL desechable y datos ficticios. La ayuda solicitada posteriormente para herramientas y cuentas Render/Neon no configura este respaldo ni acredita despliegue autorizado. Codex propone esta concreción, Claude audita y Lucía decide su implementación.
 
+### Nota posterior ADR-05 — dependencia de QA en B00 (06-oct-2026)
+
+**Concreción propuesta para revisión y decisión:** incorporar `Testcontainers.PostgreSql` 4.15.0 al proyecto `TherapEase.IntegrationTests`, con xUnit 2.9.3 existente. Testcontainers/PostgreSQL desechable ya forman parte del stack acordado; esta nota registra la versión y la referencia de pruebas conforme a 07A. Se prepararon y ejecutaron 37 casos locales con datos ficticios; la revisión humana de Miguel o Dulce y la aprobación de la entrega siguen pendientes. Las dependencias de ejecución de la aplicación permanecen iguales.
+
+La clase de apoyo usa servicios Identity y migraciones reales, usuarios separados y una base por caso. El reloj controlado de cookie y el contexto HTTP de componente viven solo en pruebas. No agrega rutas a la aplicación, no acredita páginas/navegador/TLS ni implementa el respaldo privado. Q10–Q11 y LCA conservan sus pendientes. Esta nota no modifica la transcripción ni las decisiones originales de 04.
+
 ## Estado del traslado y aprobación — 01-oct-2026
 
 Lucía autorizó el traslado el 30-sep-2026. El 01-oct aportó el veredicto de contraste y aprobó las cuatro correcciones, la fidelidad y los demás puntos documentales de B00/ADR-06/Q03. No consta una nueva auditoría ni revisión humana de Miguel o Dulce; esta aprobación no las inventa. Los ADR pueden separarse posteriormente conservando identificadores y procedencia. LCA sigue abierta hasta resultados ejecutables y decisión de Lucía; R04 sigue abierto.

@@ -1,8 +1,8 @@
 # TherapEase — Plan de pruebas por caso de uso
 
-**Actualización: 04-oct-2026.** Referencia de pruebas de 09 basada en HU/CU y alternos de 08B, modelos de 08C, trazabilidad de 08D, reglas 07B–07C y Q01–Q20. Usar únicamente datos ficticios. Las reglas compartidas están en [AGENTS.md](../../AGENTS.md); las herramientas y organización de trabajo de cada integrante son libres, las reglas de seguridad/datos/pruebas/revisión son obligatorias.
+**Actualización: 06-oct-2026.** Referencia de pruebas de 09 basada en HU/CU y alternos de 08B, modelos de 08C, trazabilidad de 08D, reglas 07B–07C y Q01–Q20. Usar únicamente datos ficticios. Las reglas compartidas están en [AGENTS.md](../../AGENTS.md); las herramientas y organización de trabajo de cada integrante son libres, las reglas de seguridad/datos/pruebas/revisión son obligatorias.
 
-PageModel a cargo de Dulce con sus unitarias. Las cuatro condiciones de Identity están resueltas e indicadas en el informe de ajustes; Miguel las incorporó a AGENTS mediante el PR #1 ya fusionado. Las 11 comprobaciones adicionales de QA siguen fuera del repo y pendientes de incorporación y revisión en el PR propio de Lucía. Sus resultados y límites están en [B00](../planning/TherapEase-etapa09-B00.md). La incorporación de esas pruebas no se acredita por actualizar este plan.
+PageModel a cargo de Dulce con sus unitarias. Las cuatro condiciones de Identity están resueltas e indicadas en el informe de ajustes; Miguel las incorporó a AGENTS mediante el PR #1 ya fusionado. Las 11 comprobaciones adicionales de QA están incorporadas localmente a IntegrationTests y ampliadas a 37 casos, todos correctos el 06-oct; revisión humana y publicación pendientes. Alcance y límites en [evidencia Identity](TherapEase-09-B00-evidencia-identidad.md). Sus resultados y límites están en [B00](../planning/TherapEase-etapa09-B00.md). Este plan no acredita por sí mismo ejecución, revisión ni cierre B00/LCA; la evidencia identifica lo realmente ejecutado.
 
 No se implementa pantalla de auditoría. Q03 conserva los eventos y consulta técnica autorizada. El directorio muestra pacientes vigentes por defecto con filtro de bajas; campos visibles y las políticas marcadas al final siguen pendientes de Dulce con la usuaria. [Guía del equipo](../../README.md). B00/LCA y R04 permanecen abiertos.
 
@@ -18,7 +18,7 @@ No se implementa pantalla de auditoría. Q03 conserva los eventos y consulta té
 - **★ = corte mínimo B00–B04.** Cada prueba entra cuando se construye su bloque (B01–B08).
 - **Pendiente** = depende de una decisión aún abierta (sección 6); se escribe cuando se decida.
 - Nombres de prueba en español sin tildes (07A), p. ej. `Agendar_ConCruceConCitaActiva_Rechaza`.
-- **Valores canario:** usar una contraseña y un contacto ficticios fáciles de buscar (p. ej. `Canario#Prueba1`, `canario@ficticio.test`) para comprobar después que no aparecen en registros (S-21).
+- **Datos rastreables:** usar una contraseña y un contacto ficticios fáciles de buscar (p. ej. `DatoRastreable#Prueba1`, `datoRastreable@ficticio.test`) para comprobar después que no aparecen en registros (S-21).
 - No se añaden herramientas nuevas sin ADR (07A). Si Dulce quiere probar JavaScript con otra herramienta, primero ADR.
 
 ## 1. Miguel — unitarias de backend
@@ -276,7 +276,7 @@ Referencia: OWASP Top 10:2025, ASVS 5.0 aplicable y 07B. «Todas las rutas» = l
 
 | ID | Qué hacer → qué debe pasar | Origen |
 | --- | --- | --- |
-| S-21 | Tras correr toda la suite, buscar los valores canario en registros técnicos, errores y eventos → no aparecen. | Q04 |
+| S-21 | Tras correr toda la suite, buscar los datos rastreables en registros técnicos, errores y eventos → no aparecen. | Q04 |
 | S-22 | Con el usuario de base de datos de la app, intentar modificar, borrar o alterar la tabla de auditoría → denegado. | Q03, 07B |
 | S-23 | El usuario de la app no puede cambiar el esquema; las migraciones usan otro usuario. | 07B |
 | S-24 | Revisar filas de auditoría → sin contacto, contraseña ni texto clínico. | Q03 |
