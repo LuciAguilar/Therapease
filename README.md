@@ -1,6 +1,6 @@
 # TherapEase — Guía de arranque del equipo en 09
 
-**Actualización documental: 06-oct-2026.** La base de esta guía, AGENTS, ADR-01…06 y el plan B00 fueron aprobados el 01-oct. Esta actualización separa ajustes para el equipo de las notas personales y alinea el estado parcial de B00. Los cambios de documentación inicial pueden comunicarse a Lucía; no se acredita una revisión no recibida.
+**Actualización documental: 08-oct-2026.** La base de esta guía, AGENTS, ADR-01…06 y el plan B00 fueron aprobados el 01-oct. Esta actualización separa ajustes para el equipo de las notas personales y alinea el estado parcial de B00. Los cambios de documentación inicial pueden comunicarse a Lucía; no se acredita una revisión no recibida.
 
 **T1 aprobado y publicado:** Lucía aprobó los 22 archivos de documentación, reglas y carpetas base el 01-oct-2026 y realizó el primer push a [LuciAguilar/Therapease](https://github.com/LuciAguilar/Therapease), repositorio público. La validación ejecutable de B00 y la decisión de cierre de LCA siguen pendientes.
 
@@ -95,7 +95,7 @@ El PR #1 fusionado ya incluye solución, `.csproj`, migraciones y aplicación m�
 
 T1 fue publicado y aprobado. La protección de main con una revisión se comprobó el 03-oct; protección contra secretos todavía sin verificar. Las reglas de revisión de código/pruebas están en AGENTS. B00/LCA y R04 siguen abiertos.
 
-**Estado de integración:** PR #1 ya fusionado en main (`41123f2`). PR #3 fusionado el 06-oct-2026 en `8baf8fb`. La rama existente `revision/etapa09` se reutiliza para las revisiones generales de la etapa. Esta guía conserva íntegra la sección técnica de Miguel (§10): construcción/arranque, base de datos local y migraciones, identidad, consulta Q03, dependencias y estructura. Los acuerdos aprobados y los pendientes de B00 se conservan.
+**Estado de integración:** PR #1 ya fusionado en main (`41123f2`). PR #3 fusionado el 06-oct-2026 en `8baf8fb`. La rama existente `revision/etapa09` se reutiliza para las revisiones generales de la etapa. Esta guía conserva los comandos y la documentación técnica de Miguel (§10); únicamente se actualiza el estado de las pruebas que ahora existen. QA local: 37 casos de Identity y 13 de recuperación, todos repetidos correctamente el 08-oct tras aplicar las correcciones de Claude; entrega conjunta propuesta para revisión humana y aprobación/fusión. Los acuerdos aprobados y pendientes B00 se conservan.
 
 Consultar [B00 — siguientes pasos compartidos](docs/planning/TherapEase-etapa09-B00.md#6-siguientes-pasos-compartidos) para el avance y los pendientes de integración y pruebas.
 
@@ -109,7 +109,7 @@ dotnet test TherapEase.sln
 dotnet run --project src/Web
 ```
 
-La aplicación escucha en `http://localhost:5052` y expone `/salud`. Los proyectos de integración y E2E están creados sin pruebas: las escribe Lucía.
+La aplicación escucha en `http://localhost:5052` y expone `/salud`. IntegrationTests contiene 50 casos locales de QA preparados por Lucía, propuestos en esta entrega y pendientes de revisión humana/fusión. E2ETests sigue sin pruebas; espera los recorridos con las páginas de Dulce.
 
 Imagen Docker (requiere Docker Desktop; salud y usuario sin privilegios se declaran en el `Dockerfile`):
 

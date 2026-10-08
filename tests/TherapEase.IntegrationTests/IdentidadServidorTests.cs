@@ -39,9 +39,11 @@ public class IdentidadServidorTests(PostgreSqlRevision postgres) : IClassFixture
 
     /// Crea un usuario ficticio directamente con el gestor de Identity y devuelve su identificador.
     private static async Task<Guid> CrearAsync(ServiceProvider proveedor, string nombre = "usuaria-ficticia",
-        string rol = "Usuaria", bool temporal = false, string contrasena = Contrasena)
+        string rol = "Usuaria",
+        bool temporal = false,
+        string contrasena = Contrasena)
     {
-        using var alcance = proveedor.CreateScope();
+        using IServiceScope alcance = proveedor.CreateScope();
         var id = Guid.NewGuid();
         var resultado = await alcance.ServiceProvider.GetRequiredService<IGestorIdentidad>()
             .CrearAsync(id, nombre, rol, contrasena, temporal);
@@ -127,6 +129,7 @@ public class IdentidadServidorTests(PostgreSqlRevision postgres) : IClassFixture
         await PostgreSqlRevision.Sql(escenario.App, $"UPDATE \"AspNetUsers\" SET \"Activo\"=false WHERE \"Id\"='{inactivo}'");
         var mensajes = new List<string>();
 
+
         // Act + Assert: inexistente, incorrecta e inactiva fallan sin cookie
 
         foreach (var nombre in new[] { "inexistente-ficticia", "usuaria-ficticia", "inactiva-ficticia" })
@@ -139,6 +142,7 @@ public class IdentidadServidorTests(PostgreSqlRevision postgres) : IClassFixture
             mensajes.Add(respuesta.Mensaje);
         }
 
+
         // Act: completar cinco fallos para bloquear la cuenta
 
         for (var intento = 0; intento < 4; intento++)
@@ -146,6 +150,7 @@ public class IdentidadServidorTests(PostgreSqlRevision postgres) : IClassFixture
             using var solicitud = new SolicitudIdentidad(proveedor);
             await solicitud.Obtener<IServicioAcceso>().IniciarSesionAsync("usuaria-ficticia", "incorrecta-ficticia");
         }
+
 
         // Act + Assert: la correcta, ya bloqueada, también falla
 
@@ -156,6 +161,7 @@ public class IdentidadServidorTests(PostgreSqlRevision postgres) : IClassFixture
             mensajes.Add(respuesta.Mensaje);
             Assert.Equal(0, solicitud.Contexto.Response.Headers.SetCookie.Count);
         }
+
 
         // Assert: todos los mensajes son iguales
 
@@ -169,12 +175,14 @@ public class IdentidadServidorTests(PostgreSqlRevision postgres) : IClassFixture
     public async Task Bloqueo_Dura_Quince_Minutos_Y_Al_Expirar_Admite_Contrasena_Correcta()
     {
 
+
         // Arrange
 
         var escenario = await postgres.Crear();
         using var proveedor = escenario.Servicios();
         var id = await CrearAsync(proveedor);
         var antes = DateTimeOffset.UtcNow;
+
 
         // Act: cinco intentos fallidos
 
@@ -183,6 +191,7 @@ public class IdentidadServidorTests(PostgreSqlRevision postgres) : IClassFixture
             using var solicitud = new SolicitudIdentidad(proveedor);
             Assert.False((await solicitud.Obtener<IServicioAcceso>().IniciarSesionAsync("usuaria-ficticia", "fallo-ficticio")).Exito);
         }
+
 
         // Assert: bloqueo de 15 minutos
 

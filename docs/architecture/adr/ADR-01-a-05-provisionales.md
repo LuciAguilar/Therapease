@@ -77,6 +77,14 @@ El repo público contiene aplicación y documentación; el privado alojará el f
 
 La clase de apoyo usa servicios Identity y migraciones reales, usuarios separados y una base por caso. El reloj controlado de cookie y el contexto HTTP de componente viven solo en pruebas. No agrega rutas a la aplicación, no acredita páginas/navegador/TLS ni implementa el respaldo privado. Q10–Q11 y LCA conservan sus pendientes. Esta nota no modifica la transcripción ni las decisiones originales de 04.
 
+### Propuesta de validación local Q10–Q11 — 07-oct-2026
+
+Solo para pruebas B00: `pg_dump`/`pg_restore` 17 del contenedor y AES-256-GCM mediante `System.Security.Cryptography` de .NET, sin paquetes nuevos. Clave aleatoria de 32 bytes solo en memoria, valor aleatorio nuevo de 12 bytes por copia, autenticación de 16 bytes y SHA-256 del archivo cifrado. Fecha y versión del formato de prueba autenticadas; rechazar copia/clave inválidas antes de escribir en destino. Restaurar en una transacción en otro PostgreSQL desechable; comparar todas las tablas, permisos, identidad y tiempos.
+
+**Propuesto, no aprobado para producción:** el formato, cifrado y clave efímera permiten únicamente la demostración local. Gestión y recuperación de claves duraderas, usuario de respaldo, retención diaria de 14 días, repositorio privado, incidencia automática, nube y pruebas a carga objetivo siguen pendientes de auditoría y decisión. No cambia ADR-05 original ni acredita Q10–Q11 completos o cierre LCA. Lucía autorizó elaborar y ejecutar la validación local; Miguel o Dulce debe revisar sus pruebas.
+
+**Ajuste de la propuesta — 08-oct-2026, veredicto de Claude aplicado por autorización de Lucía:** la antigüedad se mide y se informa para Q10; no es condición para impedir la restauración. En un incidente se restaura la copia más reciente disponible e íntegra aunque tenga más de 24 horas, registrando el incumplimiento de Q10, para no prolongar la caída Q11. Una fecha futura se informa como anomalía de medición. La integridad y la clave correcta siguen siendo obligatorias. El código de QA separa medición y restauración; su nueva ejecución del 08-oct fue correcta (50 casos en conjunto); revisión humana y aprobación siguen pendientes.
+
 ## Estado del traslado y aprobación — 01-oct-2026
 
 Lucía autorizó el traslado el 30-sep-2026. El 01-oct aportó el veredicto de contraste y aprobó las cuatro correcciones, la fidelidad y los demás puntos documentales de B00/ADR-06/Q03. No consta una nueva auditoría ni revisión humana de Miguel o Dulce; esta aprobación no las inventa. Los ADR pueden separarse posteriormente conservando identificadores y procedencia. LCA sigue abierta hasta resultados ejecutables y decisión de Lucía; R04 sigue abierto.

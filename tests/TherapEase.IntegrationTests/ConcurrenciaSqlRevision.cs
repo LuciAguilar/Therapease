@@ -22,19 +22,18 @@ public static class ConcurrenciaSqlRevision
     {
 
         // Primer cambio: hecho pero sin commit, para que mantenga su bloqueo.
-
-        await using var conexion = new NpgsqlConnection(escenario.App);
+        await using var conexion = new NpgsqlConnection(escenario.App); // conexión a la base de datos de prueba.
         await conexion.OpenAsync();
         await using var transaccion = await conexion.BeginTransactionAsync();
         await using (var comando = new NpgsqlCommand(primero, conexion, transaccion))
             await comando.ExecuteNonQueryAsync();
 
-        // Avisa el identificador de la segunda conexión para poder observarla en PostgreSQL.
 
+        // Avisa el identificador de la segunda conexión para poder observarla en PostgreSQL.
         var iniciado = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        // Segundo cambio: compite con el primero desde otra conexión.
 
+        // Segundo cambio: compite con el primero desde otra conexión.
         async Task<string> CompetirAsync()
         {
             await using var otra = new NpgsqlConnection(escenario.App);
@@ -56,8 +55,8 @@ public static class ConcurrenciaSqlRevision
         try
         {
 
-            // Hasta 5 segundos para ver en pg_stat_activity que el segundo espera un bloqueo.
 
+            // Hasta 5 segundos para ver en pg_stat_activity que el segundo espera un bloqueo.
             var espera = Stopwatch.StartNew();
             var bloqueado = false;
             while (espera.Elapsed < TimeSpan.FromSeconds(5) && !competidor.IsCompleted)
@@ -68,8 +67,8 @@ public static class ConcurrenciaSqlRevision
                 await Task.Delay(20);
             }
 
-            // Si no esperó, los cambios no fueron simultáneos y la prueba no demostraría nada.
 
+            // Si no esperó, los cambios no fueron simultáneos y la prueba no demostraría nada.
             Assert.True(bloqueado, "El segundo cambio no esperó al primero: no se demostró la concurrencia.");
             await transaccion.CommitAsync();
             return ["confirmada", await competidor.WaitAsync(TimeSpan.FromSeconds(12))];
@@ -77,8 +76,8 @@ public static class ConcurrenciaSqlRevision
         finally
         {
 
-            // En caso de fallo, liberar el primero permite terminar al competidor y limpiar el contenedor.
 
+            // En caso de fallo, liberar el primero permite terminar al competidor y limpiar el contenedor.
             await transaccion.DisposeAsync();
             try { await competidor.WaitAsync(TimeSpan.FromSeconds(12)); } catch { }
         }

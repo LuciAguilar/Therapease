@@ -1,6 +1,6 @@
 # TherapEase — 09/B00 · Plan y estado de validación
 
-**Actualización documental: 06-oct-2026.** B00 está iniciado; Elaboración/LCA y R04 continúan abiertos. No hay autorización de B01, Construcción, datos reales o despliegue.
+**Actualización documental: 08-oct-2026.** B00 está iniciado; Elaboración/LCA y R04 continúan abiertos. No hay autorización de B01, Construcción, datos reales o despliegue.
 
 ## 1. Estado y documentación
 
@@ -9,6 +9,8 @@
 - [Informe de ajustes](../reviews/TherapEase-09-B00-revision-PR01.md): alcance, cambios que deben hacer Miguel/Dulce y mejoras opcionales. No incluye explicaciones personales ni el plan de siguientes pasos.
 - [Guía de equipo](../../README.md): responsabilidades, documentación y preparación del entorno. [AGENTS.md](../../AGENTS.md) es la fuente única de reglas.
 - PR [#3](https://github.com/LuciAguilar/Therapease/pull/3), rama `revision/etapa09`, reunió el informe de ajustes, guía/README, B00 y plan de pruebas; fusionado el 06-oct-2026 en `8baf8fbc34890d4710c2b78e920f10b8d3e92cb3`. La integración documental no cierra B00 ni LCA.
+
+**Estado al 08-oct:** correcciones obligatorias de recuperación aplicadas y **50 pruebas repetidas correctamente** (37 Identity + 13 recuperación), 0 fallos/omitidas, Release sin advertencias, 19 s. La copia reciente recuperó 13 tablas en **7,375 s** desde detección simulada; se restauró además una copia íntegra de 25 h, informando incumplimiento Q10 sin bloquear recuperación. Entrega conjunta preparada en `revision/etapa09` para revisión humana de Miguel o Dulce y aprobación/fusión de Lucía. No necesita esperar los PageModel de Dulce; pendientes de navegador separados. No acredita CI ni cierre B00/LCA/R04.
 
 ## 2. Responsabilidades y forma de trabajo
 
@@ -54,7 +56,13 @@ Los comandos y salidas completos siguen conservados localmente. El PR de pruebas
 
 Base `8baf8fbc34890d4710c2b78e920f10b8d3e92cb3`. En la rama existente `revision/etapa09` se incorporaron las 11 comprobaciones y se añadieron 26 casos: **37 pasan, 0 fallos, 0 omitidos**, con PostgreSQL desechable/Testcontainers. Se probaron servicios de Identity, revocación, permisos, bloqueo/expiración controlada, temporal, atomicidad y último superusuario concurrente. Secretos/configuración revisados con alcance acotado; detalle y limitaciones en [evidencia de Identity](../testing/TherapEase-09-B00-evidencia-identidad.md).
 
-**Estado al 07-oct:** correcciones menores de la auditoría aplicadas; comentarios conservados y 37 pruebas repetidas con Docker, todas correctas. El manifiesto local identifica la entrega y su guardado en Git. Revisión de Miguel o Dulce, aprobación final y publicación pendientes; no hay un PR nuevo. Formularios/cookies reales, antifalsificación y HTTPS siguen pendientes; recuperación Q10–Q11 es el siguiente bloque autorizado. No cambia el backend ni cierra B00/LCA.
+**Estado al 07-oct:** correcciones menores de la auditoría aplicadas; comentarios conservados y 37 pruebas repetidas con Docker, todas correctas. El 08-oct se repitieron los 37 casos dentro de la ejecución conjunta de 50, todos correctos. Entrega conjunta para revisión de Miguel o Dulce; aprobación y fusión pendientes. Formularios/cookies reales, antifalsificación y HTTPS siguen pendientes; recuperación Q10–Q11 ya tiene ejecución previa y correcciones locales (§4.2), con nueva ejecución pendiente. No cambia el backend ni cierra B00/LCA.
+
+## 4.2. Recuperación Q10–Q11 — ejecución local del 07-oct
+
+Preparados 13 casos de recuperación; **50 pruebas pasaron en conjunto el 07-oct y nuevamente tras corregirlas el 08-oct**, 0 fallos/omitidas, con las 37 anteriores. Volcado real cifrado, pérdida simulada del origen, otro contenedor, restauración sin migrar, comparación de las 13 tablas y consulta autorizada. Recuperación desde detección simulada: **7,375 s en la ejecución corregida**, muestra pequeña; rechazo de alteraciones/clave incorrecta y reversión de restauración fallida comprobados. [Evidencia y límites](../testing/TherapEase-09-B00-evidencia-recuperacion.md).
+
+**Completado:** ejecución anterior de esta muestra; veredicto CORREGIR menor recibido y sus dos correcciones obligatorias aplicadas localmente el 08-oct. Comentarios pegados al código; `RestaurarAsync` ya no rechaza por antigüedad, y la prueba mide/informa Q10 sin bloquear la recuperación. **Propuesto:** cifrado/formato solo de QA y regla de antigüedad en ADR-05. **Verificado el 08-oct:** repetición correcta de 50 pruebas, incluida restauración real de copia de 25 h y comparación. **Pendiente:** revisión humana distinta, aprobación/fusión de esta entrega, carga objetivo y operación diaria/retención/gestión de claves. Sin nube, infraestructura privada o cierre Q10–Q11/B00/LCA.
 
 ## 5. Pendientes ejecutables de B00
 
@@ -67,10 +75,10 @@ Base `8baf8fbc34890d4710c2b78e920f10b8d3e92cb3`. En la rama existente `revision/
 | Q07 | Aviso de conflicto sin sobrescribir y cobertura de otros registros. |
 | Q08 | Interrupciones antes/después del commit, resultado incierto, reintentos y duplicados. |
 | Q09 | Conversión explícita a Hermosillo desde otras zonas; distinguir fecha sin hora de instante. |
-| Q10–Q11 | Respaldo cifrado, huella, restauración desechable, comparación de datos y recuperación cronometrada desde detección. |
-| Identity/Q19 | Acceso mínimo con PageModel, cookies reales en navegador, salida/cambio/restablecimiento, roles/sello siguiente solicitud, expiración, antifalsificación, TLS y revisión de hashes/configuración/secretos. |
+| Q10–Q11 | Demostración local previa ejecutada y correcciones de Claude aplicadas (§4.2); nueva ejecución correcta el 08-oct; faltan revisión/aprobación, carga objetivo y validación diaria, retención y claves duraderas. |
+| Identity/Q19 | Servidor, hashes, rol, revocación, caducidad controlada y revisión acotada de secretos ya tienen evidencia (§4.1). Faltan PageModel, cookies/formularios/navegación, renovación por actividad, antifalsificación, HTTPS, reinicio real y revisión humana. |
 | A-06 y protección | Medir minutos, runner y duración cuando exista CI. Main con una revisión comprobado el 03-oct; protección contra secretos aún sin verificar. |
-| QA y decisión | 11 pruebas incorporadas y ampliadas localmente a 37; falta revisión Miguel/Dulce y aprobación/publicación. Decidir LCA con toda la evidencia pendiente, no solo Identity. |
+| QA y decisión | 11 pruebas incorporadas y ampliadas a 37, más 13 de recuperación; 50 repetidas correctas tras correcciones; faltan revisión Miguel/Dulce y aprobación/fusión del PR conjunto. Decidir LCA con toda la evidencia pendiente, no solo Identity. |
 
 Estos pendientes no bloquean por sí solos el PR parcial #1; sí impiden declarar terminado B00. CI se exige desde B01 y el recorrido Q16 completo desde B04, conforme a AGENTS.
 
@@ -78,7 +86,7 @@ Estos pendientes no bloquean por sí solos el PR parcial #1; sí impiden declara
 
 1. **Completado:** Miguel corrigió descripción, AGENTS y README del PR #1; correcciones y build comprobados. Lucía revisó/aprobó y fusionó #1 en main (`41123f2`). Las políticas de producto pendientes no se resolvieron por esa aprobación.
 2. **Completado:** PR #3 fusionado en `8baf8fb`, con la guía y la sección técnica de Miguel íntegra. Esta fusión documental no sustituye la decisión de LCA.
-3. **Preparado localmente:** las 11 pruebas adicionales están incorporadas y ampliadas a 37, con nueva ejecución. Revisar esta entrega, completar después recuperación Q10–Q11 y publicar un PR con el alcance acordado; Miguel o Dulce revisa las pruebas de Lucía. No se acredita revisión todavía no recibida.
+3. **Entrega conjunta preparada; revisión pendiente:** Identity (37) + recuperación (13), con correcciones de Claude y nueva ejecución correcta de los 50 casos el 08-oct. Lucía autorizó preparación del PR en la rama existente `revision/etapa09`; Miguel o Dulce revisa las pruebas, Lucía decide aprobación/fusión. No necesita esperar a Dulce ni cerrar B00 para fusionar este alcance revisado. Mientras se revisa, siguiente tarea propuesta: prueba automática de límites A-01; Lucía puede preparar capas/referencias existentes y la comprobación completa de CU04 depende de su coordinador real de Miguel. No se ejecuta esa tarea como parte de este PR.
 4. Dulce registra las respuestas de producto obtenidas; si falta alguna, conserva el pendiente. Continuar las tareas independientes autorizadas de B00.
 5. Completar las comprobaciones pendientes de §5. LCA solo se decide con resultados completos y aprobación expresa de Lucía.
 
@@ -91,13 +99,14 @@ Los estados se indican por tarea: tener implementación o evidencia parcial no c
    - **Pendiente:** Lucía escribe y ejecuta la prueba automática de límites, incluido CU04; Miguel la revisa. Miguel implementa el coordinador CU04. Comprobar Hermosillo dentro de la imagen y reproducción por otra persona. Medir minutos A-06 cuando opere CI.
 2. **Datos — validación pendiente.**
    - **Completado:** persistencia, migraciones, usuarios separados de PostgreSQL y unitarias iniciales de Miguel, incorporados al PR #1 fusionado.
-   - **Pendiente; se puede adelantar sin PageModel:** Lucía incorpora y amplía las comprobaciones Q03/Q06/Q07/Q20 con PostgreSQL desechable/Testcontainers: auditoría solo de inserción, migrador separado, cruces, versiones, bajas, cambio/evento atómicos, pruebas de concurrencia y commit. Ya hay evidencia parcial (§4); falta incorporarla al repo y la revisión de Miguel o Dulce. Las pruebas de políticas funcionales aún abiertas requieren la respuesta de producto correspondiente.
+   - **Ejecución parcial completada:** las 11 pruebas de datos ya están incorporadas al proyecto local y repetidas dentro de la ejecución del 07-oct: migraciones/usuario separado, auditoría solo de inserción, cruces, dos reservas SQL, versión EF, conservación de paciente y mecanismos iniciales de Identity.
+   - **Pendiente; se puede adelantar sin PageModel:** Lucía amplía Q03/Q06/Q07/Q20/Q08 en servicios: otras operaciones/eventos atómicos, cita/baja y recuperación concurrentes, otros conflictos, interrupciones/reintentos/duplicados. Miguel implementa lo que falte, incluido CU04; las políticas funcionales abiertas dependen de Dulce con la usuaria. Publicación y revisión distinta pendientes.
 3. **Identidad y seguridad — validación pendiente.**
    - **Completado:** mecanismos iniciales de Identity de Miguel y condiciones documentales aprobadas, incorporados al PR #1 fusionado. No equivale a validación completa de Q19.
    - **Ejecución local completada; revisión pendiente:** comprobaciones de servidor, hashes, bloqueo/expiración controlada, temporal, revocación, permisos, rol y último superusuario concurrente, más revisión acotada de secretos/configuración (§4.1). Las 37 pruebas incluyen las 11 anteriores; no sustituyen las verificaciones pendientes de navegador/transporte. Miguel o Dulce aún debe revisarlas; aprobación/publicación pendientes.
    - **Pendiente de Dulce:** PageModel mínimo de acceso con sus unitarias. Después Lucía prueba el formulario real, cookies emitidas/recibidas en navegador, antifalsificación y los recorridos de salida/cambio/restablecimiento. Los atributos Secure y el transporte Q19 requieren también un entorno local HTTPS verificable; no autorizan nube. Las cookies generadas manualmente no sustituyen estas pruebas.
-4. **Recuperación y decisión — pendiente.**
-   - **Pendiente; se puede adelantar sin PageModel:** Lucía prueba Q10–Q11: pg_dump cifrado, huella SHA-256 y restauración en otro PostgreSQL desechable, comparación de datos y tiempos desde detección; registra resultados y fallos. Solo datos ficticios y entorno local/Testcontainers, sin repo de respaldo o conexiones de nube. Miguel o Dulce revisa sus pruebas.
+4. **Recuperación: correcciones y nueva ejecución completadas; revisión y decisión pendientes.**
+   - **Completado en esta muestra:** 13 casos Q10–Q11, respaldo cifrado, huella, restauración en otro PostgreSQL desechable, comparación y tiempos (§4.2). Solo datos ficticios/Testcontainers, sin repo privado o nube. **Completado al 08-oct:** dos correcciones obligatorias de Claude aplicadas. **Verificado:** 50 pruebas repetidas correctamente, con copia de 25 h restaurada. **Pendiente:** revisión de Miguel/Dulce, aprobación/fusión, carga objetivo y operación diaria/claves/retención.
    - **Pendiente de Lucía tras la evidencia completa:** decidir el cierre de B00/LCA. Completar las pruebas de recuperación no cierra LCA por sí solo ni autoriza B01 o Construcción.
 
 ## 8. Consulta Q03 y respaldo

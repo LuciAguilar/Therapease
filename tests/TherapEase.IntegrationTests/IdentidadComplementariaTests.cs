@@ -29,7 +29,6 @@ public class IdentidadComplementariaTests(PostgreSqlRevision postgres) : IClassF
     {
 
         // Arrange
-
         var escenario = await postgres.Crear();
         var primero = Guid.NewGuid();
         var segundo = Guid.NewGuid();
@@ -45,12 +44,10 @@ public class IdentidadComplementariaTests(PostgreSqlRevision postgres) : IClassF
             : $"DELETE FROM \"AspNetUserRoles\" WHERE \"UserId\"='{primero}'";
 
         // Act
-
         var resultados = await ConcurrenciaSqlRevision.EjecutarAsync(escenario, sqlPrimero,
             $"DELETE FROM \"AspNetUserRoles\" WHERE \"UserId\"='{segundo}'");
 
         // Assert
-
         Assert.Equal(new[] { "TE002", "confirmada" }, resultados.Order(StringComparer.Ordinal).ToArray());
         using var final = escenario.Servicios();
         using var revision = final.CreateScope();
@@ -70,7 +67,6 @@ public class IdentidadComplementariaTests(PostgreSqlRevision postgres) : IClassF
     {
 
         // Arrange
-
         var escenario = await postgres.Crear();
         using var proveedor = escenario.Servicios();
         var id = Guid.NewGuid();
@@ -86,16 +82,16 @@ public class IdentidadComplementariaTests(PostgreSqlRevision postgres) : IClassF
         using var solicitud = new SolicitudIdentidad(proveedor, cookie);
         Assert.True(await solicitud.AutenticarAsync());
 
-        // Act + Assert: ninguna operación de administración se permite
 
+        // Act + Assert: ninguna operación de administración se permite
         var servicio = solicitud.Obtener<IServicioUsuarios>();
         Assert.False((await servicio.CrearUsuarioAsync("intrusa-ficticia", "Usuaria")).Exito);
         Assert.False((await servicio.RestablecerContrasenaAsync(id)).Exito);
         Assert.False((await servicio.DesactivarUsuarioAsync(id)).Exito);
         Assert.False((await servicio.CambiarRolAsync(id, rol == "Usuaria" ? "Superusuario" : "Usuaria")).Exito);
 
-        // Assert: no quedó ninguna escritura
 
+        // Assert: no quedó ninguna escritura
         Assert.Equal(0L, await PostgreSqlRevision.Valor<long>(escenario.App, "SELECT count(*) FROM \"EventoAuditoria\""));
         Assert.Equal(1L, await PostgreSqlRevision.Valor<long>(escenario.App, "SELECT count(*) FROM \"AspNetUsers\""));
     }
@@ -112,11 +108,9 @@ public class IdentidadComplementariaTests(PostgreSqlRevision postgres) : IClassF
     {
 
         // Arrange
-
         var escenario = await postgres.Crear();
 
         // Ejecuta la aplicación compilada como lo haría el operador en su máquina.
-
         async Task<(int Codigo, string Salida, string Error)> EjecutarAsync(string comando)
         {
             var configuracion = new DirectoryInfo(AppContext.BaseDirectory).Parent!.Name;
@@ -139,38 +133,37 @@ public class IdentidadComplementariaTests(PostgreSqlRevision postgres) : IClassF
         }
 
         // Toma la contraseña temporal de la línea que imprime el comando.
-
         static string Temporal(string salida) => salida.Split('\n')
             .Single(linea => linea.StartsWith("Contraseña temporal: ", StringComparison.Ordinal))
             ["Contraseña temporal: ".Length..].Trim();
 
-        // Act: crear el primer superusuario
 
+        // Act: crear el primer superusuario
         var alta = await EjecutarAsync("--crear-superusuario");
 
-        // Assert
 
+        // Assert
         Assert.True(alta.Codigo == 0, "El comando local de alta falló.");
         var primeraClave = Temporal(alta.Salida);
         Assert.True(primeraClave.Length >= 12);
         Assert.DoesNotContain(primeraClave, alta.Error, StringComparison.Ordinal);
 
-        // Act: intentar crearlo otra vez
 
+        // Act: intentar crearlo otra vez
         var repetida = await EjecutarAsync("--crear-superusuario");
 
-        // Assert
 
+        // Assert
         Assert.Equal(1, repetida.Codigo);
         Assert.DoesNotContain("Contraseña temporal:", repetida.Salida, StringComparison.Ordinal);
         Assert.Equal(1L, await PostgreSqlRevision.Valor<long>(escenario.App, "SELECT count(*) FROM \"AspNetUsers\""));
 
-        // Act: restablecer al superusuario
 
+        // Act: restablecer al superusuario
         var restablecida = await EjecutarAsync("--restablecer-superusuario");
 
-        // Assert
 
+        // Assert
         Assert.True(restablecida.Codigo == 0, "El comando local de recuperación falló.");
         var segundaClave = Temporal(restablecida.Salida);
         Assert.NotEqual(primeraClave, segundaClave);
@@ -181,8 +174,8 @@ public class IdentidadComplementariaTests(PostgreSqlRevision postgres) : IClassF
             Assert.DoesNotContain(clave, restablecida.Error, StringComparison.Ordinal);
         }
 
-        // Act + Assert: solo la nueva temporal entra y obliga a cambiarla
 
+        // Act + Assert: solo la nueva temporal entra y obliga a cambiarla
         using var proveedor = escenario.Servicios();
         using var solicitud = new SolicitudIdentidad(proveedor);
         Assert.False((await solicitud.Obtener<IServicioAcceso>().IniciarSesionAsync("operador-ficticio", primeraClave)).Exito);

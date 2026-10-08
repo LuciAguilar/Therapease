@@ -1,6 +1,6 @@
 # TherapEase — B00 · Evidencia de Identity en servidor
 
-**Fecha inicial:** 06-oct-2026. **Actualización:** 07-oct-2026, comentarios y nombres según revisión. **Estado:** revisión humana y aprobación pendientes. Esta entrega aún no está publicada. B00/LCA y R04 siguen abiertos.
+**Fecha inicial:** 06-oct-2026. **Actualización:** 08-oct-2026, repetición conjunta de Identity y recuperación. **Estado:** revisión humana y aprobación pendientes. Entrega propuesta para revisión mediante PR. B00/LCA y R04 siguen abiertos.
 
 ## 1. Alcance e identificación
 
@@ -8,7 +8,7 @@
 - Se incorporaron las 11 comprobaciones anteriores y se añadieron 26 casos de Identity: **37 pasan, 0 fallan, 0 omitidos**. Compilación Release del proyecto de integración y sus cuatro referencias sin advertencias en la ejecución final.
 - Solo se modifican pruebas y documentación. Backend, PageModel, migraciones, configuración de ejecución y reglas compartidas no se modifican.
 - Entorno: Windows, SDK .NET 10.0.401, Docker 29.8.1 con motor Linux, PostgreSQL 17 desechable, Testcontainers.PostgreSql 4.15.0 y xUnit 2.9.3. Una base aislada por caso, usuarios migrador/aplicación separados, datos exclusivamente ficticios y eliminación de contenedores al terminar.
-- Publicación y PR de pruebas pendientes. El manifiesto local identifica los archivos y, después del guardado, el commit local de la entrega. La evidencia conserva TRX, huellas SHA-256, consultas y scripts de revisión.
+- Entrega conjunta de pruebas propuesta para revisión; aprobación y fusión pendientes. El manifiesto local identifica los archivos y, después del guardado, el commit local de la entrega. La evidencia conserva TRX, huellas SHA-256, consultas y scripts de revisión.
 
 ## 2. Resultados
 
@@ -46,6 +46,8 @@ La búsqueda no garantiza ausencia universal de secretos: cubre patrones y refer
 
 ## 4. Reproducción y revisión
 
+**Repetición conjunta del 08-oct:** 37 casos de esta entrega y 13 de recuperación, **50 correctos**, 0 fallos/omitidas, Release sin advertencias, 19 s. TRX local `b00-conjunto-50-corregido-08oct.trx`. Incluye los comentarios y ajustes actuales; la ejecución individual del 07-oct descrita abajo queda como antecedente.
+
 **Pruebas comentadas según el skill del proyecto.** Se conservan las explicaciones revisadas por Claude, con secciones, descripciones de pruebas y espaciado. `ConcurrenciaSqlRevision` y la prueba de datos sensibles sustituyen los nombres con jerga; no cambian las reglas comprobadas.
 
 Reejecución final del 07-oct-2026 con Docker 29.8.1 disponible: **37 pasan, 0 fallan y 0 omitidas**, duración informada por xUnit 14 s. Compilación Release sin advertencias. Resultado local `identidad-comentada-07oct.trx`. Las correcciones menores solicitadas por Claude están aplicadas; la revisión humana y la aprobación final siguen pendientes.
@@ -68,5 +70,5 @@ La revisión humana de Miguel o Dulce y la aprobación final de Lucía siguen pe
 - **Q19:** HTTPS local real, transporte y cabeceras según decisiones pendientes. Una cabecera Secure emitida en componente o una cookie enviado manualmente por HTTP no prueba comunicaciones cifradas.
 - **S-31:** reinicio real del contenedor de aplicación con claves en PostgreSQL; la recreación del proveedor solo es evidencia parcial.
 - **Q08:** pérdidas de respuesta e interrupciones antes/después del commit y resultado incierto; los fallos de auditoría solo cubren reversión antes del commit.
-- **Q10–Q11:** recuperación pendiente, siguiente bloque después de revisar esta entrega.
+- **Q10–Q11:** 13 casos locales ejecutados después de corregir esta entrega; [evidencia y pendientes de recuperación](TherapEase-09-B00-evidencia-recuperacion.md). Auditoría y revisión humana siguen pendientes.
 - **B00:** límites A-01/CU04, restantes casos de datos/horarios, producto, reproducción por otra persona y decisión LCA. CI desde B01; recorrido Q16 completo desde B04. Sin datos reales, nube ni cierre de LCA por este informe.
