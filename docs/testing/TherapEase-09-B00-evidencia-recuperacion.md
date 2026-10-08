@@ -11,7 +11,7 @@
 
 ## 1. Alcance e identificación
 
-- Rama existente `revision/etapa09`, sobre main `8baf8fbc34890d4710c2b78e920f10b8d3e92cb3`. Identity guardado localmente en `4dbee3a614e04c4086adc068151543fe81f6ab90`, sin push. Esta entrega reúne Identity y recuperación; la descripción del PR identifica el commit y la evidencia local conserva las huellas.
+- Rama existente `revision/etapa09`, sobre main `8baf8fbc34890d4710c2b78e920f10b8d3e92cb3`. Identity quedó inicialmente guardado en `4dbee3a614e04c4086adc068151543fe81f6ab90`; recuperación corregida y ejecución conjunta están en `83328783b2ea4f7487d28e2935e3c81acb8e521b`, publicado en [PR #4](https://github.com/LuciAguilar/Therapease/pull/4), en borrador. Esta entrega reúne Identity y recuperación; la descripción del PR identifica el commit y la evidencia local conserva las huellas.
 - **13 casos nuevos; 50 pasan en conjunto** con los 37 anteriores, 0 fallos/omitidas. Release sin advertencias; duración informada: 19 s. Solo pruebas/documentación, sin cambios de backend, migraciones, PageModel, dependencias de ejecución o reglas compartidas.
 - SDK 10.0.401, Docker 29.8.1 Linux, PostgreSQL 17.11, Testcontainers 4.15.0, xUnit 2.9.3. Contenedores desechables, bases aisladas y datos ficticios.
 - Cifrado **candidato de QA**: AES-256-GCM de .NET, clave aleatoria de 32 bytes en memoria, aleatorio nuevo de 12 bytes y autenticación de 16 bytes; fecha/versión autenticadas, SHA-256 del archivo cifrado. Nota propuesta en ADR-05; no es un formato de producción aprobado ni resuelve custodia de claves.
