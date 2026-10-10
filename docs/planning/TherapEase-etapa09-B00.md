@@ -1,6 +1,6 @@
 # TherapEase — 09/B00 · Plan y estado de validación
 
-**Actualización documental: 09-oct-2026.**
+**Actualización documental: 10-oct-2026.**
 
 > **B00 y Elaboración/LCA abiertos.** Solo datos ficticios; R04 abierto. No iniciar B01/Construcción ni desplegar sin decisión expresa de Lucía.
 >
@@ -16,6 +16,7 @@
 | PR #4: pruebas de Lucía | ⏳ En borrador; revisión humana y aprobación/fusión pendientes. | [PR #4](https://github.com/LuciAguilar/Therapease/pull/4), `revision/etapa09`; código probado `83328783b2ea4f7487d28e2935e3c81acb8e521b`. |
 | Arquitectura del 08-oct | ⏳ Pruebas preparadas y ejecutadas: 28 correctas y 2 fallidas; excepción Web → Domain aprobada, ajustes y revisión de Miguel pendientes. | §4.3; cambios locales aún sin publicar. |
 | Horas y Docker del 08–09-oct | ✅ 12 correctas; reinicio real y claves/sesión conservadas. | §4.4; ampliación local para el mismo PR #4, revisión pendiente. |
+| HTTPS local del 10-oct | ✅ 12 correctas, 0 fallos/omitidas; TLS 1.3 negociado. | §4.5; avance local para el mismo PR #4, cabeceras y revisión pendientes. |
 | Resultado conjunto del 08-oct | ✅ 50 correctas: 37 de Identity y 13 de recuperación; 0 fallos/omitidas, 19 s. | Release sin advertencias reportadas. Ejecución local, no CI. |
 
 | Documento | Para qué sirve |
@@ -47,6 +48,7 @@
 | Auditoría y directorio | Aprobado | Sin pantalla de auditoría; consulta técnica autorizada Q03. Directorio separado y posterior (B07), fuera de CU03: lista completa de vigentes por defecto y filtro autorizado de bajas. Decisión de Dulce del 08-oct; registrar y buscar desde Pacientes se mantiene en el primer avance de diciembre. |
 | Repositorio público | Aprobado | Documentación seleccionada y datos ficticios. Protección contra secretos aún por comprobar. |
 | Destino de respaldo | Opción A aprobada | Repositorio privado aparte; no crear ni configurar todavía. |
+| Cabeceras S-30 | Propuesta pendiente de Lucía | Inventario y propuesta en §4.5; no se implementó una política nueva ni se aprobó por ejecutar QA. |
 | Cifrado/formato y antigüedad de copia | Propuesta de QA en ADR-05 | AES-256-GCM y clave efímera usados en pruebas. Restaurar la copia íntegra disponible aunque supere 24 h y reportar Q10; decisión de implementación definitiva pendiente. |
 
 | Pendiente de producto | Responsable de obtener respuesta | Impacto |
@@ -159,7 +161,41 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 | Resultado conservado | horas-docker-corregido-09oct.trx; SHA-256 edda84c4e0c97e574baf65babd8b51a6222300f2af5903a7c4acae3b5da8b693. |
 | Primer intento | 10 correctas y 2 fallidas por puerto automático reasignado al reiniciar. Se corrigió la preparación de QA, sin tocar producción, y se repitieron las 12. Se conserva el TRX inicial. |
 | Corrección de Claude, 09-oct | DisposeAsync elimina también la imagen propia con docker rmi; PostgreSQL se libera incluso si falla esa limpieza. 12 pruebas repetidas correctamente. La evidencia permanece; no se atribuye revisión humana. |
-| Revisión / límites | Revisión humana pendiente. Pruebas comentadas según el skill del proyecto. Contenedores e imagen de cada ejecución retirados al terminar; identificador conservado en imagen.json. Las dos imágenes anteriores también se retiraron el 09-oct. HTTPS, páginas, arquitectura pendiente y decisión B00/LCA siguen abiertos. |
+| Revisión / límites | Revisión humana pendiente. Pruebas comentadas según el skill del proyecto. Contenedores e imagen de cada ejecución retirados al terminar; identificador conservado en imagen.json. Las dos imágenes anteriores también se retiraron el 09-oct. HTTPS local probado después (§4.5); páginas, arquitectura pendiente y decisión B00/LCA siguen abiertos. |
+
+### 4.5. HTTPS local Q19 — ejecutado el 10-oct
+
+| Comprobación | Resultado ejecutable | Alcance / límite |
+| --- | --- | --- |
+| Ejecución | ✅ 12 correctas, 0 fallos/omitidas/abortadas; Release sin advertencias reportadas; 13,64 s con preparación. | Servidor Web real en Windows y PostgreSQL desechable/Testcontainers. Las 50 anteriores, arquitectura y horas/Docker no se repitieron. |
+| Certificado y conexión | ✅ TLS 1.3 negociado; certificado y nombre validados. Autoridad desconocida y nombre incorrecto rechazados. | Autoridad ficticia aceptada solo por el cliente QA; no se modifica confianza de Windows ni DNS. No prueba que todos los protocolos antiguos estén deshabilitados. |
+| HTTP → HTTPS | ✅ 307 en salud/API; conserva ruta/consulta, sin cuerpo ni cookie de sesión. | Puertos/certificado suministrados por QA; no acredita el Dockerfile HTTP ni un despliegue con proxy. |
+| Cookie del servidor | ✅ Renovación real por HTTPS: Secure, HttpOnly, SameSite=Lax. Cliente .NET usa la cookie por HTTPS y la excluye de HTTP. | Sesión inicial preparada con servicios reales, 16 min de antigüedad simulada. Sin login por formulario ni navegador. |
+| Autorización | ✅ Consulta HTTPS devuelve el evento ficticio esperado; sin sesión devuelve 401. | No sustituye completar filtros/límites Q03 ni permisos de las demás operaciones. |
+| HSTS | ✅ max-age=2592000 en HTTPS bajo modo Production local con nombre .test. Ausente en HTTP y localhost. | Se comprueba la cabecera; no el comportamiento de un navegador ni HSTS en nube. Sin includeSubDomains/preload. |
+| Mensajes y limpieza | ✅ Mensajes capturados sin los secretos ficticios buscados; certificado privado, proceso y PostgreSQL retirados. | Búsqueda acotada a este arranque/consulta. Solo se conservan metadatos públicos y cabeceras permitidas, sin valores de cookies. No sustituye las pruebas ampliadas de errores/registros. |
+
+**Reproducción:** Docker Desktop iniciado; desde la raíz del repo:
+
+```powershell
+dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj -c Release --filter FullyQualifiedName~HttpsLocalTests --logger "trx;LogFileName=b00-https.trx"
+```
+
+[Pruebas HTTPS](../../tests/TherapEase.IntegrationTests/HttpsLocalTests.cs) y [entorno temporal](../../tests/TherapEase.IntegrationTests/HttpsLocalRevision.cs). La evidencia automática queda en TestResults/https y se excluye de Git. TRX de esta ejecución: b00-https-final-10oct.trx, SHA-256 dd0dd08048c161a5cf2d7dd1fde06ee92d98f94c5c44edc89282d6b1193a3b46. Base local 47ca601; ampliación para el mismo PR #4 aún sin subir. Pruebas comentadas según el skill del proyecto; auditoría de esta entrega y revisión humana pendientes.
+
+> La redirección no protege datos que un cliente ya haya enviado por HTTP. La prueba envía las credenciales de sesión únicamente por HTTPS. HSTS necesita un cliente compatible y una primera conexión segura; ASP.NET Core excluye localhost por defecto. [Referencia oficial de Microsoft](https://learn.microsoft.com/en-us/aspnet/core/security/enforcing-ssl?view=aspnetcore-10.0).
+
+**Cabeceras S-30 — propuesta para decisión de Lucía:** inventario de salud y consulta autenticada con renovación, no de todas las páginas/respuestas. No hay corrección obligatoria atribuida al equipo por una política aún sin aprobar.
+
+| Cabecera | Observado | Propuesta pendiente |
+| --- | --- | --- |
+| X-Content-Type-Options | Ausente | nosniff, con Content-Type correcto. |
+| Content-Security-Policy | Ausente | frame-ancestors 'none'; completar restricciones de recursos después de validar las páginas de Dulce. |
+| X-Frame-Options | Ausente | DENY como apoyo a navegadores antiguos, coherente con frame-ancestors. |
+| Referrer-Policy | Ausente | no-referrer, para evitar enviar la dirección de origen a otros sitios. |
+| Cache-Control | no-store, no-cache en las dos respuestas observadas | Exigir no-store en contenido privado autenticado, incluida respuesta sin renovación; sin aplicarlo indiscriminadamente a archivos estáticos. |
+
+Propuesta fundamentada en [OWASP HTTP Headers](https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html). Lucía decide; Miguel/Dulce implementan su parte y Lucía prueba. No se añade política por iniciativa de QA. Navegador, antifalsificación, configuración del despliegue y cierre B00/LCA siguen pendientes.
 
 ## 5. Cobertura y alcance de los pendientes
 
@@ -168,7 +204,7 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 | Arquitectura | Pruebas automáticas ejecutadas: 30, con 28 correctas y 2 fallidas (§4.3). | Corregir llamada Web → MatrizDePermisos, implementar/probar CU04, repetir sobre páginas funcionales y revisión de Miguel. | §7, paso 1. |
 | Datos Q03/Q06/Q07/Q08/Q20 | Migraciones, permisos y varios escenarios ejecutados. | Otras operaciones, estados, concurrencia, conflictos, interrupciones y reintentos. | §7, paso 2. |
 | Horas Q09 y Docker | ✅ Imagen, horas, API, EF/PostgreSQL y reinicio probados (§4.4). | Revisión/reproducción por otra persona; horas en páginas/navegador cuando existan. | §7, pasos 1–3. |
-| Identidad y seguridad Q19 | Servidor probado; revisión acotada de secretos y reinicio real con claves/sesión. | PageModel, navegador, transporte HTTPS y revisión. | §7, paso 3. |
+| Identidad y seguridad Q19 | Servidor, reinicio y HTTPS local probados (§4.5); revisión acotada de secretos. | PageModel, navegador, decisión/verificación de cabeceras y revisión humana. | §7, paso 3. |
 | Recuperación Q10–Q11 | Procedimiento local corregido, ejecutado. | Revisión, decisiones de implementación y límites de operación registrados. | §7, paso 4; operación posterior en §9. |
 | Decisión LCA | Evidencia parcial disponible. | Completar validación, revisión distinta y decisión expresa de Lucía. | §7, paso 4. |
 
@@ -178,11 +214,11 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 
 | Orden de trabajo | Quién | Qué falta / dependencia |
 | --- | --- | --- |
-| Revisar la entrega de Identity + recuperación del PR #4 | Miguel o Dulce; Lucía decide fusión | Autor distinto del revisor. No necesita esperar a los PageModel. |
+| Revisar la entrega conjunta de QA del PR #4 | Miguel o Dulce; Lucía decide fusión | Autor distinto del revisor. No necesita esperar a los PageModel. |
 | **Arquitectura: resolver hallazgos del paso 1** | Miguel implementa/corrige y revisa las pruebas; Lucía repite | Pruebas ejecutadas: faltan acceso Web → MatrizDePermisos y coordinador CU04. No se da por cerrada la validación (§4.3). |
 | Datos restantes y revisión de horas/Docker | Lucía prueba; Miguel implementa/corrige y otro integrante revisa | Horas/Docker ejecutados en §4.4; datos por servicios esperan implementación/políticas donde corresponda. |
 | Acceso mínimo y producto | Dulce implementa/valida | Unitarias propias, respuestas reales de la usuaria y frontend afectado validado. |
-| Navegador y HTTPS | Lucía prueba; Miguel/Dulce aportan implementación | Acceso mínimo/configuración local y resolución de hallazgos; reinicio normal ya probado (§4.4). |
+| Navegador y cabeceras de seguridad | Lucía decide/prueba; Miguel/Dulce implementan | HTTPS local ya probado (§4.5); faltan páginas, decisión S-30 y comprobación de su implementación. |
 | Consolidar evidencia y decidir LCA | Lucía, con revisión humana distinta | Solo después de completar la validación; no autorizar B01 por una fusión parcial. |
 
 ## 7. Plan de validación autorizado
@@ -239,7 +275,8 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 | ⏳ | Probar cookies reales y renovación por actividad; cookie manipulada/ausente, redirección externa y caché tras salir. | Lucía | Navegador y acceso mínimo; no reutilizar el resultado de componentes como prueba de páginas. |
 | ⏳ | Probar antifalsificación, permisos por URL/envío directo y validación de las rutas disponibles. | Lucía prueba; Miguel/Dulce corrigen | PageModel disponibles; ampliar con las rutas de cada bloque posterior. |
 | ⏳ | Revisar errores, entradas/salidas y datos rastreables de la validación ampliada. | Lucía prueba; Miguel/Dulce corrigen | Sin datos privados ni secretos en eventos, respuestas o registros; no acreditar toda 09. |
-| ⏳ | Probar transporte HTTPS local y configuración aplicable; decidir cabeceras exigidas. | Lucía decide/prueba; Miguel/Dulce configuran su parte | Q19 y S-30; no autoriza nube ni HSTS de un despliegue inexistente. |
+| ✅ | Probar HTTPS local, certificado, redirección, cookie renovada y HSTS de modo Production local. | Lucía | 12 correctas; servidor real y PostgreSQL desechable. Sin navegador ni despliegue (§4.5). |
+| ⏳ | Decidir cabeceras exigidas y comprobar la implementación aprobada. | Lucía decide/prueba; Miguel/Dulce configuran su parte | S-30: inventario y propuesta en §4.5; no autoriza nube. |
 | ✅ | Reiniciar el contenedor de aplicación y comprobar continuidad de claves/sesión, sin claves en disco. | Lucía prueba; Miguel corrige | Reinicio real, cookie previa y evento correctos; claves PostgreSQL iguales y sin key-*.xml observados en /app, /home/app y /tmp. No acredita TLS (§4.4). |
 
 ### Paso 4. Recuperación y decisión
@@ -260,6 +297,7 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 | --- | --- |
 | Consulta técnica Q03 | `ConsultarEventosAutorizados`: solo lectura, sesión Identity y superusuario activo comprobados por el servidor. Filtros parametrizados; salida actor, momento, registro/campo y hecho, sin valores privados. No permite editar/borrar ni acceso directo del cliente a PostgreSQL. Comando completo pendiente; API parcialmente probada. |
 | Respaldo aprobado | Opción A: repo privado aparte; `pg_dump` cifrado, SHA-256, 14 días, restauración desechable e incidencia asignada a Lucía ante fallo. Sin crear repo, conectar Neon ni desplegar. |
+| Cabeceras S-30 | HTTPS local probado; política adicional propuesta en §4.5, pendiente de decisión e implementación. |
 | Propuesta ADR-05 | La prueba local no decide custodia duradera, formato definitivo ni operación diaria. Esos límites deben quedar explícitos en la decisión de LCA. |
 
 | Mejora opcional ya registrada | Quién podría aplicarla | Situación |

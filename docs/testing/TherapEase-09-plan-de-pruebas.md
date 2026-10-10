@@ -1,6 +1,6 @@
 # TherapEase — Plan de pruebas por caso de uso
 
-**Actualización: 09-oct-2026.** Referencia de pruebas de 09 basada en HU/CU y alternos de 08B, modelos de 08C, trazabilidad de 08D, reglas 07B–07C y Q01–Q20. Usar únicamente datos ficticios. Las reglas compartidas están en [AGENTS.md](../../AGENTS.md); las herramientas y organización de trabajo de cada integrante son libres, las reglas de seguridad/datos/pruebas/revisión son obligatorias.
+**Actualización: 10-oct-2026.** Referencia de pruebas de 09 basada en HU/CU y alternos de 08B, modelos de 08C, trazabilidad de 08D, reglas 07B–07C y Q01–Q20. Usar únicamente datos ficticios. Las reglas compartidas están en [AGENTS.md](../../AGENTS.md); las herramientas y organización de trabajo de cada integrante son libres, las reglas de seguridad/datos/pruebas/revisión son obligatorias.
 
 PageModel a cargo de Dulce con sus unitarias. Las cuatro condiciones de Identity están resueltas e indicadas en el informe de ajustes; Miguel las incorporó a AGENTS mediante el PR #1 ya fusionado. Las 11 comprobaciones anteriores están incorporadas y ampliadas a 37 casos de Identity, repetidos el 07-oct. Con 13 casos de recuperación, la ejecución anterior registró **50 correctos**, sin fallos/omitidas. Claude emitió **CORREGIR menor** para recuperación; ajustes de código aplicados y los 50 casos repetidos correctamente el 08-oct, 19 s, sin fallos/omitidas. Entrega conjunta publicada en [PR #4](https://github.com/LuciAguilar/Therapease/pull/4), en borrador; revisión humana y aprobación/fusión pendientes. [Recuperación y límites](TherapEase-09-B00-evidencia-recuperacion.md). Alcance y límites en [evidencia Identity](TherapEase-09-B00-evidencia-identidad.md). Sus resultados y límites están en [B00](../planning/TherapEase-etapa09-B00.md). Este plan no acredita por sí mismo ejecución, revisión ni cierre B00/LCA; la evidencia identifica lo realmente ejecutado.
 
@@ -21,7 +21,7 @@ No se implementa pantalla de auditoría. Q03 conserva los eventos y consulta té
 - **Datos rastreables:** usar una contraseña y un contacto ficticios fáciles de buscar (p. ej. `DatoRastreable#Prueba1`, `datoRastreable@ficticio.test`) para comprobar después que no aparecen en registros (S-21).
 - No se añaden herramientas nuevas sin ADR (07A). Si Dulce quiere probar JavaScript con otra herramienta, primero ADR.
 
-## 0.1. Seguimiento de ejecución — 08–09-oct-2026
+## 0.1. Seguimiento de ejecución — 08–10-oct-2026
 
 La columna **Estado** usa solo ✅ y ⏳. ✅ identifica ejecución local con evidencia para el alcance indicado; no equivale a revisión humana, aprobación, CI ni cierre. ⏳ señala que falta completar o evidenciar el caso; puede haber una parte ya probada. No se acreditan las unitarias de Miguel o Dulce a partir de las pruebas de integración de Lucía.
 
@@ -30,7 +30,9 @@ La columna **Estado** usa solo ✅ y ⏳. ✅ identifica ejecución local con ev
 | A-01 | Pruebas automáticas preparadas y ejecutadas el 08-oct: **30, 28 correctas y 2 fallidas, 0 omitidas** tras aprobar Lucía enumeraciones/constantes de Domain en Web. Hallazgos: Web llama a MatrizDePermisos y falta coordinador CU04. Controles negativos detectan infracciones; páginas funcionales y revisión de Miguel pendientes. Sigue ⏳; alcance y comando en B00 §4.3. Cambios aún locales para la actualización final del PR #4. |
 | A-02, A-03, A-07, S-22, S-23 | Migraciones reales, usuario separado, cruce SQL y permisos de auditoría/esquema en `RevisionDatosTests`; repetidos dentro de los 50 casos del 07-oct. |
 | L-CU02-02/03/04/06, L-CU11-01/02/03 | Duplicados, desactivación, rol, restablecimiento, cambio propio y auditoría en servicios reales de Identity. No acredita las páginas o formularios. |
-| S-01, S-02, S-04, S-05, S-08 | Bloqueo, mensaje genérico, atributos de cookie, revocación y hash en componentes reales. Expiración con reloj/fecha controlados; navegador y transporte siguen pendientes. |
+| S-01, S-02, S-04, S-05, S-08 | Bloqueo, mensaje genérico, atributos de cookie, revocación y hash en componentes reales. Expiración con reloj/fecha controlados; navegador pendiente. HTTPS local se probó aparte el 10-oct (B00 §4.5). |
+| S-04, S-29 (local) | ✅ HttpsLocalTests: 12 correctas el 10-oct, TLS 1.3, certificado/nombre válidos y rechazos, redirección 307, renovación real Secure/HttpOnly/Lax, cliente .NET excluye cookie en HTTP, HSTS local. No acredita navegador ni despliegue. B00 §4.5. |
+| S-30 | ⏳ Inventario y propuesta en B00 §4.5; Lucía decide, equipo implementa y QA verifica. Se conservan los otros pendientes de seguridad. |
 | S-26, S-27 | Búsqueda acotada en historial/archivos e imagen histórica, y revisión de `.env.example` ficticio. No se detectaron credenciales de TherapEase dentro del alcance; las claves privadas de ejemplo de GnuTLS están clasificadas en la evidencia. No es garantía universal. |
 | A-04, S-32 | ✅ Repetidos el 08 y 09-oct en HorasDockerTests: imagen actual construida, no root, /salud 200 y HEALTHCHECK healthy; ruta sin sesión 401. 12 casos correctos; el 09-oct se verificó también la eliminación automática de la imagen. B00 §4.4. |
 | L-CU02-01/05/07, L-CU04-01/03/04, L-CU06-05, L-Q03-01/02/03/04 | Cobertura parcial: temporal/políticas, último superusuario concurrente, auditoría de Identity, versión EF, conservación del paciente, dos reservas SQL y consulta autorizada. Faltan los demás caminos/operaciones, formularios o recuentos previstos; no se da por completo el caso compuesto. |
@@ -317,8 +319,8 @@ Referencia: OWASP Top 10:2025, ASVS 5.0 aplicable y 07B. «Todas las rutas» = l
 | S-26 | ✅ | Buscar secretos en el repositorio (incluido el historial) y en la imagen Docker → ninguno. | Q19, 07B |
 | S-27 | ✅ | `.env.example` solo tiene nombres y valores ficticios. | 07B |
 | S-28 | ⏳ | La conexión a Neon usa `SSL Mode=VerifyFull` (revisión de configuración, sin conectar desde CI). | 07B, 07C |
-| S-29 | ⏳ | HTTP redirige a HTTPS; en producción hay HSTS. | Q19 |
-| S-30 | ⏳ | Cabeceras de seguridad básicas (tipo de contenido, protección contra incrustación en marcos, política de contenido). **Pendiente:** Lucía decide cuáles exigir. | ASVS |
+| S-29 | ✅ | Validación local: HTTP redirige a HTTPS y HSTS se emite en modo Production con nombre .test; localhost excluido. HttpsLocalTests, B00 §4.5. Despliegue y navegador siguen pendientes. | Q19 |
+| S-30 | ⏳ | Cabeceras de seguridad básicas (tipo de contenido, protección contra incrustación en marcos, política de contenido). **Pendiente:** Lucía decide la propuesta de B00 §4.5; después se implementa y verifica. | ASVS |
 | S-31 | ✅ | Reiniciar el contenedor → las sesiones siguen siendo válidas (claves de Data Protection en PostgreSQL) y no hay claves en disco. | 05D, 07B |
 | S-32 | ✅ | El proceso del contenedor no corre como administrador. | 05E |
 
