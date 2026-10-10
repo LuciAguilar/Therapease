@@ -32,10 +32,11 @@ La columna **Estado** usa solo ✅ y ⏳. ✅ identifica ejecución local con ev
 | L-CU02-02/03/04/06, L-CU11-01/02/03 | Duplicados, desactivación, rol, restablecimiento, cambio propio y auditoría en servicios reales de Identity. No acredita las páginas o formularios. |
 | S-01, S-02, S-04, S-05, S-08 | Bloqueo, mensaje genérico, atributos de cookie, revocación y hash en componentes reales. Expiración con reloj/fecha controlados; navegador pendiente. HTTPS local se probó aparte el 10-oct (B00 §4.5). |
 | S-04, S-29 (local) | ✅ HttpsLocalTests: 12 correctas el 10-oct, TLS 1.3, certificado/nombre válidos y rechazos, redirección 307, renovación real Secure/HttpOnly/Lax, cliente .NET excluye cookie en HTTP, HSTS local. No acredita navegador ni despliegue. B00 §4.5. |
+| Consulta Q03 por API | 47 nuevos ejecutados: 46 correctos, 1 fallo real de tipo combinado; además 12 HTTPS repetidos correctamente, 59 total. Filtros válidos, límites, permisos, solo lectura y metadatos en B00 §4.6. Paciente,Cita devuelve 200/Cita en vez de 400; ajuste propuesto para Miguel. Comando final y revisión humana pendientes. |
 | S-30 | ⏳ Inventario y propuesta en B00 §4.5; Lucía decide, equipo implementa y QA verifica. Se conservan los otros pendientes de seguridad. |
 | S-26, S-27 | Búsqueda acotada en historial/archivos e imagen histórica, y revisión de `.env.example` ficticio. No se detectaron credenciales de TherapEase dentro del alcance; las claves privadas de ejemplo de GnuTLS están clasificadas en la evidencia. No es garantía universal. |
 | A-04, S-32 | ✅ Repetidos el 08 y 09-oct en HorasDockerTests: imagen actual construida, no root, /salud 200 y HEALTHCHECK healthy; ruta sin sesión 401. 12 casos correctos; el 09-oct se verificó también la eliminación automática de la imagen. B00 §4.4. |
-| L-CU02-01/05/07, L-CU04-01/03/04, L-CU06-05, L-Q03-01/02/03/04 | Cobertura parcial: temporal/políticas, último superusuario concurrente, auditoría de Identity, versión EF, conservación del paciente, dos reservas SQL y consulta autorizada. Faltan los demás caminos/operaciones, formularios o recuentos previstos; no se da por completo el caso compuesto. |
+| L-CU02-01/05/07, L-CU04-01/03/04, L-CU06-05, L-Q03-01/02/04 | Cobertura parcial: temporal/políticas, último superusuario concurrente, auditoría de Identity, versión EF, conservación del paciente, dos reservas SQL y consulta autorizada. Faltan los demás caminos/operaciones, formularios o recuentos previstos; no se da por completo el caso compuesto. |
 | Q09 (servidor/imagen), S-31 | Horas en UTC/Nueva York/Madrid, entradas con/sin zona en API, cita EF/PostgreSQL y reinicio real con claves/sesión comprobados el 08-oct. Las 12 se repitieron correctamente el 09-oct tras ajustar limpieza. Q09 de navegador y operaciones de agenda sigue ⏳; S-31 local ✅. Detalle y reproducción en B00 §4.4. |
 | S-03, S-06/07, S-11/12/13, S-21/24, S-28/33/34 | Comprobaciones parciales de servidor/configuración; faltan alcance completo, rutas, navegador, infraestructura o CI según el caso. Cinco fallos simultáneos no acreditan por sí solos cualquier volumen de intentos. |
 | A-05 | Recuperación corregida y repetida el 08-oct: respaldo cifrado/huella, 13 tablas y 7,375 s desde detección en muestra pequeña; además copia de 25 h restaurada, con incumplimiento Q10 informado. Revisión humana/aprobación pendientes. |
@@ -251,10 +252,10 @@ Integración: xUnit + Testcontainers, con el esquema creado por **las migracione
 | --- | --- | --- | --- |
 | L-Q03-01 ★ | ⏳ | Cada cambio de paciente, cita, pago y usuario genera exactamente un evento con actor, momento, registro/campo y hecho. | Q03 |
 | L-Q03-02 ★ | ⏳ | Si el evento no se puede guardar → el cambio tampoco se guarda. | Q03, S4 |
-| L-Q03-03 ★ | ⏳ | El usuario de aplicación puede insertar eventos, pero `UPDATE`/`DELETE` se deniegan en PostgreSQL. La consulta técnica autorizada devuelve únicamente actor, momento, registro/campo y hecho. | Q03, 07B, B00 aprobado |
+| L-Q03-03 ★ | ✅ | El usuario de aplicación puede insertar eventos, pero `UPDATE`/`DELETE` se deniegan en PostgreSQL. La consulta técnica autorizada devuelve únicamente actor, momento, registro/campo y hecho. | Q03, 07B, B00 aprobado |
 | L-Q03-04 ★ | ⏳ | Consulta técnica aprobada por Lucía: comando de lectura → servidor valida superusuario activo; sin sesión, sesión revocada o rol sin permiso → denegación, sin eventos. No hay operación de edición ni borrado. | Q03, Q01–Q02, B00 aprobado |
 
-Lucía aprobó el 01-oct la consulta sin pantalla de B00 mediante un comando de lectura que llama al servidor y exige permiso actual de superusuario. Q03 conserva su meta; existen implementación y pruebas parciales de consulta técnica, con validación completa pendiente según el seguimiento de §0.1.
+Lucía aprobó el 01-oct la consulta sin pantalla de B00 mediante un comando de lectura que llama al servidor y exige permiso actual de superusuario. Q03 conserva su meta. Permisos PostgreSQL y salida de metadatos comprobados; API con 46 correctas y 1 fallo de tipo combinado (B00 §4.6). Faltan corregir ese filtro, completar acceso/comando final y revisión humana; captura y atomicidad de todas las operaciones siguen ⏳.
 
 ### Recorrido completo Q16 (desde B04) ★
 
@@ -319,7 +320,7 @@ Referencia: OWASP Top 10:2025, ASVS 5.0 aplicable y 07B. «Todas las rutas» = l
 | S-26 | ✅ | Buscar secretos en el repositorio (incluido el historial) y en la imagen Docker → ninguno. | Q19, 07B |
 | S-27 | ✅ | `.env.example` solo tiene nombres y valores ficticios. | 07B |
 | S-28 | ⏳ | La conexión a Neon usa `SSL Mode=VerifyFull` (revisión de configuración, sin conectar desde CI). | 07B, 07C |
-| S-29 | ✅ | Validación local: HTTP redirige a HTTPS y HSTS se emite en modo Production con nombre .test; localhost excluido. HttpsLocalTests, B00 §4.5. Despliegue y navegador siguen pendientes. | Q19 |
+| S-29 | ✅ | Validación local: HTTP redirige a HTTPS y HSTS se emite en modo Production con nombre .test; localhost excluido. HttpsLocalTests, B00 §4.5. Despliegue y navegador siguen pendientes; duración HSTS final por decidir al desplegar. | Q19 |
 | S-30 | ⏳ | Cabeceras de seguridad básicas (tipo de contenido, protección contra incrustación en marcos, política de contenido). **Pendiente:** Lucía decide la propuesta de B00 §4.5; después se implementa y verifica. | ASVS |
 | S-31 | ✅ | Reiniciar el contenedor → las sesiones siguen siendo válidas (claves de Data Protection en PostgreSQL) y no hay claves en disco. | 05D, 07B |
 | S-32 | ✅ | El proceso del contenedor no corre como administrador. | 05E |

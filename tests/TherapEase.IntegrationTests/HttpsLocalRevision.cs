@@ -39,8 +39,7 @@ public sealed class HttpsLocalRevision : IAsyncLifetime
     private string? _archivoCertificado;
     private int _liberado;
     public const string Anfitrion = "therapease.local.test";
-    public string Evidencia { get; } = Environment.GetEnvironmentVariable("THERAPEASE_EVIDENCIA_HTTPS")
-        ?? Path.Combine(ServidorRevision.RaizRepositorio(), "TestResults", "https", Guid.NewGuid().ToString("N"));
+    public string Evidencia { get; }
     public Escenario Escenario { get; private set; } = null!;
     public HttpClient Cliente { get; private set; } = null!;
     public Uri Http { get; private set; } = null!;
@@ -49,6 +48,15 @@ public sealed class HttpsLocalRevision : IAsyncLifetime
     public Guid Evento { get; } = Guid.NewGuid();
     public Guid Registro { get; } = Guid.NewGuid();
     public string Consulta => $"/api/auditoria/eventos?desde=2026-10-10T00:00:00Z&hasta=2026-10-11T00:00:00Z&idRegistro={Registro}";
+
+    public HttpsLocalRevision() : this(null) { }
+
+    /// Permite reutilizar HTTPS en otra revisión, guardando su evidencia en la carpeta correspondiente.
+    internal HttpsLocalRevision(string? carpetaEvidencia)
+    {
+        Evidencia = carpetaEvidencia ?? Environment.GetEnvironmentVariable("THERAPEASE_EVIDENCIA_HTTPS")
+            ?? Path.Combine(ServidorRevision.RaizRepositorio(), "TestResults", "https", Guid.NewGuid().ToString("N"));
+    }
 
     /// Prepara datos ficticios, certificado y servidor; espera hasta que HTTPS responda.
     public async Task InitializeAsync()

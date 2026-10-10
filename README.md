@@ -97,6 +97,8 @@ T1 fue publicado y aprobado. La protección de main con una revisión se comprob
 
 **Estado de integración:** PR #1 ya fusionado en main (`41123f2`). PR #3 fusionado el 06-oct-2026 en `8baf8fb`. La rama existente `revision/etapa09` se reutiliza para las revisiones generales de la etapa. Esta guía conserva los comandos y la documentación técnica de Miguel (§10); únicamente se actualiza el estado de las pruebas que ahora existen. QA local: 37 casos de Identity y 13 de recuperación, todos repetidos correctamente el 08-oct tras aplicar las correcciones de Claude; entrega conjunta propuesta para revisión humana y aprobación/fusión. Ampliación local del 08-oct para el mismo PR #4: arquitectura (28 correctas/2 fallidas, pendientes de Miguel) y horas/Docker (12 correctas, incluido reinicio real; repetidas el 09-oct con limpieza automática de la imagen). El 10-oct se suman 12 pruebas correctas de HTTPS local; cabeceras adicionales, navegador y revisión humana pendientes (B00 §4.5). El commit local 47ca601 y la ampliación HTTPS se acumulan para actualizar el mismo PR #4 al final, sin subir aún. Los acuerdos aprobados y pendientes B00 se conservan.
 
+**Q03 — 10-oct:** 47 casos nuevos, 46 correctos y 1 fallo de tipo combinado; 12 HTTPS repetidos correctamente. El ajuste propuesto está en el informe §7 y la evidencia en B00 §4.6. Acceso/comando final y revisión humana pendientes. Auditoría de HTTPS recibida: APROBADO; duración HSTS final pendiente al desplegar.
+
 Consultar [B00 — siguientes pasos compartidos](docs/planning/TherapEase-etapa09-B00.md#6-siguientes-pasos-compartidos) para el avance y los pendientes de integración y pruebas.
 
 ## 10. Construir, probar y ejecutar

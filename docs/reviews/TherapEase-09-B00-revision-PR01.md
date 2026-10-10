@@ -1,6 +1,6 @@
 # TherapEase — B00 · Ajustes del PR #1
 
-> **Ampliación del 08-oct:** ajustes nuevos de arquitectura en §6; correcciones históricas de §2 ya fusionadas.
+> **Ampliaciones:** arquitectura en §6 (08-oct) y filtro Q03 en §7 (10-oct, propuesta pendiente de auditoría/aprobación). Correcciones históricas de §2 ya fusionadas.
 
 **Fecha de revisión:** 04-oct-2026. **Estado:** correcciones obligatorias documentales comprobadas en `b60eba42edeb2fa8cdbea08ad1a4e51b041c21b0`, incluida la descripción. Lucía revisó/aprobó y fusionó PR #1 en main (`41123f2d2c115a05ff1df944457195a7f671cc17`). Las políticas de producto y mejoras opcionales siguen abiertas.
 
@@ -58,3 +58,13 @@ Estos ajustes provienen de la validación ejecutable sobre la base `2d088e2c4cc3
 | **Miguel** | Implementar un coordinador CU04 mínimo en Application, fuera de Pacientes/Citas, que consulte las citas activas antes de dar de baja al paciente. | `src/Application/`; mediante contratos públicos de los módulos, sin ciclo. | Baja solo en condición segura, cambio/evento atómicos y protección concurrente. Conservar el bloqueo PostgreSQL. No cancelar automáticamente ni resolver por omisión la política pendiente con Dulce. |
 
 **Resultado actual:** 30 comprobaciones de arquitectura, 28 correctas y 2 fallidas, 0 omitidas. Las dos pendientes son el acceso a `MatrizDePermisos` y el coordinador CU04; no se omiten ni se alteran para aparentar cumplimiento. Tras corregir, repetir el comando de B00 §4.3 y las pruebas de identidad/operaciones afectadas. Verificar la operación real de CU04 además de su ubicación. Revisión del código por persona distinta del autor y aprobación de Lucía; Miguel revisa las pruebas de límites escritas por Lucía. B00/LCA siguen abiertos.
+
+## 7. Ajuste propuesto del filtro Q03 — 10-oct-2026
+
+**Hallazgo comprobado; corrección propuesta pendiente de auditoría y aprobación de Lucía.** La consulta pide un tipo de registro, pero acepta una lista con comas y la transforma en otro tipo.
+
+| Responsable | Cambio propuesto | Dónde | Resultado esperado |
+| --- | --- | --- | --- |
+| **Miguel** | Rechazar listas como tipoRegistro=Paciente,Cita antes de convertir el tipo. Mantener filtros válidos, permisos y salida de metadatos. Añadir la unitaria del caso en su PR. | src/Web/Endpoints/EndpointDeConsultaDeEventos.cs:39; enum TipoRegistroAuditoria. | 400, sin eventos. Actualmente devuelve 200 con Cita. Conservar la prueba fallida ConsultaAuditoriaApiTests.Tipo_Invalido_O_Combinado_Se_Rechaza hasta corregir; después repetir Q03 y autorización afectada. |
+
+Enum.TryParse combina los valores separados por comas; IsDefined acepta el resultado cuando coincide con un valor existente. No basta comprobar únicamente el valor resultante. [Referencia de Microsoft](https://learn.microsoft.com/en-us/dotnet/api/system.enum.tryparse?view=net-10.0). No se propone cambiar permisos, arquitectura ni admitir filtros múltiples.

@@ -20,7 +20,8 @@ public sealed class HttpsLocalTests(HttpsLocalRevision entorno) : IClassFixture<
     public async Task Https_Valida_Certificado_Y_Consulta_Real()
     {
         // Arrange
-        var esperado = entorno.Evento;
+        var esperado = entorno.Evento; // el entorno se refiere a un evento ficticio
+                                       // que se inserta en la BD desechable para validar la consulta.
 
         // Act
         var protocolo = await entorno.ProtocoloAsync();
