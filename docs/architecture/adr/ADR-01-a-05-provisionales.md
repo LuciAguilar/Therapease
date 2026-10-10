@@ -39,6 +39,10 @@
 
 **Continuidad posterior:** 07A concretó un puerto de persistencia por módulo y la prueba automática de límites. 08C situó conceptualmente el coordinador de CU04 fuera de Pacientes y Citas, en Application, para evitar un ciclo; Miguel define su ubicación al crear los proyectos en 09. Lucía escribe y ejecuta la prueba de límites; Miguel la revisa.
 
+**Decisión posterior — aprobada por Lucía el 08-oct-2026, tras recomendación de Claude:** se permite a Web usar de Domain solo enumeraciones y constantes en contenedores sin lógica. Entidades, reglas y servicios de Domain siguen accediéndose por Application. Se admite la referencia de compilación a Domain, directa o transitiva, con comprobación del uso real; no se obliga a modificar los archivos de proyecto existentes. La regla operativa se registra en AGENTS §1. No se modifica la transcripción de la decisión 04D.
+
+**Validación ejecutable del 08-oct:** 30 comprobaciones de arquitectura: 28 correctas, 2 fallidas, 0 omitidas. Enumeraciones y constantes aceptadas; falla la llamada de Web a `MatrizDePermisos` y la presencia del coordinador CU04. Miguel corrige/implementa, Lucía repite y Miguel revisa estas pruebas. La prueba estructural no demuestra por sí sola el funcionamiento de CU04. B00/LCA siguen abiertos.
+
 ## ADR-04 — Integridad y ciclo de datos
 
 - **Contexto 04D v0.3:** Q03, **Q05**, Q06–Q09, Q20 y R02.

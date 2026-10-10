@@ -1,6 +1,6 @@
 # TherapEase — Guía de arranque del equipo en 09
 
-**Actualización documental: 08-oct-2026.** La base de esta guía, AGENTS, ADR-01…06 y el plan B00 fueron aprobados el 01-oct. Esta actualización separa ajustes para el equipo de las notas personales y alinea el estado parcial de B00. Los cambios de documentación inicial pueden comunicarse a Lucía; no se acredita una revisión no recibida.
+**Actualización documental: 09-oct-2026.** La base de esta guía, AGENTS, ADR-01…06 y el plan B00 fueron aprobados el 01-oct. Esta actualización separa ajustes para el equipo de las notas personales y alinea el estado parcial de B00. Los cambios de documentación inicial pueden comunicarse a Lucía; no se acredita una revisión no recibida.
 
 **T1 aprobado y publicado:** Lucía aprobó los 22 archivos de documentación, reglas y carpetas base el 01-oct-2026 y realizó el primer push a [LuciAguilar/Therapease](https://github.com/LuciAguilar/Therapease), repositorio público. La validación ejecutable de B00 y la decisión de cierre de LCA siguen pendientes.
 
@@ -8,8 +8,8 @@
 
 - **Autorizado:** iniciar 09 por B00, implementar lo necesario para validar el stack y registrar evidencia. Lucía aprobó el plan corregido, ADR-06, la fidelidad de ADR-01…05 corregidos y la consulta Q03 sin pantalla. Eligió repositorio público y autorizó instalar .NET 10.
 - **Avance parcial incorporado:** PR #1 corregido, revisado por Lucía y fusionado en main con `41123f2d2c115a05ff1df944457195a7f671cc17`. Incluye solución/proyectos, backend inicial, migraciones e identidad. Hay resultados parciales, resumidos en B00; la validación completa sigue pendiente. B01–B08 no quedan autorizados por esta fusión.
-- **Producto:** primer recorrido previsto: acceso → paciente → cita → pago pagado/pendiente, sin montos ni cobros. B00–B04 al 04-dic-2026 es un corte propuesto que Dulce debe validar con la usuaria. B05–B07 dependen de prioridad y capacidad; B08 recoge evidencia realmente obtenida.
-- **Cambio vigente:** no hay pantalla de auditoría. Q03 registra eventos en base y permite consulta técnica autorizada de solo lectura. El directorio muestra pacientes vigentes por defecto y filtro autorizado de bajas; sus campos visibles siguen pendientes.
+- **Producto:** primer recorrido previsto: acceso → paciente → cita → pago pagado/pendiente, sin montos ni cobros. B00–B04 al 04-dic-2026 es un corte propuesto que Dulce debe validar con la usuaria. B05–B06 dependen de prioridad y capacidad; el directorio B07 queda para después del primer avance de diciembre; B08 recoge evidencia realmente obtenida.
+- **Cambio vigente:** no hay pantalla de auditoría. Q03 registra eventos en base y permite consulta técnica autorizada de solo lectura. **Decisión de Dulce del 08-oct:** registrar y **buscar pacientes desde Pacientes** permanece en el primer avance de diciembre. El directorio sale de CU03 y pasa a una pantalla aparte posterior (B07), con la lista completa de vigentes por defecto y filtro autorizado de bajas; sus campos visibles siguen pendientes.
 - **Datos:** solo ficticios. R04 sigue abierto. Expediente, notas, reportes, capturista, correo e integraciones están diferidos. TOTP es obligatorio antes de datos reales, con revisión del impacto en ADR-05.
 - **Forma de trabajo:** solo Lucía elabora con Codex y audita con Claude. Miguel y Dulce eligen herramientas, asistentes y organización de sus revisiones; la documentación les sirve de contexto y soporte. Las reglas compartidas de revisión entre personas y aprobación están en [AGENTS.md](AGENTS.md).
 
@@ -95,7 +95,7 @@ El PR #1 fusionado ya incluye solución, `.csproj`, migraciones y aplicación m�
 
 T1 fue publicado y aprobado. La protección de main con una revisión se comprobó el 03-oct; protección contra secretos todavía sin verificar. Las reglas de revisión de código/pruebas están en AGENTS. B00/LCA y R04 siguen abiertos.
 
-**Estado de integración:** PR #1 ya fusionado en main (`41123f2`). PR #3 fusionado el 06-oct-2026 en `8baf8fb`. La rama existente `revision/etapa09` se reutiliza para las revisiones generales de la etapa. Esta guía conserva los comandos y la documentación técnica de Miguel (§10); únicamente se actualiza el estado de las pruebas que ahora existen. QA local: 37 casos de Identity y 13 de recuperación, todos repetidos correctamente el 08-oct tras aplicar las correcciones de Claude; entrega conjunta propuesta para revisión humana y aprobación/fusión. Los acuerdos aprobados y pendientes B00 se conservan.
+**Estado de integración:** PR #1 ya fusionado en main (`41123f2`). PR #3 fusionado el 06-oct-2026 en `8baf8fb`. La rama existente `revision/etapa09` se reutiliza para las revisiones generales de la etapa. Esta guía conserva los comandos y la documentación técnica de Miguel (§10); únicamente se actualiza el estado de las pruebas que ahora existen. QA local: 37 casos de Identity y 13 de recuperación, todos repetidos correctamente el 08-oct tras aplicar las correcciones de Claude; entrega conjunta propuesta para revisión humana y aprobación/fusión. Ampliación local del 08-oct para el mismo PR #4: arquitectura (28 correctas/2 fallidas, pendientes de Miguel) y horas/Docker (12 correctas, incluido reinicio real; repetidas el 09-oct con limpieza automática de la imagen). Se acumula la entrega para actualizar el PR al final; revisión humana pendiente. Los acuerdos aprobados y pendientes B00 se conservan.
 
 Consultar [B00 — siguientes pasos compartidos](docs/planning/TherapEase-etapa09-B00.md#6-siguientes-pasos-compartidos) para el avance y los pendientes de integración y pruebas.
 

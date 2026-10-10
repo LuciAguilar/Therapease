@@ -1,122 +1,289 @@
 # TherapEase — 09/B00 · Plan y estado de validación
 
-**Actualización documental: 08-oct-2026.** B00 está iniciado; Elaboración/LCA y R04 continúan abiertos. No hay autorización de B01, Construcción, datos reales o despliegue.
+**Actualización documental: 09-oct-2026.**
+
+> **B00 y Elaboración/LCA abiertos.** Solo datos ficticios; R04 abierto. No iniciar B01/Construcción ni desplegar sin decisión expresa de Lucía.
+>
+> **Cómo leer las tablas:** ✅ = la tarea concreta tiene ejecución o decisión registrada; ⏳ = falta completarla o revisarla. Una prueba correcta no significa revisión humana, fusión ni cierre del bloque.
 
 ## 1. Estado y documentación
 
-- T1 fue aprobado y publicado el 01-oct-2026; su commit base fue `174afe0b6764f2415427f28b04d4627ce4c33b16`.
-- PR [#1](https://github.com/LuciAguilar/Therapease/pull/1): B00 pasos 1–3. Revisión original en `e418010`; correcciones comprobadas en `b60eba42edeb2fa8cdbea08ad1a4e51b041c21b0`. Lucía revisó/aprobó y fusionó con Squash and merge; commit en main: `41123f2d2c115a05ff1df944457195a7f671cc17`.
-- [Informe de ajustes](../reviews/TherapEase-09-B00-revision-PR01.md): alcance, cambios que deben hacer Miguel/Dulce y mejoras opcionales. No incluye explicaciones personales ni el plan de siguientes pasos.
-- [Guía de equipo](../../README.md): responsabilidades, documentación y preparación del entorno. [AGENTS.md](../../AGENTS.md) es la fuente única de reglas.
-- PR [#3](https://github.com/LuciAguilar/Therapease/pull/3), rama `revision/etapa09`, reunió el informe de ajustes, guía/README, B00 y plan de pruebas; fusionado el 06-oct-2026 en `8baf8fbc34890d4710c2b78e920f10b8d3e92cb3`. La integración documental no cierra B00 ni LCA.
+| Entrega | Estado registrado | Referencia |
+| --- | --- | --- |
+| T1: repositorio y carpetas base | ✅ Aprobado y publicado el 01-oct. | Base `174afe0b6764f2415427f28b04d4627ce4c33b16`. |
+| PR #1: pasos 1–3 de Miguel | ✅ Corregido, aprobado y fusionado con Squash and merge. | [PR #1](https://github.com/LuciAguilar/Therapease/pull/1); main `41123f2d2c115a05ff1df944457195a7f671cc17`. |
+| PR #3: documentación compartida | ✅ Fusionado el 06-oct. | [PR #3](https://github.com/LuciAguilar/Therapease/pull/3); main `8baf8fbc34890d4710c2b78e920f10b8d3e92cb3`. |
+| PR #4: pruebas de Lucía | ⏳ En borrador; revisión humana y aprobación/fusión pendientes. | [PR #4](https://github.com/LuciAguilar/Therapease/pull/4), `revision/etapa09`; código probado `83328783b2ea4f7487d28e2935e3c81acb8e521b`. |
+| Arquitectura del 08-oct | ⏳ Pruebas preparadas y ejecutadas: 28 correctas y 2 fallidas; excepción Web → Domain aprobada, ajustes y revisión de Miguel pendientes. | §4.3; cambios locales aún sin publicar. |
+| Horas y Docker del 08–09-oct | ✅ 12 correctas; reinicio real y claves/sesión conservadas. | §4.4; ampliación local para el mismo PR #4, revisión pendiente. |
+| Resultado conjunto del 08-oct | ✅ 50 correctas: 37 de Identity y 13 de recuperación; 0 fallos/omitidas, 19 s. | Release sin advertencias reportadas. Ejecución local, no CI. |
 
-**Estado al 08-oct:** correcciones obligatorias de recuperación aplicadas y **50 pruebas repetidas correctamente** (37 Identity + 13 recuperación), 0 fallos/omitidas, Release sin advertencias, 19 s. La copia reciente recuperó 13 tablas en **7,375 s** desde detección simulada; se restauró además una copia íntegra de 25 h, informando incumplimiento Q10 sin bloquear recuperación. Entrega conjunta publicada en [PR #4](https://github.com/LuciAguilar/Therapease/pull/4), en borrador, `revision/etapa09`, para revisión humana de Miguel o Dulce y aprobación/fusión de Lucía. No necesita esperar los PageModel de Dulce; pendientes de navegador separados. No acredita CI ni cierre B00/LCA/R04.
+| Documento | Para qué sirve |
+| --- | --- |
+| [Guía / README](../../README.md) y [AGENTS](../../AGENTS.md) | Preparación y comandos; reglas compartidas en AGENTS. |
+| [Informe PR01](../reviews/TherapEase-09-B00-revision-PR01.md) | Ajustes ya comprobados y mejoras opcionales del PR #1. |
+| [Plan de pruebas](../testing/TherapEase-09-plan-de-pruebas.md) | Casos y estados de toda 09; cada caso entra en su bloque. |
+| [08B](../requirements/TherapEase-etapa08-casos-historias.md), [08C](../requirements/TherapEase-etapa08-modelos-interfaces.md), [08D](TherapEase-etapa08-backlog-trazabilidad.md) y [Q/R](../requirements/TherapEase-requisitos-arquitectonicos.md) | Alcance, alternos, modelos, orden propuesto y criterios. |
+| [ADR-01…05](../architecture/adr/ADR-01-a-05-provisionales.md) y [ADR-06](../architecture/adr/ADR-06-monorepo.md) | Decisiones y notas posteriores; las propuestas no se convierten en decisiones por ejecutarlas en QA. |
 
 ## 2. Responsabilidades y forma de trabajo
 
-| Persona | Responsabilidad |
-| --- | --- |
-| Miguel | Solución, proyectos, carpetas internas, backend, persistencia, migraciones e Identity. Unitarias propias en cada PR. PR #1 corregido y fusionado; documenta comandos/resultados de los siguientes cambios de B00. |
-| Dulce | Frontend, PageModel y unitarias propias; valida las políticas pendientes y prioridades con la usuaria. |
-| Lucía | Arquitectura, seguridad, estrategia de QA, integración crítica, recorrido y evidencia final. Revisa los cambios críticos y toma la decisión de LCA. |
-
-Cada integrante organiza sus herramientas y revisiones a su modo; la documentación aporta contexto y soporte. Las reglas de seguridad, datos, pruebas y revisión son obligatorias para todo el equipo y están en AGENTS. Las pruebas de Lucía requieren revisión de Miguel o Dulce; ninguna revisión asistida sustituye a la revisión humana.
-
-## 3. Condiciones resueltas y propuestas de producto
-
-- Condiciones de identidad resueltas: longitud mínima de contraseña, caducidad de sesión, comando local de primer superusuario y conservación del bloqueo al restablecer; incorporadas al AGENTS del repositorio por el PR #1 fusionado. PageModel a cargo de Dulce.
-- El bloqueo PostgreSQL se conserva: nunca puede quedar una cita activa de un paciente de baja. Solo queda provisional la política para las citas existentes al dar de baja: impedir la baja o cancelar primero.
-- Pago inicial «Pendiente» y citas contiguas siguen provisionales, pendientes de Dulce con la usuaria. Aprobar el PR parcial no decide esas políticas.
-- No se implementa pantalla de auditoría. Q03 registra eventos y permite consulta técnica autorizada. Directorio de pacientes: vigentes por defecto y filtro de bajas; campos visibles pendientes.
-- Corte B00–B04 al 04-dic-2026: propuesta que Dulce valida con la usuaria. B05–B07 dependen de prioridad y capacidad; B08 reúne evidencia realmente obtenida.
-
-## 4. Evidencia parcial del PR #1
-
-**Fecha:** revisión del 03–04-oct-2026. **Commit:** `e418010882f9827ece2a1500d28f27490b45c585`. Entorno local: Windows, SDK .NET 10.0.401, Docker 29.8.1 con contenedores Linux; PostgreSQL 17 desechable mediante Testcontainers 4.15.0, xUnit 2.9.3. Solo datos ficticios.
-
-| Comprobación | Resultado registrado | Límite |
+| Persona | Implementa / elabora | Revisa o decide |
 | --- | --- | --- |
-| Build de siete proyectos | 0 errores y 0 advertencias | Corresponde al SHA indicado, no a futuras correcciones. |
-| Unitarias del PR | 149 pasan, sin fallos ni omitidas | Integración y E2E del PR están vacíos; no cuentan como pruebas ejecutadas. |
-| QA adicional con PostgreSQL/Testcontainers | 11 pasan, sin fallos ni omitidas | En la revisión original era un borrador externo. Incorporación local y nueva ejecución del 06-oct en §4.1; revisión humana y publicación pendientes. Sin CI nueva. |
-| Docker | Imagen construida, proceso UID 1654 y salud observados | Salud comprueba el proceso, no disponibilidad de base o acceso funcional. |
-| HTTP | `/salud` 200, auditoría sin sesión 401, inicio público 200 sin datos privados | Comprobación local; no acredita TLS o navegación completa. |
-| Límites | Inspección parcial sin infracciones encontradas | Falta prueba automática A-01 y código real de CU04. |
-| NuGet directo y transitivo | Consulta sin vulnerabilidades reportadas en PR y borrador QA | Resultado de esa consulta; no equivale a auditoría completa de seguridad. |
+| Miguel | Solución, proyectos, módulos, backend, persistencia, migraciones e Identity; unitarias propias. | Prueba de límites de Lucía; puede revisar sus demás pruebas. |
+| Dulce | Frontend, PageModel y unitarias propias; valida producto con la usuaria. | Puede revisar las pruebas de Lucía; registra respuestas reales de producto. |
+| Lucía | Estrategia QA, arquitectura, integración crítica, seguridad y evidencia. | Cambios críticos, aprobación final y decisión de LCA. |
 
-Las 11 comprobaciones cubrieron migraciones y usuario separado; auditoría de solo inserción; cruces y dos reservas concurrentes; versiones de edición; baja/recuperación de paciente sin citas activas; último superusuario y dos desactivaciones concurrentes; bloqueo tras cinco fallos; permisos/revocación en API; y reversión del alta de usuario si falla su auditoría.
+> Las herramientas y el método son libres. Las reglas compartidas de AGENTS son obligatorias. Autor y revisor humanos deben ser personas distintas; Miguel o Dulce revisa las pruebas de Lucía.
 
-Las cookies de QA se generaron y enviaron manualmente por HTTP local: no prueban el formulario de acceso, navegador, atributos recibidos de cookie, antifalsificación o TLS. Los 15 minutos se comprobaron en configuración sin esperar su expiración. Las pruebas de concurrencia cubren dos transacciones coordinadas, no carga ni todos los órdenes posibles. La reversión de un alta no prueba todas las operaciones. Los resultados adicionales requieren revisión/adopción de Lucía y revisión de Miguel o Dulce antes de incorporarse a su PR de pruebas.
+## 3. Decisiones aprobadas, propuestas y pendientes
 
-Los comandos y salidas completos siguen conservados localmente. El PR de pruebas publicará el código y la evidencia reproducible necesarios, con datos ficticios y sin secretos. Esta actualización documental no ejecutó nuevas pruebas de código.
+| Tema | Situación | Qué se mantiene / qué falta |
+| --- | --- | --- |
+| Identidad | Aprobado | Mínimo 12 caracteres sin composición; sesión 30 min sin actividad; cinco fallos bloquean 15 min; restablecer conserva el bloqueo. |
+| Primer superusuario | Aprobado | Comando local del operador; temporal solo en su consola, nunca en registros del servidor. |
+| PageModel | Aprobado | Dulce los implementa y escribe sus unitarias. |
+| Paciente de baja y cita activa | Aprobado | El bloqueo PostgreSQL **se conserva**. Nunca debe quedar una cita activa de un paciente de baja. |
+| Auditoría y directorio | Aprobado | Sin pantalla de auditoría; consulta técnica autorizada Q03. Directorio separado y posterior (B07), fuera de CU03: lista completa de vigentes por defecto y filtro autorizado de bajas. Decisión de Dulce del 08-oct; registrar y buscar desde Pacientes se mantiene en el primer avance de diciembre. |
+| Repositorio público | Aprobado | Documentación seleccionada y datos ficticios. Protección contra secretos aún por comprobar. |
+| Destino de respaldo | Opción A aprobada | Repositorio privado aparte; no crear ni configurar todavía. |
+| Cifrado/formato y antigüedad de copia | Propuesta de QA en ADR-05 | AES-256-GCM y clave efímera usados en pruebas. Restaurar la copia íntegra disponible aunque supere 24 h y reportar Q10; decisión de implementación definitiva pendiente. |
 
-**Comprobación de las correcciones:** el nuevo SHA `b60eba4` cambió solo README y AGENTS; build Release de siete proyectos correcto, 0 errores/advertencias. Miguel declara 149 unitarias correctas para ese SHA; no se repitieron las pruebas de esta tabla en la actualización documental. La fusión en `41123f2` incorpora ese código, sin convertir la evidencia parcial en cierre de B00.
+| Pendiente de producto | Responsable de obtener respuesta | Impacto |
+| --- | --- | --- |
+| Citas existentes al dar de baja al paciente: impedir o cancelar primero | Dulce con la usuaria | CU04; no retirar el bloqueo de la base ni cancelar automáticamente. |
+| Citas contiguas y pago inicial «Pendiente» | Dulce con la usuaria | Reglas hoy provisionales; no validarlas por omisión. |
+| Retirar un ámbito con citas, incluidas agendadas de baja recuperables | Dulce con la usuaria | Baja/recuperación coherente. |
+| Corregir pago de una cita cancelada o de baja | Dulce con la usuaria | Permisos y alternos del pago. |
+| Campos de paciente/cita/directorio, ámbitos, duplicados y menores/tutor | Dulce con la usuaria | Validar antes del frontend afectado; `NombreCompleto`/`Correo` no se presuponen necesarios. |
+| Pantallas de 08C, navegación y resto de prioridades/corte B00–B04 para 04-dic | Dulce con la usuaria y equipo | Registrar y buscar pacientes en el primer avance ya se mantiene. Directorio aparte posterior decidido el 08-oct; los demás compromisos y campos siguen por validar. B05–B06 dependen de capacidad. |
 
-## 4.1. Identity en servidor — ejecución local del 06-oct
+## 4. Evidencia registrada y límites
 
-Base `8baf8fbc34890d4710c2b78e920f10b8d3e92cb3`. En la rama existente `revision/etapa09` se incorporaron las 11 comprobaciones y se añadieron 26 casos: **37 pasan, 0 fallos, 0 omitidos**, con PostgreSQL desechable/Testcontainers. Se probaron servicios de Identity, revocación, permisos, bloqueo/expiración controlada, temporal, atomicidad y último superusuario concurrente. Secretos/configuración revisados con alcance acotado; detalle y limitaciones en [evidencia de Identity](../testing/TherapEase-09-B00-evidencia-identidad.md).
+### PR #1 — antecedente del 03–04-oct
 
-**Estado al 07-oct:** correcciones menores de la auditoría aplicadas; comentarios conservados y 37 pruebas repetidas con Docker, todas correctas. El 08-oct se repitieron los 37 casos dentro de la ejecución conjunta de 50, todos correctos. Entrega conjunta para revisión de Miguel o Dulce; aprobación y fusión pendientes. Formularios/cookies reales, antifalsificación y HTTPS siguen pendientes; recuperación Q10–Q11 corregida y repetida correctamente el 08-oct (§4.2), pendiente de revisión humana. No cambia el backend ni cierra B00/LCA.
+Revisión original `e418010882f9827ece2a1500d28f27490b45c585`; corrección documental `b60eba42edeb2fa8cdbea08ad1a4e51b041c21b0`. Windows, SDK 10.0.401, Docker 29.8.1 Linux, PostgreSQL desechable/Testcontainers 4.15.0, xUnit 2.9.3.
 
-## 4.2. Recuperación Q10–Q11 — ejecución local del 07-oct
+| Comprobación | Resultado histórico | Límite actual |
+| --- | --- | --- |
+| Build de siete proyectos | 0 errores/advertencias, también en `b60eba4`. | No se repite por reorganizar este documento. |
+| Unitarias de Miguel | 149 correctas en la revisión original; Miguel declaró resultado correcto en `b60eba4`. | No son parte del nuevo conjunto de 50 de Lucía. |
+| Integración externa | 11 correctas: migraciones, permisos, cruces, versiones, conservación, Identity y atomicidad inicial. | Ya incorporadas y repetidas dentro de los 37; no sumar 11 otra vez. |
+| Docker y HTTP | Imagen construida; UID 1654; salud 200, inicio 200 y auditoría sin sesión 401. | Salud comprueba el proceso, no la base ni acceso funcional; no demuestra HTTPS. |
+| Límites y paquetes | Inspección manual histórica y consulta NuGet sin vulnerabilidades reportadas entonces. | La prueba automática detecta Web → MatrizDePermisos; enumeraciones/constantes permitidas por decisión posterior del 08-oct (§4.3). Búsqueda de paquetes acotada. |
 
-Preparados 13 casos de recuperación; **50 pruebas pasaron en conjunto el 07-oct y nuevamente tras corregirlas el 08-oct**, 0 fallos/omitidas, con las 37 anteriores. Volcado real cifrado, pérdida simulada del origen, otro contenedor, restauración sin migrar, comparación de las 13 tablas y consulta autorizada. Recuperación desde detección simulada: **7,375 s en la ejecución corregida**, muestra pequeña; rechazo de alteraciones/clave incorrecta y reversión de restauración fallida comprobados. [Evidencia y límites](../testing/TherapEase-09-B00-evidencia-recuperacion.md).
+### 4.1. Identity en servidor — repetido el 08-oct
 
-**Completado:** ejecución anterior de esta muestra; veredicto CORREGIR menor recibido y sus dos correcciones obligatorias aplicadas localmente el 08-oct. Comentarios pegados al código; `RestaurarAsync` ya no rechaza por antigüedad, y la prueba mide/informa Q10 sin bloquear la recuperación. **Propuesto:** cifrado/formato solo de QA y regla de antigüedad en ADR-05. **Verificado el 08-oct:** repetición correcta de 50 pruebas, incluida restauración real de copia de 25 h y comparación. **Pendiente:** revisión humana distinta, aprobación/fusión de esta entrega, carga objetivo y operación diaria/retención/gestión de claves. Sin nube, infraestructura privada o cierre Q10–Q11/B00/LCA.
+| Comprobación de Lucía | Resultado | Qué no acredita |
+| --- | --- | --- |
+| Integración incorporada y ampliada | ✅ 37 casos, incluidos los 11 anteriores. | Revisión humana aún pendiente. |
+| Hash, longitud, bloqueo y temporal | ✅ Servicios reales; expiración controlada. | No se esperaron 15 minutos reales. |
+| Revocación, permisos, rol y último superusuario | ✅ Incluye cambios simultáneos observados en PostgreSQL. | No cubre todos los recorridos de páginas. |
+| Auditoría de Identity | ✅ Cambio/evento y reversión ante fallo en operaciones probadas. | Faltan otras operaciones y fallos de respuesta. |
+| Cookies y caducidad | ✅ Componentes reales, atributos y reloj controlado. | No equivale a navegador, renovación por actividad ni TLS; reinicio normal probado después en §4.4. |
+| Secretos/configuración | ✅ Revisión acotada de archivos, historial, imagen histórica y registros. | No garantiza ausencia universal ni nueva construcción de imagen. |
 
-## 5. Pendientes ejecutables de B00
+[Evidencia de Identity](../testing/TherapEase-09-B00-evidencia-identidad.md): alcance, comandos y limitaciones. Comentarios conservados según el skill del proyecto.
 
-| Tema | Comprobación que falta |
+### 4.2. Recuperación Q10–Q11 — corregida y repetida el 08-oct
+
+| Comprobación de Lucía | Resultado | Límite |
+| --- | --- | --- |
+| Casos de recuperación | ✅ 13; con Identity son **50**, todos correctos, 0 fallos/omitidas. | Muestra pequeña, no carga objetivo. |
+| Copia y restauración | ✅ `pg_dump` cifrado, SHA-256, origen detenido y otro PostgreSQL vacío. | Sin nube ni respaldo diario. |
+| Datos restaurados | ✅ 13 tablas iguales; permisos, Identity y consulta autorizada HTTP 200. | No recorrido funcional completo ni navegador. |
+| Tiempos | ✅ Respaldo 458 ms; recuperación **7,375 s** desde detección simulada; pérdida simulada 460,8682 ms. | No prueba cadencia real de 24 h ni carga Q12. |
+| Errores | ✅ Copia alterada/truncada, clave incorrecta, volcado fallido y restauración conflictiva. | Clave efímera de QA; falta custodia duradera. |
+| Correcciones de Claude | ✅ Comentarios pegados al código; no bloquear por antigüedad. Copia de 25 h restaurada, 13 tablas iguales y Q10 incumplido informado. | No cierra Q10–Q11 en operación. |
+
+[Evidencia de recuperación](../testing/TherapEase-09-B00-evidencia-recuperacion.md): reproducción y límites. Las correcciones obligatorias están verificadas; revisión humana y aprobación/fusión siguen pendientes.
+
+### 4.3. Arquitectura — regla aprobada y repetida el 08-oct
+
+Lucía aprobó la excepción recomendada por Claude: **Web puede usar enumeraciones y constantes de Domain; entidades, reglas y servicios, solo mediante Application.** Registrada en AGENTS §1 y en la nota posterior de ADR-03/validación ADR-06. Se conservan los comentarios revisados por Claude.
+
+| Comprobación | Resultado real | Alcance / límite |
+| --- | --- | --- |
+| Compilación Release y arquitectura con la regla aprobada | ✅ **30 ejecutadas: 28 correctas, 2 fallidas, 0 omitidas**, 220 ms. | Compila sin advertencias reportadas; ejecución local, sin revisión humana atribuida. |
+| Regla de enumeraciones/constantes | ✅ Nueve casos adicionales aceptan enumeraciones/constantes y rechazan entidades/reglas o clases con lógica. | Las constantes no autorizan usar cualquier clase estática ni una clase que tenga métodos. |
+| Referencias, capas internas, módulos y contratos | ✅ Referencias declaradas permitidas; sin ciclos detectados en los cuatro módulos actuales; un puerto con implementación por módulo. | Revisar referencias declaradas no sustituye revisar el código compilado. |
+| Único acceso Web → Domain indebido detectado | ⏳ `ManejadorDeRequisitoDePermiso` llama a `MatrizDePermisos`. | Miguel debe utilizar `IAutorizacion` de Application. `Permiso` y `TipoRegistroAuditoria` ya están permitidos: no requieren cambio por este hallazgo. |
+| Coordinador CU04 | ⏳ Falta el candidato mínimo en Application fuera de Pacientes/Citas. | Debe consultar citas activas antes de la baja. Luego falta probar la operación real y la concurrencia. |
+| PageModel actual y controles del inspector | ✅ ErrorModel sin persistencia directa; controles de colecciones, métodos, async y ciclos indirectos correctos. | No acredita las páginas funcionales que aún debe implementar Dulce. |
+| Controles negativos reales anteriores | ✅ Ciclo Pacientes → Citas y PageModel con repositorio detectados y retirados en la ejecución anterior. | No se repitieron las modificaciones temporales; se conserva su evidencia histórica. |
+| Revisión | ⏳ Miguel revisa las pruebas de límites de Lucía. | Veredicto de Claude recibido; la implementación de estas correcciones aún no tiene revisión humana. |
+
+**Ajustes pendientes — Miguel:**
+
+| Lugar | Cambio a realizar | Comprobación necesaria |
+| --- | --- | --- |
+| `src/Web/Seguridad/Manejadores/ManejadorDeRequisitoDePermiso.cs:14` | Pedir el permiso a `IAutorizacion.TienePermisoAsync`, sin llamar directamente a `MatrizDePermisos`. | Permiso vigente, usuario activo y temporal restringida; sin cambiar permisos aprobados. |
+| `src/Web/Seguridad/ConfiguracionDeSeguridad.cs:46` | Al inyectar `IAutorizacion`, registrar el manejador por solicitud, compatible con ese servicio; hoy es Singleton. | Arranque y solicitudes sin mezclar servicios de distinta duración. |
+| `src/Application/`, fuera de Pacientes/Citas | Implementar el coordinador mínimo CU04 que consulta citas activas antes de dar de baja al paciente, con contratos públicos y sin ciclos. | Conservar protección PostgreSQL, concurrencia y cambio/evento atómicos. No cancelar automáticamente ni decidir la política de citas existentes pendiente con Dulce. |
+
+**Reproducción:** desde la raíz del repo:
+
+```powershell
+dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj -c Release --filter FullyQualifiedName~ArquitecturaTests --logger "trx;LogFileName=b00-arquitectura.trx"
+```
+
+> **Salida actual 1 por los dos hallazgos reales.** Las pruebas no se omiten ni fuerzan un fallo artificial: comprueban las reglas y seguirán fallando hasta corregir el código. `ArquitecturaTests.cs` contiene los casos y `ArquitecturaRevision.cs` su lectura de proyectos/código compilado. Pruebas comentadas según el skill del proyecto.
+>
+> **Trazabilidad:** base de trabajo `2d088e2c4cc3e2c6f7dc279452713fd1bbf3bced`, misma rama `revision/etapa09`; cambios aún locales para la entrega conjunta del PR #4. No cambia backend, migraciones, proyectos ni paquetes. Ejecución anterior: 21 casos, 19 correctos/2 fallidos; la revisión detectó que la regla era demasiado estricta para enumeraciones. La aprobación del 08-oct permite esa excepción; el resultado vigente es el de 30 casos. No se repitieron aquí las 50 pruebas de Identity/recuperación.
+>
+> **Límites:** mapa de Pacientes, Citas, Identidad y Auditoría; ampliar al agregar módulos. No detecta dependencias formadas por texto/reflexión ni el origen de constantes eliminadas al compilar. Reconoce contenedores estáticos con campos constantes literales, sin métodos ni inicialización. La ubicación de un candidato CU04 no demuestra sus llamadas funcionales. Excepción de composición solo para registro de Infrastructure en arranque/comando local; no autoriza repositorios o DbContext.
+
+### 4.4. Horas de Hermosillo y Docker — ejecutado el 08–09-oct
+
+| Comprobación | Resultado real | Alcance / límite |
+| --- | --- | --- |
+| Nueva ejecución Release | ✅ **12 correctas, 0 fallos/omitidas**, repetidas el 09-oct tras corregir limpieza; 26,85 s con preparación. | xUnit; PostgreSQL 17 desechable/Testcontainers 4.15.0. No se repitieron aquí las 50 de Identity/recuperación ni las 30 de arquitectura. |
+| Hermosillo dentro de la imagen final | ✅ 3 zonas de proceso: UTC, Nueva York y Madrid; 6 fechas por zona. | Se ejecuta la DLL de Domain extraída de la imagen, con cambios horarios externos y cambio de año. La hora explícita de Hermosillo no depende de TZ. |
+| API de eventos y fechas | ✅ 3 entradas inválidas rechazadas; Z, -07:00 y +02:00 devuelven el mismo evento. | Comprueba el contenido: inicio incluido y fin excluido. Fecha sola/hora sin zona no se aceptan como instante. Q03 completo y páginas siguen pendientes. |
+| Cita guardada y recuperada | ✅ EF/Npgsql conservan inicio/fin y fecha local al consultar PostgreSQL con otras 3 zonas. | Cruce de año; no equivale a agendar/reprogramar desde PageModel. |
+| Docker vigente | ✅ Dockerfile construido; arranque, /salud 200, HEALTHCHECK healthy, usuario no root y ruta sin sesión 401. | /salud indica proceso vivo; disponibilidad de base se demuestra aparte en las consultas autenticadas. |
+| Reinicio y claves (S-31) | ✅ Reinicio real; misma cookie aceptada, evento correcto y claves PostgreSQL idénticas. | Sin archivos key-*.xml observados en /app, /home/app y /tmp. HTTP local con cookie enviada manualmente; no acredita TLS/navegador ni política tras incidente. |
+
+**Reproducción:** Docker Desktop iniciado; desde la raíz del repo:
+
+```powershell
+dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj -c Release --filter FullyQualifiedName~HorasDockerTests --logger "trx;LogFileName=b00-horas-docker.trx"
+```
+
+[Casos de prueba](../../tests/TherapEase.IntegrationTests/HorasDockerTests.cs) y [preparación del entorno](../../tests/TherapEase.IntegrationTests/HorasDockerRevision.cs). La consola temporal de QA se genera en TestResults, no agrega un proyecto a la solución. El entorno actual usa host.docker.internal para comunicar la imagen con el PostgreSQL desechable de Docker Desktop.
+
+| Trazabilidad | Dato |
 | --- | --- |
-| A-01 y CU04 | Prueba automática de capas/módulos, ausencia de ciclos y coordinador real fuera de Pacientes/Citas. Una carpeta vacía no demuestra el límite. |
-| A-04, Docker | America/Hermosillo disponible dentro de la imagen y reproducción por otra persona. |
-| Q03/Q20 | Comando autenticado sin pantalla, filtros/contenido seguro y cambio/evento atómicos en las otras operaciones. |
-| Q06 | Recuperar cita agendada, concurrencia cita/baja y estados alternos mediante servicios, con política de producto resuelta. |
-| Q07 | Aviso de conflicto sin sobrescribir y cobertura de otros registros. |
-| Q08 | Interrupciones antes/después del commit, resultado incierto, reintentos y duplicados. |
-| Q09 | Conversión explícita a Hermosillo desde otras zonas; distinguir fecha sin hora de instante. |
-| Q10–Q11 | Demostración local previa ejecutada y correcciones de Claude aplicadas (§4.2); nueva ejecución correcta el 08-oct; faltan revisión/aprobación, carga objetivo y validación diaria, retención y claves duraderas. |
-| Identity/Q19 | Servidor, hashes, rol, revocación, caducidad controlada y revisión acotada de secretos ya tienen evidencia (§4.1). Faltan PageModel, cookies/formularios/navegación, renovación por actividad, antifalsificación, HTTPS, reinicio real y revisión humana. |
-| A-06 y protección | Medir minutos, runner y duración cuando exista CI. Main con una revisión comprobado el 03-oct; protección contra secretos aún sin verificar. |
-| QA y decisión | 11 pruebas incorporadas y ampliadas a 37, más 13 de recuperación; 50 repetidas correctas tras correcciones; faltan revisión Miguel/Dulce y aprobación/fusión del PR conjunto. Decidir LCA con toda la evidencia pendiente, no solo Identity. |
+| Código base | 2d088e2c4cc3e2c6f7dc279452713fd1bbf3bced; nuevas pruebas locales en revision/etapa09, sin publicar. |
+| Imagen final | sha256:104ff4c79b0242fb8ac62d138e644d8d17750074f33d0bf0502caae9d2f10c02 |
+| Resultado conservado | horas-docker-corregido-09oct.trx; SHA-256 edda84c4e0c97e574baf65babd8b51a6222300f2af5903a7c4acae3b5da8b693. |
+| Primer intento | 10 correctas y 2 fallidas por puerto automático reasignado al reiniciar. Se corrigió la preparación de QA, sin tocar producción, y se repitieron las 12. Se conserva el TRX inicial. |
+| Corrección de Claude, 09-oct | DisposeAsync elimina también la imagen propia con docker rmi; PostgreSQL se libera incluso si falla esa limpieza. 12 pruebas repetidas correctamente. La evidencia permanece; no se atribuye revisión humana. |
+| Revisión / límites | Revisión humana pendiente. Pruebas comentadas según el skill del proyecto. Contenedores e imagen de cada ejecución retirados al terminar; identificador conservado en imagen.json. Las dos imágenes anteriores también se retiraron el 09-oct. HTTPS, páginas, arquitectura pendiente y decisión B00/LCA siguen abiertos. |
 
-Estos pendientes no bloquean por sí solos el PR parcial #1; sí impiden declarar terminado B00. CI se exige desde B01 y el recorrido Q16 completo desde B04, conforme a AGENTS.
+## 5. Cobertura y alcance de los pendientes
+
+| Área de B00 | Avance | Lo que aún falta | Dónde seguir |
+| --- | --- | --- | --- |
+| Arquitectura | Pruebas automáticas ejecutadas: 30, con 28 correctas y 2 fallidas (§4.3). | Corregir llamada Web → MatrizDePermisos, implementar/probar CU04, repetir sobre páginas funcionales y revisión de Miguel. | §7, paso 1. |
+| Datos Q03/Q06/Q07/Q08/Q20 | Migraciones, permisos y varios escenarios ejecutados. | Otras operaciones, estados, concurrencia, conflictos, interrupciones y reintentos. | §7, paso 2. |
+| Horas Q09 y Docker | ✅ Imagen, horas, API, EF/PostgreSQL y reinicio probados (§4.4). | Revisión/reproducción por otra persona; horas en páginas/navegador cuando existan. | §7, pasos 1–3. |
+| Identidad y seguridad Q19 | Servidor probado; revisión acotada de secretos y reinicio real con claves/sesión. | PageModel, navegador, transporte HTTPS y revisión. | §7, paso 3. |
+| Recuperación Q10–Q11 | Procedimiento local corregido, ejecutado. | Revisión, decisiones de implementación y límites de operación registrados. | §7, paso 4; operación posterior en §9. |
+| Decisión LCA | Evidencia parcial disponible. | Completar validación, revisión distinta y decisión expresa de Lucía. | §7, paso 4. |
+
+> **Cobertura documental:** §7 reúne los pendientes conocidos de B00 contrastados con 08B–08D, Q/R, AGENTS, plan de pruebas y evidencia. No garantiza que no aparezcan hallazgos nuevos. Las funciones completas de B01–B08 y los pendientes de uso real se distinguen en §9; no se autorizan ni se dan por hechos aquí.
 
 ## 6. Siguientes pasos compartidos
 
-1. **Completado:** Miguel corrigió descripción, AGENTS y README del PR #1; correcciones y build comprobados. Lucía revisó/aprobó y fusionó #1 en main (`41123f2`). Las políticas de producto pendientes no se resolvieron por esa aprobación.
-2. **Completado:** PR #3 fusionado en `8baf8fb`, con la guía y la sección técnica de Miguel íntegra. Esta fusión documental no sustituye la decisión de LCA.
-3. **Entrega conjunta publicada en [PR #4](https://github.com/LuciAguilar/Therapease/pull/4), en borrador; revisión pendiente:** Identity (37) + recuperación (13), con correcciones de Claude y nueva ejecución correcta de los 50 casos el 08-oct. Lucía autorizó preparación del PR en la rama existente `revision/etapa09`; Miguel o Dulce revisa las pruebas, Lucía decide aprobación/fusión. No necesita esperar a Dulce ni cerrar B00 para fusionar este alcance revisado. Mientras se revisa, siguiente tarea propuesta: prueba automática de límites A-01; Lucía puede preparar capas/referencias existentes y la comprobación completa de CU04 depende de su coordinador real de Miguel. No se ejecuta esa tarea como parte de este PR.
-4. Dulce registra las respuestas de producto obtenidas; si falta alguna, conserva el pendiente. Continuar las tareas independientes autorizadas de B00.
-5. Completar las comprobaciones pendientes de §5. LCA solo se decide con resultados completos y aprobación expresa de Lucía.
+| Orden de trabajo | Quién | Qué falta / dependencia |
+| --- | --- | --- |
+| Revisar la entrega de Identity + recuperación del PR #4 | Miguel o Dulce; Lucía decide fusión | Autor distinto del revisor. No necesita esperar a los PageModel. |
+| **Arquitectura: resolver hallazgos del paso 1** | Miguel implementa/corrige y revisa las pruebas; Lucía repite | Pruebas ejecutadas: faltan acceso Web → MatrizDePermisos y coordinador CU04. No se da por cerrada la validación (§4.3). |
+| Datos restantes y revisión de horas/Docker | Lucía prueba; Miguel implementa/corrige y otro integrante revisa | Horas/Docker ejecutados en §4.4; datos por servicios esperan implementación/políticas donde corresponda. |
+| Acceso mínimo y producto | Dulce implementa/valida | Unitarias propias, respuestas reales de la usuaria y frontend afectado validado. |
+| Navegador y HTTPS | Lucía prueba; Miguel/Dulce aportan implementación | Acceso mínimo/configuración local y resolución de hallazgos; reinicio normal ya probado (§4.4). |
+| Consolidar evidencia y decidir LCA | Lucía, con revisión humana distinta | Solo después de completar la validación; no autorizar B01 por una fusión parcial. |
 
 ## 7. Plan de validación autorizado
 
-Los estados se indican por tarea: tener implementación o evidencia parcial no completa todas las pruebas de un paso. Las comprobaciones históricas de §4 mantienen sus límites; no se acredita una revisión aún no recibida.
+> **Esta es la lista de trabajo compartida.** Cada fila indica persona, avance y dependencia. No se repiten como pendientes las pruebas ya ejecutadas. Una fila de revisión sigue ⏳ aunque el código de prueba pase.
+>
+> Los códigos como **A-01** son referencias del [plan de pruebas, sección «B00 — Validación de arquitectura»](../testing/TherapEase-09-plan-de-pruebas.md); **no son pasos nuevos**. A-01 corresponde a la prueba de límites del **paso 1** siguiente.
 
-1. **Base y límites — validación pendiente.**
-   - **Completado:** solución, siete proyectos y aplicación Razor Pages/Docker inicial de Miguel, incorporados al PR #1 fusionado. Build correcto; arranque Docker observado en la revisión original (§4).
-   - **Pendiente:** Lucía escribe y ejecuta la prueba automática de límites, incluido CU04; Miguel la revisa. Miguel implementa el coordinador CU04. Comprobar Hermosillo dentro de la imagen y reproducción por otra persona. Medir minutos A-06 cuando opere CI.
-2. **Datos — validación pendiente.**
-   - **Completado:** persistencia, migraciones, usuarios separados de PostgreSQL y unitarias iniciales de Miguel, incorporados al PR #1 fusionado.
-   - **Ejecución parcial completada:** las 11 pruebas de datos ya están incorporadas al proyecto local y repetidas dentro de la ejecución del 07-oct: migraciones/usuario separado, auditoría solo de inserción, cruces, dos reservas SQL, versión EF, conservación de paciente y mecanismos iniciales de Identity.
-   - **Pendiente; se puede adelantar sin PageModel:** Lucía amplía Q03/Q06/Q07/Q20/Q08 en servicios: otras operaciones/eventos atómicos, cita/baja y recuperación concurrentes, otros conflictos, interrupciones/reintentos/duplicados. Miguel implementa lo que falte, incluido CU04; las políticas funcionales abiertas dependen de Dulce con la usuaria. Publicación y revisión distinta pendientes.
-3. **Identidad y seguridad — validación pendiente.**
-   - **Completado:** mecanismos iniciales de Identity de Miguel y condiciones documentales aprobadas, incorporados al PR #1 fusionado. No equivale a validación completa de Q19.
-   - **Ejecución local completada; revisión pendiente:** comprobaciones de servidor, hashes, bloqueo/expiración controlada, temporal, revocación, permisos, rol y último superusuario concurrente, más revisión acotada de secretos/configuración (§4.1). Las 37 pruebas incluyen las 11 anteriores; no sustituyen las verificaciones pendientes de navegador/transporte. Miguel o Dulce aún debe revisarlas; aprobación/publicación pendientes.
-   - **Pendiente de Dulce:** PageModel mínimo de acceso con sus unitarias. Después Lucía prueba el formulario real, cookies emitidas/recibidas en navegador, antifalsificación y los recorridos de salida/cambio/restablecimiento. Los atributos Secure y el transporte Q19 requieren también un entorno local HTTPS verificable; no autorizan nube. Las cookies generadas manualmente no sustituyen estas pruebas.
-4. **Recuperación: correcciones y nueva ejecución completadas; revisión y decisión pendientes.**
-   - **Completado en esta muestra:** 13 casos Q10–Q11, respaldo cifrado, huella, restauración en otro PostgreSQL desechable, comparación y tiempos (§4.2). Solo datos ficticios/Testcontainers, sin repo privado o nube. **Completado al 08-oct:** dos correcciones obligatorias de Claude aplicadas. **Verificado:** 50 pruebas repetidas correctamente, con copia de 25 h restaurada. **Pendiente:** revisión de Miguel/Dulce, aprobación/fusión, carga objetivo y operación diaria/claves/retención.
-   - **Pendiente de Lucía tras la evidencia completa:** decidir el cierre de B00/LCA. Completar las pruebas de recuperación no cierra LCA por sí solo ni autoriza B01 o Construcción.
+### Paso 1. Base y límites — arquitectura, Docker y entorno
 
-## 8. Consulta Q03 y respaldo
+| Estado | Tarea | Responsable | Dependencia / evidencia necesaria |
+| --- | --- | --- | --- |
+| ✅ | Crear repositorio y carpetas base; publicar documentos seleccionados. | Lucía | T1 publicado. |
+| ✅ | Crear solución, siete proyectos y base Razor Pages/Docker. | Miguel | PR #1 fusionado; build y arranque históricos en §4. |
+| ✅ | Escribir y ejecutar pruebas automáticas de capas/módulos, ciclos y contratos; comprobar que detectan infracciones. | Lucía | 30 casos: 28 correctos y 2 fallidos; nueve controles nuevos de la excepción aprobada (§4.3). |
+| ⏳ | Resolver la llamada directa Web → MatrizDePermisos y repetir las pruebas de límites. | Miguel corrige; Lucía prueba | No basta que las referencias de proyectos sean correctas; ver archivos y cambios en §4.3. |
+| ⏳ | Revisar humanamente las pruebas de arquitectura. | Miguel | Revisor distinto de Lucía, como establece ADR-06; aún sin revisión. |
+| ⏳ | Implementar coordinador CU04 en Application, fuera de Pacientes/Citas. | Miguel | No introducir dependencia inversa ni ciclo; pertenece a validación B00, no autoriza B02 completo. |
+| ⏳ | Probar ubicación y llamadas reales de CU04; PageModel funcionales sin persistencia directa. | Lucía; Miguel revisa | Ubicación falla por coordinador ausente; la única página actual, ErrorModel, sí pasa. Depende de Miguel y de las páginas de Dulce. |
+| ✅ | Repetir imagen, arranque, salud y ejecución sin privilegios para el código vigente. | Lucía prueba; Miguel corrige | Imagen actual construida; HEALTHCHECK healthy, HTTP 200 y usuario no root (§4.4). |
+| ✅ | Comprobar `America/Hermosillo` dentro de la imagen. | Lucía prueba; Miguel corrige | DLL real de imagen ejecutada bajo UTC, Nueva York y Madrid; 6 fechas por zona (§4.4). |
+| ⏳ | Reproducir entorno y verificaciones con la documentación. | Miguel o Dulce; Lucía verifica | Una persona distinta de la autora del procedimiento; evidencia identificada (Q15). |
+| ⏳ | Comprobar protección contra secretos; conservar revisión exigida en main. | Lucía | Una revisión en main comprobada el 03-oct; protección de secretos sin verificar. Visibilidad pública ya decidida. |
 
-`ConsultarEventosAutorizados` es consulta técnica de solo lectura mediante comando documentado que llama al servidor. En cada solicitud se valida sesión Identity y rol de superusuario activo; no hay acceso directo desde cliente a PostgreSQL. Filtros de periodo/registro parametrizados; salida solo actor, momento, registro/campo y hecho, sin valores clínicos, contactos o credenciales. No permite editar o borrar. Aprobada documentalmente el 01-oct; validación completa pendiente.
+### Paso 2. Datos — persistencia, concurrencia y horas
 
-Respaldo: opción A resuelta, repositorio privado aparte para el respaldo diario. Conservar pg_dump cifrado, SHA-256, retención de 14 días, restauración desechable e incidencia asignada a Lucía ante fallo. La nota ADR-05 sigue como propuesta de implementación pendiente de revisión y decisión. No crear ese repo, conectar Neon ni desplegar. B00 prueba recuperación desechable sin nube.
+| Estado | Tarea | Responsable | Dependencia / evidencia necesaria |
+| --- | --- | --- | --- |
+| ✅ | Implementar persistencia, migraciones y usuarios separados de PostgreSQL. | Miguel | PR #1 fusionado. |
+| ✅ | Probar migraciones desde cero, permisos y auditoría solo de inserción. | Lucía | Repetido dentro de las 50: `INSERT` permitido; `UPDATE`/`DELETE`/alteración denegados. |
+| ✅ | Probar cruces SQL, dos reservas simultáneas, versión EF y conservación inicial del paciente. | Lucía | Alcance parcial de los 11 incorporados; no cubre todos los servicios/estados. |
+| ⏳ | Probar consulta técnica Q03 completa: comando autenticado, filtros, límites, contenido y denegaciones. | Lucía prueba; Miguel/Dulce implementan su parte | API y pruebas parciales disponibles; comando final de acceso aún pendiente. Sin pantalla de auditoría. |
+| ⏳ | Probar cambio y evento atómicos en restantes operaciones; sin datos sensibles ni éxito ante fallo. | Lucía prueba; Miguel corrige | Identity ya tiene casos; ampliar pacientes, citas y pago en la validación disponible. |
+| ⏳ | Probar reservas y recuperación de cita agendada por servicios; estados alternos y nuevas comprobaciones de cruce. | Lucía prueba; Miguel implementa/corrige | Paciente vigente; cancelada/de baja no bloquea; políticas contigua/pago pendientes de Dulce. |
+| ⏳ | Probar agendar frente a baja de paciente y recuperar frente a otra reserva, con cambios simultáneos. | Lucía prueba; Miguel implementa/corrige | CU04 y política de citas existentes; nunca debilitar el bloqueo PostgreSQL. |
+| ⏳ | Probar conflictos de edición en otros registros; avisar sin sobrescribir. | Lucía prueba; Miguel implementa/corrige | Servicios disponibles y concurrencia controlada; versión EF aislada no basta. |
+| ⏳ | Probar baja/consulta/recuperación autorizada, sin borrado físico y fuera de listados ordinarios. | Lucía prueba; Miguel/Dulce implementan su parte | Conservación inicial probada; faltan servicios, filtros y caminos restantes (Q20). |
+| ⏳ | Interrumpir antes/después del commit; comprobar resultado incierto, reintento y ausencia de duplicados. | Lucía prueba; Miguel implementa/corrige | No confundir reversión por auditoría con pérdida de respuesta (Q08). |
+| ✅ | Probar conversión explícita a Hermosillo desde otras zonas; separar fecha sin hora de instante, en servidor/imagen. | Lucía prueba; Miguel corrige | 18 conversiones en imagen, API rechaza entradas sin zona y EF/PostgreSQL conserva la cita; interfaz/navegador siguen en paso 3 (§4.4). |
+| ⏳ | Revisar SQL, permisos, impacto y reversión de nuevas migraciones de esta validación. | Miguel prepara; Lucía revisa/prueba | Solo si hay nuevas migraciones; no dar por ejecutado un rollback no probado. |
 
-## 9. Publicación y límites
+### Paso 3. Identidad y seguridad
 
-El informe de ajustes está en `docs/reviews/`; B00 en `docs/planning/`; el plan de pruebas en `docs/testing/`; la guía es la entrada del README. Las reglas están en AGENTS y los ADR en `docs/architecture/adr/`. El StarUML aprobado de 08 antecede al cambio de pantalla; no autoriza construir la pantalla de auditoría retirada. Las skills adaptadas siguen para un PR posterior.
+| Estado | Tarea | Responsable | Dependencia / evidencia necesaria |
+| --- | --- | --- | --- |
+| ✅ | Implementar Identity inicial y condiciones aprobadas. | Miguel | PR #1 fusionado. |
+| ✅ | Probar hashes, longitud, bloqueo, temporal, revocación, rol y último superusuario concurrente. | Lucía | 37 casos, incluidos 11 anteriores; repetidos dentro de 50 correctos del 08-oct. |
+| ✅ | Probar cookies/caducidad en componentes, claves en PostgreSQL, comando local y fallo de auditoría de Identity. | Lucía | Reloj controlado; no acredita navegador, TLS o reinicio real. |
+| ✅ | Revisar secretos/configuración, registros capturados y `.env.example`. | Lucía | Alcance acotado e imagen histórica; mantener revisión por cada cambio. |
+| ⏳ | Revisar humanamente las pruebas del PR #4. | Miguel o Dulce | Persona distinta de Lucía; falta revisión, no ejecución de esas 50. |
+| ⏳ | Concretar verificación y entrega segura de temporales a otros usuarios, sin correo ni registros de contraseñas. | Miguel propone; Lucía decide; Dulce integra páginas | HU03/CU02; el comando del primer superusuario no resuelve por sí solo la entrega a otros usuarios. |
+| ⏳ | Implementar acceso mínimo/PageModel y sus unitarias. | Dulce | Validar frontend afectado; llamadas a Application. Si falla auditoría, mostrar «no se guardó». |
+| ⏳ | Probar entrada/salida, temporal, cambio/restablecimiento y rol desde las páginas. | Lucía | Depende de PageModel de Dulce; cuentas ficticias y distintas sesiones. |
+| ⏳ | Probar cookies reales y renovación por actividad; cookie manipulada/ausente, redirección externa y caché tras salir. | Lucía | Navegador y acceso mínimo; no reutilizar el resultado de componentes como prueba de páginas. |
+| ⏳ | Probar antifalsificación, permisos por URL/envío directo y validación de las rutas disponibles. | Lucía prueba; Miguel/Dulce corrigen | PageModel disponibles; ampliar con las rutas de cada bloque posterior. |
+| ⏳ | Revisar errores, entradas/salidas y datos rastreables de la validación ampliada. | Lucía prueba; Miguel/Dulce corrigen | Sin datos privados ni secretos en eventos, respuestas o registros; no acreditar toda 09. |
+| ⏳ | Probar transporte HTTPS local y configuración aplicable; decidir cabeceras exigidas. | Lucía decide/prueba; Miguel/Dulce configuran su parte | Q19 y S-30; no autoriza nube ni HSTS de un despliegue inexistente. |
+| ✅ | Reiniciar el contenedor de aplicación y comprobar continuidad de claves/sesión, sin claves en disco. | Lucía prueba; Miguel corrige | Reinicio real, cookie previa y evento correctos; claves PostgreSQL iguales y sin key-*.xml observados en /app, /home/app y /tmp. No acredita TLS (§4.4). |
 
-R04 permanece abierto y se usan únicamente datos ficticios. No iniciar B01, cerrar LCA o desplegar sin resultados y decisión expresa. Publicar documentos, aprobar el PR parcial y cerrar LCA son decisiones distintas.
+### Paso 4. Recuperación y decisión
+
+| Estado | Tarea | Responsable | Dependencia / evidencia necesaria |
+| --- | --- | --- | --- |
+| ✅ | Probar copia cifrada, huella, otro PostgreSQL, datos/permisos/Identity y consulta restaurados. | Lucía | 13 casos; 13 tablas iguales en la muestra local. |
+| ✅ | Probar copia alterada, clave incorrecta y fallos de copia/restauración; medir pérdida y recuperación. | Lucía | 7,375 s desde detección simulada; no acredita operación diaria. |
+| ✅ | Aplicar correcciones de Claude y repetir las 50; restaurar copia íntegra de 25 h e informar Q10. | Lucía | Ejecución del 08-oct, 0 fallos/omitidas. |
+| ⏳ | Revisar las pruebas de recuperación y reproducir sus resultados. | Miguel o Dulce | Revisión distinta del autor; puede integrarse con Q15 del paso 1. |
+| ⏳ | Revisar/decidir la propuesta ADR-05: cifrado/formato, antigüedad y pendientes operativos. | Lucía | Auditoría personal de Claude cuando corresponda; no hay decisión definitiva de producción atribuida. |
+| ⏳ | Resolver o registrar hallazgos y aprobar/fusionar el PR #4. | Lucía; Miguel o Dulce revisa las pruebas | La aprobación parcial no cierra B00. |
+| ⏳ | Consolidar evidencia Q06–Q11/Q19, límites y riesgos residuales; decidir B00/LCA. | Lucía | Resultados ejecutables, revisión humana distinta y pendientes de esta puerta tratados expresamente; no cierre automático. |
+
+## 8. Consulta Q03, respaldo y mejoras propuestas
+
+| Tema | Regla / situación |
+| --- | --- |
+| Consulta técnica Q03 | `ConsultarEventosAutorizados`: solo lectura, sesión Identity y superusuario activo comprobados por el servidor. Filtros parametrizados; salida actor, momento, registro/campo y hecho, sin valores privados. No permite editar/borrar ni acceso directo del cliente a PostgreSQL. Comando completo pendiente; API parcialmente probada. |
+| Respaldo aprobado | Opción A: repo privado aparte; `pg_dump` cifrado, SHA-256, 14 días, restauración desechable e incidencia asignada a Lucía ante fallo. Sin crear repo, conectar Neon ni desplegar. |
+| Propuesta ADR-05 | La prueba local no decide custodia duradera, formato definitivo ni operación diaria. Esos límites deben quedar explícitos en la decisión de LCA. |
+
+| Mejora opcional ya registrada | Quién podría aplicarla | Situación |
+| --- | --- | --- |
+| Comprobar resultados de `UpdateAsync`, `AddToRoleAsync` y `RemovePasswordAsync`. | Miguel | Propuesta del informe PR01; no confundir con corrección obligatoria pendiente. |
+| Ámbitos de Paciente como colección de solo lectura; aclarar alcance de `/salud`. | Miguel | Propuestas del informe PR01. |
+| Comprobar el evento HTTP restaurado además del 200; documentar `crear-roles.sql` para servidor nuevo. | Lucía en pruebas/documentación | Opcionales de Claude, aún sin aplicar. |
+| Correo noreply en futuros commits. | Cada autor | Recomendación; no incluye reescribir historial publicado. |
+
+## 9. Publicación, trabajos posteriores y límites
+
+| Pendiente que continúa | Cuándo / quién | Relación con B00 |
+| --- | --- | --- |
+| CI: build, pruebas y controles; medir minutos, runner y duración (A-06). | Desde B01; Miguel configura, Lucía verifica. | Visibilidad pública ya aprobada. La medición espera a que exista CI; no está ejecutada ni autoriza B01. |
+| Funciones completas de acceso, pacientes, agenda, pago y bajas. | B01–B06 según prioridad autorizada; Miguel/Dulce implementan, Lucía prueba. | El primer avance conserva registrar y buscar pacientes desde Pacientes. B00 valida mecanismos y riesgos; no autoriza esos incrementos. |
+| Directorio como pantalla aparte, fuera de CU03. | B07, posterior al primer avance de diciembre; decisión de Dulce del 08-oct. | Lista completa de vigentes por defecto y filtro autorizado de bajas; campos y prioridad posterior por validar. No sustituye la búsqueda mínima de Pacientes. |
+| Recorrido completo Playwright Q16. | Desde B04; Lucía, revisión Miguel/Dulce. | No exigible como recorrido completo inexistente en B00. |
+| Rendimiento/carga Q12, uso Q13, demo Q14 y reproducción Q15 final. | B08; Lucía coordina, otro integrante reproduce. | Recuperación con carga objetivo y funcionamiento completo siguen pendientes; Q15 básico del entorno sí figura en §7. |
+| Repo privado, respaldo diario, retención 14 días, restauración programada e incidencia. | Tras autorización; implementación por concretar, Lucía decide/verifica. | Demostración local hecha; no operar nube ni declarar Q10–Q11 completos en producción. |
+| Custodia/rotación de claves duraderas y política de sesiones tras incidente. | Decisión de Lucía; Miguel implementa, Lucía prueba cuando se autorice. | La copia restaura Identity; la cookie antigua usada en QA no fija la política tras incidente real. |
+| TLS Neon, Render y controles del despliegue. | Solo con autorización expresa. | Q19 local se prueba sin nube; no se presumen servicios configurados. |
+| R04, datos reales, TOTP y recuperación; expediente/notas/reportes/capturista. | Fuera de B00; Lucía decide con respuestas de la usuaria y equipo. | R04 sigue abierto. Solo datos ficticios; no trasladar estos pendientes a una falsa aprobación actual. |
+| Skills adaptadas. | PR posterior autorizado. | No bloquean por sí solas el trabajo del equipo. |
+
+> **Documentación:** ajustes en `docs/reviews/`, B00 en `docs/planning/`, pruebas/evidencia en `docs/testing/`, reglas en AGENTS y entrada técnica en README. El StarUML de 08 es un antecedente: no autoriza la pantalla de auditoría retirada.
+>
+> **Cierre:** publicar documentos, fusionar un PR parcial y cerrar LCA son decisiones distintas. Conservar los pendientes visibles y actualizar este documento cuando exista nueva evidencia o decisión.

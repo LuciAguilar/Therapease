@@ -1,5 +1,7 @@
 # TherapEase — B00 · Ajustes del PR #1
 
+> **Ampliación del 08-oct:** ajustes nuevos de arquitectura en §6; correcciones históricas de §2 ya fusionadas.
+
 **Fecha de revisión:** 04-oct-2026. **Estado:** correcciones obligatorias documentales comprobadas en `b60eba42edeb2fa8cdbea08ad1a4e51b041c21b0`, incluida la descripción. Lucía revisó/aprobó y fusionó PR #1 en main (`41123f2d2c115a05ff1df944457195a7f671cc17`). Las políticas de producto y mejoras opcionales siguen abiertas.
 
 ## 1. Alcance revisado
@@ -42,3 +44,17 @@ Validar con la usuaria las tres políticas provisionales de §2: baja con citas 
 - **Paciente:** en `src/Domain/Pacientes/Entidades/Paciente.cs:26`, valorar exponer los ámbitos como colección de solo lectura y modificarlos mediante las reglas previstas.
 - **Salud:** documentar que `/salud` comprueba que el proceso está encendido. Puede responder aunque la base no esté disponible; no demuestra que funcione el acceso. Valorar una comprobación de disponibilidad para operación real.
 - **Commits:** usar el correo noreply de GitHub en próximos commits. La propuesta no incluye reescribir commits ya publicados.
+
+## 6. Ajustes nuevos de arquitectura B00 — 08-oct-2026
+
+Estos ajustes provienen de la validación ejecutable sobre la base `2d088e2c4cc3e2c6f7dc279452713fd1bbf3bced`. Se añaden al seguimiento de B00; no reabren las correcciones documentales del PR #1 ya fusionadas.
+
+**Regla vigente aprobada por Lucía el 08-oct:** Web puede usar enumeraciones y constantes sin lógica de Domain. Entidades, reglas y servicios siempre mediante Application; regla en AGENTS §1 y nota posterior de ADR-03. No es necesario retirar los usos de `Permiso` o `TipoRegistroAuditoria` por esta revisión.
+
+| Responsable | Ajuste obligatorio | Dónde | Qué debe quedar comprobado |
+| --- | --- | --- | --- |
+| **Miguel** | El manejador pide el permiso a `IAutorizacion.TienePermisoAsync`; deja de llamar a `MatrizDePermisos` directamente. | `src/Web/Seguridad/Manejadores/ManejadorDeRequisitoDePermiso.cs:14`; contrato existente en `src/Application/Compartido/Interfaces/Servicios/IAutorizacion.cs`. | Usuario activo, temporal restringida y permiso vigente; conservar reglas y denegaciones. |
+| **Miguel** | Registrar el manejador por solicitud al inyectar `IAutorizacion`, que ya se registra por solicitud. Hoy el manejador es Singleton y no debe conservar ese servicio compartido entre solicitudes. | `src/Web/Seguridad/ConfiguracionDeSeguridad.cs:46`; registro de Application en `src/Web/Configuracion/ServiciosDeAplicacion.cs:14`. | Arranque y autorización sin errores de duración de servicios ni mezcla de usuarios. |
+| **Miguel** | Implementar un coordinador CU04 mínimo en Application, fuera de Pacientes/Citas, que consulte las citas activas antes de dar de baja al paciente. | `src/Application/`; mediante contratos públicos de los módulos, sin ciclo. | Baja solo en condición segura, cambio/evento atómicos y protección concurrente. Conservar el bloqueo PostgreSQL. No cancelar automáticamente ni resolver por omisión la política pendiente con Dulce. |
+
+**Resultado actual:** 30 comprobaciones de arquitectura, 28 correctas y 2 fallidas, 0 omitidas. Las dos pendientes son el acceso a `MatrizDePermisos` y el coordinador CU04; no se omiten ni se alteran para aparentar cumplimiento. Tras corregir, repetir el comando de B00 §4.3 y las pruebas de identidad/operaciones afectadas. Verificar la operación real de CU04 además de su ubicación. Revisión del código por persona distinta del autor y aprobación de Lucía; Miguel revisa las pruebas de límites escritas por Lucía. B00/LCA siguen abiertos.

@@ -1,10 +1,10 @@
 # TherapEase — Plan de pruebas por caso de uso
 
-**Actualización: 08-oct-2026.** Referencia de pruebas de 09 basada en HU/CU y alternos de 08B, modelos de 08C, trazabilidad de 08D, reglas 07B–07C y Q01–Q20. Usar únicamente datos ficticios. Las reglas compartidas están en [AGENTS.md](../../AGENTS.md); las herramientas y organización de trabajo de cada integrante son libres, las reglas de seguridad/datos/pruebas/revisión son obligatorias.
+**Actualización: 09-oct-2026.** Referencia de pruebas de 09 basada en HU/CU y alternos de 08B, modelos de 08C, trazabilidad de 08D, reglas 07B–07C y Q01–Q20. Usar únicamente datos ficticios. Las reglas compartidas están en [AGENTS.md](../../AGENTS.md); las herramientas y organización de trabajo de cada integrante son libres, las reglas de seguridad/datos/pruebas/revisión son obligatorias.
 
 PageModel a cargo de Dulce con sus unitarias. Las cuatro condiciones de Identity están resueltas e indicadas en el informe de ajustes; Miguel las incorporó a AGENTS mediante el PR #1 ya fusionado. Las 11 comprobaciones anteriores están incorporadas y ampliadas a 37 casos de Identity, repetidos el 07-oct. Con 13 casos de recuperación, la ejecución anterior registró **50 correctos**, sin fallos/omitidas. Claude emitió **CORREGIR menor** para recuperación; ajustes de código aplicados y los 50 casos repetidos correctamente el 08-oct, 19 s, sin fallos/omitidas. Entrega conjunta publicada en [PR #4](https://github.com/LuciAguilar/Therapease/pull/4), en borrador; revisión humana y aprobación/fusión pendientes. [Recuperación y límites](TherapEase-09-B00-evidencia-recuperacion.md). Alcance y límites en [evidencia Identity](TherapEase-09-B00-evidencia-identidad.md). Sus resultados y límites están en [B00](../planning/TherapEase-etapa09-B00.md). Este plan no acredita por sí mismo ejecución, revisión ni cierre B00/LCA; la evidencia identifica lo realmente ejecutado.
 
-No se implementa pantalla de auditoría. Q03 conserva los eventos y consulta técnica autorizada. El directorio muestra pacientes vigentes por defecto con filtro de bajas; campos visibles y las políticas marcadas al final siguen pendientes de Dulce con la usuaria. [Guía del equipo](../../README.md). B00/LCA y R04 permanecen abiertos.
+No se implementa pantalla de auditoría. Q03 conserva los eventos y consulta técnica autorizada. **Decisión de Dulce del 08-oct:** la búsqueda desde Pacientes permanece en el primer avance de diciembre. El directorio sale de CU03 y pasa a pantalla aparte posterior (B07), con la lista completa de vigentes por defecto y filtro autorizado de bajas; campos visibles y las demás políticas marcadas al final siguen pendientes de Dulce con la usuaria. [Guía del equipo](../../README.md). B00/LCA y R04 permanecen abiertos.
 
 ## 0. Cómo se usa
 
@@ -21,19 +21,21 @@ No se implementa pantalla de auditoría. Q03 conserva los eventos y consulta té
 - **Datos rastreables:** usar una contraseña y un contacto ficticios fáciles de buscar (p. ej. `DatoRastreable#Prueba1`, `datoRastreable@ficticio.test`) para comprobar después que no aparecen en registros (S-21).
 - No se añaden herramientas nuevas sin ADR (07A). Si Dulce quiere probar JavaScript con otra herramienta, primero ADR.
 
-## 0.1. Seguimiento de ejecución — 07-oct-2026
+## 0.1. Seguimiento de ejecución — 08–09-oct-2026
 
 La columna **Estado** usa solo ✅ y ⏳. ✅ identifica ejecución local con evidencia para el alcance indicado; no equivale a revisión humana, aprobación, CI ni cierre. ⏳ señala que falta completar o evidenciar el caso; puede haber una parte ya probada. No se acreditan las unitarias de Miguel o Dulce a partir de las pruebas de integración de Lucía.
 
 | Casos | Evidencia y alcance del estado |
 | --- | --- |
+| A-01 | Pruebas automáticas preparadas y ejecutadas el 08-oct: **30, 28 correctas y 2 fallidas, 0 omitidas** tras aprobar Lucía enumeraciones/constantes de Domain en Web. Hallazgos: Web llama a MatrizDePermisos y falta coordinador CU04. Controles negativos detectan infracciones; páginas funcionales y revisión de Miguel pendientes. Sigue ⏳; alcance y comando en B00 §4.3. Cambios aún locales para la actualización final del PR #4. |
 | A-02, A-03, A-07, S-22, S-23 | Migraciones reales, usuario separado, cruce SQL y permisos de auditoría/esquema en `RevisionDatosTests`; repetidos dentro de los 50 casos del 07-oct. |
 | L-CU02-02/03/04/06, L-CU11-01/02/03 | Duplicados, desactivación, rol, restablecimiento, cambio propio y auditoría en servicios reales de Identity. No acredita las páginas o formularios. |
 | S-01, S-02, S-04, S-05, S-08 | Bloqueo, mensaje genérico, atributos de cookie, revocación y hash en componentes reales. Expiración con reloj/fecha controlados; navegador y transporte siguen pendientes. |
 | S-26, S-27 | Búsqueda acotada en historial/archivos e imagen histórica, y revisión de `.env.example` ficticio. No se detectaron credenciales de TherapEase dentro del alcance; las claves privadas de ejemplo de GnuTLS están clasificadas en la evidencia. No es garantía universal. |
-| A-04, S-32 | Existe evidencia histórica de Docker del PR #1 (`e418010`), sin repetición actual; se conserva como antecedente. |
+| A-04, S-32 | ✅ Repetidos el 08 y 09-oct en HorasDockerTests: imagen actual construida, no root, /salud 200 y HEALTHCHECK healthy; ruta sin sesión 401. 12 casos correctos; el 09-oct se verificó también la eliminación automática de la imagen. B00 §4.4. |
 | L-CU02-01/05/07, L-CU04-01/03/04, L-CU06-05, L-Q03-01/02/03/04 | Cobertura parcial: temporal/políticas, último superusuario concurrente, auditoría de Identity, versión EF, conservación del paciente, dos reservas SQL y consulta autorizada. Faltan los demás caminos/operaciones, formularios o recuentos previstos; no se da por completo el caso compuesto. |
-| S-03, S-06/07, S-11/12/13, S-21/24, S-28/31/33/34 | Comprobaciones parciales de servidor/configuración; faltan alcance completo, rutas, navegador, infraestructura o CI según el caso. Cinco fallos simultáneos no acreditan por sí solos cualquier volumen de intentos. |
+| Q09 (servidor/imagen), S-31 | Horas en UTC/Nueva York/Madrid, entradas con/sin zona en API, cita EF/PostgreSQL y reinicio real con claves/sesión comprobados el 08-oct. Las 12 se repitieron correctamente el 09-oct tras ajustar limpieza. Q09 de navegador y operaciones de agenda sigue ⏳; S-31 local ✅. Detalle y reproducción en B00 §4.4. |
+| S-03, S-06/07, S-11/12/13, S-21/24, S-28/33/34 | Comprobaciones parciales de servidor/configuración; faltan alcance completo, rutas, navegador, infraestructura o CI según el caso. Cinco fallos simultáneos no acreditan por sí solos cualquier volumen de intentos. |
 | A-05 | Recuperación corregida y repetida el 08-oct: respaldo cifrado/huella, 13 tablas y 7,375 s desde detección en muestra pequeña; además copia de 25 h restaurada, con incumplimiento Q10 informado. Revisión humana/aprobación pendientes. |
 | N-02, N-03 | Demostración local previa y corregida disponible; B08/operación real, carga, revisión humana y aprobación siguen pendientes. |
 | Restantes | No hay evidencia suficiente para acreditar su alcance completo; permanecen ⏳. Las decisiones de producto abiertas se conservan en §6. |
@@ -106,7 +108,7 @@ Evidencia detallada: [Identity](TherapEase-09-B00-evidencia-identidad.md), [recu
 | D-07 ★ | ⏳ | Login: mensaje de error genérico; nunca «el usuario no existe». | CU01 A1 |
 | D-08 ★ | ⏳ | El menú muestra opciones según el rol (Usuarios solo para superusuario); no muestra Auditoría. Ocultar no protege: eso lo prueba Lucía (S-11 a S-13). | Decisión 09; 08B §1.2 |
 | D-09 ★ | ⏳ | B02: búsqueda/lista mínima de pacientes vigentes, estado vacío y acceso a ficha autorizada. | HU05, Q20 |
-| D-15 | ⏳ | B07: directorio completo de vigentes por defecto, información relevante validada, filtro por ámbito y filtro autorizado de bajas. | HU05, Q20, decisión 09 |
+| D-15 | ⏳ | **B07, posterior al primer avance de diciembre:** directorio separado de CU03, lista completa de vigentes por defecto, información relevante validada, filtro por ámbito y filtro autorizado de bajas. | Q20; decisión de Dulce 08-oct |
 | D-10 ★ | ⏳ | Agenda: con la zona horaria del equipo cambiada, las horas siguen en Hermosillo. Estado vacío. Canceladas solo con su filtro. | HU08, Q09 |
 | D-11 | ⏳ | Detalle de cita: interruptor Pagado/Pendiente; confirmación antes de cancelar y de dar de baja. | HU11–HU13 |
 | D-12 | ⏳ | Mensajes emergentes: guardado, faltan datos, conflicto, incierto, confirmar baja. | S3–S5 |
@@ -121,10 +123,10 @@ Integración: xUnit + Testcontainers, con el esquema creado por **las migracione
 
 | ID | Estado | Qué hacer → qué debe pasar | Origen |
 | --- | --- | --- | --- |
-| A-01 | ⏳ | Prueba automática de límites: Web → solo Application; Domain sin dependencias; Pacientes no depende de Citas; coordinador de CU04 fuera de ambos; sin ciclos. | 07A, 07C |
+| A-01 | ⏳ | Prueba automática de límites: Web usa Application y solo enumeraciones/constantes sin lógica de Domain, salvo composición de Infrastructure; Domain sin dependencias de otras capas; Pacientes no depende de Citas; coordinador de CU04 fuera de ambos; sin ciclos. Ejecutada: 30, 28 correctas y 2 fallidas. Miguel sustituye Web → MatrizDePermisos por IAutorizacion e implementa CU04; revisión y páginas funcionales aún pendientes. | 07A, 07C, ADR-06; B00 §4.3 |
 | A-02 | ✅ | Las migraciones crean el esquema desde cero sin errores con un usuario distinto del de la aplicación; las credenciales de migración no se usan en ejecución normal. | 07B |
 | A-03 | ✅ | Insertar por SQL directo dos citas activas solapadas → **la base** las rechaza (no solo el código). | Q06, 05C |
-| A-04 | ⏳ | La imagen Docker arranca, responde la comprobación de salud y corre sin privilegios. | 05E |
+| A-04 | ✅ | La imagen Docker arranca, responde la comprobación de salud y corre sin privilegios. | 05E |
 | A-05 | ✅ | Respaldo cifrado, huella SHA-256 correcta y restauración en PostgreSQL desechable con los mismos datos. | Q10, 05E |
 | A-06 | ⏳ | Lucía registra la decisión de visibilidad del repositorio antes de crearlo y mide minutos de CI por PR, indicando visibilidad, tipo de runner y duración por trabajo. | R01, 07C, ajuste B00 del 01-oct |
 | A-07 | ✅ | Con PostgreSQL/Testcontainers y el usuario real de la aplicación: `INSERT` en `EventoAuditoria` permitido; `UPDATE`, `DELETE` y cambio de esquema denegados. | Q03, 07B; S-22–S-23 |
@@ -165,8 +167,15 @@ Integración: xUnit + Testcontainers, con el esquema creado por **las migracione
 | L-CU03-02 | ⏳ | Nombre ya existente → muestra coincidencias; se puede abrir la existente o registrar un homónimo. | HU04, CU03 A1 |
 | L-CU03-03 | ⏳ | La búsqueda ordinaria no muestra pacientes de baja. | HU05, Q20 |
 | L-CU03-04 | ⏳ | Doble clic en Guardar o reenvío → no crea dos fichas. | S5 |
-| L-CU03-05 | ⏳ | Directorio sin filtro de bajas → solo vigentes; con filtro autorizado → bajas consultables sin alterar fichas. | HU05, Q20, decisión 09 |
-| L-CU03-06 | ⏳ | Sin sesión o sin permiso para bajas → el directorio no revela fichas ni permite el filtro de bajas por URL/envío directo. | Q01, Q20 |
+
+### B07 — Directorio como pantalla aparte, posterior al primer avance de diciembre
+
+> Por decisión de Dulce del 08-oct, estas pruebas salen del alcance CU03/B02 y del primer avance. Se conservan sus identificadores originales únicamente para trazabilidad; no significan que el directorio siga dentro de CU03. La búsqueda de Pacientes se prueba en L-CU03-02/03.
+
+| ID | Estado | Qué hacer → qué debe pasar | Origen |
+| --- | --- | --- | --- |
+| L-CU03-05 | ⏳ | Directorio posterior sin filtro de bajas → lista completa de vigentes; con filtro autorizado → bajas consultables sin alterar fichas. | Q20; decisión de Dulce 08-oct; ID histórico |
+| L-CU03-06 | ⏳ | Sin sesión o sin permiso para bajas → el directorio posterior no revela fichas ni permite el filtro de bajas por URL/envío directo. | Q01, Q20; decisión de Dulce 08-oct; ID histórico |
 
 ### CU04 — Actualizar, dar de baja y recuperar paciente (B02, B06)
 
@@ -198,7 +207,7 @@ Integración: xUnit + Testcontainers, con el esquema creado por **las migracione
 | L-CU06-04 | ⏳ | Solapada con una cancelada o de baja → permitida. | Q06 |
 | L-CU06-05 | ⏳ | 2 y 10 solicitudes simultáneas por el mismo horario → se guarda exactamente una. | Q06, R02 |
 | L-CU06-06 | ⏳ | Agendar desde un equipo en otra zona horaria → al consultarla, la hora de Hermosillo está intacta. | HU09 CA4, Q09 |
-| L-CU06-07 | ⏳ | **Extra:** citas en las fechas de cambio de horario de EE. UU. y del resto de México (Hermosillo no cambia) → la hora no se desplaza. | Q09 |
+| L-CU06-07 | ⏳ | Servidor/imagen y persistencia probados (B00 §4.4); falta recorrido de agenda. **Extra:** citas en las fechas de cambio de horario de EE. UU. y del resto de México (Hermosillo no cambia) → la hora no se desplaza. | Q09 |
 | L-CU06-08 | ⏳ | Paciente de baja o ámbito que no tiene → rechaza. | CU06 A1 |
 | L-CU06-09 | ⏳ | Respuesta interrumpida y reintento → no existe una segunda cita. | S5 |
 
@@ -310,8 +319,8 @@ Referencia: OWASP Top 10:2025, ASVS 5.0 aplicable y 07B. «Todas las rutas» = l
 | S-28 | ⏳ | La conexión a Neon usa `SSL Mode=VerifyFull` (revisión de configuración, sin conectar desde CI). | 07B, 07C |
 | S-29 | ⏳ | HTTP redirige a HTTPS; en producción hay HSTS. | Q19 |
 | S-30 | ⏳ | Cabeceras de seguridad básicas (tipo de contenido, protección contra incrustación en marcos, política de contenido). **Pendiente:** Lucía decide cuáles exigir. | ASVS |
-| S-31 | ⏳ | Reiniciar el contenedor → las sesiones siguen siendo válidas (claves de Data Protection en PostgreSQL) y no hay claves en disco. | 05D, 07B |
-| S-32 | ⏳ | El proceso del contenedor no corre como administrador. | 05E |
+| S-31 | ✅ | Reiniciar el contenedor → las sesiones siguen siendo válidas (claves de Data Protection en PostgreSQL) y no hay claves en disco. | 05D, 07B |
+| S-32 | ✅ | El proceso del contenedor no corre como administrador. | 05E |
 
 ### Dependencias y revisión de vulnerabilidades
 
