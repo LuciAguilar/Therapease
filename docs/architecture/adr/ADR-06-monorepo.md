@@ -26,4 +26,6 @@ Usar **un monorepo** para el primer avance. Organizar la raíz según 06B–06C:
 
 ## Validación pendiente en B00
 
+**Precisión aprobada el 08-oct:** aplicar la excepción Web → Domain de AGENTS §1 y la nota posterior de ADR-03: solo enumeraciones y constantes sin lógica. Las pruebas deben aceptar esa excepción y seguir rechazando entidades/reglas/servicios, ciclos y persistencia directa. La ejecución actual registra 30 casos, 28 correctos y 2 fallidos; no cierra la validación.
+
 Miguel crea los proyectos. **Lucía escribe y ejecuta la prueba automática de límites; Miguel la revisa.** La prueba debe fallar ante referencias de capa prohibidas, un ciclo entre módulos o acceso de Web directo a persistencia, e incluir al coordinador CU04 fuera de Pacientes/Citas en Application. Otro integrante reproduce construcción y pruebas (Q15). Lucía revisa arquitectura, seguridad y evidencias; Miguel o Dulce revisa los demás archivos que ella haya creado. La aprobación documental de Lucía no acredita esa revisión ni los resultados pendientes. El cierre de LCA se decide por separado, únicamente con todos los resultados ejecutables de B00.
