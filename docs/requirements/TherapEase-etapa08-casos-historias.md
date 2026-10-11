@@ -1,12 +1,14 @@
 # TherapEase — Etapa 08: historias y casos de uso
 
+**Decisión de producto — Dulce, 08-oct-2026; comunicada por Lucía:** el directorio sale de CU03 y pasa a funcionalidad posterior como pantalla aparte. **La búsqueda de pacientes desde Pacientes se queda en el primer avance de diciembre**, junto con el registro. El directorio posterior mostrará la lista completa de pacientes vigentes por defecto y ofrecerá filtro de bajas solo con permiso; sus campos visibles siguen por validar. B07 conserva la referencia de backlog para esa funcionalidad posterior, sin crear un CU nuevo ni comprometerla para diciembre. Este cambio no elimina Q20 ni la consulta/recuperación autorizada de CU04, y no modifica permisos, auditoría, arquitectura ni la aprobación histórica de 08.
+
 **Continuidad del 01-oct-2026:** Lucía aprobó el plan B00 corregido, ADR-06 y la consulta Q03 sin pantalla; confirmó la fidelidad de ADR-01…05 corregidos, eligió repositorio público y documentación seleccionada, sin antecedentes de escritorio. Ver [guía de equipo](../../README.md). LCA y R04 siguen abiertos; no se acredita revisión humana ni pruebas aún pendientes.
 
 **Fecha:** 28-sep-2026; estado actualizado el 30-sep. **08A v0.3:** aprobada por Lucía tras auditoría APROBADO de Claude. **08B v0.4:** auditada APROBADO por Claude y aprobada por Lucía el 28-sep, con la aclaración opcional de CU11 incorporada sin cambiar permisos. **08C v0.5 y 08D v0.2:** aprobadas; etapa 08 cerrada documentalmente por Lucía el 30-sep. Documento de planeación, sin código ni estructura de implementación. Elaboración/LCA sigue abierta hasta B00 en 09 autorizada.
 
 **Aclaración terminológica de Lucía:** se usan **Usuario** y **Rol** para la identidad y los permisos. Las referencias anteriores a «cuenta» en Q03 y documentos cerrados se interpretan como usuario. La ampliación v0.3 detalla caminos ya acordados en 07B y propone verificaciones adicionales. El ajuste v0.4 separa visual y textualmente el cambio de contraseña propia de la administración de otros usuarios.
 
-**Adenda de 09, decidida por Lucía el 30-sep-2026:** Miguel implementa reglas críticas y seguridad, y escribe unitarias de su código; Lucía diseña, escribe y ejecuta sus pruebas de integración y seguridad Q03/Q06/Q07/Q20. Dulce confirmó que no se hará pantalla de auditoría; **HU14/CU10 quedan fuera de la interfaz de 09**, sin eliminar los eventos ni Q03. El directorio se integra en HU05/CU03: vigentes por defecto y filtro de bajas solo con permiso; campos visibles pendientes de Dulce con Usuaria. Esta adenda no atribuye una nueva auditoría de 08.
+**Adenda de 09, decidida por Lucía el 30-sep-2026:** Miguel implementa reglas críticas y seguridad, y escribe unitarias de su código; Lucía diseña, escribe y ejecuta sus pruebas de integración y seguridad Q03/Q06/Q07/Q20. Dulce confirmó que no se hará pantalla de auditoría; **HU14/CU10 quedan fuera de la interfaz de 09**, sin eliminar los eventos ni Q03. La adenda inicial integraba el directorio en HU05/CU03 (sustituido por la decisión del 08-oct): vigentes por defecto y filtro de bajas solo con permiso; campos visibles pendientes de Dulce con Usuaria. Esta adenda no atribuye una nueva auditoría de 08.
 
 ## 1. Límite y convenciones de 08B
 
@@ -46,7 +48,7 @@ Lucía aprobó 08A como propuesta documental; Dulce aún debe validar con Usuari
 
 **HU04 — Registrar paciente (CU03).** Como Usuaria, quiero registrar una sola ficha por paciente para organizar su atención en uno o ambos ámbitos. Origen: §2, Q05, Q13. **CA:** (1) Con nombre y al menos un ámbito propuestos, el guardado confirmado crea un identificador y deja la ficha consultable. (2) Antes de crear, se muestran posibles coincidencias para elegir una ficha existente; un homónimo distinto puede registrarse. (3) La acción queda auditada y solo usa datos ficticios en la demostración.
 
-**HU05 — Buscar y consultar paciente (CU03).** Como Usuaria, quiero localizar un paciente para revisar su ficha sin duplicarla. Origen: §2, Q13, Q20. **CA:** (1) El directorio muestra por defecto fichas vigentes y permite distinguir homónimos por identificador y datos autorizados. (2) Un filtro de bajas solo está disponible con permiso; las bajas no aparecen por defecto. (3) Sin permiso o sesión no se revela la ficha. (4) La información relevante visible queda pendiente de Dulce con Usuaria; no se agregan campos por este cambio de 09.
+**HU05 — Buscar y consultar paciente (CU03).** Como la usuaria, quiero localizar un paciente para revisar su ficha sin duplicarla. Origen: §2, Q13, Q20. **CA:** (1) Desde Pacientes se pueden buscar fichas vigentes y distinguir homónimos por identificador y datos autorizados. (2) Se abre la ficha correcta con sesión y permiso; sin ellos no se revela. (3) Las bajas quedan fuera de la búsqueda ordinaria; su consulta autorizada se mantiene según CU04/Q20. (4) Los campos visibles siguen pendientes de Dulce con la usuaria. **Esta búsqueda forma parte del primer avance de diciembre; la pantalla de directorio completo queda fuera de CU03 y para después.**
 
 **HU06 — Actualizar paciente (CU04).** Como Usuaria, quiero corregir la ficha de un paciente para mantener sus datos vigentes. Origen: §2, Q03, Q07, Q08. **CA:** (1) Un cambio válido se guarda y audita por usuario actor, momento, registro/campo y hecho, sin copiar valores privados a la auditoría. (2) Si otra persona modificó la ficha desde que se abrió, se avisa antes de sobrescribir; no se pierde silenciosamente el cambio. (3) Un fallo de respuesta no se presenta como guardado confirmado.
 
@@ -130,11 +132,11 @@ Se aplican al CU indicado cuando corresponde; los alternos particulares de cada 
   - A8) Sin superusuario capaz de entrar: no hay autoservicio ni recuperación por correo aprobada; el procedimiento inicial/de recuperación queda pendiente de 09. El bloqueo por intentos del CU01 no se elimina por un restablecimiento sin una regla explícita aprobada.
 
 **CU03 — Registrar, buscar y consultar paciente (HU04–HU05).** Actor: Usuaria o superusuario; capturista futuro. Disparador: necesita localizar o incorporar un paciente. Precondición: sesión y permiso. Postcondición: ficha existente localizada o una nueva guardada y auditada con identificador.
-- **Básico:** 1) Abre el directorio, que muestra vigentes por defecto, y busca por los datos disponibles. 2) Revisa coincidencias. 3) Abre la ficha correcta o captura los campos mínimos propuestos. 4) El sistema valida y guarda; la ficha queda consultable. El filtro de bajas requiere permiso propio.
+- **Básico:** 1) Abre Pacientes y busca por los datos disponibles. 2) Revisa las coincidencias vigentes. 3) Abre la ficha correcta o captura los campos mínimos propuestos. 4) El sistema valida y guarda; la ficha queda consultable. Esta búsqueda se conserva en el primer avance de diciembre; la pantalla aparte de directorio se realizará posteriormente.
 - **Alternos:**
   - A1) Coincidencia real: abrir la ficha existente y evitar el alta duplicada; un homónimo distinto puede registrarse, sin unicidad forzada del nombre.
   - A2) Falta un campo obligatorio, ámbito inválido o dato con formato inválido: señalarlo y no guardar.
-  - A3) Ficha de baja: excluir del directorio ordinario y mostrarla solo mediante filtro autorizado de bajas.
+  - A3) Ficha de baja: excluir de la búsqueda ordinaria de Pacientes; mantener consulta autorizada según CU04/Q20. El filtro de bajas de la pantalla aparte de directorio pertenece a la funcionalidad posterior.
   - A4) Falta sesión/permiso, incluso por enlace directo: no revelar ficha.
   - A5) Guardado o auditoría falla, o la respuesta es incierta: aplicar S4/S5; no presentar un alta no confirmada ni repetirla a ciegas.
 
