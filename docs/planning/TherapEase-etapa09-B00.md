@@ -19,7 +19,7 @@
 | HTTPS local del 10-oct | ✅ 12 correctas, 0 fallos/omitidas; TLS 1.3 negociado. | §4.5; avance local para el mismo PR #4, cabeceras y revisión pendientes. |
 | Q03 por API del 10-oct | ⏳ 51 casos Q03 tras ampliar: 46 correctos y 5 fallos de filtro. | §4.6; auditoría de las pruebas APROBADO. Miguel corrige números/listas; revisión humana pendiente. |
 | Q08 de Identity del 10-oct | ✅ 16 correctas, 0 fallos/omitidas; ejecución local. | §4.7; auditoría de Claude APROBADO; revisión humana, formularios y demás servicios pendientes. |
-| Errores/registros del 10-oct | ✅ 11 correctas; búsqueda acotada sin valores privados detectados. | §4.8; 500 de Identity vacío, mejora propuesta; auditoría/revisión humana pendientes. |
+| Errores/registros del 10-oct | ✅ 11 correctas; búsqueda acotada sin valores privados detectados. | §4.8; auditoría de Claude APROBADO; 500 de Identity vacío, mejora propuesta; revisión humana pendiente. |
 | Resultado conjunto del 08-oct | ✅ 50 correctas: 37 de Identity y 13 de recuperación; 0 fallos/omitidas, 19 s. | Release sin advertencias reportadas. Ejecución local, no CI. |
 
 | Documento | Para qué sirve |
@@ -50,9 +50,9 @@
 | Paciente de baja y cita activa | Aprobado | El bloqueo PostgreSQL **se conserva**. Nunca debe quedar una cita activa de un paciente de baja. |
 | Auditoría y directorio | Aprobado | Sin pantalla de auditoría; consulta técnica autorizada Q03. Directorio separado y posterior (B07), fuera de CU03: lista completa de vigentes por defecto y filtro autorizado de bajas. Decisión de Dulce del 08-oct; registrar y buscar desde Pacientes se mantiene en el primer avance de diciembre. |
 | Repositorio público | Aprobado | Documentación seleccionada y datos ficticios. Protección contra secretos aún por comprobar. |
-| Destino de respaldo | Opción A aprobada | Repositorio privado aparte; no crear ni configurar todavía. |
+| Destino de respaldo | Opción A aprobada | Repositorio privado aparte, artefacto privado 14 días; no crear ni configurar todavía. |
 | Cabeceras S-30 | Propuesta pendiente de Lucía | Inventario y propuesta en §4.5; no se implementó una política nueva ni se aprobó por ejecutar QA. |
-| Cifrado/formato y antigüedad de copia | Propuesta de QA en ADR-05 | AES-256-GCM y clave efímera usados en pruebas. Restaurar la copia íntegra disponible aunque supere 24 h y reportar Q10; decisión de implementación definitiva pendiente. |
+| Respaldo: cifrado, claves y validación | Aprobado el 10-oct, ADR-05 posterior | age con clave pública en GitHub; clave privada de Lucía en su gestor fuera de GitHub, copia de Miguel. Restaurar/comparar antes de cifrar; volcado solo en ejecutor. Simulacro mensual de Lucía; antigüedad >24 h no bloquea y genera incidencia. Implementación no autorizada. |
 
 | Pendiente de producto | Responsable de obtener respuesta | Impacto |
 | --- | --- | --- |
@@ -259,7 +259,7 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 | Fallo real de auditoría | ✅ Se retira SELECT únicamente en EventoAuditoria de la base ficticia; devuelve 500 con página genérica y no-store. | El registro contiene 42501, sin los datos sensibles buscados. SELECT se restituye y la consulta vuelve a 200. |
 | Fallo real de Identity | ✅ Retirar SELECT de AspNetUsers produce 500 vacío, sin valores privados ni detalles técnicos. Restituirlo permite otra consulta 200. | ⏳ Mejora propuesta de mensaje genérico que funcione si falla Identity; S-20 sigue parcial. No se confunde ausencia de filtración con mensaje útil. |
 | Búsqueda y evidencia | ✅ Nombre/contacto guardados, cuenta/contraseña ficticia, hashes, sellos, claves de sesión, cookies inicial/renovada y conexiones/claves ficticias; representaciones de URL/HTML/JSON. | Texto clínico solo como entrada ficticia: el modelo actual no tiene ese campo. Se buscan respuestas y salida/errores capturados tras detener el proceso; no se guardan mensajes crudos. Set-Cookie se permite como entrega normal de sesión, nunca en cuerpo/registros. |
-| Limpieza y revisión | ✅ 11 entornos retirados; sin contenedores Testcontainers ni imágenes nuevas. | ⏳ Auditoría de este bloque y revisión humana. No acredita toda la suite, páginas, todos los valores posibles, nube ni Q04/S-20/S-21 completos. |
+| Limpieza y revisión | ✅ 11 entornos retirados; sin contenedores Testcontainers ni imágenes nuevas. | ✅ Auditoría de Claude APROBADO; ⏳ revisión humana. No acredita toda la suite, páginas, todos los valores posibles, nube ni Q04/S-20/S-21 completos. |
 
 **Reproducir:** Docker Desktop iniciado; desde la raíz del repo:
 
@@ -269,7 +269,7 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 
 [Pruebas de errores](../../tests/TherapEase.IntegrationTests/ErroresRegistrosTests.cs) y [preparación/búsqueda](../../tests/TherapEase.IntegrationTests/ErroresRegistrosRevision.cs). Se reutiliza el servidor HTTPS existente mediante tres consultas de registros en memoria, sin modificar su arranque o limpieza. Herramientas: xUnit/HttpClient, Kestrel real en modo Production local, EF/Npgsql y PostgreSQL desechable/Testcontainers con migraciones/roles reales. Solo el migrador altera los permisos temporales de prueba; el servidor conserva su usuario limitado.
 
-**Evidencia:** errores-registros-10oct.trx, SHA-256 efba171d31b618949584a1da04dcdc97d9783be7a3cdf17c7f2b8b49f8f8cdd2; manifest.json y resúmenes por caso sin valores privados. Base local 1bf4f45; avance para el mismo PR #4, sin push. Pruebas comentadas según el skill del proyecto. Revisión humana, decisión ADR-05 y otros pendientes B00/LCA/R04 permanecen abiertos.
+**Evidencia:** errores-registros-10oct.trx, SHA-256 efba171d31b618949584a1da04dcdc97d9783be7a3cdf17c7f2b8b49f8f8cdd2; manifest.json y resúmenes por caso sin valores privados. Base local 1bf4f45; avance para el mismo PR #4, sin push. Pruebas comentadas según el skill del proyecto. Auditoría de errores/registros: Claude APROBADO, sin correcciones obligatorias. Decisión ADR-05 registrada el 10-oct, sin implementación; revisión humana y otros pendientes B00/LCA/R04 permanecen abiertos.
 
 ## 5. Cobertura y alcance de los pendientes
 
@@ -283,6 +283,8 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 | Decisión LCA | Evidencia parcial disponible. | Completar validación, revisión distinta y decisión expresa de Lucía. | §7, paso 4. |
 
 > **Cobertura documental:** §7 reúne los pendientes conocidos de B00 contrastados con 08B–08D, Q/R, AGENTS, plan de pruebas y evidencia. No garantiza que no aparezcan hallazgos nuevos. Las funciones completas de B01–B08 y los pendientes de uso real se distinguen en §9; no se autorizan ni se dan por hechos aquí.
+
+**Entrega propia acordada — 10-oct:** bloques de QA adelantados y decisión ADR-05 registrados; errores/registros auditados APROBADO. Siguiente: actualizar el PR #4 con el avance local para revisión de Miguel. La revisión humana, correcciones de Miguel, páginas de Dulce, protección contra secretos/cabeceras y demás filas abiertas siguen pendientes. No equivale a cerrar todo B00 o LCA.
 
 ## 6. Siguientes pasos compartidos
 
@@ -366,7 +368,7 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 | ✅ | Probar copia alterada, clave incorrecta y fallos de copia/restauración; medir pérdida y recuperación. | Lucía | 7,375 s desde detección simulada; no acredita operación diaria. |
 | ✅ | Aplicar correcciones de Claude y repetir las 50; restaurar copia íntegra de 25 h e informar Q10. | Lucía | Ejecución del 08-oct, 0 fallos/omitidas. |
 | ⏳ | Revisar las pruebas de recuperación y reproducir sus resultados. | Miguel o Dulce | Revisión distinta del autor; puede integrarse con Q15 del paso 1. |
-| ⏳ | Revisar/decidir la propuesta ADR-05: cifrado/formato, antigüedad y pendientes operativos. | Lucía | Auditoría personal de Claude cuando corresponda; no hay decisión definitiva de producción atribuida. |
+| ✅ | Registrar la decisión ADR-05 sobre cifrado, custodia, antigüedad y validación. | Lucía | Decisión del 10-oct: age, clave pública solo para cifrar en GitHub, privada fuera de GitHub y copia de Miguel; restaurar/comparar antes de cifrar, simulacro mensual y 14 días privados. No implementar todavía. |
 | ⏳ | Resolver o registrar hallazgos y aprobar/fusionar el PR #4. | Lucía; Miguel o Dulce revisa las pruebas | La aprobación parcial no cierra B00. |
 | ⏳ | Consolidar evidencia Q06–Q11/Q19, límites y riesgos residuales; decidir B00/LCA. | Lucía | Resultados ejecutables, revisión humana distinta y pendientes de esta puerta tratados expresamente; no cierre automático. |
 
@@ -375,9 +377,9 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 | Tema | Regla / situación |
 | --- | --- |
 | Consulta técnica Q03 | API de lectura por HTTPS probada en §4.6: filtros válidos, límites, metadatos y denegaciones. Cinco casos de números/listas pendientes de corregir; comando/acceso final del operador y revisión humana pendientes. Sin pantalla ni acceso directo del cliente a PostgreSQL. |
-| Respaldo aprobado | Opción A: repo privado aparte; `pg_dump` cifrado, SHA-256, 14 días, restauración desechable e incidencia asignada a Lucía ante fallo. Sin crear repo, conectar Neon ni desplegar. |
+| Respaldo aprobado | Decisión del 10-oct en ADR-05 y AGENTS §2.8: age/clave pública, restaurar y comparar antes de cifrar, volcado solo en ejecutor, 14 días privados y simulacro mensual de Lucía. No crear repo, conectar Neon ni configurar flujo. |
 | Cabeceras S-30 | HTTPS local probado; política adicional propuesta en §4.5, pendiente de decisión e implementación. |
-| Propuesta ADR-05 | La prueba local no decide custodia duradera, formato definitivo ni operación diaria. Esos límites deben quedar explícitos en la decisión de LCA. |
+| QA y respaldo real | Cifrar/Abrir mantienen AES-256-GCM exclusivo de QA. Las pruebas de cifrado se reemplazan por age al implementar; volcado, restauración, comparación, fallos y antigüedad se conservan. La decisión no acredita operación real ni autoriza modificar las pruebas ahora. |
 
 | Mejora opcional ya registrada | Quién podría aplicarla | Situación |
 | --- | --- | --- |
@@ -395,8 +397,9 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 | Directorio como pantalla aparte, fuera de CU03. | B07, posterior al primer avance de diciembre; decisión de Dulce del 08-oct. | Lista completa de vigentes por defecto y filtro autorizado de bajas; campos y prioridad posterior por validar. No sustituye la búsqueda mínima de Pacientes. |
 | Recorrido completo Playwright Q16. | Desde B04; Lucía, revisión Miguel/Dulce. | No exigible como recorrido completo inexistente en B00. |
 | Rendimiento/carga Q12, uso Q13, demo Q14 y reproducción Q15 final. | B08; Lucía coordina, otro integrante reproduce. | Recuperación con carga objetivo y funcionamiento completo siguen pendientes; Q15 básico del entorno sí figura en §7. |
-| Repo privado, respaldo diario, retención 14 días, restauración programada e incidencia. | Tras autorización; implementación por concretar, Lucía decide/verifica. | Demostración local hecha; no operar nube ni declarar Q10–Q11 completos en producción. |
-| Custodia/rotación de claves duraderas y política de sesiones tras incidente. | Decisión de Lucía; Miguel implementa, Lucía prueba cuando se autorice. | La copia restaura Identity; la cookie antigua usada en QA no fija la política tras incidente real. |
+| Repo privado, respaldo diario con age, validación antes de cifrar, retención 14 días e incidencia. | Solo tras autorización expresa de implementación. | Decisión documental tomada; no operar nube ni declarar Q10–Q11 completos en producción. |
+| Simulacro mensual: descifrar, restaurar y medir. | Lucía, cuando el respaldo real esté autorizado y disponible. | El flujo diario solo usa la clave pública y no comprueba descifrado; recorrido mensual aún no ejecutado. |
+| Generar/custodiar claves según la decisión; concretar rotación y política de sesiones tras incidente. | Lucía custodia privada fuera de GitHub; Miguel conserva copia; solo implementar cuando se autorice. | Custodia decidida, todavía no ejecutada. La copia restaura Identity; la cookie antigua usada en QA no fija la política tras incidente real. |
 | TLS Neon, Render y controles del despliegue. | Solo con autorización expresa. | Q19 local se prueba sin nube; no se presumen servicios configurados. |
 | R04, datos reales, TOTP y recuperación; expediente/notas/reportes/capturista. | Fuera de B00; Lucía decide con respuestas de la usuaria y equipo. | R04 sigue abierto. Solo datos ficticios; no trasladar estos pendientes a una falsa aprobación actual. |
 | Skills adaptadas. | PR posterior autorizado. | No bloquean por sí solas el trabajo del equipo. |

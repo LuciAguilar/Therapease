@@ -65,9 +65,9 @@
 
 **Continuidad posterior:** 05E definió documentalmente el respaldo diario y su verificación de restauración; 07B detalló Identity, sesiones, TLS y auditoría. Lucía exigió TOTP con app autenticadora **antes de usar datos reales** en 08B. La incorporación de ese mecanismo exige revisar el impacto en ADR-05 conforme a 07A antes de implementarse. **R04 sigue abierto:** procedencia, acceso, conservación y eliminación definitiva se deciden con Usuaria antes de cualquier dato real; este ADR no los resuelve.
 
-### Nota posterior ADR-05 — opción A del respaldo (propuesta para Claude)
+### Nota posterior ADR-05 — opción A del respaldo (antecedente del 01-oct)
 
-**Decisión de Lucía, 01-oct-2026:** usar un repositorio **privado aparte**, dedicado únicamente al respaldo diario. **Estado de esta nota:** propuesta de implementación para auditoría de Claude; no se atribuye auditoría recibida ni creación de infraestructura. El texto original de 04 se conserva.
+**Decisión de Lucía, 01-oct-2026:** usar un repositorio **privado aparte**, dedicado únicamente al respaldo diario. **Estado al 01-oct:** propuesta de implementación para auditoría de Claude; no se atribuye auditoría recibida ni creación de infraestructura. El texto original de 04 se conserva. La decisión vigente de cifrado/custodia y validación está en la nota posterior del 10-oct.
 
 El repo público contiene aplicación y documentación; el privado alojará el flujo del respaldo y sus artefactos privados, sin guardar volcados ni secretos en Git. Mantener 05E: `pg_dump` diario cifrado, huella SHA-256, retención de 14 días, restauración automática en PostgreSQL desechable y una incidencia asignada a Lucía ante fallo de respaldo o restauración, hasta resolverlo. Secretos de conexión/cifrado serán configuración externa del repo privado; nunca material del repositorio público. Acceso al repo privado, origen y permisos de la automatización, método de cifrado y recuperación de claves deben concretarse y revisarse antes de implementar.
 
@@ -88,6 +88,23 @@ Solo para pruebas B00: `pg_dump`/`pg_restore` 17 del contenedor y AES-256-GCM me
 **Propuesto, no aprobado para producción:** el formato, cifrado y clave efímera permiten únicamente la demostración local. Gestión y recuperación de claves duraderas, usuario de respaldo, retención diaria de 14 días, repositorio privado, incidencia automática, nube y pruebas a carga objetivo siguen pendientes de auditoría y decisión. No cambia ADR-05 original ni acredita Q10–Q11 completos o cierre LCA. Lucía autorizó elaborar y ejecutar la validación local; Miguel o Dulce debe revisar sus pruebas.
 
 **Ajuste de la propuesta — 08-oct-2026, veredicto de Claude aplicado por autorización de Lucía:** la antigüedad se mide y se informa para Q10; no es condición para impedir la restauración. En un incidente se restaura la copia más reciente disponible e íntegra aunque tenga más de 24 horas, registrando el incumplimiento de Q10, para no prolongar la caída Q11. Una fecha futura se informa como anomalía de medición. La integridad y la clave correcta siguen siendo obligatorias. El código de QA separa medición y restauración; su nueva ejecución del 08-oct fue correcta (50 casos en conjunto); revisión humana y aprobación siguen pendientes.
+
+### Nota posterior ADR-05 — decisión de Lucía, 10-oct-2026
+
+**Estado: aprobado documentalmente; implementación no autorizada.** Concreta y sustituye las propuestas anteriores sobre cifrado, custodia y validación del respaldo. Conserva el texto original de 04, Q10–Q11 y la opción A del 01-oct.
+
+| Tema | Decisión aprobada | Implementación / evidencia pendiente |
+| --- | --- | --- |
+| Cifrado diario | pg_dump cifrado con age y clave pública; conservar SHA-256 de la copia cifrada. age es herramienta nueva registrada conforme a 07A. | Sin instalación, claves generadas ni cambio de dependencias. |
+| Claves | Para cifrar, el flujo de GitHub solo tiene la clave pública. Lucía guarda la privada fuera de GitHub en su gestor de contraseñas y Miguel guarda una copia fuera de GitHub. | Generación, entrega y comprobación de custodia pendientes; no se afirma que las claves ya existan. |
+| Validación diaria | En el mismo trabajo: generar volcado, restaurarlo en PostgreSQL desechable, comparar y después cifrarlo. El volcado sin cifrar nunca sale del ejecutor. | No subirlo a Git, artefactos o registros. El flujo diario no recibe la clave privada ni descifra; la comprobación mensual cubre ese recorrido. |
+| Simulacro mensual | Lucía descifra una copia, restaura y mide el tiempo para Q10–Q11. | Pendiente de implementación/autorización y ejecución real; no acreditado por las pruebas actuales. |
+| Antigüedad | Nunca bloquear la restauración por antigüedad: usar la última copia íntegra disponible aunque supere 24 h y abrir o actualizar incidencia asignada a Lucía. | Medir/reportar incumplimiento Q10; la integridad y la clave correcta siguen siendo necesarias. |
+| Conservación | 14 días como artefacto privado del repositorio de respaldos, separado del público. | Repositorio, permisos y retención todavía sin configurar. |
+| Fallos | Mantener incidencia asignada a Lucía ante fallo de respaldo/restauración hasta corregirlo. | Automatización pendiente. |
+| Pruebas existentes | Cifrar/Abrir usan formato exclusivo de QA (AES-256-GCM). No se modifican ahora. | Al implementar el respaldo real, reemplazar las pruebas de cifrado —copia alterada, clave incorrecta, aleatorio nuevo y fecha protegida— por pruebas con age. Conservar las de volcado, restauración, comparación, fallos y antigüedad. |
+
+**Límite:** no crear el repositorio de respaldos, conectar Neon ni implementar el flujo. No instalar age ni generar/guardar claves en esta entrega documental. Rotación de claves, usuario/permisos de respaldo, política de sesiones tras incidente, carga objetivo y demás detalles operativos siguen pendientes donde corresponda. La aprobación no acredita funcionamiento diario/mensual ni cierra B00/LCA/R04.
 
 ## Estado del traslado y aprobación — 01-oct-2026
 

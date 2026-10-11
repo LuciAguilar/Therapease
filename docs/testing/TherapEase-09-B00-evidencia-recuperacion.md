@@ -1,6 +1,17 @@
 # TherapEase — B00 · Evidencia local de recuperación Q10–Q11
 
-**Actualizado el 08-oct-2026 · Correcciones aplicadas y 50 pruebas repetidas: todas correctas. Revisión humana y aprobación pendientes.** Propuesta de validación, sin respaldo diario configurado, datos reales o nube. B00/LCA/R04 abiertos.
+**Actualizado el 10-oct-2026 · Correcciones aplicadas y 50 pruebas repetidas: todas correctas. Revisión humana y aprobación pendientes.** Propuesta de validación, sin respaldo diario configurado, datos reales o nube. B00/LCA/R04 abiertos.
+
+## Decisión ADR-05 registrada — 10-oct-2026
+
+La operación real usará age con clave pública en GitHub; Lucía custodia la privada fuera de GitHub en su gestor y Miguel conserva copia. En cada trabajo diario se restaura y compara el volcado en PostgreSQL desechable antes de cifrarlo; el volcado sin cifrar nunca sale del ejecutor. Retención de 14 días como artefacto privado en el repo de respaldos. Lucía descifra/restaura/mide en un simulacro mensual. Copia de más de 24 h: restaurar igual, reportar Q10 y abrir o actualizar incidencia a Lucía. No se implementa ni configura nada en esta entrega.
+
+| Pruebas existentes | Tratamiento decidido |
+| --- | --- |
+| Cifrar / Abrir | Mantienen el formato exclusivo de QA AES-256-GCM; no son implementación ni validación de age. |
+| Copia alterada, clave incorrecta, aleatorio nuevo y fecha protegida | Se reemplazarán por pruebas con age al implementar el respaldo real; no se modifican ahora. |
+| Volcado, restauración, comparación, fallos y antigüedad | Se conservan. |
+| Resultados actuales | Los 13 casos de recuperación y la ejecución conjunta de 50 pertenecen al formato de QA. No se repitieron pruebas por esta actualización documental. |
 
 ## Correcciones aplicadas y verificadas — 08-oct-2026
 
@@ -14,7 +25,7 @@
 - Rama existente `revision/etapa09`, sobre main `8baf8fbc34890d4710c2b78e920f10b8d3e92cb3`. Identity quedó inicialmente guardado en `4dbee3a614e04c4086adc068151543fe81f6ab90`; recuperación corregida y ejecución conjunta están en `83328783b2ea4f7487d28e2935e3c81acb8e521b`, publicado en [PR #4](https://github.com/LuciAguilar/Therapease/pull/4), en borrador. Esta entrega reúne Identity y recuperación; la descripción del PR identifica el commit y la evidencia local conserva las huellas.
 - **13 casos nuevos; 50 pasan en conjunto** con los 37 anteriores, 0 fallos/omitidas. Release sin advertencias; duración informada: 19 s. Solo pruebas/documentación, sin cambios de backend, migraciones, PageModel, dependencias de ejecución o reglas compartidas.
 - SDK 10.0.401, Docker 29.8.1 Linux, PostgreSQL 17.11, Testcontainers 4.15.0, xUnit 2.9.3. Contenedores desechables, bases aisladas y datos ficticios.
-- Cifrado **candidato de QA**: AES-256-GCM de .NET, clave aleatoria de 32 bytes en memoria, aleatorio nuevo de 12 bytes y autenticación de 16 bytes; fecha/versión autenticadas, SHA-256 del archivo cifrado. Nota propuesta en ADR-05; no es un formato de producción aprobado ni resuelve custodia de claves.
+- Cifrado **candidato de QA**: AES-256-GCM de .NET, clave aleatoria de 32 bytes en memoria, aleatorio nuevo de 12 bytes y autenticación de 16 bytes; fecha/versión autenticadas, SHA-256 del archivo cifrado. Formato exclusivo de QA documentado en ADR-05; el respaldo real aprobado usará age, con custodia decidida el 10-oct y todavía sin implementar.
 
 ## 2. Casos ejecutados
 
@@ -51,7 +62,7 @@ Desde la raíz de la solución, con .NET 10 y Docker Desktop Linux disponible:
 dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj -c Release --filter FullyQualifiedName~RecuperacionTests --logger "trx;LogFileName=recuperacion.trx" --results-directory TestResults/B00
 ```
 
-Sin `--filter` se ejecutan los 50 casos. TRX corregido del 08-oct: `b00-conjunto-50-corregido-08oct.trx`, con mediciones sin datos ni claves. Dos intentos anteriores fallaron en comprobaciones nuevas: consulta HTTP sin fechas y consulta del historial EF con usuario de app; se corrigieron las pruebas sin cambiar la aplicación ni omitir casos. Evidencia anterior conservada localmente.
+Los 50 casos corresponden a la ejecución conjunta de Identity/recuperación del 08-oct. Hoy, sin filtro se incluyen también los bloques nuevos y los fallos conocidos de arquitectura/Q03; el comando anterior selecciona solo recuperación. TRX corregido del 08-oct: `b00-conjunto-50-corregido-08oct.trx`, con mediciones sin datos ni claves. Dos intentos anteriores fallaron en comprobaciones nuevas: consulta HTTP sin fechas y consulta del historial EF con usuario de app; se corrigieron las pruebas sin cambiar la aplicación ni omitir casos. Evidencia anterior conservada localmente.
 
 Código: [casos](../../tests/TherapEase.IntegrationTests/RecuperacionTests.cs), [apoyo de cifrado/volcado/restauración](../../tests/TherapEase.IntegrationTests/RecuperacionRevision.cs).
 
@@ -60,8 +71,8 @@ Volcados sin cifrar: solo temporales dentro del contenedor, modo 0600 comprobado
 ## 5. Pendientes y límites
 
 - Claude emitió CORREGIR menor; correcciones aplicadas y pruebas repetidas correctamente. Miguel o Dulce revisa las pruebas; Lucía aprueba y decide publicación.
-- Clave efímera solo de QA. Custodia, acceso, recuperación y rotación duradera pendientes. SHA-256 por sí solo no autentica frente a quien cambie archivo y huella.
-- Repositorio privado, ejecución diaria, retención 14 días, incidencia automática, restauración programada y acceso privado pendientes; no se crean servicios o conexiones de nube.
+- Clave efímera solo de QA. Custodia de la privada age decidida el 10-oct; generación, entrega, comprobación de custodia y rotación pendientes cuando se autorice. SHA-256 por sí solo no autentica frente a quien cambie archivo y huella.
+- Repositorio privado, ejecución diaria con validación del volcado antes de cifrar, retención 14 días, incidencia automática, acceso privado y simulacro mensual pendientes de implementación/ejecución; no se crean servicios o conexiones de nube.
 - Se restaura también el estado de Identity de la copia. La cookie anterior se conserva deliberadamente para verificar las claves; revisar la política de revocación de sesiones tras un incidente real antes de usar datos reales. No acredita S-31 (reinicio del contenedor de app), navegador, antifalsificación o HTTPS/Q19.
 - Muestra pequeña: un paciente, una cita, un superusuario, un evento y tablas auxiliares. No acredita carga Q12, caída de proveedor, detección automática, transporte seguro o pérdida máxima diaria en operación real.
 - Q10–Q11 conservan revisión, reproducción y operación pendientes. Sin cierre B00/LCA ni autorización B01/Construcción.

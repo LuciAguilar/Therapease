@@ -60,12 +60,12 @@ Ver [AGENTS.md — Reglas por cambio](AGENTS.md).
 | Baja de paciente con citas activas; retirar un ámbito con citas y recuperación posterior | Dulce con la usuaria; Miguel implementa; Lucía prueba | Política funcional antes de implementarla. B00 valida los invariantes aprobados sin adjudicar una regla pendiente. |
 | Resuelto el 04-oct: primer superusuario por comando local y restablecimiento sin levantar bloqueo | Lucía aprobó; Miguel implementa; Lucía prueba | Condiciones en [AGENTS.md](AGENTS.md); sin contraseña fija ni correo supuesto. |
 | Resuelto el 04-oct: PageModel a cargo de Dulce | Lucía confirmó; Dulce implementa y escribe unitarias | Revisión distinta y aprobación de Lucía. |
-| Opción A del respaldo decidida: repo privado aparte, dedicado al respaldo diario | Lucía revisa la nota de implementación ADR-05 con su método personal y decide | Nota propuesta para auditoría; no crear aún el repo ni conectar Neon. Conservar `pg_dump` cifrado, SHA-256, 14 días, restauración desechable e incidencia a Lucía ante fallo. No frena B00 desechable. |
+| Respaldo: decisión de Lucía del 10-oct registrada | Implementación pendiente de autorización | Opción A, age, validación diaria antes de cifrar y simulacro mensual; reglas vigentes en AGENTS §2.8 y nota posterior ADR-05. No crear repo, conectar Neon ni configurar flujo. |
 | Revisión de documentación inicial | Miguel o Dulce comunica observaciones con su propio método; Lucía confirma cambios | Pendiente y no bloqueante; guía, AGENTS y ADR corregidos ya aprobados por Lucía. |
 | Revisión de código/pruebas, resultados B00 y decisión LCA | Autor distinto del revisor en cada PR; aprobación final de Lucía | Miguel/Dulce revisa pruebas de Lucía. Construcción continúa pendiente de evidencia y decisión LCA. |
 | Acceso, procedencia, conservación y eliminación de datos reales; TOTP | Lucía con la usuaria y responsables técnicos | R04 sigue abierto: no utilizar datos reales. |
 
-GitHub permite descargar artefactos a personas autenticadas con lectura del repositorio; en uno público ese acceso no restringe el respaldo al equipo. El cifrado no convierte el artefacto en privado. [Fuente oficial: descarga de artefactos](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/download-workflow-artifacts). La opción A tiene una nota posterior de implementación en ADR-05, pendiente de revisión y decisión de Lucía. No se ha creado el repo de respaldo ni configurado el flujo.
+GitHub permite descargar artefactos a personas autenticadas con lectura del repositorio; en uno público ese acceso no restringe el respaldo al equipo. El cifrado no convierte el artefacto en privado. [Fuente oficial: descarga de artefactos](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/download-workflow-artifacts). La nota posterior ADR-05 del 10-oct registra la decisión aprobada de cifrado, custodia y validación; su implementación no está autorizada. No se ha creado el repo de respaldo ni configurado el flujo.
 
 ## 7. Cómo dejar trabajo revisable sin depender de una llamada
 
@@ -105,7 +105,9 @@ Consultar [B00 — siguientes pasos compartidos](docs/planning/TherapEase-etapa0
 
 **Dulce — mensajes Q08:** rechazo conocido del servicio → «No se guardó» y motivo. Excepción inesperada → «No pudimos confirmar si se guardó; revisa el registro antes de repetir», sin reintento automático. Si se solicita otro restablecimiento, avisar que la temporal anterior deja de servir. Ajuste y unitarias pendientes; detalle en el informe de ajustes §8.
 
-**Errores/registros — 10-oct:** 11 casos nuevos correctos de API HTTPS, entradas inválidas, rechazo de sesión y fallos reales de lectura PostgreSQL. Sin valores privados buscados en respuestas/registros capturados; 500 de Identity vacío, mejora propuesta en informe §9. Alcance, comando y límites en B00 §4.8. Auditoría y revisión humana pendientes; mismo PR #4, ampliación aún local.
+**Errores/registros — 10-oct:** 11 casos nuevos correctos de API HTTPS, entradas inválidas, rechazo de sesión y fallos reales de lectura PostgreSQL. Sin valores privados buscados en respuestas/registros capturados; 500 de Identity vacío, mejora propuesta en informe §9. Alcance, comando y límites en B00 §4.8. Auditoría de Claude APROBADO; revisión humana pendiente; mismo PR #4, ampliación aún local.
+
+**Entrega QA — 10-oct:** decisión ADR-05 registrada y bloques adelantados auditados. Siguiente: actualizar PR #4 para revisión de Miguel; la ampliación todavía es local. Reglas de respaldo en AGENTS §2.8; en esta entrega no se instaló age, crearon claves ni configuró el flujo. B00/LCA siguen abiertos.
 
 ## 10. Construir, probar y ejecutar
 
