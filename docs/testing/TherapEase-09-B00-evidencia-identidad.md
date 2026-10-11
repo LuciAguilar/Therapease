@@ -66,7 +66,7 @@ La revisión humana de Miguel o Dulce y la aprobación final de Lucía siguen pe
 
 ## 5. Pendientes que se conservan
 
-- **Dulce:** PageModel y unitarias; después probar formulario real, envío antifalsificación, cookies/navegador, renovación por actividad, salida y cambio/restablecimiento desde las páginas, redirecciones y caché. Si falla la auditoría, el servicio lanza una excepción y revierte; la página debe mostrar «no se guardó», sin confirmar éxito.
+- **Dulce:** PageModel y unitarias; después probar formulario real, envío antifalsificación, cookies/navegador, renovación por actividad, salida y cambio/restablecimiento desde las páginas, redirecciones y caché. Indicación actualizada tras auditoría Q08 del 10-oct: rechazo conocido (RespuestaServicio fallida) → «No se guardó» y motivo; excepción inesperada → «No pudimos confirmar si se guardó; revisa el registro antes de repetir», sin reintento automático. Otro restablecimiento invalida la temporal anterior y debe avisarlo. El fallo de auditoría observado revierte, pero una excepción inesperada no acredita por sí sola ausencia de commit. Informe §8/B00 §4.7.
 - **Q19:** HTTPS local real, transporte y cabeceras según decisiones pendientes. Una cabecera Secure emitida en componente o una cookie enviado manualmente por HTTP no prueba comunicaciones cifradas.
 - **S-31:** reinicio real del contenedor de aplicación con claves en PostgreSQL; la recreación del proveedor solo es evidencia parcial.
 - **Q08:** pérdidas de respuesta e interrupciones antes/después del commit y resultado incierto; los fallos de auditoría solo cubren reversión antes del commit.

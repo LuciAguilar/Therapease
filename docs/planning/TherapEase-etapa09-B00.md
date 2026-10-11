@@ -19,6 +19,7 @@
 | HTTPS local del 10-oct | ✅ 12 correctas, 0 fallos/omitidas; TLS 1.3 negociado. | §4.5; avance local para el mismo PR #4, cabeceras y revisión pendientes. |
 | Q03 por API del 10-oct | ⏳ 51 casos Q03 tras ampliar: 46 correctos y 5 fallos de filtro. | §4.6; auditoría de las pruebas APROBADO. Miguel corrige números/listas; revisión humana pendiente. |
 | Q08 de Identity del 10-oct | ✅ 16 correctas, 0 fallos/omitidas; ejecución local. | §4.7; auditoría de Claude APROBADO; revisión humana, formularios y demás servicios pendientes. |
+| Errores/registros del 10-oct | ✅ 11 correctas; búsqueda acotada sin valores privados detectados. | §4.8; 500 de Identity vacío, mejora propuesta; auditoría/revisión humana pendientes. |
 | Resultado conjunto del 08-oct | ✅ 50 correctas: 37 de Identity y 13 de recuperación; 0 fallos/omitidas, 19 s. | Release sin advertencias reportadas. Ejecución local, no CI. |
 
 | Documento | Para qué sirve |
@@ -183,7 +184,7 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj -c Release --filter FullyQualifiedName~HttpsLocalTests --logger "trx;LogFileName=b00-https.trx"
 ```
 
-[Pruebas HTTPS](../../tests/TherapEase.IntegrationTests/HttpsLocalTests.cs) y [entorno temporal](../../tests/TherapEase.IntegrationTests/HttpsLocalRevision.cs). La evidencia automática queda en TestResults/https y se excluye de Git. TRX de esta ejecución: b00-https-final-10oct.trx, SHA-256 dd0dd08048c161a5cf2d7dd1fde06ee92d98f94c5c44edc89282d6b1193a3b46. Base local 47ca601; ampliación para el mismo PR #4 aún sin subir. Pruebas comentadas según el skill del proyecto. Auditoría HTTPS recibida de Claude: APROBADO, sin correcciones obligatorias; revisión humana pendiente. La ampliación Q03 de §4.6 tiene auditoría pendiente.
+[Pruebas HTTPS](../../tests/TherapEase.IntegrationTests/HttpsLocalTests.cs) y [entorno temporal](../../tests/TherapEase.IntegrationTests/HttpsLocalRevision.cs). La evidencia automática queda en TestResults/https y se excluye de Git. TRX de esta ejecución: b00-https-final-10oct.trx, SHA-256 dd0dd08048c161a5cf2d7dd1fde06ee92d98f94c5c44edc89282d6b1193a3b46. Base local 47ca601; ampliación para el mismo PR #4 aún sin subir. Pruebas comentadas según el skill del proyecto. Auditoría HTTPS recibida de Claude: APROBADO, sin correcciones obligatorias; revisión humana pendiente. La ampliación Q03 de §4.6 ya tiene auditoría APROBADO; implementación de Miguel y revisión humana pendientes.
 
 > La redirección no protege datos que un cliente ya haya enviado por HTTP. La prueba envía las credenciales de sesión únicamente por HTTPS. HSTS necesita un cliente compatible y una primera conexión segura; ASP.NET Core excluye localhost por defecto. [Referencia oficial de Microsoft](https://learn.microsoft.com/en-us/aspnet/core/security/enforcing-ssl?view=aspnetcore-10.0).
 
@@ -248,6 +249,28 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 
 **Veredicto Q08 — 10-oct:** Claude APROBADO, sin correcciones a las pruebas. Para Dulce: rechazo conocido → «No se guardó» y motivo; excepción inesperada → «No pudimos confirmar si se guardó; revisa el registro antes de repetir», sin reintento automático; nuevo restablecimiento → avisar que la temporal anterior deja de servir. Implementación/PageModel, procedimiento de entrega y revisión humana pendientes.
 
+### 4.8. Errores y registros sin valores privados — 10-oct
+
+| Comprobación | Resultado ejecutable | Alcance / pendiente |
+| --- | --- | --- |
+| Ejecución | ✅ 11 correctas, 0 fallidas/omitidas/abortadas; Release, 0 errores/advertencias al compilar. 76,22 s incluida preparación. | Solo este bloque nuevo; no se repitieron ni se dan por corregidos los fallos de arquitectura/Q03. |
+| Entradas inválidas | ✅ Siete respuestas 400: fecha, tipo, identificador, límite de texto, límite desbordado, periodo invertido y límite 501. | Valores ficticios enviados en campos inválidos/parámetros extra; respuesta y registros capturados no los repiten. |
+| Acceso rechazado | ✅ Dos respuestas 401, sin sesión/con cookie inválida; sin redirección ni valores privados buscados. | Permisos de los otros roles ya tienen evidencia separada Q03; no son casos nuevos de este bloque. |
+| Fallo real de auditoría | ✅ Se retira SELECT únicamente en EventoAuditoria de la base ficticia; devuelve 500 con página genérica y no-store. | El registro contiene 42501, sin los datos sensibles buscados. SELECT se restituye y la consulta vuelve a 200. |
+| Fallo real de Identity | ✅ Retirar SELECT de AspNetUsers produce 500 vacío, sin valores privados ni detalles técnicos. Restituirlo permite otra consulta 200. | ⏳ Mejora propuesta de mensaje genérico que funcione si falla Identity; S-20 sigue parcial. No se confunde ausencia de filtración con mensaje útil. |
+| Búsqueda y evidencia | ✅ Nombre/contacto guardados, cuenta/contraseña ficticia, hashes, sellos, claves de sesión, cookies inicial/renovada y conexiones/claves ficticias; representaciones de URL/HTML/JSON. | Texto clínico solo como entrada ficticia: el modelo actual no tiene ese campo. Se buscan respuestas y salida/errores capturados tras detener el proceso; no se guardan mensajes crudos. Set-Cookie se permite como entrega normal de sesión, nunca en cuerpo/registros. |
+| Limpieza y revisión | ✅ 11 entornos retirados; sin contenedores Testcontainers ni imágenes nuevas. | ⏳ Auditoría de este bloque y revisión humana. No acredita toda la suite, páginas, todos los valores posibles, nube ni Q04/S-20/S-21 completos. |
+
+**Reproducir:** Docker Desktop iniciado; desde la raíz del repo:
+
+~~~powershell
+dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj -c Release --filter FullyQualifiedName~ErroresRegistrosTests --logger "trx;LogFileName=b00-errores-registros.trx"
+~~~
+
+[Pruebas de errores](../../tests/TherapEase.IntegrationTests/ErroresRegistrosTests.cs) y [preparación/búsqueda](../../tests/TherapEase.IntegrationTests/ErroresRegistrosRevision.cs). Se reutiliza el servidor HTTPS existente mediante tres consultas de registros en memoria, sin modificar su arranque o limpieza. Herramientas: xUnit/HttpClient, Kestrel real en modo Production local, EF/Npgsql y PostgreSQL desechable/Testcontainers con migraciones/roles reales. Solo el migrador altera los permisos temporales de prueba; el servidor conserva su usuario limitado.
+
+**Evidencia:** errores-registros-10oct.trx, SHA-256 efba171d31b618949584a1da04dcdc97d9783be7a3cdf17c7f2b8b49f8f8cdd2; manifest.json y resúmenes por caso sin valores privados. Base local 1bf4f45; avance para el mismo PR #4, sin push. Pruebas comentadas según el skill del proyecto. Revisión humana, decisión ADR-05 y otros pendientes B00/LCA/R04 permanecen abiertos.
+
 ## 5. Cobertura y alcance de los pendientes
 
 | Área de B00 | Avance | Lo que aún falta | Dónde seguir |
@@ -255,7 +278,7 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 | Arquitectura | Pruebas automáticas ejecutadas: 30, con 28 correctas y 2 fallidas (§4.3). | Corregir llamada Web → MatrizDePermisos, implementar/probar CU04, repetir sobre páginas funcionales y revisión de Miguel. | §7, paso 1. |
 | Datos Q03/Q06/Q07/Q08/Q20 | Migraciones/permisos y escenarios ejecutados; consulta API Q03: 46 correctos y 5 fallos de entradas (§4.6). | Corregir filtro combinado, acceso/comando de consulta y demás operaciones, estados, concurrencia, conflictos e interrupciones. | §7, paso 2. |
 | Horas Q09 y Docker | ✅ Imagen, horas, API, EF/PostgreSQL y reinicio probados (§4.4). | Revisión/reproducción por otra persona; horas en páginas/navegador cuando existan. | §7, pasos 1–3. |
-| Identidad y seguridad Q19 | Servidor, reinicio y HTTPS local probados (§4.5); revisión acotada de secretos. | PageModel, navegador, decisión/verificación de cabeceras y revisión humana. | §7, paso 3. |
+| Identidad y seguridad Q19 | Servidor, reinicio, HTTPS local (§4.5), Q08 Identity (§4.7) y errores/registros de API (§4.8) probados; alcance acotado. | PageModel, navegador, decisión/verificación de cabeceras y revisión humana. | §7, paso 3. |
 | Recuperación Q10–Q11 | Procedimiento local corregido, ejecutado. | Revisión, decisiones de implementación y límites de operación registrados. | §7, paso 4; operación posterior en §9. |
 | Decisión LCA | Evidencia parcial disponible. | Completar validación, revisión distinta y decisión expresa de Lucía. | §7, paso 4. |
 
@@ -329,7 +352,8 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 | ⏳ | Probar entrada/salida, temporal, cambio/restablecimiento y rol desde las páginas. | Lucía | Depende de PageModel de Dulce; cuentas ficticias y distintas sesiones. |
 | ⏳ | Probar cookies reales y renovación por actividad; cookie manipulada/ausente, redirección externa y caché tras salir. | Lucía | Navegador y acceso mínimo; no reutilizar el resultado de componentes como prueba de páginas. |
 | ⏳ | Probar antifalsificación, permisos por URL/envío directo y validación de las rutas disponibles. | Lucía prueba; Miguel/Dulce corrigen | PageModel disponibles; ampliar con las rutas de cada bloque posterior. |
-| ⏳ | Revisar errores, entradas/salidas y datos rastreables de la validación ampliada. | Lucía prueba; Miguel/Dulce corrigen | Sin datos privados ni secretos en eventos, respuestas o registros; no acreditar toda 09. |
+| ✅ | Probar errores/respuestas y registros de la API disponible. | Lucía prueba; Miguel/Dulce corrigen | 11 correctas; búsqueda de valores privados y fallos reales de lectura, §4.8. |
+| ⏳ | Completar revisión de errores/registros/eventos en otras operaciones y páginas. | Lucía prueba; Miguel/Dulce corrigen | No acreditar toda 09; S-20/S-21 siguen parciales. 500 de Identity vacío: mejora propuesta, revisión humana pendiente. |
 | ✅ | Probar HTTPS local, certificado, redirección, cookie renovada y HSTS de modo Production local. | Lucía | 12 correctas; servidor real y PostgreSQL desechable. Sin navegador ni despliegue (§4.5). |
 | ⏳ | Decidir cabeceras exigidas y comprobar la implementación aprobada. | Lucía decide/prueba; Miguel/Dulce configuran su parte | S-30: inventario y propuesta en §4.5; no autoriza nube. |
 | ✅ | Reiniciar el contenedor de aplicación y comprobar continuidad de claves/sesión, sin claves en disco. | Lucía prueba; Miguel corrige | Reinicio real, cookie previa y evento correctos; claves PostgreSQL iguales y sin key-*.xml observados en /app, /home/app y /tmp. No acredita TLS (§4.4). |

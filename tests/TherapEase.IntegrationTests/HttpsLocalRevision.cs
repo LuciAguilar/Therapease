@@ -276,6 +276,20 @@ public sealed class HttpsLocalRevision : IAsyncLifetime
             .All(secreto => !texto.Contains(secreto, StringComparison.Ordinal));
     }
 
+    /// Cuenta los mensajes capturados sin devolver su contenido a los archivos de evidencia.
+    internal int CantidadDeRegistros => _registros.Count;
+
+    /// Busca un código de error conocido para confirmar que el servidor registró el fallo provocado.
+    internal bool RegistrosContienen(string fragmento) =>
+        _registros.Any(linea => linea.Contains(fragmento, StringComparison.Ordinal));
+
+    /// Comprueba valores adicionales en memoria; el resultado no revela cuáles eran esos valores.
+    internal bool RegistrosSinValores(IEnumerable<string> valores)
+    {
+        var texto = string.Join('\n', _registros);
+        return valores.All(valor => !texto.Contains(valor, StringComparison.Ordinal));
+    }
+
     /// Guarda solo cabeceras permitidas y el código HTTP; nunca guarda valores de cookies.
     public async Task GuardarCabecerasAsync(HttpResponseMessage respuesta, string nombre)
     {

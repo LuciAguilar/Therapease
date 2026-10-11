@@ -105,6 +105,8 @@ Consultar [B00 — siguientes pasos compartidos](docs/planning/TherapEase-etapa0
 
 **Dulce — mensajes Q08:** rechazo conocido del servicio → «No se guardó» y motivo. Excepción inesperada → «No pudimos confirmar si se guardó; revisa el registro antes de repetir», sin reintento automático. Si se solicita otro restablecimiento, avisar que la temporal anterior deja de servir. Ajuste y unitarias pendientes; detalle en el informe de ajustes §8.
 
+**Errores/registros — 10-oct:** 11 casos nuevos correctos de API HTTPS, entradas inválidas, rechazo de sesión y fallos reales de lectura PostgreSQL. Sin valores privados buscados en respuestas/registros capturados; 500 de Identity vacío, mejora propuesta en informe §9. Alcance, comando y límites en B00 §4.8. Auditoría y revisión humana pendientes; mismo PR #4, ampliación aún local.
+
 ## 10. Construir, probar y ejecutar
 
 Requiere el SDK indicado en `global.json` (.NET 10). Visual Studio solo abre estos proyectos desde la versión 2026 (18.0 o superior); Visual Studio 2022 no carga ese SDK y muestra «The SDK 'Microsoft.NET.Sdk' specified could not be found». VS Code y la terminal funcionan con el SDK instalado. Desde la raíz del repositorio:

@@ -1,6 +1,6 @@
 # TherapEase — B00 · Ajustes del PR #1
 
-> **Ampliaciones:** arquitectura en §6 (08-oct) filtro Q03 en §7 y mensajes de PageModel en §8 (10-oct, pruebas auditadas; correcciones por implementar). Correcciones históricas de §2 ya fusionadas.
+> **Ampliaciones:** arquitectura en §6 (08-oct), filtro Q03 en §7 y mensajes de PageModel en §8 (10-oct, pruebas auditadas; correcciones por implementar). Mejora de mensaje ante fallo de Identity en §9. Correcciones históricas de §2 ya fusionadas.
 
 **Fecha de revisión:** 04-oct-2026. **Estado:** correcciones obligatorias documentales comprobadas en `b60eba42edeb2fa8cdbea08ad1a4e51b041c21b0`, incluida la descripción. Lucía revisó/aprobó y fusionó PR #1 en main (`41123f2d2c115a05ff1df944457195a7f671cc17`). Las políticas de producto y mejoras opcionales siguen abiertas.
 
@@ -80,3 +80,11 @@ Sustituye la indicación general «si falla la auditoría, mostrar no se guardó
 | Restablecimiento solicitado otra vez | Avisar que la contraseña temporal anterior deja de servir. |
 
 No presentar una excepción inesperada como prueba de que nada se guardó. Estas indicaciones requieren implementación y unitarias de Dulce; las pruebas de servidor no acreditan el comportamiento de las páginas.
+
+## 9. Mensaje ante fallo de Identity — mejora propuesta, 10-oct-2026
+
+| Responsable | Propuesta | Dónde / resultado observado |
+| --- | --- | --- |
+| Miguel; Dulce revisa la presentación | Mantener una respuesta genérica útil aunque falle la consulta de Identity, sin depender de la base de datos para construir ese error. Conservar la ausencia de detalles y valores privados. | Arranque/manejo de errores en src/Web/Program.cs y página src/Web/Pages/Error.cshtml.cs. Si PostgreSQL rechaza SELECT en AspNetUsers, la API devuelve 500 vacío; al restituirlo vuelve a 200. |
+
+Se propone para revisión: no cambia la política de mensajes Q08 de §8 ni autoriza reintentos automáticos. La prueba acredita ausencia de los valores privados buscados en este camino; S-20 sigue parcial porque aquí no aparece un mensaje para la persona.
