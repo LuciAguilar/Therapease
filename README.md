@@ -91,23 +91,21 @@ El PR #1 fusionado ya incluye solución, `.csproj`, migraciones y aplicación m�
 
 **Render y Neon:** no se necesitan para B00. No crear cuentas ni aceptar condiciones hasta que Lucía autorice el despliegue. B00 utiliza PostgreSQL desechable mediante Testcontainers y Docker; las conexiones a servicios de nube y el respaldo diario siguen pendientes de su autorización.
 
-## 9. Estado y orden de integración
+## 9. Estado y entrega de B00
 
-T1 fue publicado y aprobado. La protección de main con una revisión se comprobó el 03-oct; protección contra secretos todavía sin verificar. Las reglas de revisión de código/pruebas están en AGENTS. B00/LCA y R04 siguen abiertos.
+T1 está publicado; PR #1 y PR #3 ya están fusionados; main de referencia: `8baf8fb`. La protección de main con una revisión se comprobó el 03-oct; la protección contra secretos sigue sin verificar.
 
-**Estado de integración:** PR #1 ya fusionado en main (`41123f2`). PR #3 fusionado el 06-oct-2026 en `8baf8fb`. La rama existente `revision/etapa09` se reutiliza para las revisiones generales de la etapa. Esta guía conserva los comandos y la documentación técnica de Miguel (§10); únicamente se actualiza el estado de las pruebas que ahora existen. QA local: 37 casos de Identity y 13 de recuperación, todos repetidos correctamente el 08-oct tras aplicar las correcciones de Claude; entrega conjunta propuesta para revisión humana y aprobación/fusión. Ampliación local del 08-oct para el mismo PR #4: arquitectura (28 correctas/2 fallidas, pendientes de Miguel) y horas/Docker (12 correctas, incluido reinicio real; repetidas el 09-oct con limpieza automática de la imagen). El 10-oct se suman 12 pruebas correctas de HTTPS local; cabeceras adicionales, navegador y revisión humana pendientes (B00 §4.5). El commit local 47ca601 y la ampliación HTTPS se acumulan para actualizar el mismo PR #4 al final, sin subir aún. Los acuerdos aprobados y pendientes B00 se conservan.
+**[PR #4](https://github.com/LuciAguilar/Therapease/pull/4), rama `revision/etapa09`:** entrega conjunta de QA para revisión de Miguel. Incluye Identity, recuperación local, arquitectura, horas/Docker, HTTPS, API Q03, interrupciones Q08 y errores/registros. Los resultados por bloque están en [B00 §4](docs/planning/TherapEase-etapa09-B00.md#4-evidencia-registrada-y-límites); son ejecuciones locales, no CI ni una nueva ejecución conjunta. Quedan **siete fallos conocidos**: dos de arquitectura y cinco del filtro Q03. Se conservan visibles hasta corregir el código.
 
-**Q03 — 10-oct:** ampliación tras auditoría APROBADO: 51 casos, 46 correctos y 5 fallidos (números/listas reciben 200 en vez de 400). Las 12 HTTPS pasaron en la ejecución anterior. Corrección para Miguel precisada en informe §7; evidencia en B00 §4.6. Acceso/comando final y revisión humana pendientes. Auditoría de HTTPS recibida: APROBADO; duración HSTS final pendiente al desplegar.
+| Quién | Qué debe consultar y atender |
+| --- | --- |
+| Miguel | [Informe de ajustes](docs/reviews/TherapEase-09-B00-revision-PR01.md): §6–§7 obligatorios, §9 opcional. Revisar las pruebas de Lucía, corregir su código con unitarias propias y registrar resultados. Los ajustes históricos de §2 ya están resueltos. |
+| Dulce | Informe §8: mensajes ante rechazo conocido, resultado incierto y restablecimiento repetido; PageModel, unitarias y pendientes de producto. |
+| Equipo | [B00 §6–§7](docs/planning/TherapEase-etapa09-B00.md#6-siguientes-pasos-compartidos): tareas, responsables y dependencias; [AGENTS](AGENTS.md): reglas obligatorias. Cada persona puede avanzar en las tareas independientes de su alcance. |
 
-Consultar [B00 — siguientes pasos compartidos](docs/planning/TherapEase-etapa09-B00.md#6-siguientes-pasos-compartidos) para el avance y los pendientes de integración y pruebas.
+**ADR-05 decidido el 10-oct:** age con clave pública, custodia privada fuera de GitHub, validación antes de cifrar y simulacro mensual; detalle en AGENTS §2.8. Las pruebas actuales de cifrado usan un formato de QA. Implementación del respaldo real todavía no autorizada.
 
-**Q08 — 10-oct:** 16 casos locales correctos de interrupciones y reintentos de Identity; alcance/comando y pendientes en B00 §4.7. No acredita formularios ni cortes HTTP reales. Repetir un restablecimiento genera otra temporal y otro evento; procedimiento de entrega pendiente. Auditoría de Claude APROBADO; revisión humana pendiente, mismo PR #4 sin subir la ampliación.
-
-**Dulce — mensajes Q08:** rechazo conocido del servicio → «No se guardó» y motivo. Excepción inesperada → «No pudimos confirmar si se guardó; revisa el registro antes de repetir», sin reintento automático. Si se solicita otro restablecimiento, avisar que la temporal anterior deja de servir. Ajuste y unitarias pendientes; detalle en el informe de ajustes §8.
-
-**Errores/registros — 10-oct:** 11 casos nuevos correctos de API HTTPS, entradas inválidas, rechazo de sesión y fallos reales de lectura PostgreSQL. Sin valores privados buscados en respuestas/registros capturados; 500 de Identity vacío, mejora propuesta en informe §9. Alcance, comando y límites en B00 §4.8. Auditoría de Claude APROBADO; revisión humana pendiente; mismo PR #4, ampliación aún local.
-
-**Entrega QA — 10-oct:** decisión ADR-05 registrada y bloques adelantados auditados. Siguiente: actualizar PR #4 para revisión de Miguel; la ampliación todavía es local. Reglas de respaldo en AGENTS §2.8; en esta entrega no se instaló age, crearon claves ni configuró el flujo. B00/LCA siguen abiertos.
+Revisión humana por persona distinta de la autora, aprobación final y fusión pendientes. B00/LCA/R04 siguen abiertos; sin B01, nube ni datos reales. Se conservan los comandos técnicos de Miguel en §10; sus referencias históricas de QA se actualizan únicamente para enlazar el estado vigente.
 
 ## 10. Construir, probar y ejecutar
 
@@ -119,7 +117,7 @@ dotnet test TherapEase.sln
 dotnet run --project src/Web
 ```
 
-La aplicación escucha en `http://localhost:5052` y expone `/salud`. IntegrationTests contiene 50 casos locales de QA preparados por Lucía, propuestos en esta entrega y pendientes de revisión humana/fusión. E2ETests sigue sin pruebas; espera los recorridos con las páginas de Dulce.
+La aplicación escucha en `http://localhost:5052` y expone `/salud`. IntegrationTests contiene los bloques de QA de B00 §4.1–§4.8, pendientes de revisión humana/fusión; hay siete fallos conocidos de arquitectura/Q03. Los 50 casos de Identity/recuperación corresponden a la ejecución del 08-oct. E2ETests sigue sin pruebas; espera los recorridos con las páginas de Dulce.
 
 Imagen Docker (requiere Docker Desktop; salud y usuario sin privilegios se declaran en el `Dockerfile`):
 
@@ -143,7 +141,7 @@ Las migraciones las aplica solo `therapease_migrador`; la aplicación se conecta
 
 **Reglas de citas implementadas.** Activa = agendada y vigente; solo las activas bloquean horarios. La base impone por sí misma que dos citas activas no se crucen y que nunca exista una cita activa de un paciente de baja (restricción de exclusión y triggers de `EsquemaInicial`); esa protección se conserva. Cancelar no es baja y conserva el pago. Ninguna cita se cancela ni se recupera automáticamente. **Provisional, pendiente de validar con la usuaria (Dulce):** (1) la política para las citas existentes al dar de baja a un paciente: hoy la baja se rechaza mientras haya citas activas, y la alternativa sería cancelarlas primero; (2) el pago inicial «Pendiente»; (3) las citas seguidas sin hueco, que hoy se permiten porque el intervalo es `[inicio, fin)`. Lo provisional es la política de atención a las citas existentes, no el bloqueo de la base.
 
-**Identidad y acceso.** Los usuarios y roles los administra ASP.NET Core Identity; los roles `Usuaria` y `Superusuario` los siembra la migración. Con la aplicación configurada (`ConnectionStrings__TherapEase`), el primer superusuario se crea con un comando que se ejecuta solo en la máquina del operador: entrega una contraseña temporal únicamente por su consola, una sola vez, sin escribirla en los registros del servidor, sin correo y sin contraseña fija en el código. Condiciones decididas por Lucía: la contraseña tiene mínimo 12 caracteres y no exige combinaciones de letras, números o símbolos, y la sesión caduca tras 30 minutos sin actividad. Documentarlas no acredita que sus mecanismos estén completamente probados: hoy solo existen las pruebas unitarias de Miguel.
+**Identidad y acceso.** Los usuarios y roles los administra ASP.NET Core Identity; los roles `Usuaria` y `Superusuario` los siembra la migración. Con la aplicación configurada (`ConnectionStrings__TherapEase`), el primer superusuario se crea con un comando que se ejecuta solo en la máquina del operador: entrega una contraseña temporal únicamente por su consola, una sola vez, sin escribirla en los registros del servidor, sin correo y sin contraseña fija en el código. Condiciones decididas por Lucía: la contraseña tiene mínimo 12 caracteres y no exige combinaciones de letras, números o símbolos, y la sesión caduca tras 30 minutos sin actividad. Documentarlas no acredita que sus mecanismos estén completamente probados: la evidencia de QA en servidor está en B00 §4.1; los recorridos de navegador siguen pendientes.
 
 ```powershell
 dotnet run --project src/Web -- --crear-superusuario <nombre-de-usuario>

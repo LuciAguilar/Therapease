@@ -13,10 +13,10 @@
 | T1: repositorio y carpetas base | ✅ Aprobado y publicado el 01-oct. | Base `174afe0b6764f2415427f28b04d4627ce4c33b16`. |
 | PR #1: pasos 1–3 de Miguel | ✅ Corregido, aprobado y fusionado con Squash and merge. | [PR #1](https://github.com/LuciAguilar/Therapease/pull/1); main `41123f2d2c115a05ff1df944457195a7f671cc17`. |
 | PR #3: documentación compartida | ✅ Fusionado el 06-oct. | [PR #3](https://github.com/LuciAguilar/Therapease/pull/3); main `8baf8fbc34890d4710c2b78e920f10b8d3e92cb3`. |
-| PR #4: pruebas de Lucía | ⏳ En borrador; revisión humana y aprobación/fusión pendientes. | [PR #4](https://github.com/LuciAguilar/Therapease/pull/4), `revision/etapa09`; código probado `83328783b2ea4f7487d28e2935e3c81acb8e521b`. |
-| Arquitectura del 08-oct | ⏳ Pruebas preparadas y ejecutadas: 28 correctas y 2 fallidas; excepción Web → Domain aprobada, ajustes y revisión de Miguel pendientes. | §4.3; cambios locales aún sin publicar. |
-| Horas y Docker del 08–09-oct | ✅ 12 correctas; reinicio real y claves/sesión conservadas. | §4.4; ampliación local para el mismo PR #4, revisión pendiente. |
-| HTTPS local del 10-oct | ✅ 12 correctas, 0 fallos/omitidas; TLS 1.3 negociado. | §4.5; avance local para el mismo PR #4, cabeceras y revisión pendientes. |
+| PR #4: pruebas de Lucía | ⏳ Entrega conjunta para revisión de Miguel; aprobación/fusión pendientes. | [PR #4](https://github.com/LuciAguilar/Therapease/pull/4), `revision/etapa09`; ejecuciones y commits de cada bloque en §4.1–§4.8. |
+| Arquitectura del 08-oct | ⏳ Pruebas preparadas y ejecutadas: 28 correctas y 2 fallidas; excepción Web → Domain aprobada, ajustes y revisión de Miguel pendientes. | §4.3; incluido en la entrega conjunta del PR #4. |
+| Horas y Docker del 08–09-oct | ✅ 12 correctas; reinicio real y claves/sesión conservadas. | §4.4; incluido en el mismo PR #4, revisión pendiente. |
+| HTTPS local del 10-oct | ✅ 12 correctas, 0 fallos/omitidas; TLS 1.3 negociado. | §4.5; incluido en el mismo PR #4, cabeceras y revisión pendientes. |
 | Q03 por API del 10-oct | ⏳ 51 casos Q03 tras ampliar: 46 correctos y 5 fallos de filtro. | §4.6; auditoría de las pruebas APROBADO. Miguel corrige números/listas; revisión humana pendiente. |
 | Q08 de Identity del 10-oct | ✅ 16 correctas, 0 fallos/omitidas; ejecución local. | §4.7; auditoría de Claude APROBADO; revisión humana, formularios y demás servicios pendientes. |
 | Errores/registros del 10-oct | ✅ 11 correctas; búsqueda acotada sin valores privados detectados. | §4.8; auditoría de Claude APROBADO; 500 de Identity vacío, mejora propuesta; revisión humana pendiente. |
@@ -134,7 +134,7 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 
 > **Salida actual 1 por los dos hallazgos reales.** Las pruebas no se omiten ni fuerzan un fallo artificial: comprueban las reglas y seguirán fallando hasta corregir el código. `ArquitecturaTests.cs` contiene los casos y `ArquitecturaRevision.cs` su lectura de proyectos/código compilado. Pruebas comentadas según el skill del proyecto.
 >
-> **Trazabilidad:** base de trabajo `2d088e2c4cc3e2c6f7dc279452713fd1bbf3bced`, misma rama `revision/etapa09`; cambios aún locales para la entrega conjunta del PR #4. No cambia backend, migraciones, proyectos ni paquetes. Ejecución anterior: 21 casos, 19 correctos/2 fallidos; la revisión detectó que la regla era demasiado estricta para enumeraciones. La aprobación del 08-oct permite esa excepción; el resultado vigente es el de 30 casos. No se repitieron aquí las 50 pruebas de Identity/recuperación.
+> **Trazabilidad:** base de trabajo `2d088e2c4cc3e2c6f7dc279452713fd1bbf3bced`, misma rama `revision/etapa09`; pruebas reunidas en la entrega conjunta del PR #4. No cambia backend, migraciones, proyectos ni paquetes. Ejecución anterior: 21 casos, 19 correctos/2 fallidos; la revisión detectó que la regla era demasiado estricta para enumeraciones. La aprobación del 08-oct permite esa excepción; el resultado vigente es el de 30 casos. No se repitieron aquí las 50 pruebas de Identity/recuperación.
 >
 > **Límites:** mapa de Pacientes, Citas, Identidad y Auditoría; ampliar al agregar módulos. No detecta dependencias formadas por texto/reflexión ni el origen de constantes eliminadas al compilar. Reconoce contenedores estáticos con campos constantes literales, sin métodos ni inicialización. La ubicación de un candidato CU04 no demuestra sus llamadas funcionales. Excepción de composición solo para registro de Infrastructure en arranque/comando local; no autoriza repositorios o DbContext.
 
@@ -159,7 +159,7 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 
 | Trazabilidad | Dato |
 | --- | --- |
-| Código base | 2d088e2c4cc3e2c6f7dc279452713fd1bbf3bced; nuevas pruebas locales en revision/etapa09, sin publicar. |
+| Código base | 2d088e2c4cc3e2c6f7dc279452713fd1bbf3bced; pruebas reunidas en revision/etapa09 para el PR #4. |
 | Imagen final | sha256:104ff4c79b0242fb8ac62d138e644d8d17750074f33d0bf0502caae9d2f10c02 |
 | Resultado conservado | horas-docker-corregido-09oct.trx; SHA-256 edda84c4e0c97e574baf65babd8b51a6222300f2af5903a7c4acae3b5da8b693. |
 | Primer intento | 10 correctas y 2 fallidas por puerto automático reasignado al reiniciar. Se corrigió la preparación de QA, sin tocar producción, y se repitieron las 12. Se conserva el TRX inicial. |
@@ -184,7 +184,7 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj -c Release --filter FullyQualifiedName~HttpsLocalTests --logger "trx;LogFileName=b00-https.trx"
 ```
 
-[Pruebas HTTPS](../../tests/TherapEase.IntegrationTests/HttpsLocalTests.cs) y [entorno temporal](../../tests/TherapEase.IntegrationTests/HttpsLocalRevision.cs). La evidencia automática queda en TestResults/https y se excluye de Git. TRX de esta ejecución: b00-https-final-10oct.trx, SHA-256 dd0dd08048c161a5cf2d7dd1fde06ee92d98f94c5c44edc89282d6b1193a3b46. Base local 47ca601; ampliación para el mismo PR #4 aún sin subir. Pruebas comentadas según el skill del proyecto. Auditoría HTTPS recibida de Claude: APROBADO, sin correcciones obligatorias; revisión humana pendiente. La ampliación Q03 de §4.6 ya tiene auditoría APROBADO; implementación de Miguel y revisión humana pendientes.
+[Pruebas HTTPS](../../tests/TherapEase.IntegrationTests/HttpsLocalTests.cs) y [entorno temporal](../../tests/TherapEase.IntegrationTests/HttpsLocalRevision.cs). La evidencia automática queda en TestResults/https y se excluye de Git. TRX de esta ejecución: b00-https-final-10oct.trx, SHA-256 dd0dd08048c161a5cf2d7dd1fde06ee92d98f94c5c44edc89282d6b1193a3b46. Base local 47ca601; ampliación incluida en el mismo PR #4. Pruebas comentadas según el skill del proyecto. Auditoría HTTPS recibida de Claude: APROBADO, sin correcciones obligatorias; revisión humana pendiente. La ampliación Q03 de §4.6 ya tiene auditoría APROBADO; implementación de Miguel y revisión humana pendientes.
 
 > La redirección no protege datos que un cliente ya haya enviado por HTTP. La prueba envía las credenciales de sesión únicamente por HTTPS. HSTS necesita un cliente compatible y una primera conexión segura; ASP.NET Core excluye localhost por defecto. [Referencia oficial de Microsoft](https://learn.microsoft.com/en-us/aspnet/core/security/enforcing-ssl?view=aspnetcore-10.0).
 
@@ -221,7 +221,7 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 
 [Casos API](../../tests/TherapEase.IntegrationTests/ConsultaAuditoriaApiTests.cs) y [datos/entorno](../../tests/TherapEase.IntegrationTests/ConsultaAuditoriaRevision.cs). Las cinco entradas inválidas citadas **permanecen fallidas**, sin omitirla ni cambiar el resultado esperado. [Ajuste propuesto para Miguel, §7](../reviews/TherapEase-09-B00-revision-PR01.md). Para comprobarlo, GET /api/auditoria/eventos con fechas válidas y tipoRegistro=Paciente%2CCita, usando una sesión ficticia de superusuario por HTTPS: esperado 400; observado 200 y tipo Cita. Enum.TryParse acepta listas y combina sus valores; IsDefined no basta si el resultado combinado coincide con otro valor válido. [Documentación de Microsoft](https://learn.microsoft.com/en-us/dotnet/api/system.enum.tryparse?view=net-10.0).
 
-**Evidencia:** b00-q03-https-entrega-10oct.trx, SHA-256 17e9fe894f1d4895c171ec9089019b3b20f19af1555964892747376155ddb3eb. Resumen del hallazgo original en tipo-combinado.json, sin valores de sesión. Ampliación: q03-ampliado-10oct.trx, 51 casos (46 correctos, 5 fallidos). Base local e97646d; mismo PR #4, avance sin subir. Pruebas comentadas según el skill del proyecto. Veredicto recibido: APROBADO para las pruebas; números/listas ampliados conforme a Claude. Corrección de Miguel y revisión humana pendientes; B00/LCA/R04 abiertos.
+**Evidencia:** b00-q03-https-entrega-10oct.trx, SHA-256 17e9fe894f1d4895c171ec9089019b3b20f19af1555964892747376155ddb3eb. Resumen del hallazgo original en tipo-combinado.json, sin valores de sesión. Ampliación: q03-ampliado-10oct.trx, 51 casos (46 correctos, 5 fallidos). Base local e97646d; ampliación incluida en el mismo PR #4. Pruebas comentadas según el skill del proyecto. Veredicto recibido: APROBADO para las pruebas; números/listas ampliados conforme a Claude. Corrección de Miguel y revisión humana pendientes; B00/LCA/R04 abiertos.
 
 ### 4.7. Q08 — interrupciones y reintentos de Identity, 10-oct
 
@@ -245,7 +245,7 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 
 [Pruebas Q08](../../tests/TherapEase.IntegrationTests/InterrupcionesIdentidadTests.cs) y [preparación/cortes de confirmación](../../tests/TherapEase.IntegrationTests/InterrupcionesIdentidadRevision.cs). Herramientas: xUnit, Testcontainers, Npgsql y callbacks de transacción de EF sobre la unidad de trabajo real. La aplicación usa su usuario PostgreSQL sin privilegios; solo el corte de conexión usa el administrador del contenedor ficticio. Datos exclusivamente ficticios. Pruebas comentadas según el skill del proyecto.
 
-**Evidencia:** q08-entrega-ampliada-10oct.trx, SHA-256 2beba1cf37a328f877ea2de216aaf6d320bb08e30a4fa5f46372eba4a9819f27; resúmenes JSON solo con estados/huellas y manifest.json. Se comprobó que no quedan contenedores Testcontainers; no se construyeron imágenes nuevas. No se repitieron los bloques anteriores. Ampliación local para el mismo PR #4, sin push ni cierre.
+**Evidencia:** q08-entrega-ampliada-10oct.trx, SHA-256 2beba1cf37a328f877ea2de216aaf6d320bb08e30a4fa5f46372eba4a9819f27; resúmenes JSON solo con estados/huellas y manifest.json. Se comprobó que no quedan contenedores Testcontainers; no se construyeron imágenes nuevas. No se repitieron los bloques anteriores. Ampliación incluida en el mismo PR #4; sin cierre B00/LCA.
 
 **Veredicto Q08 — 10-oct:** Claude APROBADO, sin correcciones a las pruebas. Para Dulce: rechazo conocido → «No se guardó» y motivo; excepción inesperada → «No pudimos confirmar si se guardó; revisa el registro antes de repetir», sin reintento automático; nuevo restablecimiento → avisar que la temporal anterior deja de servir. Implementación/PageModel, procedimiento de entrega y revisión humana pendientes.
 
@@ -269,7 +269,7 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 
 [Pruebas de errores](../../tests/TherapEase.IntegrationTests/ErroresRegistrosTests.cs) y [preparación/búsqueda](../../tests/TherapEase.IntegrationTests/ErroresRegistrosRevision.cs). Se reutiliza el servidor HTTPS existente mediante tres consultas de registros en memoria, sin modificar su arranque o limpieza. Herramientas: xUnit/HttpClient, Kestrel real en modo Production local, EF/Npgsql y PostgreSQL desechable/Testcontainers con migraciones/roles reales. Solo el migrador altera los permisos temporales de prueba; el servidor conserva su usuario limitado.
 
-**Evidencia:** errores-registros-10oct.trx, SHA-256 efba171d31b618949584a1da04dcdc97d9783be7a3cdf17c7f2b8b49f8f8cdd2; manifest.json y resúmenes por caso sin valores privados. Base local 1bf4f45; avance para el mismo PR #4, sin push. Pruebas comentadas según el skill del proyecto. Auditoría de errores/registros: Claude APROBADO, sin correcciones obligatorias. Decisión ADR-05 registrada el 10-oct, sin implementación; revisión humana y otros pendientes B00/LCA/R04 permanecen abiertos.
+**Evidencia:** errores-registros-10oct.trx, SHA-256 efba171d31b618949584a1da04dcdc97d9783be7a3cdf17c7f2b8b49f8f8cdd2; manifest.json y resúmenes por caso sin valores privados. Base local 1bf4f45; ampliación incluida en el mismo PR #4. Pruebas comentadas según el skill del proyecto. Auditoría de errores/registros: Claude APROBADO, sin correcciones obligatorias. Decisión ADR-05 registrada el 10-oct, sin implementación; revisión humana y otros pendientes B00/LCA/R04 permanecen abiertos.
 
 ## 5. Cobertura y alcance de los pendientes
 
@@ -284,7 +284,7 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 
 > **Cobertura documental:** §7 reúne los pendientes conocidos de B00 contrastados con 08B–08D, Q/R, AGENTS, plan de pruebas y evidencia. No garantiza que no aparezcan hallazgos nuevos. Las funciones completas de B01–B08 y los pendientes de uso real se distinguen en §9; no se autorizan ni se dan por hechos aquí.
 
-**Entrega propia acordada — 10-oct:** bloques de QA adelantados y decisión ADR-05 registrados; errores/registros auditados APROBADO. Siguiente: actualizar el PR #4 con el avance local para revisión de Miguel. La revisión humana, correcciones de Miguel, páginas de Dulce, protección contra secretos/cabeceras y demás filas abiertas siguen pendientes. No equivale a cerrar todo B00 o LCA.
+**Entrega propia acordada — 10-oct:** bloques de QA adelantados y decisión ADR-05 registrados; errores/registros auditados APROBADO. Avance reunido en el PR #4 para revisión de Miguel. La revisión humana, correcciones de Miguel, páginas de Dulce, protección contra secretos/cabeceras y demás filas abiertas siguen pendientes. No equivale a cerrar todo B00 o LCA.
 
 ## 6. Siguientes pasos compartidos
 
@@ -292,7 +292,7 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 | --- | --- | --- |
 | Revisar la entrega conjunta de QA del PR #4 | Miguel o Dulce; Lucía decide fusión | Autor distinto del revisor. No necesita esperar a los PageModel. |
 | **Arquitectura: resolver hallazgos del paso 1** | Miguel implementa/corrige y revisa las pruebas; Lucía repite | Pruebas ejecutadas: faltan acceso Web → MatrizDePermisos y coordinador CU04. No se da por cerrada la validación (§4.3). |
-| Corregir filtro Q03 y repetir | Miguel propone/implementa; Lucía prueba | Rechazar listas de tipos como Paciente,Cita; hallazgo/ajuste en §4.6, pruebas auditadas; implementación y revisión humana pendientes. |
+| Corregir filtro Q03 y repetir | Miguel propone/implementa; Lucía prueba | Rechazar números y listas de tipos como Paciente,Cita; hallazgo/ajuste en §4.6, pruebas auditadas; implementación y revisión humana pendientes. |
 | Datos restantes y revisión de horas/Docker | Lucía prueba; Miguel implementa/corrige y otro integrante revisa | Horas/Docker ejecutados en §4.4; datos por servicios esperan implementación/políticas donde corresponda. |
 | Acceso mínimo y producto | Dulce implementa/valida | Unitarias propias, respuestas reales de la usuaria y frontend afectado validado. |
 | Navegador y cabeceras de seguridad | Lucía decide/prueba; Miguel/Dulce implementan | HTTPS local ya probado (§4.5); faltan páginas, decisión S-30 y comprobación de su implementación. |
@@ -328,7 +328,7 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 | ✅ | Probar migraciones desde cero, permisos y auditoría solo de inserción. | Lucía | Repetido dentro de las 50: `INSERT` permitido; `UPDATE`/`DELETE`/alteración denegados. |
 | ✅ | Probar cruces SQL, dos reservas simultáneas, versión EF y conservación inicial del paciente. | Lucía | Alcance parcial de los 11 incorporados; no cubre todos los servicios/estados. |
 | ✅ | Probar filtros válidos, límites 1–500, contenido, permisos actuales y solo lectura de la API Q03. | Lucía | 46 casos correctos por HTTPS; alcance y evidencia en §4.6. |
-| ⏳ | Rechazar listas de tipos y repetir Q03 sin el fallo. | Miguel corrige tras revisión/aprobación; Lucía prueba | 0, 1, 2 y las dos listas con comas devuelven 200 en vez de 400. Ajuste precisado en informe §7; no se omiten las pruebas. |
+| ⏳ | Rechazar números/listas de tipos y repetir Q03 sin los cinco fallos. | Miguel corrige tras revisión/aprobación; Lucía prueba | 0, 1, 2 y las dos listas con comas devuelven 200 en vez de 400. Ajuste precisado en informe §7; no se omiten las pruebas. |
 | ⏳ | Completar/probar acceso y comando autenticado de lectura Q03. | Miguel/Dulce implementan su parte; Lucía prueba | La API ya exige permiso actual; sesiones de QA no sustituyen el procedimiento final del operador. Sin pantalla de auditoría. |
 | ⏳ | Probar cambio y evento atómicos en restantes operaciones; sin datos sensibles ni éxito ante fallo. | Lucía prueba; Miguel corrige | Identity ya tiene casos; ampliar pacientes, citas y pago en la validación disponible. |
 | ⏳ | Probar reservas y recuperación de cita agendada por servicios; estados alternos y nuevas comprobaciones de cruce. | Lucía prueba; Miguel implementa/corrige | Paciente vigente; cancelada/de baja no bloquea; políticas contigua/pago pendientes de Dulce. |
