@@ -101,6 +101,8 @@ T1 fue publicado y aprobado. La protección de main con una revisión se comprob
 
 Consultar [B00 — siguientes pasos compartidos](docs/planning/TherapEase-etapa09-B00.md#6-siguientes-pasos-compartidos) para el avance y los pendientes de integración y pruebas.
 
+**Q08 — 10-oct:** 16 casos locales correctos de interrupciones y reintentos de Identity; alcance/comando y pendientes en B00 §4.7. No acredita formularios ni cortes HTTP reales. Repetir un restablecimiento genera otra temporal y otro evento; procedimiento de entrega pendiente. Auditoría y revisión humana pendientes, mismo PR #4 sin subir la ampliación.
+
 ## 10. Construir, probar y ejecutar
 
 Requiere el SDK indicado en `global.json` (.NET 10). Visual Studio solo abre estos proyectos desde la versión 2026 (18.0 o superior); Visual Studio 2022 no carga ese SDK y muestra «The SDK 'Microsoft.NET.Sdk' specified could not be found». VS Code y la terminal funcionan con el SDK instalado. Desde la raíz del repositorio:
