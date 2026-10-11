@@ -165,13 +165,17 @@ public sealed class ConsultaAuditoriaApiTests(ConsultaAuditoriaRevision entorno)
     // ──── ENTRADAS INVÁLIDAS ────────────────────────────────────────────────────────────────
 
 
-    /// Un tipo inexistente, una lista de tipos o texto de SQL no se interpreta como un tipo válido.
+    /// Un número, un tipo inexistente, una lista o texto de SQL se rechaza con 400.
     [Theory]
     [InlineData("Inexistente")]
     [InlineData("999")]
     [InlineData("-1")]
+    [InlineData("0")]
+    [InlineData("1")]
+    [InlineData("2")]
     [InlineData("Cita,Usuario")]
     [InlineData("Paciente,Cita")]
+    [InlineData("Paciente, Cita")]
     [InlineData("Paciente' OR 1=1--")]
     public async Task Tipo_Invalido_O_Combinado_Se_Rechaza(string tipo)
     {

@@ -1,6 +1,6 @@
 # TherapEase — B00 · Ajustes del PR #1
 
-> **Ampliaciones:** arquitectura en §6 (08-oct) y filtro Q03 en §7 (10-oct, propuesta pendiente de auditoría/aprobación). Correcciones históricas de §2 ya fusionadas.
+> **Ampliaciones:** arquitectura en §6 (08-oct) y filtro Q03 en §7 (10-oct, pruebas auditadas; corrección por implementar). Correcciones históricas de §2 ya fusionadas.
 
 **Fecha de revisión:** 04-oct-2026. **Estado:** correcciones obligatorias documentales comprobadas en `b60eba42edeb2fa8cdbea08ad1a4e51b041c21b0`, incluida la descripción. Lucía revisó/aprobó y fusionó PR #1 en main (`41123f2d2c115a05ff1df944457195a7f671cc17`). Las políticas de producto y mejoras opcionales siguen abiertas.
 
@@ -61,10 +61,10 @@ Estos ajustes provienen de la validación ejecutable sobre la base `2d088e2c4cc3
 
 ## 7. Ajuste propuesto del filtro Q03 — 10-oct-2026
 
-**Hallazgo comprobado; corrección propuesta pendiente de auditoría y aprobación de Lucía.** La consulta pide un tipo de registro, pero acepta una lista con comas y la transforma en otro tipo.
+**Hallazgo comprobado; Claude aprobó las pruebas y Lucía indicó ampliar los casos y precisar esta corrección. Implementación de Miguel y revisión humana pendientes.** La consulta pide un tipo de registro, pero acepta una lista con comas y la transforma en otro tipo.
 
 | Responsable | Cambio propuesto | Dónde | Resultado esperado |
 | --- | --- | --- | --- |
-| **Miguel** | Rechazar listas como tipoRegistro=Paciente,Cita antes de convertir el tipo. Mantener filtros válidos, permisos y salida de metadatos. Añadir la unitaria del caso en su PR. | src/Web/Endpoints/EndpointDeConsultaDeEventos.cs:39; enum TipoRegistroAuditoria. | 400, sin eventos. Actualmente devuelve 200 con Cita. Conservar la prueba fallida ConsultaAuditoriaApiTests.Tipo_Invalido_O_Combinado_Se_Rechaza hasta corregir; después repetir Q03 y autorización afectada. |
+| **Miguel** | Aceptar únicamente nombres completos de TipoRegistroAuditoria, sin distinguir mayúsculas: validar primero con Enum.GetNames<TipoRegistroAuditoria>().Contains(valor, StringComparer.OrdinalIgnoreCase) y después convertir. Rechazar números (0, 1, 2) y listas con comas (Paciente,Cita y Paciente, Cita) con 400. Mantener filtros válidos, permisos y metadatos; añadir las unitarias en su PR. | src/Web/Endpoints/EndpointDeConsultaDeEventos.cs:39; enum TipoRegistroAuditoria. | 400, sin eventos, para los números y las listas. Actualmente Paciente,Cita devuelve 200 con Cita; los casos añadidos deben permanecer visibles hasta corregir. Conservar la prueba fallida ConsultaAuditoriaApiTests.Tipo_Invalido_O_Combinado_Se_Rechaza hasta corregir; después repetir Q03 y autorización afectada. |
 
-Enum.TryParse combina los valores separados por comas; IsDefined acepta el resultado cuando coincide con un valor existente. No basta comprobar únicamente el valor resultante. [Referencia de Microsoft](https://learn.microsoft.com/en-us/dotnet/api/system.enum.tryparse?view=net-10.0). No se propone cambiar permisos, arquitectura ni admitir filtros múltiples.
+Enum.TryParse combina los valores separados por comas; IsDefined acepta el resultado cuando coincide con un valor existente. No basta comprobar únicamente el valor resultante. [Referencia de Microsoft](https://learn.microsoft.com/en-us/dotnet/api/system.enum.tryparse?view=net-10.0). La coincidencia es contra el nombre completo; conservar el tratamiento actual del filtro ausente y no recortar una entrada inválida para aceptarla. No se propone cambiar permisos, arquitectura ni admitir filtros múltiples.
