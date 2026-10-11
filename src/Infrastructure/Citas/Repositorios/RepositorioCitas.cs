@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using TherapEase.Application.Citas.Interfaces.Repositorios;
 using TherapEase.Domain.Citas.Entidades;
+using TherapEase.Domain.Citas.Entidades.Enums;
+using TherapEase.Domain.Compartido.Entidades.Enums;
 using TherapEase.Infrastructure.Data;
 
 namespace TherapEase.Infrastructure.Citas.Repositorios;
@@ -23,5 +25,12 @@ public class RepositorioCitas : IRepositorioCitas
     public Task<Cita?> ObtenerAsync(Guid idCita, CancellationToken cancelacion = default)
     {
         return _contexto.Citas.FirstOrDefaultAsync(c => c.IdCita == idCita, cancelacion);
+    }
+
+    public Task<bool> ExistenActivasDePacienteAsync(Guid idPaciente, CancellationToken cancelacion = default)
+    {
+        return _contexto.Citas.AnyAsync(
+            c => c.IdPaciente == idPaciente && c.Estado == EstadoCita.Agendada && c.Condicion == CondicionRegistro.Vigente,
+            cancelacion);
     }
 }

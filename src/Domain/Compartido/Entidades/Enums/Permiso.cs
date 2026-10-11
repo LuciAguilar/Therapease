@@ -4,5 +4,8 @@ namespace TherapEase.Domain.Compartido.Entidades.Enums;
 public enum Permiso
 {
     AdministrarUsuarios,
-    ConsultarAuditoria
+    ConsultarAuditoria,
+
+    // Solo superusuario por ahora: concederla a la usuaria (08B §1.2) queda pendiente de validar con Dulce.
+    DarDeBajaPacientes
 }

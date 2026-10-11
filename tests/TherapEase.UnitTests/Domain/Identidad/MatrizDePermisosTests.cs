@@ -9,7 +9,8 @@ public class MatrizDePermisosTests
     [Theory]
     [InlineData(Permiso.AdministrarUsuarios)]
     [InlineData(Permiso.ConsultarAuditoria)]
-    public void Superusuario_TieneLosPermisosDeAdministracionYAuditoria(Permiso permiso)
+    [InlineData(Permiso.DarDeBajaPacientes)]
+    public void Superusuario_TieneLosPermisosActuales(Permiso permiso)
     {
         Assert.True(MatrizDePermisos.RolTienePermiso(NombresDeRol.Superusuario, permiso));
     }
@@ -17,7 +18,8 @@ public class MatrizDePermisosTests
     [Theory]
     [InlineData(Permiso.AdministrarUsuarios)]
     [InlineData(Permiso.ConsultarAuditoria)]
-    public void Usuaria_NoAdministraUsuariosNiConsultaLaAuditoriaTecnica(Permiso permiso)
+    [InlineData(Permiso.DarDeBajaPacientes)]
+    public void Usuaria_NoTieneLosPermisosActuales(Permiso permiso)
     {
         Assert.False(MatrizDePermisos.RolTienePermiso(NombresDeRol.Usuaria, permiso));
     }
