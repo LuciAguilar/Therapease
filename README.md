@@ -101,7 +101,9 @@ T1 fue publicado y aprobado. La protección de main con una revisión se comprob
 
 Consultar [B00 — siguientes pasos compartidos](docs/planning/TherapEase-etapa09-B00.md#6-siguientes-pasos-compartidos) para el avance y los pendientes de integración y pruebas.
 
-**Q08 — 10-oct:** 16 casos locales correctos de interrupciones y reintentos de Identity; alcance/comando y pendientes en B00 §4.7. No acredita formularios ni cortes HTTP reales. Repetir un restablecimiento genera otra temporal y otro evento; procedimiento de entrega pendiente. Auditoría y revisión humana pendientes, mismo PR #4 sin subir la ampliación.
+**Q08 — 10-oct:** 16 casos locales correctos de interrupciones y reintentos de Identity; alcance/comando y pendientes en B00 §4.7. No acredita formularios ni cortes HTTP reales. Repetir un restablecimiento genera otra temporal y otro evento; procedimiento de entrega pendiente. Auditoría de Claude APROBADO; revisión humana pendiente, mismo PR #4 sin subir la ampliación.
+
+**Dulce — mensajes Q08:** rechazo conocido del servicio → «No se guardó» y motivo. Excepción inesperada → «No pudimos confirmar si se guardó; revisa el registro antes de repetir», sin reintento automático. Si se solicita otro restablecimiento, avisar que la temporal anterior deja de servir. Ajuste y unitarias pendientes; detalle en el informe de ajustes §8.
 
 ## 10. Construir, probar y ejecutar
 

@@ -18,7 +18,7 @@
 | Horas y Docker del 08–09-oct | ✅ 12 correctas; reinicio real y claves/sesión conservadas. | §4.4; ampliación local para el mismo PR #4, revisión pendiente. |
 | HTTPS local del 10-oct | ✅ 12 correctas, 0 fallos/omitidas; TLS 1.3 negociado. | §4.5; avance local para el mismo PR #4, cabeceras y revisión pendientes. |
 | Q03 por API del 10-oct | ⏳ 51 casos Q03 tras ampliar: 46 correctos y 5 fallos de filtro. | §4.6; auditoría de las pruebas APROBADO. Miguel corrige números/listas; revisión humana pendiente. |
-| Q08 de Identity del 10-oct | ✅ 16 correctas, 0 fallos/omitidas; ejecución local. | §4.7; auditoría/revisión humana, formularios y demás servicios pendientes. |
+| Q08 de Identity del 10-oct | ✅ 16 correctas, 0 fallos/omitidas; ejecución local. | §4.7; auditoría de Claude APROBADO; revisión humana, formularios y demás servicios pendientes. |
 | Resultado conjunto del 08-oct | ✅ 50 correctas: 37 de Identity y 13 de recuperación; 0 fallos/omitidas, 19 s. | Release sin advertencias reportadas. Ejecución local, no CI. |
 
 | Documento | Para qué sirve |
@@ -234,7 +234,7 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 | Repetir alta, baja o rol | ✅ Devuelven resultado fallido al pedir otra vez el mismo estado; filas y evento permanecen idénticos, sin duplicar. | Una nueva solicitud/scope; no habilita reintentos ciegos en toda operación. |
 | Cambio propio temporal y ordinario | ✅ Si se pierde su respuesta, la cookie vieja queda revocada; se puede iniciar sesión con la nueva clave conocida y sin restricción de temporal. | Ambos cambios propios probados; en el ordinario se deja pasar y cuenta la comprobación de la clave actual antes de cortar el cambio. Páginas/red pendientes. |
 | Restablecimiento | ✅ Se observa una diferencia importante: repetirlo crea otra temporal válida y otro evento. ⏳ Procedimiento de nueva entrega pendiente. | No se acredita «reintento sin duplicar» para este caso ni se aprueba automáticamente una política. Mantener la decisión de entrega ya pendiente; no almacenar/revelar la primera temporal. |
-| Revisión y otros servicios | ⏳ Auditoría de Q08, revisión humana y demás operaciones/formularios. | Miguel o Dulce revisa estas pruebas. Pacientes, citas, pago y duplicados de citas siguen pendientes; B00/LCA/R04 abiertos. |
+| Revisión y otros servicios | ✅ Auditoría de Claude APROBADO el 10-oct; ⏳ revisión humana y demás operaciones/formularios. | Miguel o Dulce revisa estas pruebas. Pacientes, citas, pago y duplicados de citas siguen pendientes; B00/LCA/R04 abiertos. |
 
 **Reproducir:** Docker Desktop iniciado; desde la raíz del repo:
 
@@ -245,6 +245,8 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 [Pruebas Q08](../../tests/TherapEase.IntegrationTests/InterrupcionesIdentidadTests.cs) y [preparación/cortes de confirmación](../../tests/TherapEase.IntegrationTests/InterrupcionesIdentidadRevision.cs). Herramientas: xUnit, Testcontainers, Npgsql y callbacks de transacción de EF sobre la unidad de trabajo real. La aplicación usa su usuario PostgreSQL sin privilegios; solo el corte de conexión usa el administrador del contenedor ficticio. Datos exclusivamente ficticios. Pruebas comentadas según el skill del proyecto.
 
 **Evidencia:** q08-entrega-ampliada-10oct.trx, SHA-256 2beba1cf37a328f877ea2de216aaf6d320bb08e30a4fa5f46372eba4a9819f27; resúmenes JSON solo con estados/huellas y manifest.json. Se comprobó que no quedan contenedores Testcontainers; no se construyeron imágenes nuevas. No se repitieron los bloques anteriores. Ampliación local para el mismo PR #4, sin push ni cierre.
+
+**Veredicto Q08 — 10-oct:** Claude APROBADO, sin correcciones a las pruebas. Para Dulce: rechazo conocido → «No se guardó» y motivo; excepción inesperada → «No pudimos confirmar si se guardó; revisa el registro antes de repetir», sin reintento automático; nuevo restablecimiento → avisar que la temporal anterior deja de servir. Implementación/PageModel, procedimiento de entrega y revisión humana pendientes.
 
 ## 5. Cobertura y alcance de los pendientes
 
@@ -323,7 +325,7 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 | ✅ | Revisar secretos/configuración, registros capturados y `.env.example`. | Lucía | Alcance acotado e imagen histórica; mantener revisión por cada cambio. |
 | ⏳ | Revisar humanamente las pruebas del PR #4. | Miguel o Dulce | Persona distinta de Lucía; falta revisión, no ejecución de esas 50. |
 | ⏳ | Concretar verificación y entrega segura de temporales a otros usuarios, sin correo ni registros de contraseñas. | Miguel propone; Lucía decide; Dulce integra páginas | HU03/CU02; incluir temporal perdida después del commit: repetir restablecimiento genera otra clave y otro evento (§4.7). |
-| ⏳ | Implementar acceso mínimo/PageModel y sus unitarias. | Dulce | Validar frontend afectado; llamadas a Application. Si falla auditoría, mostrar «no se guardó». |
+| ⏳ | Implementar acceso mínimo/PageModel y sus unitarias. | Dulce | Llamadas a Application. Rechazo conocido: «No se guardó» y motivo. Excepción inesperada: «No pudimos confirmar si se guardó; revisa el registro antes de repetir», sin reintento automático. Restablecer otra vez: avisar que la temporal anterior deja de servir. Informe §8; Q08/S5. |
 | ⏳ | Probar entrada/salida, temporal, cambio/restablecimiento y rol desde las páginas. | Lucía | Depende de PageModel de Dulce; cuentas ficticias y distintas sesiones. |
 | ⏳ | Probar cookies reales y renovación por actividad; cookie manipulada/ausente, redirección externa y caché tras salir. | Lucía | Navegador y acceso mínimo; no reutilizar el resultado de componentes como prueba de páginas. |
 | ⏳ | Probar antifalsificación, permisos por URL/envío directo y validación de las rutas disponibles. | Lucía prueba; Miguel/Dulce corrigen | PageModel disponibles; ampliar con las rutas de cada bloque posterior. |

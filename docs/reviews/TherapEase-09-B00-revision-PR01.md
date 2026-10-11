@@ -1,6 +1,6 @@
 # TherapEase — B00 · Ajustes del PR #1
 
-> **Ampliaciones:** arquitectura en §6 (08-oct) y filtro Q03 en §7 (10-oct, pruebas auditadas; corrección por implementar). Correcciones históricas de §2 ya fusionadas.
+> **Ampliaciones:** arquitectura en §6 (08-oct) filtro Q03 en §7 y mensajes de PageModel en §8 (10-oct, pruebas auditadas; correcciones por implementar). Correcciones históricas de §2 ya fusionadas.
 
 **Fecha de revisión:** 04-oct-2026. **Estado:** correcciones obligatorias documentales comprobadas en `b60eba42edeb2fa8cdbea08ad1a4e51b041c21b0`, incluida la descripción. Lucía revisó/aprobó y fusionó PR #1 en main (`41123f2d2c115a05ff1df944457195a7f671cc17`). Las políticas de producto y mejoras opcionales siguen abiertas.
 
@@ -68,3 +68,15 @@ Estos ajustes provienen de la validación ejecutable sobre la base `2d088e2c4cc3
 | **Miguel** | Aceptar únicamente nombres completos de TipoRegistroAuditoria, sin distinguir mayúsculas: validar primero con Enum.GetNames<TipoRegistroAuditoria>().Contains(valor, StringComparer.OrdinalIgnoreCase) y después convertir. Rechazar números (0, 1, 2) y listas con comas (Paciente,Cita y Paciente, Cita) con 400. Mantener filtros válidos, permisos y metadatos; añadir las unitarias en su PR. | src/Web/Endpoints/EndpointDeConsultaDeEventos.cs:39; enum TipoRegistroAuditoria. | 400, sin eventos, para los números y las listas. Actualmente Paciente,Cita devuelve 200 con Cita; los casos añadidos deben permanecer visibles hasta corregir. Conservar la prueba fallida ConsultaAuditoriaApiTests.Tipo_Invalido_O_Combinado_Se_Rechaza hasta corregir; después repetir Q03 y autorización afectada. |
 
 Enum.TryParse combina los valores separados por comas; IsDefined acepta el resultado cuando coincide con un valor existente. No basta comprobar únicamente el valor resultante. [Referencia de Microsoft](https://learn.microsoft.com/en-us/dotnet/api/system.enum.tryparse?view=net-10.0). La coincidencia es contra el nombre completo; conservar el tratamiento actual del filtro ausente y no recortar una entrada inválida para aceptarla. No se propone cambiar permisos, arquitectura ni admitir filtros múltiples.
+
+## 8. Mensajes de guardado — Dulce (PageModel), 10-oct-2026
+
+Sustituye la indicación general «si falla la auditoría, mostrar no se guardó». Distinguir estos resultados al implementar las páginas y sus unitarias:
+
+| Resultado del servicio | Qué debe mostrar / hacer el PageModel |
+| --- | --- |
+| Rechazo conocido: RespuestaServicio fallida | «No se guardó» y el motivo recibido. |
+| Excepción inesperada: el resultado puede estar confirmado | «No pudimos confirmar si se guardó; revisa el registro antes de repetir». No ofrecer reintento automático (Q08, S5 de 08B). |
+| Restablecimiento solicitado otra vez | Avisar que la contraseña temporal anterior deja de servir. |
+
+No presentar una excepción inesperada como prueba de que nada se guardó. Estas indicaciones requieren implementación y unitarias de Dulce; las pruebas de servidor no acreditan el comportamiento de las páginas.
