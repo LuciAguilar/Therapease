@@ -14,7 +14,7 @@ namespace TherapEase.UnitTests.Web;
 
 public class ManejadorDeErroresInesperadosTests
 {
-    private const string TextoPrivado = "Password=clave-ficticia;Host=servidor-privado;usuario-ficticio";
+    private const string TextoPrivado = "valor-privado-ficticio";
 
     // Un proveedor que falla si alguien le pide un servicio: demuestra que el manejador no usa Identity, la base ni nada de la solicitud.
     private sealed class ProveedorQueNoDebeUsarse : IServiceProvider
@@ -81,8 +81,7 @@ public class ManejadorDeErroresInesperadosTests
         await ManejadorDeErroresInesperados.ResponderAsync(contexto);
 
         var todo = Cuerpo(contexto) + string.Join(";", contexto.Response.Headers.Select(h => h.Key + "=" + h.Value));
-        Assert.DoesNotContain("clave-ficticia", todo);
-        Assert.DoesNotContain("servidor-privado", todo);
+        Assert.DoesNotContain(TextoPrivado, todo);
         Assert.DoesNotContain("usuario-ficticio", todo);
         Assert.DoesNotContain("Exception", todo);
         Assert.DoesNotContain("StackTrace", todo);

@@ -5,7 +5,7 @@ namespace TherapEase.Domain.Identidad.Reglas;
 
 public static class MatrizDePermisos
 {
-    // 08B §1.2: administrar usuarios y la consulta técnica de auditoría son solo del superusuario; la baja de pacientes también es de la usuaria (decisión provisional de Lucía, 11-oct-2026).
+    // 08B §1.2: administrar usuarios y auditoría técnica, solo superusuario; la baja de pacientes también la usuaria (provisional, Lucía 11-oct-2026).
     public static bool RolTienePermiso(string? rol, Permiso permiso)
     {
         if (!Enum.IsDefined(permiso))

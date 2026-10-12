@@ -97,7 +97,7 @@ T1 está publicado; PR #1, PR #3 y PR #4 ya están fusionados; main de referenci
 
 **[PR #4](https://github.com/LuciAguilar/Therapease/pull/4), rama `revision/etapa09`:** entrega conjunta de QA, revisada por Miguel y fusionada. Incluye Identity, recuperación local, arquitectura, horas/Docker, HTTPS, API Q03, interrupciones Q08 y errores/registros. Los resultados por bloque están en [B00 §4](docs/planning/TherapEase-etapa09-B00.md#4-evidencia-registrada-y-límites); son ejecuciones locales, no CI.
 
-**[PR #5](https://github.com/LuciAguilar/Therapease/pull/5), rama `b00/correcciones-pr4`:** correcciones de Miguel con unitarias propias. Sobre `7e83c3c`: 192 unitarias y 182 de integración correctas, en ejecuciones separadas; los siete fallos anteriores están corregidos. PR #5 sigue pendiente de aprobación/fusión. E2E espera las páginas de Dulce. El estado vigente de B00 está en [B00 §4.9](docs/planning/TherapEase-etapa09-B00.md).
+**[PR #5](https://github.com/LuciAguilar/Therapease/pull/5), rama `b00/correcciones-pr4`:** correcciones de Miguel con unitarias propias. Sobre `7e83c3c`: 192 unitarias y 182 de integración correctas, en ejecuciones separadas; los siete fallos anteriores están corregidos. PR #5 sigue pendiente de aprobación/fusión. E2E espera las páginas de Dulce. El estado vigente de B00 está en [B00 §4](docs/planning/TherapEase-etapa09-B00.md#4-evidencia-registrada-y-límites).
 
 | Quién | Qué debe consultar y atender |
 | --- | --- |
@@ -119,7 +119,7 @@ dotnet test TherapEase.sln
 dotnet run --project src/Web
 ```
 
-La aplicación escucha en `http://localhost:5052` y expone `/salud`, que solo comprueba que el proceso está encendido: puede responder 200 aunque PostgreSQL no esté disponible, así que no demuestra que el acceso a datos funcione. IntegrationTests contiene los bloques de QA de B00 §4.1–§4.8 (PR #4, fusionado); sus resultados están en [B00 §4.9](docs/planning/TherapEase-etapa09-B00.md). E2ETests sigue sin pruebas; espera los recorridos con las páginas de Dulce.
+La aplicación escucha en `http://localhost:5052` y expone `/salud`, que solo comprueba que el proceso está encendido: puede responder 200 aunque PostgreSQL no esté disponible, así que no demuestra que el acceso a datos funcione. IntegrationTests contiene los bloques de QA de B00 §4.1–§4.8 (PR #4, fusionado); sus resultados están en [B00 §4](docs/planning/TherapEase-etapa09-B00.md#4-evidencia-registrada-y-límites). E2ETests sigue sin pruebas; espera los recorridos con las páginas de Dulce.
 
 Imagen Docker (requiere Docker Desktop; salud y usuario sin privilegios se declaran en el `Dockerfile`):
 
@@ -154,9 +154,9 @@ El segundo comando es la recuperación cuando ningún superusuario puede entrar;
 
 **Cabeceras de seguridad y errores.** Toda respuesta lleva `X-Content-Type-Options: nosniff`, `Content-Security-Policy: frame-ancestors 'none'`, `X-Frame-Options: DENY` y `Referrer-Policy: no-referrer`. El contenido que exige sesión lleva además `Cache-Control: no-store`; no se aplica a los archivos estáticos ni a `/salud`, que son anónimos. Las demás restricciones de CSP se completan con las páginas y la duración de HSTS se decide al desplegar. Fuera de Development, una excepción no controlada recibe un 500 con cuerpo fijo (JSON en `/api`, HTML mínimo en las páginas) que no consulta Identity ni la base y no incluye datos de la excepción, de la solicitud ni del usuario.
 
-**Consulta técnica de auditoría (Q03, sin pantalla).** Solo lectura, solo superusuario activo con sesión vigente: `GET /api/auditoria/eventos?desde=<instante>&hasta=<instante>` con opcionales `tipoRegistro` (`Paciente`, `Cita`, `Usuario`), `idRegistro` y `limite` (1 a 500, 100 por defecto). Los instantes llevan zona, por ejemplo `2026-10-01T00:00:00Z`; sin zona se rechazan. Responde `401` sin sesión, `403` sin permiso y `400` ante un filtro inválido. Devuelve en JSON el actor, el momento, el registro y los campos afectados, la acción y el hecho, nunca valores. El comando que inicia sesión y llama a este servicio queda pendiente de que existan las pantallas de acceso: Dulce implementa los `PageModel` y escribe sus unitarias en el mismo PR.
+**Consulta técnica de auditoría (Q03, sin pantalla).** Solo lectura, solo superusuario activo con sesión vigente: `GET /api/auditoria/eventos?desde=<instante>&hasta=<instante>` con opcionales `tipoRegistro` (`Paciente`, `Cita`, `Usuario`; solo nombres completos, sin distinguir mayúsculas: números y listas con comas devuelven `400`), `idRegistro` y `limite` (1 a 500, 100 por defecto). Los instantes llevan zona, por ejemplo `2026-10-01T00:00:00Z`; sin zona se rechazan. Responde `401` sin sesión, `403` sin permiso y `400` ante un filtro inválido. Devuelve en JSON el actor, el momento, el registro y los campos afectados, la acción y el hecho, nunca valores. El comando que inicia sesión y llama a este servicio queda pendiente de que existan las pantallas de acceso: Dulce implementa los `PageModel` y escribe sus unitarias en el mismo PR.
 
-**Dependencias permitidas según [AGENTS](AGENTS.md) §1.** Las 30 pruebas automáticas de límites pasan sobre el commit revisado del PR #5; el recorrido sobre páginas funcionales sigue pendiente. Estado de B00: [B00 §4.9](docs/planning/TherapEase-etapa09-B00.md).
+**Dependencias permitidas según [AGENTS](AGENTS.md) §1.** Las 30 pruebas automáticas de límites pasan sobre el commit revisado del PR #5; el recorrido sobre páginas funcionales sigue pendiente. Estado de B00: [B00 §4](docs/planning/TherapEase-etapa09-B00.md#4-evidencia-registrada-y-límites).
 
 | Proyecto | Puede referenciar |
 | --- | --- |

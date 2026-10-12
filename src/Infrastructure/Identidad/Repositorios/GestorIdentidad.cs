@@ -177,7 +177,8 @@ public class GestorIdentidad : IGestorIdentidad
         await _usuarios.FindByIdAsync(idUsuario.ToString())
         ?? throw new InvalidOperationException("El usuario no existe.");
 
-    // Un intento a la vez por usuario (S-03): el bloqueo de fila dura hasta el commit de IUnidadDeTrabajo; sin LINQ encima, para que FOR UPDATE no quede en una subconsulta. Es virtual solo para sustituir la base en las unitarias.
+    // Un intento a la vez por usuario (S-03): el bloqueo de fila dura hasta el commit de IUnidadDeTrabajo; sin LINQ encima, para que FOR UPDATE no quede en una subconsulta.
+    // Los dos son virtuales solo para sustituir la base en las unitarias.
     protected virtual async Task<Usuario?> BloquearUsuarioAsync(string nombreNormalizado, CancellationToken cancelacion) =>
         (await _contexto.Users
             .FromSqlInterpolated($"""SELECT * FROM "AspNetUsers" WHERE "NormalizedUserName" = {nombreNormalizado} FOR UPDATE""")
