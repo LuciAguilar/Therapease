@@ -15,13 +15,24 @@ public class MatrizDePermisosTests
         Assert.True(MatrizDePermisos.RolTienePermiso(NombresDeRol.Superusuario, permiso));
     }
 
+    [Fact]
+    public void Usuaria_PuedeDarDeBajaPacientes()
+    {
+        Assert.True(MatrizDePermisos.RolTienePermiso(NombresDeRol.Usuaria, Permiso.DarDeBajaPacientes));
+    }
+
     [Theory]
     [InlineData(Permiso.AdministrarUsuarios)]
     [InlineData(Permiso.ConsultarAuditoria)]
-    [InlineData(Permiso.DarDeBajaPacientes)]
-    public void Usuaria_NoTieneLosPermisosActuales(Permiso permiso)
+    public void Usuaria_NoAdministraUsuariosNiConsultaLaAuditoriaTecnica(Permiso permiso)
     {
         Assert.False(MatrizDePermisos.RolTienePermiso(NombresDeRol.Usuaria, permiso));
+    }
+
+    [Fact]
+    public void PermisosDeLaUsuaria_SonSoloLaBajaDePacientes()
+    {
+        Assert.Equal([Permiso.DarDeBajaPacientes], MatrizDePermisos.PermisosDelRol(NombresDeRol.Usuaria));
     }
 
     [Theory]
@@ -29,16 +40,20 @@ public class MatrizDePermisosTests
     [InlineData("")]
     [InlineData("Capturista")]
     [InlineData("superusuario")]
+    [InlineData("usuaria")]
     public void RolDesconocidoOMalEscrito_NoTienePermisos(string? rol)
     {
         Assert.Empty(MatrizDePermisos.PermisosDelRol(rol));
         Assert.False(MatrizDePermisos.RolTienePermiso(rol, Permiso.AdministrarUsuarios));
+        Assert.False(MatrizDePermisos.RolTienePermiso(rol, Permiso.DarDeBajaPacientes));
     }
 
-    [Fact]
-    public void PermisoInexistente_NuncaSeConcede()
+    [Theory]
+    [InlineData(NombresDeRol.Superusuario)]
+    [InlineData(NombresDeRol.Usuaria)]
+    public void PermisoInexistente_NuncaSeConcede(string rol)
     {
-        Assert.False(MatrizDePermisos.RolTienePermiso(NombresDeRol.Superusuario, (Permiso)99));
+        Assert.False(MatrizDePermisos.RolTienePermiso(rol, (Permiso)99));
     }
 
     [Fact]
@@ -46,5 +61,4 @@ public class MatrizDePermisosTests
     {
         Assert.Equal(Enum.GetValues<Permiso>().Length, MatrizDePermisos.PermisosDelRol(NombresDeRol.Superusuario).Count);
     }
-
 }

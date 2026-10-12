@@ -2,6 +2,7 @@ using TherapEase.Application.Auditoria.Servicios;
 using TherapEase.Application.Compartido.Interfaces.Repositorios;
 using TherapEase.Application.Coordinadores.Constantes;
 using TherapEase.Application.Coordinadores.Servicios;
+using TherapEase.Application.Identidad.Servicios;
 using TherapEase.Domain.Auditoria.Entidades.Enums;
 using TherapEase.Domain.Citas.Entidades;
 using TherapEase.Domain.Citas.Entidades.Enums;
@@ -9,6 +10,7 @@ using TherapEase.Domain.Citas.Excepciones;
 using TherapEase.Domain.Citas.Reglas;
 using TherapEase.Domain.Compartido.Entidades.Enums;
 using TherapEase.Domain.Compartido.Excepciones;
+using TherapEase.Domain.Identidad.Constantes;
 using TherapEase.Domain.Pacientes.Entidades;
 using TherapEase.Domain.Pacientes.Entidades.Enums;
 using TherapEase.Domain.Pacientes.Reglas;
@@ -41,6 +43,18 @@ public class CoordinadorDeBajaDePacienteTests
         var reloj = new RelojFijo(Ahora);
         var auditoria = new ServicioAuditoria(_repositorioAuditoria, _autorizacion, reloj);
         return new CoordinadorDeBajaDePaciente(_pacientes, _citas, unidad, auditoria, _autorizacion, _actual, reloj);
+    }
+
+    // Usa la autorización real (rol, cuenta activa y contraseña temporal) en lugar del doble de permisos.
+    private (CoordinadorDeBajaDePaciente Coordinador, Guid IdUsuario) CrearConAutorizacionReal(string rol, bool activo = true, bool debeCambiar = false)
+    {
+        var gestor = new GestorIdentidadFalso();
+        var usuario = gestor.Agregar("operador", rol, activo: activo, debeCambiar: debeCambiar);
+        var actual = new UsuarioActualFalso { IdUsuario = usuario.IdUsuario };
+        var autorizacion = new Autorizacion(actual, gestor);
+        var reloj = new RelojFijo(Ahora);
+        var auditoria = new ServicioAuditoria(_repositorioAuditoria, autorizacion, reloj);
+        return (new CoordinadorDeBajaDePaciente(_pacientes, _citas, _unidad, auditoria, autorizacion, actual, reloj), usuario.IdUsuario);
     }
 
     private Paciente AgregarPaciente()
@@ -143,6 +157,64 @@ public class CoordinadorDeBajaDePacienteTests
         Assert.Equal(MensajesDeCoordinacion.SinPermiso, respuesta.Mensaje);
         Assert.Equal(CondicionRegistro.Vigente, paciente.Condicion);
         Assert.Empty(_repositorioAuditoria.Eventos);
+    }
+
+    [Theory]
+    [InlineData(NombresDeRol.Usuaria)]
+    [InlineData(NombresDeRol.Superusuario)]
+    public async Task DarDeBaja_ConUsuariaOSuperusuarioActivos_DaDeBajaYAuditaConSuIdentificador(string rol)
+    {
+        var paciente = AgregarPaciente();
+        var (coordinador, idUsuario) = CrearConAutorizacionReal(rol);
+
+        var respuesta = await coordinador.DarDeBajaAsync(paciente.IdPaciente, paciente.Version);
+
+        Assert.True(respuesta.Exito);
+        Assert.Equal(CondicionRegistro.Baja, paciente.Condicion);
+        Assert.Equal(idUsuario, Assert.Single(_repositorioAuditoria.Eventos).IdUsuarioActor);
+    }
+
+    [Theory]
+    [InlineData(NombresDeRol.Usuaria)]
+    [InlineData(NombresDeRol.Superusuario)]
+    public async Task DarDeBaja_ConContrasenaTemporalPendiente_RechazaSinCambios(string rol)
+    {
+        var paciente = AgregarPaciente();
+        var (coordinador, _) = CrearConAutorizacionReal(rol, debeCambiar: true);
+
+        var respuesta = await coordinador.DarDeBajaAsync(paciente.IdPaciente, paciente.Version);
+
+        Assert.False(respuesta.Exito);
+        Assert.Equal(MensajesDeCoordinacion.SinPermiso, respuesta.Mensaje);
+        Assert.Equal(CondicionRegistro.Vigente, paciente.Condicion);
+        Assert.Empty(_repositorioAuditoria.Eventos);
+    }
+
+    [Theory]
+    [InlineData(NombresDeRol.Usuaria)]
+    [InlineData(NombresDeRol.Superusuario)]
+    public async Task DarDeBaja_ConCuentaDesactivada_RechazaSinCambios(string rol)
+    {
+        var paciente = AgregarPaciente();
+        var (coordinador, _) = CrearConAutorizacionReal(rol, activo: false);
+
+        var respuesta = await coordinador.DarDeBajaAsync(paciente.IdPaciente, paciente.Version);
+
+        Assert.False(respuesta.Exito);
+        Assert.Equal(MensajesDeCoordinacion.SinPermiso, respuesta.Mensaje);
+        Assert.Equal(CondicionRegistro.Vigente, paciente.Condicion);
+    }
+
+    [Fact]
+    public async Task DarDeBaja_ConRolSinPermiso_Rechaza()
+    {
+        var paciente = AgregarPaciente();
+        var (coordinador, _) = CrearConAutorizacionReal("Capturista");
+
+        var respuesta = await coordinador.DarDeBajaAsync(paciente.IdPaciente, paciente.Version);
+
+        Assert.False(respuesta.Exito);
+        Assert.Equal(CondicionRegistro.Vigente, paciente.Condicion);
     }
 
     [Fact]

@@ -15,6 +15,7 @@ public class AutorizacionTests
     [Theory]
     [InlineData(Permiso.AdministrarUsuarios)]
     [InlineData(Permiso.ConsultarAuditoria)]
+    [InlineData(Permiso.DarDeBajaPacientes)]
     public async Task Superusuario_ActivoSinContrasenaTemporal_TienePermiso(Permiso permiso)
     {
         var usuario = _gestor.Agregar("super", NombresDeRol.Superusuario);
@@ -50,6 +51,54 @@ public class AutorizacionTests
         _usuarioActual.IdUsuario = usuario.IdUsuario;
 
         Assert.False(await Crear().TienePermisoAsync(permiso));
+    }
+
+    [Fact]
+    public async Task Usuaria_ActivaSinContrasenaTemporal_PuedeDarDeBajaPacientes()
+    {
+        var usuario = _gestor.Agregar("usuaria", NombresDeRol.Usuaria);
+        _usuarioActual.IdUsuario = usuario.IdUsuario;
+
+        Assert.True(await Crear().TienePermisoAsync(Permiso.DarDeBajaPacientes));
+    }
+
+    [Fact]
+    public async Task Usuaria_ConContrasenaTemporalPendiente_NoPuedeDarDeBajaPacientes()
+    {
+        var usuario = _gestor.Agregar("usuaria", NombresDeRol.Usuaria, debeCambiar: true);
+        _usuarioActual.IdUsuario = usuario.IdUsuario;
+
+        Assert.False(await Crear().TienePermisoAsync(Permiso.DarDeBajaPacientes));
+    }
+
+    [Fact]
+    public async Task Usuaria_Desactivada_NoPuedeDarDeBajaPacientes()
+    {
+        var usuario = _gestor.Agregar("usuaria", NombresDeRol.Usuaria, activo: false);
+        _usuarioActual.IdUsuario = usuario.IdUsuario;
+
+        Assert.False(await Crear().TienePermisoAsync(Permiso.DarDeBajaPacientes));
+    }
+
+    [Fact]
+    public async Task SinSesion_NoPuedeDarDeBajaPacientes()
+    {
+        _gestor.Agregar("usuaria", NombresDeRol.Usuaria);
+
+        Assert.False(await Crear().TienePermisoAsync(Permiso.DarDeBajaPacientes));
+    }
+
+    [Fact]
+    public async Task UsuariaQueDejaDeSerlo_PierdeLaBajaEnLaSiguienteConsulta()
+    {
+        var usuario = _gestor.Agregar("usuaria", NombresDeRol.Usuaria);
+        _usuarioActual.IdUsuario = usuario.IdUsuario;
+        var autorizacion = Crear();
+        Assert.True(await autorizacion.TienePermisoAsync(Permiso.DarDeBajaPacientes));
+
+        _gestor.Usuarios[usuario.IdUsuario] = usuario with { Rol = "Capturista" };
+
+        Assert.False(await autorizacion.TienePermisoAsync(Permiso.DarDeBajaPacientes));
     }
 
     [Fact]

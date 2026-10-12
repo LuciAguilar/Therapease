@@ -6,6 +6,6 @@ public enum Permiso
     AdministrarUsuarios,
     ConsultarAuditoria,
 
-    // Solo superusuario por ahora: concederla a la usuaria (08B §1.2) queda pendiente de validar con Dulce.
+    // Usuaria y superusuario, provisionalmente (decisión de Lucía, 11-oct-2026); Dulce valida la política operativa con la usuaria.
     DarDeBajaPacientes
 }
