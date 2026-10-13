@@ -16,6 +16,9 @@ public class ManejadorDeErroresInesperadosTests
 {
     private const string TextoPrivado = "valor-privado-ficticio";
 
+    // Texto fijado a mano a propósito: si alguien cambia la constante, estas pruebas deben avisar.
+    private const string MensajeEsperado = "Ocurrió un error. Si estabas guardando algo, revisa si se guardó antes de repetirlo.";
+
     // Un proveedor que falla si alguien le pide un servicio: demuestra que el manejador no usa Identity, la base ni nada de la solicitud.
     private sealed class ProveedorQueNoDebeUsarse : IServiceProvider
     {
@@ -56,7 +59,16 @@ public class ManejadorDeErroresInesperadosTests
         var cuerpo = Cuerpo(contexto);
         Assert.Equal(ManejadorDeErroresInesperados.CuerpoJson, cuerpo);
         using var documento = JsonDocument.Parse(cuerpo);
-        Assert.Equal(ManejadorDeErroresInesperados.MensajeGenerico, documento.RootElement.GetProperty("error").GetString());
+        Assert.Equal(MensajeEsperado, documento.RootElement.GetProperty("error").GetString());
+        Assert.DoesNotContain("Intenta de nuevo", cuerpo);
+    }
+
+    [Fact]
+    public void MensajeGenerico_PideRevisarSiSeGuardoAntesDeRepetir_YNoInvitaAReintentar()
+    {
+        Assert.Equal(MensajeEsperado, ManejadorDeErroresInesperados.MensajeGenerico);
+        Assert.Contains("revisa si se guardó antes de repetirlo", ManejadorDeErroresInesperados.MensajeGenerico);
+        Assert.DoesNotContain("Intenta de nuevo", ManejadorDeErroresInesperados.MensajeGenerico, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -68,7 +80,10 @@ public class ManejadorDeErroresInesperadosTests
 
         Assert.Equal(500, contexto.Response.StatusCode);
         Assert.StartsWith("text/html", contexto.Response.ContentType);
-        Assert.Equal(ManejadorDeErroresInesperados.CuerpoHtml, Cuerpo(contexto));
+        var cuerpo = Cuerpo(contexto);
+        Assert.Equal(ManejadorDeErroresInesperados.CuerpoHtml, cuerpo);
+        Assert.Contains(MensajeEsperado, cuerpo);
+        Assert.DoesNotContain("Intenta de nuevo", cuerpo);
     }
 
     [Theory]
@@ -140,6 +155,8 @@ public class ManejadorDeErroresInesperadosTests
         await aplicacion.Build()(contexto);
 
         Assert.Equal(500, contexto.Response.StatusCode);
-        Assert.Equal(ManejadorDeErroresInesperados.CuerpoJson, Cuerpo(contexto));
+        var cuerpo = Cuerpo(contexto);
+        Assert.Equal(ManejadorDeErroresInesperados.CuerpoJson, cuerpo);
+        Assert.Contains(MensajeEsperado, cuerpo);
     }
 }

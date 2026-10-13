@@ -6,7 +6,7 @@ namespace TherapEase.Web.Configuracion;
 // Respuesta fija ante una excepción no controlada: no pasa por Identity ni la base de datos y no incluye datos de la excepción, de la solicitud ni del usuario.
 public static class ManejadorDeErroresInesperados
 {
-    public const string MensajeGenerico = "Ocurrió un error inesperado. Intenta de nuevo; si el problema continúa, informa al equipo.";
+    public const string MensajeGenerico = "Ocurrió un error. Si estabas guardando algo, revisa si se guardó antes de repetirlo.";
 
     public const string CuerpoJson = "{\"error\":\"" + MensajeGenerico + "\"}";
 
