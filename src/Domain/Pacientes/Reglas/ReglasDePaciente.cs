@@ -39,7 +39,7 @@ public static class ReglasDePaciente
         AsignarDatos(paciente, nombre, contacto);
         foreach (var ambito in ambitosSolicitados)
         {
-            paciente.Ambitos.Add(new PacienteAmbito { IdPaciente = idPaciente, Ambito = ambito });
+            paciente.AmbitosEditables.Add(new PacienteAmbito { IdPaciente = idPaciente, Ambito = ambito });
         }
 
         MetadatosDeAuditoria.RegistrarAlta(paciente, idActor, ahora);

@@ -29,6 +29,42 @@ public class ReglasDePacienteTests
     }
 
     [Fact]
+    public void Ambitos_SeExponenSoloLectura_NoSePuedenModificarDesdeFuera()
+    {
+        var paciente = NuevoPaciente(AmbitoAtencion.Escolar, AmbitoAtencion.Independiente);
+
+        var ambitos = paciente.Ambitos;
+
+        Assert.IsNotType<List<PacienteAmbito>>(ambitos);
+        var comoColeccion = Assert.IsAssignableFrom<ICollection<PacienteAmbito>>(ambitos);
+        Assert.True(comoColeccion.IsReadOnly);
+        Assert.Throws<NotSupportedException>(() => comoColeccion.Clear());
+        Assert.Throws<NotSupportedException>(() => comoColeccion.Remove(ambitos.First()));
+        Assert.Equal(2, paciente.Ambitos.Count);
+    }
+
+    [Fact]
+    public void Ambitos_ReflejanLosRegistradosPorLasReglas()
+    {
+        var paciente = NuevoPaciente(AmbitoAtencion.Escolar, AmbitoAtencion.Independiente);
+
+        Assert.Equal(
+            [AmbitoAtencion.Escolar, AmbitoAtencion.Independiente],
+            paciente.Ambitos.Select(a => a.Ambito).Order());
+        Assert.All(paciente.Ambitos, a => Assert.Equal(paciente.IdPaciente, a.IdPaciente));
+    }
+
+    [Fact]
+    public void Actualizar_NoCambiaLosAmbitos()
+    {
+        var paciente = NuevoPaciente(AmbitoAtencion.Independiente);
+
+        ReglasDePaciente.Actualizar(paciente, "Otro Nombre", null, 1, OtroActor, Ahora);
+
+        Assert.Equal(AmbitoAtencion.Independiente, Assert.Single(paciente.Ambitos).Ambito);
+    }
+
+    [Fact]
     public void Registrar_ConAmbitoRepetido_Rechaza()
     {
         Assert.Throws<ReglaDeNegocioException>(() =>
