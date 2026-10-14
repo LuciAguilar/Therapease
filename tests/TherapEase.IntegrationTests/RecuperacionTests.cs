@@ -41,6 +41,8 @@ public class RecuperacionTests(PostgreSqlRevision postgres, ITestOutputHelper sa
             await origen.InitializeAsync();
             var anterior = await origen.Crear();
             var idPaciente = await PrepararAsync(anterior);
+            var idEvento = await PostgreSqlRevision.Valor<Guid>(anterior.App,
+                "SELECT \"IdEvento\" FROM \"EventoAuditoria\"");
             string cookie;
             using (var proveedor = anterior.Servicios())
             using (var solicitud = new SolicitudIdentidad(proveedor))
@@ -85,7 +87,18 @@ public class RecuperacionTests(PostgreSqlRevision postgres, ITestOutputHelper sa
             using (var solicitud = new SolicitudIdentidad(proveedor, cookie))
                 Assert.True(await solicitud.AutenticarAsync());
             await using (var servidor = await ServidorRevision.IniciarAsync(nuevo))
-                Assert.Equal(200, await servidor.EstadoAsync(cookie, "/api/auditoria/eventos?desde=2026-10-07T00:00:00Z&hasta=2026-10-08T00:00:00Z"));
+            {
+                using var respuesta = await servidor.ConsultarAsync(cookie,
+                    "/api/auditoria/eventos?desde=2026-10-07T00:00:00Z&hasta=2026-10-08T00:00:00Z");
+                Assert.Equal(200, (int)respuesta.StatusCode);
+                using var eventos = JsonDocument.Parse(await respuesta.Content.ReadAsStringAsync());
+                var evento = Assert.Single(eventos.RootElement.EnumerateArray());
+                Assert.Equal(idEvento, evento.GetProperty("idEvento").GetGuid());
+                Assert.Equal(idPaciente, evento.GetProperty("idRegistro").GetGuid());
+                Assert.Equal("Paciente", evento.GetProperty("tipoRegistro").GetString());
+                Assert.Equal("Alta", evento.GetProperty("accion").GetString());
+                Assert.Equal("Alta ficticia", evento.GetProperty("hecho").GetString());
+            }
             recuperacion.Stop();
             var perdidaSimulada = RecuperacionRevision.Antiguedad(leido, detectadoEn);
             Assert.InRange(perdidaSimulada, TimeSpan.Zero, TimeSpan.FromHours(24));
