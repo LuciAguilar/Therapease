@@ -2,7 +2,7 @@
 
 **Revisión actual: 13-oct-2026.** [PR #5](https://github.com/LuciAguilar/Therapease/pull/5), commit `bce94091ba614e16f4cce3435697d8c58c2a31ff`, rama `b00/correcciones-pr4`. Base `709ff615`. Autor: Miguel. Aprobación final: Lucía.
 
-> **Resultado de revisión: sin bloqueantes de código.** El 500 ya pide comprobar si se guardó antes de repetir. Build Release correcto, 258 unitarias y 182 integración correctas; aprobación formal/fusión de PR #5 pendientes en GitHub. Lucía autorizó preparar el PR de QA y avanzar B01 con pendientes B00/LCA visibles.
+> **Resultado de revisión: sin bloqueantes de código.** El 500 ya pide comprobar si se guardó antes de repetir. Build Release correcto, 258 unitarias y 182 integración correctas; PR #5 aprobado y fusionado por Lucía el 13-oct; main 40785d2. Lucía autorizó preparar el PR de QA y avanzar B01 con pendientes B00/LCA visibles.
 
 ## 1. Alcance comprobado
 
@@ -45,7 +45,7 @@ Decisión de Lucía del 11-oct: órdenes 1–3 aprobados completos. Se conserva 
 | Quién | Alcance aprobado | Estado / entrega |
 | --- | --- | --- |
 | Miguel | Cinco cabeceras: `X-Content-Type-Options: nosniff`, `Content-Security-Policy: frame-ancestors 'none'`, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`, `Cache-Control: no-store` en contenido privado. | ✅ Incluido en PR #5; comprobación HTTPS real. Navegador posterior; no-store no se impone al CSS. |
-| Miguel | Comprobar resultados de Identity; 500 fijo independiente; ámbitos de solo lectura; aclarar `/salud`. | ✅ Incluidos en PR #5. ✅ Mensaje corregido en bce9409. ⏳ Aprobación formal/fusión. |
+| Miguel | Comprobar resultados de Identity; 500 fijo independiente; ámbitos de solo lectura; aclarar `/salud`. | ✅ Incluidos en PR #5. ✅ Mensaje corregido en bce9409. ✅ PR #5 aprobado y fusionado el 13-oct. |
 | Lucía | Arranque de QA tolerante al tiempo de espera agotado; contenido del evento HTTP restaurado; documentar `crear-roles.sql` porque pg_dump no copia usuarios. | ✅ Aplicadas y probadas el 13-oct, con baja/cabeceras. ⏳ Revisión humana y fusión del PR conjunto de QA. |
 
 **Otros pendientes:** ejecución final de los procedimientos 7–8 ya aprobados, producto/PageModel con Dulce, QA restante y decisión B00/LCA. Miguel revisa la entrega de QA cuando Lucía la presente. B01 autorizado expresamente el 13-oct en otro chat; nube y datos reales siguen sin autorización. Correo noreply sigue como recomendación personal, sin reescribir historial.

@@ -67,7 +67,8 @@ El seguimiento 0.1 conserva las ejecuciones del 08–10-oct como historia. Los f
 
 | Estado | Alcance | Resultado / pendiente |
 | --- | --- | --- |
-| ✅ | PR #5 bce9409 | 258 unitarias y 182 integración, 0 fallos/omitidas; compilación Release sin errores/advertencias. Mensaje 500 corregido. |
+| ✅ | Repetición final de QA | Código 4ca53c4: 258 unitarias y 205 integración correctas, 0 fallos/omitidas. Evidencia/huellas en B00 §4.10. Revisión humana pendiente. |
+| ✅ | PR #5 bce9409 | 258 unitarias y 182 integración, 0 fallos/omitidas; compilación Release sin errores/advertencias. Mensaje 500 corregido; PR #5 fusionado el 13-oct, main 40785d2. |
 | ✅ | BajaPacienteTests: 14 casos | Nueve anteriores más Usuaria/Superusuario, con/sin temporal y sesión ausente. Guardado/evento reales y concurrencia conservados. L-CU04, Q03/Q07/Q08/Q20; cobertura de servidor, no página. |
 | ✅ | CabecerasSeguridadTests: 9 casos | S-30 y apoyo Q04/Q08/Q19: cabeceras reales, caché privada, estático, fallo de Identity JSON/HTML y recuperación. No sustituye navegador/CSP de recursos. |
 | ✅ | Tres mejoras de QA | Arranque con timeout tolerado, evento restaurado comprobado en HTTP, documentación de crear-roles.sql para un destino nuevo. Recuperación: 13 casos correctos. |
