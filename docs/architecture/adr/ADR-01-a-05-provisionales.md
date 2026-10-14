@@ -106,6 +106,19 @@ Solo para pruebas B00: `pg_dump`/`pg_restore` 17 del contenedor y AES-256-GCM me
 
 **Límite:** no crear el repositorio de respaldos, conectar Neon ni implementar el flujo. No instalar age ni generar/guardar claves en esta entrega documental. Rotación de claves, usuario/permisos de respaldo, política de sesiones tras incidente, carga objetivo y demás detalles operativos siguen pendientes donde corresponda. La aprobación no acredita funcionamiento diario/mensual ni cierra B00/LCA/R04.
 
+### Nota posterior ADR-05 — temporales y acceso Q03 (12-oct-2026)
+
+**Decisión de Lucía, aprobada documentalmente.** No altera la transcripción original de 04. AGENTS §2.2–§2.3 conserva las reglas completas.
+
+| Tema | Decisión | Implementación / evidencia pendiente |
+| --- | --- | --- |
+| Temporales, orden 7 | Puntos 1–4 aprobados: verificar identidad por canal conocido distinto al de entrega; temporal una vez, sin secretos en registros/URL/TempData; nuevo restablecimiento ante respuesta perdida, sin reintento automático; acceso solo CU11 y revocación acordada. | Entrega desde páginas y recorrido final pendientes. Solo registrar eventos de cambios confirmados: dos si ambos intentos confirmaron; uno si el primero se revirtió. |
+| Caducidad A | B00 con datos ficticios, sin vencimiento adicional de la temporal. Otro restablecimiento invalida la anterior. No cambia sesión de 30 min ni bloqueo vigente. | Mantener evidencia local y límites del alcance; no acredita navegador. |
+| Caducidad B | Temporal de 24 h obligatoria antes de datos reales: fecha de emisión, migración y pruebas. | Trabajo posterior; no implementar ahora. No autoriza datos reales ni resuelve R04/TOTP. |
+| Q03, orden 8 | Opción A: superusuario activo, sin temporal, accede con navegador autenticado y abre la URL en la misma ventana; cookie y permisos vigentes. | Acceso/cierre de sesión de Dulce y prueba final. Sin pantalla de auditoría; script B no incluido. |
+
+La decisión no cierra B00/LCA y no cambia el respaldo ni autoriza nube.
+
 ## Estado del traslado y aprobación — 01-oct-2026
 
 Lucía autorizó el traslado el 30-sep-2026. El 01-oct aportó el veredicto de contraste y aprobó las cuatro correcciones, la fidelidad y los demás puntos documentales de B00/ADR-06/Q03. No consta una nueva auditoría ni revisión humana de Miguel o Dulce; esta aprobación no las inventa. Los ADR pueden separarse posteriormente conservando identificadores y procedencia. LCA sigue abierta hasta resultados ejecutables y decisión de Lucía; R04 sigue abierto.

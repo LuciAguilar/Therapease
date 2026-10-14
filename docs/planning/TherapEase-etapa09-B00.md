@@ -1,6 +1,6 @@
 # TherapEase — 09/B00 · Plan y estado de validación
 
-**Actualización documental: 11-oct-2026.**
+**Actualización documental: 12-oct-2026.**
 
 > **B00 y Elaboración/LCA abiertos.** Solo datos ficticios; R04 abierto. No iniciar B01/Construcción ni desplegar sin decisión expresa de Lucía.
 >
@@ -50,7 +50,7 @@
 | PageModel | Aprobado | Dulce los implementa y escribe sus unitarias. |
 | Paciente de baja y cita activa | Aprobado | El bloqueo PostgreSQL **se conserva**. Nunca debe quedar una cita activa de un paciente de baja. |
 | Auditoría y directorio | Aprobado | Sin pantalla de auditoría; consulta técnica autorizada Q03. Directorio separado y posterior (B07), fuera de CU03: lista completa de vigentes por defecto y filtro autorizado de bajas. Decisión de Dulce del 08-oct; registrar y buscar desde Pacientes se mantiene en el primer avance de diciembre. |
-| Repositorio público | Aprobado | Documentación seleccionada y datos ficticios. Protección contra secretos aún por comprobar. |
+| Repositorio público | Aprobado | Documentación seleccionada y datos ficticios. Secret Protection y Push protection activadas: captura aportada por Lucía el 12-oct (ambos botones Disable). Verifica configuración, no una prueba de bloqueo ni ausencia de secretos. |
 | Destino de respaldo | Opción A aprobada | Repositorio privado aparte, artefacto privado 14 días; no crear ni configurar todavía. |
 | Permiso de baja | Aprobado el 11-oct para Usuaria y Superusuario, provisional | Regla en AGENTS §2.1. Miguel implementa y prueba en PR #5; conserva la decisión en AGENTS. Política de citas existentes pendiente. |
 | Cabeceras S-30 | Aprobadas por Lucía el 11-oct | Política en AGENTS §2.5 y §4.5; Miguel implementa en PR #5 y Lucía verifica en su entrega de QA. Implementación y pruebas pendientes. |
@@ -282,7 +282,7 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 | `dotnet build TherapEase.sln -c Release` | 0 errores, 0 advertencias. |
 | UnitTests, Release | 192 correctas; 0 fallidas/omitidas. |
 | IntegrationTests, Release | 182 correctas; 0 fallidas/omitidas. Incluye arquitectura 30/30 y Q03 51/51: los siete fallos anteriores están corregidos. |
-| Nueve adicionales locales CU04 | 9 correctas; 0 fallidas/omitidas. Sin citas/con citas inactivas, rechazo de activa, cita posterior a consulta, versión concurrente, fallo de auditoría, respuesta perdida/repetición y bloqueo real baja frente a cita. Archivo temporal BajaPacientePr05RevisionTests; correspondencia con casos existentes en plan §0.3. Propuesta: BajaPacienteTests en un PR de Lucía, con revisión distinta. No están en PR #5 ni tienen aún revisión humana. |
+| Nueve adicionales locales CU04 | 9 correctas; 0 fallidas/omitidas. Sin citas/con citas inactivas, rechazo de activa, cita posterior a consulta, versión concurrente, fallo de auditoría, respuesta perdida/repetición y bloqueo real baja frente a cita. Archivo local BajaPacienteTests, renombrado el 12-oct; correspondencia con casos existentes en plan §0.3. Incorporación pendiente en un PR de Lucía, con revisión distinta. No están en PR #5 ni tienen aún revisión humana. |
 | Alcance técnico | Windows, .NET 10.0.401, Docker 29.8.1, PostgreSQL 17 desechable/Testcontainers. Migraciones, roles y servicios reales; datos ficticios. Tres ejecuciones de pruebas separadas, no CI. |
 | Arranque intermitente de QA | Miguel lo reprodujo en PR #4/PR #5: tiempo de espera HTTP de 3 s no capturado. No ocurrió en esta ejecución; mejora del apoyo de pruebas de Lucía, no defecto nuevo de producción. |
 | Resultado propuesto | CORREGIR menor: README desactualizado y permiso ampliado aprobado por Lucía el 11-oct, aún por implementar/probar. Los resultados citados pertenecen al commit anterior a esa ampliación. Código solicitado comprobado. [Informe PR #5](../reviews/TherapEase-09-B00-revision-PR05.md). |
@@ -296,7 +296,7 @@ Los TRX y el manifiesto local identifican el commit y las huellas. Sin contenedo
 | Arquitectura | 30/30 sobre PR #5; pruebas del PR #4 revisadas por Miguel. CU04 mínimo implementado y nueve adicionales locales correctas. | Revisión del QA adicional; límites sobre PageModel funcionales. |
 | Datos Q03/Q06/Q07/Q08/Q20 | Q03 51/51; persistencia/Identity/recuperación repetidas dentro de 182/182. CU04 mínimo probado con PostgreSQL. | Acceso final Q03; restantes operaciones, estados, concurrencia e interrupciones disponibles del plan §7. |
 | Horas y Docker | 12/12 en la suite repetida; revisión humana del PR #4 registrada. | Interfaz/navegador cuando existan páginas. |
-| Identidad y seguridad | QA de servidor revisado; HTTPS, Q08 y errores/registros repetidos. | Entrega segura de temporales, PageModel/navegador, protección contra secretos y cabeceras aprobadas; por implementar/verificar. |
+| Identidad y seguridad | QA de servidor revisado; HTTPS, Q08 y errores/registros repetidos. | Entrega segura de temporales, PageModel/navegador y validación de cabeceras. Secret Protection/Push protection activadas según captura del 12-oct; reverificación actual de main pendiente. |
 | Recuperación local | Procedimiento QA repetido; PR #4 revisado/fusionado. ADR-05 decidido, sin implementación real. | Mantener límites de carga/operación; respaldo real solo con autorización posterior. |
 | Decisión LCA | Evidencia identificada y PR #4 revisado. | Tratar pendientes de la puerta, revisión del nuevo alcance y decisión expresa de Lucía. |
 
@@ -334,12 +334,12 @@ No crear un PR por cada mejora. GitHub Settings y el correo local se verifican/c
 | **4** | ⏳ | **Miguel: ajustes obligatorios del PR #5.** | Permiso Usuaria/Superusuario **ya aprobado**; implementarlo con unitarias y actualizar README/AGENTS. Informe PR05 §2–§3. | PR #5 existente. |
 | **5** | ⏳ | **Miguel: aplicar las cuatro mejoras de backend aprobadas.** | Decisión aprobada del orden 2; mantener transacciones, permisos y pruebas de rechazo. | Mismo PR #5. |
 | **6** | ⏳ | **Miguel: configurar cabeceras aprobadas.** | Decisión aprobada del orden 1; no anticipar restricciones de recursos que necesiten conocer las páginas de Dulce. | Mismo PR #5; QA en la entrega de Lucía. |
-| **7** | ⏳ | **Miguel: proponer verificación y entrega de contraseñas temporales.** | Todavía falta un procedimiento concreto. Incluir respuesta perdida y que otra temporal invalida la anterior; sin contraseñas en registros. | Por escrito en la descripción del PR #5; ejecución/interfaz tras decisión de Lucía. |
-| **8** | ⏳ | **Miguel: proponer acceso autenticado del operador a Q03.** | La API existe; falta el procedimiento utilizable. Conservar cookie/permiso vigente; no introducir JWT ni acceso sin autenticación. | Por escrito en la descripción del PR #5; recorrido final con acceso de Dulce tras decisión de Lucía. |
-| **9** | ⏳ | **Lucía: decidir los procedimientos propuestos en 7–8.** | Se decide cuando Miguel presente opciones concretas; no es una aprobación disponible hoy. Producto/páginas pueden dejar una parte pendiente. | Registrar en la entrega correspondiente; sin PR por la decisión sola. |
-| **10** | ⏳ | **Lucía: verificar protección contra secretos y revisión exigida en main.** | Comprobar ajustes reales de GitHub; no confundir el estado histórico con una verificación actual. | Settings; resumen de evidencia en su entrega documental. |
+| **7** | ✅ | **Miguel: propuesta de temporales presentada y aprobada.** | Lucía aprobó el 12-oct puntos 1–4 y caducidad A para B00 ficticio; B de 24 h antes de datos reales. Regla en AGENTS §2.2 y nota posterior ADR-05. Entrega/interfaz y prueba final siguen pendientes. | Decisión registrada; recorrido final con Dulce y QA de Lucía. |
+| **8** | ✅ | **Miguel: propuesta de acceso Q03 presentada y aprobada.** | Lucía aprobó el 12-oct opción A: navegador autenticado de superusuario con cookie/permiso vigente. No incluye el script B. Falta acceso/cierre de sesión de Dulce y prueba final. | Decisión registrada; implementación/prueba pendientes en 16–17. |
+| **9** | ✅ | **Lucía: procedimientos 7–8 decididos.** | Orden 7 puntos 1–4, caducidad A provisional y B antes de datos reales; orden 8 opción A. Aprobar el procedimiento no acredita implementación ni autoriza datos reales. | Registrar en AGENTS y ADR-05; sin PR por la decisión sola. |
+| **10** | ⏳ | **Lucía: protección contra secretos verificada; falta reverificar main.** | ✅ Secret Protection y Push protection activadas, captura del 12-oct con ambos botones Disable. ⏳ Revisión exigida en main: comprobación histórica del 03-oct, sin captura actual. No se probó un push con secreto. | Settings; evidencia de configuración. |
 | **11** | ⏳ | **Cada autor: correo noreply para futuros commits.** | Recomendación opcional de privacidad. No incluye reescribir historial publicado. | Configuración personal, sin PR propio. |
-| **12** | ⏳ | **Lucía: reunir sus pruebas y mejoras de QA.** | Renombrar BajaPacientePr05RevisionTests a BajaPacienteTests; conservar/aplicar comentarios, probar el permiso ampliado y cabeceras implementadas; añadir las tres mejoras aprobadas en 3 y repetir las comprobaciones afectadas. | Un solo PR de QA con B00, plan, informe y evidencia pública necesaria. Notas personales fuera. |
+| **12** | ⏳ | **Lucía: reunir sus pruebas y mejoras de QA.** | Archivo y clase ya renombrados a BajaPacienteTests el 12-oct; conservar comentarios, probar el permiso ampliado y cabeceras implementadas; añadir las tres mejoras aprobadas en 3 y repetir las comprobaciones afectadas. | Un solo PR de QA con B00, plan, informe y evidencia pública necesaria. Notas personales fuera. |
 | **13** | ⏳ | **Lucía: comprobar nuevo commit, auditar personalmente y decidir PR #5.** | Resultados sobre SHA real y revisión humana de código de Miguel por persona distinta; comprobar también cabeceras y las cuatro mejoras aprobadas. | Aprobación/fusión del PR #5; no cierre B00. |
 | **14** | ⏳ | **Miguel o Dulce: revisar el PR de QA; Lucía decide fusión.** | Revisar código y evidencia del nuevo alcance; la aprobación de PR #4 no lo cubre. Se publica el conjunto, sin PR por archivo. | Próximo PR de QA de Lucía, después de integrar #5, en revision/etapa09. |
 | **15** | ⏳ | **Dulce: validar políticas de producto con la usuaria.** | Citas contiguas, pago inicial, tratamiento de citas al dar de baja, retirada de ámbitos con citas y pago en citas canceladas/de baja. Campos del directorio: avance posterior. Lucía confirma decisiones; no exigir respuestas para mejoras independientes. | Registrar respuestas en los documentos existentes; aplicar en el bloque autorizado. |
@@ -362,7 +362,8 @@ No crear un PR por cada mejora. GitHub Settings y el correo local se verifican/c
 | ✅ | Repetir imagen, arranque, salud y ejecución sin privilegios para el código vigente. | Lucía prueba; Miguel corrige | Imagen actual construida; HEALTHCHECK healthy, HTTP 200 y usuario no root (§4.4). |
 | ✅ | Comprobar `America/Hermosillo` dentro de la imagen. | Lucía prueba; Miguel corrige | DLL real de imagen ejecutada bajo UTC, Nueva York y Madrid; 6 fechas por zona (§4.4). |
 | ✅ | Reproducir entorno y verificaciones con la documentación. | Miguel; Lucía verifica | Miguel reprodujo 182 pruebas dos veces en PR #4 y registró resultados/fallo de arranque; §4.9. No acredita un simulacro operativo real. |
-| ⏳ | Comprobar protección contra secretos; conservar revisión exigida en main. | Lucía | **Orden 10.** Una revisión en main comprobada el 03-oct; protección de secretos sin verificar. Visibilidad pública ya decidida. |
+| ✅ | Comprobar Secret Protection y Push protection. | Lucía | Captura del 12-oct: ambos botones Disable, configuración activada. No acredita bloqueo ejecutado ni ausencia universal de secretos. |
+| ⏳ | Reverificar revisión exigida en main. | Lucía | **Orden 10.** Una revisión comprobada el 03-oct; falta comprobación actual. Visibilidad pública ya decidida. |
 
 ### Paso 2. Datos — persistencia, concurrencia y horas
 
@@ -373,7 +374,7 @@ No crear un PR por cada mejora. GitHub Settings y el correo local se verifican/c
 | ✅ | Probar cruces SQL, dos reservas simultáneas, versión EF y conservación inicial del paciente. | Lucía | Alcance parcial de los 11 incorporados; no cubre todos los servicios/estados. |
 | ✅ | Probar filtros válidos, límites 1–500, contenido, permisos actuales y solo lectura de la API Q03. | Lucía | 46 casos correctos por HTTPS; alcance y evidencia en §4.6. |
 | ✅ | Rechazar números/listas de tipos y repetir Q03 sin los cinco fallos. | Miguel corrige; Lucía prueba | PR #5; Q03 51/51, §4.9. Sin omitir pruebas. |
-| ⏳ | Completar/probar acceso y comando autenticado de lectura Q03. | Miguel/Dulce implementan su parte; Lucía prueba | **Órdenes 8–9, 16–17.** La API ya exige permiso actual; sesiones de QA no sustituyen el procedimiento final del operador. Sin pantalla de auditoría. |
+| ⏳ | Completar/probar acceso y comando autenticado de lectura Q03. | Miguel/Dulce implementan su parte; Lucía prueba | **Órdenes 8–9 aprobados el 12-oct; 16–17 pendientes.** Opción A: navegador autenticado. La API exige permiso actual; sesiones de QA no sustituyen el acceso/cierre de sesión de Dulce ni el recorrido final. Sin pantalla de auditoría. |
 | ⏳ | Probar cambio y evento atómicos en restantes operaciones; sin datos sensibles ni éxito ante fallo. | Lucía prueba; Miguel corrige | Identity ya tiene casos; ampliar pacientes, citas y pago en la validación disponible. |
 | ⏳ | Probar reservas y recuperación de cita agendada por servicios; estados alternos y nuevas comprobaciones de cruce. | Lucía prueba; Miguel implementa/corrige | Paciente vigente; cancelada/de baja no bloquea; políticas contigua/pago pendientes de Dulce. |
 | ⏳ | Completar concurrencia por servicios: agendar frente a baja y recuperar frente a otra reserva. | Lucía prueba; Miguel implementa/corrige | Nueve adicionales locales prueban el CU04 mínimo, incluida cita frente a baja; falta revisión y recorrido por servicio de reservas/recuperación. Conservar bloqueo PostgreSQL. |
@@ -393,7 +394,7 @@ No crear un PR por cada mejora. GitHub Settings y el correo local se verifican/c
 | ✅ | Probar cookies/caducidad en componentes, claves en PostgreSQL, comando local y fallo de auditoría de Identity. | Lucía | Reloj controlado; no acredita navegador, TLS o reinicio real. |
 | ✅ | Revisar secretos/configuración, registros capturados y `.env.example`. | Lucía | Alcance acotado e imagen histórica; mantener revisión por cada cambio. |
 | ✅ | Revisar humanamente las pruebas del PR #4. | Miguel | APPROVED el 11-oct sobre f06dc7b; PR #4 fusionado. No incluye las nuevas pruebas locales del PR #5. |
-| ⏳ | Concretar verificación y entrega segura de temporales a otros usuarios, sin correo ni registros de contraseñas. | Miguel propone; Lucía decide; Dulce integra páginas | **Órdenes 7, 9 y 16–17.** HU03/CU02; temporal perdida después del commit: repetir restablecimiento genera otra clave y otro evento (§4.7). |
+| ⏳ | Concretar verificación y entrega segura de temporales a otros usuarios, sin correo ni registros de contraseñas. | Procedimiento aprobado; Dulce integra páginas; Lucía prueba | **Órdenes 7 y 9 aprobados; 16–17 pendientes.** HU03/CU02; temporal perdida después del commit: repetir restablecimiento genera otra clave y otro evento (§4.7). |
 | ⏳ | Implementar acceso mínimo/PageModel y sus unitarias. | Dulce | Llamadas a Application. Rechazo conocido: «No se guardó» y motivo. Excepción inesperada: «No pudimos confirmar si se guardó; revisa el registro antes de repetir», sin reintento automático. Restablecer otra vez: avisar que la temporal anterior deja de servir. Informe §8; Q08/S5. |
 | ⏳ | Probar entrada/salida, temporal, cambio/restablecimiento y rol desde las páginas. | Lucía | Depende de PageModel de Dulce; cuentas ficticias y distintas sesiones. |
 | ⏳ | Probar cookies reales y renovación por actividad; cookie manipulada/ausente, redirección externa y caché tras salir. | Lucía | Navegador y acceso mínimo; no reutilizar el resultado de componentes como prueba de páginas. |
@@ -421,7 +422,7 @@ No crear un PR por cada mejora. GitHub Settings y el correo local se verifican/c
 
 | Tema | Regla / situación |
 | --- | --- |
-| Consulta técnica Q03 | API de lectura por HTTPS: 51/51 correctas sobre PR #5. Filtro corregido. El procedimiento/acceso final del operador sigue pendiente; sin pantalla de auditoría. |
+| Consulta técnica Q03 | API de lectura por HTTPS: 51/51 correctas sobre PR #5. Opción A aprobada el 12-oct: navegador autenticado de superusuario; falta acceso/cierre de sesión de Dulce y prueba final. Sin pantalla de auditoría. |
 | Respaldo aprobado | Decisión del 10-oct en ADR-05 y AGENTS §2.8: age/clave pública, restaurar y comparar antes de cifrar, volcado solo en ejecutor, 14 días privados y simulacro mensual de Lucía. No crear repo, conectar Neon ni configurar flujo. |
 | Permiso de baja | Aprobado el 11-oct para Usuaria y Superusuario, provisional | Regla en AGENTS §2.1. Miguel implementa y prueba en PR #5; conserva la decisión en AGENTS. Política de citas existentes pendiente. |
 | Cabeceras S-30 | HTTPS local probado; política adicional aprobada por Lucía el 11-oct (§4.5 y §7, orden 1). Miguel implementa en PR #5 y Lucía verifica; ambas tareas pendientes. |
@@ -440,6 +441,8 @@ No crear un PR por cada mejora. GitHub Settings y el correo local se verifican/c
 
 | Pendiente que continúa | Cuándo / quién | Relación con B00 |
 | --- | --- | --- |
+| Permisos nuevos de Superusuario: enumerarlos expresamente. | B01 en adelante, al añadir permisos; Miguel implementa unitarias y Lucía revisa. | Observación no bloqueante: MatrizDePermisos concede hoy todo permiso nuevo automáticamente. Antes de añadir, por ejemplo, acceso clínico, listar permisos uno por uno y probar denegación de los no autorizados. No modificar ahora PR #5 ni iniciar B01. |
+| Temporales con caducidad de 24 h (opción B). | Antes de datos reales; Miguel implementa fecha/migración y unitarias, Lucía verifica. | Decisión de Lucía del 12-oct, nota posterior ADR-05. B00 conserva A con datos ficticios; no implementar B ahora ni considerar resuelto R04. |
 | CI: build, pruebas y controles; medir minutos, runner y duración (A-06). | Desde B01; Miguel configura, Lucía verifica. | Visibilidad pública ya aprobada. La medición espera a que exista CI; no está ejecutada ni autoriza B01. |
 | Funciones completas de acceso, pacientes, agenda, pago y bajas. | B01–B06 según prioridad autorizada; Miguel/Dulce implementan, Lucía prueba. | El primer avance conserva registrar y buscar pacientes desde Pacientes. B00 valida mecanismos y riesgos; no autoriza esos incrementos. |
 | Directorio como pantalla aparte, fuera de CU03. | B07, posterior al primer avance de diciembre; decisión de Dulce del 08-oct. | Lista completa de vigentes por defecto y filtro autorizado de bajas; campos y prioridad posterior por validar. No sustituye la búsqueda mínima de Pacientes. |

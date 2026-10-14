@@ -1,65 +1,51 @@
 # TherapEase — Ajustes del PR #5 · B00
 
-**Revisión: 11-oct-2026.** [PR #5](https://github.com/LuciAguilar/Therapease/pull/5), commit `7e83c3c6033c6c0df9dd15c2b751950e631c5475`. Autor: Miguel. Aprobación final: Lucía.
+**Revisión actual: 12-oct-2026.** [PR #5](https://github.com/LuciAguilar/Therapease/pull/5), commit `60e7932a953c7af72a33837b2e6347712ae423c4`, rama `b00/correcciones-pr4`. Base `709ff615`. Autor: Miguel. Aprobación final: Lucía.
 
-> **Resultado propuesto: CORREGIR menor.** Los tres ajustes de código iniciales están comprobados sobre 7e83c3c. Lucía aprobó el 11-oct la baja provisional para Usuaria y Superusuario. Miguel debe implementar ese permiso, las cabeceras y las cuatro mejoras de backend aprobadas el 11-oct, con sus unitarias, y actualizar README/AGENTS. Se comprobará su nuevo commit; B00/LCA y R04 siguen abiertos.
+> **Resultado propuesto: CORREGIR menor.** Los ajustes anteriores están implementados y las pruebas pasan. Queda alinear el mensaje genérico del 500 con Q08. Pendiente auditoría solicitada por Lucía; PR #5 y B00/LCA siguen abiertos. No iniciar todavía el PR de QA.
 
 ## 1. Alcance comprobado
 
-| Estado | Ajuste del PR #4 | Resultado |
+| Estado | Ajuste | Resultado |
 | --- | --- | --- |
-| ✅ | Filtro de auditoría Q03 | Acepta nombres completos sin distinguir mayúsculas; rechaza números y listas con comas con 400. |
-| ✅ | Permisos desde Web | El manejador consulta `IAutorizacion`; ya no llama directamente a `MatrizDePermisos`. Se crea por solicitud. |
-| ✅ | Coordinador CU04 mínimo | Está en Application, fuera de Pacientes/Citas. Consulta citas activas; conserva el bloqueo PostgreSQL y guarda baja/evento juntos. |
+| ✅ | Q03, autorización Web y CU04 mínimo | Se conservan los tres ajustes comprobados el 11-oct; arquitectura y consulta pasan de nuevo. |
+| ✅ | Baja por Usuaria y Superusuario | Matriz, autorización y unitarias del coordinador cubren ambos roles, cuenta inactiva, temporal y sesión ausente. Usuaria no administra cuentas ni consulta auditoría. Política de citas existentes sigue provisional. |
+| ✅ | Resultados de Identity | `GestorIdentidad` detiene la operación cuando Identity rechaza un cambio. Sus unitarias cubren rechazos y el orden de llamadas; la unidad de trabajo real conserva la transacción. |
+| ✅ | Ámbitos de Paciente | Colección pública de solo lectura. Guardado y recarga de dos ámbitos en PostgreSQL real correctos; sin cambios de modelo pendientes. |
+| ✅ | Cabeceras aprobadas | HTTPS real: nosniff, frame-ancestors 'none', DENY, no-referrer; no-store en contenido privado. CSS real no recibe no-store. CSP de recursos y HSTS final siguen para después. |
+| ✅ | 500 fijo sin Identity/base | API y página responden con cuerpo fijo, cabeceras y no-store al retirar SELECT de Identity. Se recuperan al devolver el permiso. **El texto aún requiere el ajuste de §2.** |
+| ✅ | README técnico | Corrige límites, excepción Web→Domain, estado del PR #4, permisos y alcance de `/salud`; conserva comandos de base, migraciones e identidad. Los 192/182 se citan como resultados históricos de 7e83c3c. |
+| ✅ | AGENTS y descripción del PR | AGENTS coincide byte por byte con `8a08307`. Descripción identifica SHA, resultados nuevos, alcance y propuestas 7–8; aprobadas por Lucía el 12-oct; el recorrido final con páginas no está implementado/probado. |
 
-La evidencia ejecutable y sus límites se registran en **B00 §4.9**. Las comprobaciones adicionales de QA son locales; no forman parte del PR de Miguel.
+**Ejecución independiente:** build Release sin errores/advertencias; **257 unitarias y 182 de integración correctas**, cero fallos/omitidas, en ejecuciones separadas. Las **9 adicionales de baja** también pasan por separado: son QA local de Lucía, fuera del PR. La comprobación HTTPS es apoyo temporal; no acredita páginas de negocio o navegador. Evidencia local identificada en las notas de revisión; no son resultados de CI.
 
-## 2. Ajuste de Miguel en este PR
+## 2. Corrección de Miguel en este PR
 
-**Miguel reúne README, permiso, cabeceras y mejoras de backend aprobadas, con sus unitarias, en la misma rama del PR #5.** Lucía revisa ese commit. B00 y el plan de pruebas se actualizan en la entrega documental de QA; no duplicar esos cambios en este PR.
-
-| Dónde | Qué corregir |
+| Dónde | Problema → cambio requerido |
 | --- | --- |
-| `README.md:155` | Quitar que la prueba automática de límites aún no existe. Ya existe y pasa sobre este commit. Enlazar el estado de B00. |
-| `README.md:162` | Añadir la excepción aprobada: Web puede usar enumeraciones y contenedores de constantes de Domain; entidades, reglas y servicios pasan por Application. AGENTS sigue siendo la fuente de reglas. |
-| `README.md:96–120` | Actualizar el estado: PR #4 fusionado y revisado por Miguel; los siete fallos anteriores están corregidos en PR #5. Se reprodujeron 192 unitarias y 182 de integración correctas, en ejecuciones separadas; no son resultados de CI. Conservar comandos y documentación técnica existentes. |
-| `src/Domain/Identidad/Reglas/MatrizDePermisos.cs` y unitarias afectadas | Autorizar `DarDeBajaPacientes` a Usuaria y Superusuario. Mantener administración de usuarios y consulta de auditoría solo para Superusuario. Corregir la unitaria que esperaba denegar la baja a Usuaria y comprobar permiso concedido/denegado, sesión ausente, cuenta inactiva y temporal pendiente. No debilitar la protección del último superusuario ni las otras reglas. |
-| `AGENTS.md`, regla de seguridad en servidor | Registrar o conservar las decisiones del 11-oct de AGENTS §2.5–§2.6 (cabeceras y paquetes aprobados), sin duplicarlas, y la baja provisional para Usuaria y Superusuario, con autorización de servidor, evento atómico y protección de citas activas. Dulce valida la política operativa con la usuaria. No presentar esta aprobación como implementación comprobada. |
+| `src/Web/Configuracion/ManejadorDeErroresInesperados.cs:9` | El mensaje dice «Intenta de nuevo» para cualquier excepción. Un fallo puede ocurrir después de confirmar un guardado; repetir sin consultar puede duplicar o repetir cambios (Q08, 08B S5). Quitar esa invitación. Usar texto neutral o avisar que hay que comprobar el registro antes de repetir un cambio cuyo resultado no pudo confirmarse. Conservar cuerpo fijo, ausencia de detalles y funcionamiento sin Identity/base. |
+| `tests/TherapEase.UnitTests/Web/ManejadorDeErroresInesperadosTests.cs` | Añadir una comprobación del mensaje que evite recomendar repetir a ciegas, para JSON y HTML. Repetir las pruebas afectadas y actualizar SHA/resultados en la descripción. |
 
-**Al subir el nuevo commit:** Miguel actualiza la descripción del PR con SHA y resultados reales; Codex comprueba el cambio y repite las pruebas afectadas. Los 192/182 y nueve adicionales registrados corresponden a la versión anterior 7e83c3c, no acreditan todavía el permiso ampliado.
+**No cambiar la migración ni relajar permisos.** Miguel corrige en su misma rama del PR #5. B00 y plan se consolidan en la entrega de Lucía, después del veredicto; las pruebas de QA se incorporarán cuando ella lo indique.
 
-**En la descripción del PR #5, Miguel presenta por escrito las propuestas de B00 §7, órdenes 7–8:** cómo verificar la identidad y entregar contraseñas temporales de forma segura (incluida respuesta perdida y repetición que invalida la anterior), y cómo accede el operador autenticado a la consulta Q03. Sin secretos en registros, JWT ni acceso sin autenticación. Son propuestas pendientes de decisión de Lucía; no se dan por aprobadas con los paquetes siguientes.
+## 3. Propuestas presentadas y precisiones
 
-**Textos de referencia para el ajuste:**
+| Orden / tema | Situación |
+| --- | --- |
+| **7 — temporales** | **Aprobado por Lucía el 12-oct:** puntos 1–4, caducidad A para B00 ficticio, B de 24 h antes de datos reales. Verificación por canal conocido, entrega única autorizada sin registros, restablecimiento nuevo ante respuesta perdida sin reintento automático, CU11 y revocación acordados. Regla en AGENTS §2.2. La entrega desde páginas sigue pendiente; no implementar B ahora. |
+| Precisión de la propuesta 7 | «Quedan dos eventos» solo si el primer intento confirmó el cambio. Si falló antes del commit y se revirtió, el nuevo intento exitoso deja uno. Conservar esta precisión en la descripción y en las pruebas; la aprobación no implica dos eventos ante cualquier 500. |
+| **8 — acceso Q03** | **Aprobado por Lucía el 12-oct: opción A, navegador autenticado.** Superusuario con sesión/permiso vigente; abre la consulta en la misma ventana. Regla en AGENTS §2.3. Script B no incluido. Falta acceso/cierre de sesión de Dulce y prueba final; sin JWT, acceso anónimo ni conexión directa que eluda permisos. |
+| Precisión de caché | El middleware propio no añade no-store a rutas anónimas; `/salud` sí lo emite por el framework y `/Error` por ResponseCache. Aclarar el comentario de `CabecerasDeSeguridad.cs:39` y el README si se describe la respuesta final. No es un fallo de las cabeceras ni se debe retirar esa protección. |
+| Enlace de Dulce en README §9 | «Informe §8» corresponde al informe PR01, no a este PR05 (que tiene cuatro secciones). Conviene añadir el enlace/nombre explícito. |
 
-- Encabezado de dependencias: «Dependencias permitidas según AGENTS §1. Las 30 pruebas automáticas de límites pasan sobre el commit revisado del PR #5; el recorrido sobre páginas funcionales sigue pendiente».
-- Fila Web: «Application; Domain solo para enumeraciones y contenedores de constantes sin lógica; Infrastructure solo para componer dependencias en el arranque».
-- Estado de QA: «PR #4 revisado por Miguel y fusionado. Sobre `7e83c3c` del PR #5: 192 unitarias y 182 de integración correctas, en ejecuciones separadas. Los siete fallos anteriores están corregidos; PR #5 sigue pendiente de aprobación/fusión. E2E espera las páginas de Dulce».
+## 4. Mejoras aprobadas — incluidas en la entrega
 
-## 3. Decisión aprobada y política pendiente
+Decisión de Lucía del 11-oct: órdenes 1–3 aprobados completos. Se conserva la separación de autores y revisión humana.
 
-| Tema | Implementación actual | Quién resuelve |
+| Quién | Alcance aprobado | Estado / entrega |
 | --- | --- | --- |
-| `DarDeBajaPacientes` | **Aprobado por Lucía el 11-oct: Usuaria y Superusuario, provisionalmente.** El commit revisado aún permite solo Superusuario. | Miguel implementa y prueba en PR #5; Lucía verifica/aprueba el PR. Dulce valida la política operativa con la usuaria. |
-| Citas existentes al dar de baja | Rechaza la baja; no cancela citas automáticamente. | Dulce valida la política y Lucía decide. Conservar la protección aprobada: nunca cita activa de paciente de baja. |
+| Miguel | Cinco cabeceras: `X-Content-Type-Options: nosniff`, `Content-Security-Policy: frame-ancestors 'none'`, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`, `Cache-Control: no-store` en contenido privado. | ✅ Incluido en PR #5; comprobación HTTPS real. Navegador posterior; no-store no se impone al CSS. |
+| Miguel | Comprobar resultados de Identity; 500 fijo independiente; ámbitos de solo lectura; aclarar `/salud`. | ✅ Incluidos en PR #5. ⏳ Mensaje del 500, §2, y aprobación/fusión. |
+| Lucía | Arranque de QA tolerante al tiempo de espera agotado; contenido del evento HTTP restaurado; documentar `crear-roles.sql` porque pg_dump no copia usuarios. | ⏳ Próximo PR conjunto de QA, con baja/cabeceras y revisión de Miguel o Dulce. No iniciado en esta revisión. |
 
-**Alcance aprobado:** únicamente el permiso de baja de pacientes para ambos roles. No concede administración de usuarios ni consulta de auditoría a Usuaria. Mantener controles de servidor, evento obligatorio y protección ante citas activas. No resuelve automáticamente qué hacer con las citas existentes al solicitar la baja.
-
-## 4. Mejoras y cabeceras aprobadas — incluidas en la entrega
-
-**Decisión de Lucía, 11-oct-2026: órdenes 1–3 aprobados completos.** Miguel incluye cabeceras y las cuatro mejoras de backend en **este PR #5**. Lucía agrupa las tres mejoras de QA con sus pruebas en **su próximo PR conjunto**, revisado por Miguel o Dulce. La aprobación del alcance no acredita implementación, ejecución ni fusión.
-
-| Quién | Cambio aprobado | Entrega / estado |
-| --- | --- | --- |
-| Miguel | `X-Content-Type-Options: nosniff`, `Content-Security-Policy: frame-ancestors 'none'`, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer` y `Cache-Control: no-store` en contenido privado. CSP de recursos se completa con las páginas; HSTS final se decide al desplegar. | **Incluido en este PR #5.** Implementar y añadir unitarias; Lucía verifica cabeceras reales en su QA. |
-| Miguel | Comprobar resultados de `UpdateAsync`, `AddToRoleAsync`, `RemovePasswordAsync` y operaciones relacionadas de Identity; no confirmar una operación rechazada. | **Incluido en este PR #5.** Implementación y unitarias pendientes. |
-| Miguel | Error 500 con respuesta genérica fija, independiente de Identity/base de datos y sin datos privados. | **Incluido en este PR #5.** Implementación y unitarias pendientes. |
-| Miguel | Ámbitos de Paciente como colección de solo lectura. | **Incluido en este PR #5.** Implementación y unitarias pendientes. |
-| Miguel | Aclarar que `/salud` comprueba el proceso, no la disponibilidad de PostgreSQL. | **Incluido en este PR #5.** Documentación técnica pendiente. |
-| Lucía | Arranque del servidor de pruebas más tolerante al tiempo de espera agotado. | **Incluido en su próximo PR conjunto de QA.** Miguel reprodujo el problema en PR #4; no ocurrió en la última ejecución. |
-| Lucía | Comprobar contenido del evento HTTP restaurado además del 200. | **Incluido en su próximo PR conjunto de QA.** Implementación y ejecución pendientes. |
-| Lucía | Documentar `crear-roles.sql` para servidor nuevo: `pg_dump` no copia usuarios de PostgreSQL. | **Incluido en su próximo PR conjunto de QA.** Documentación pendiente. |
-
-**Recomendación personal restante:** cada autor puede usar correo noreply en futuros commits; no implica reescribir el historial publicado.
-
-Los pendientes compartidos y responsables se mantienen en **B00 §6–§7**. Las propuestas de los órdenes 7–8 van en la descripción del PR #5 (§2); requieren decisión posterior de Lucía. Páginas, producto y cierre B00/LCA continúan pendientes.
+**Otros pendientes:** ejecución final de los procedimientos 7–8 ya aprobados, producto/PageModel con Dulce, QA restante y decisión B00/LCA. Miguel puede corregir §2 sin esperar páginas; después revisar la entrega de QA cuando Lucía la presente. No adelantar B01 ni nube. Correo noreply sigue como recomendación personal, sin reescribir historial.

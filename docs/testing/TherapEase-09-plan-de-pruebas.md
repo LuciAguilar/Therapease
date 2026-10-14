@@ -58,13 +58,14 @@ Evidencia detallada: [Identity](TherapEase-09-B00-evidencia-identidad.md), [recu
 | ⏳ | Incorporación y revisión humana de las nueve adicionales | Miguel o Dulce revisa; no acreditar revisión por la de PR #4. |
 | ⏳ | Implementar permiso aprobado, actualizar README/AGENTS y aprobar PR #5 | Lucía aprobó el 11-oct Usuaria y Superusuario como provisional. Miguel implementa y prueba; Lucía revisa el nuevo commit. |
 | ✅ | Decisiones de Lucía del 11-oct, órdenes 1–3 de B00 §7 | Cabeceras y cuatro mejoras de backend incluidas en PR #5; tres mejoras de QA incluidas en el próximo PR conjunto de Lucía. Implementación, pruebas y revisión siguen ⏳. Reglas en AGENTS §2.5–§2.6. |
+| ✅ | Secret Protection y Push protection de GitHub | Captura aportada por Lucía el 12-oct: ambos botones Disable. Configuración activada; no prueba de bloqueo, ni revisión actual de main, ni garantía de ausencia de secretos. B00 §7, orden 10. |
 | ⏳ | Cobertura restante B00 | Páginas/navegador, temporales, Q03, cabeceras/secretos. B00 §7 ordena las propuestas, dependencias y entregas: mejoras de Miguel en PR #5 y un próximo PR conjunto de QA de Lucía; sin PR por cada punto. B00/LCA/R04 siguen abiertos. |
 
 El seguimiento 0.1 conserva las ejecuciones del 08–10-oct como historia. Los fallos de arquitectura/Q03 allí citados ya no son el resultado vigente. No se marcan completas las pruebas de páginas u operaciones aún inexistentes.
 
 ## 0.3. Correspondencia del QA adicional de CU04 — PR #5
 
-**Archivo actual:** `BajaPacientePr05RevisionTests.cs`, preparado por Codex para QA de Lucía en la copia local de revisión. **Temporal, sin commit y fuera del PR #5.** Sus nueve casos concretan requisitos ya contemplados; no crean una funcionalidad nueva ni sustituyen los recorridos completos siguientes.
+**Archivo actual:** `BajaPacienteTests.cs`, preparado por Codex para QA de Lucía en la copia local de revisión. **Temporal, sin commit y fuera del PR #5.** Sus nueve casos concretan requisitos ya contemplados; no crean una funcionalidad nueva ni sustituyen los recorridos completos siguientes.
 
 | Estado de ejecución local | Casos del archivo | Caso/requisito ya previsto | Alcance que falta |
 | --- | --- | --- | --- |
@@ -74,6 +75,7 @@ El seguimiento 0.1 conserva las ejecuciones del 08–10-oct como historia. Los f
 | ✅ | Fallo real al insertar auditoría: 1 caso | Q03; regla de cambio/evento atómicos, B00 §7 paso 2 | Se revierte la baja. No acredita atomicidad de todas las operaciones restantes. |
 | ✅ | Respuesta perdida después de confirmar y nueva solicitud: 1 caso | L-CU04-02; Q08 | No duplica baja/evento. Interrupción simulada tras commit, no corte HTTP/navegador. |
 | ✅ | Baja primero y cita simultánea que espera el bloqueo: 1 caso | L-CU04-06 | PostgreSQL rechaza la cita. Falta el recorrido por servicio de reservas y repetición ampliada del caso completo. |
+| ✅ | Renombrar archivo y clase a `BajaPacienteTests` | Ajuste de nombre solicitado por Lucía el 12-oct | Comentarios y lógica conservados; el archivo sigue local, fuera del PR #5. |
 | ⏳ | Incorporar el archivo como `BajaPacienteTests.cs` | QA de Lucía, revisión humana de Miguel o Dulce | Aplicar/conservar comentarios y subir en un PR de Lucía, separado del #5 de Miguel. No se crea rama ni PR en este paso. |
 
 Los identificadores de la sección 3 conservan ⏳ si su alcance completo aún falta, aunque una parte tenga ejecución ✅ aquí. La prueba automática de arquitectura verifica ubicación y dependencias; estas nueve comprueban además el comportamiento real del coordinador.
@@ -401,3 +403,5 @@ Referencia: OWASP Top 10:2025, ASVS 5.0 aplicable y 07B. «Todas las rutas» = l
 | ¿Qué campos son información relevante del directorio? | D-15, L-CU03-05–06 | Dulce con la usuaria |
 | Resuelto el 01-oct: consulta técnica sin pantalla de B00 para superusuario activo aprobada | L-Q03-03–04, S-22–S-24 | Lucía aprobó y prueba; Miguel implementa y revisa las pruebas de Lucía |
 | Resuelto el 11-oct: baja provisional de pacientes para Usuaria y Superusuario; otros permisos no se amplían | CU04, Q01; pruebas de autorización del permiso nuevo | Lucía aprobó; Miguel implementa y prueba en PR #5. Dulce valida la política operativa con la usuaria. |
+| Resuelto el 12-oct: temporales, orden 7 puntos 1–4; A para B00 ficticio, B de 24 h antes de datos reales | CU02, CU11, Q08/Q19 | Lucía aprobó; entrega/interfaz y prueba final pendientes; B no se implementa ahora |
+| Resuelto el 12-oct: Q03 por navegador autenticado, orden 8 opción A; script B no incluido | L-Q03-03–04, S-22–S-24 | Lucía aprobó; acceso/cierre de sesión de Dulce y prueba final pendientes |
