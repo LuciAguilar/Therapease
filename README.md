@@ -93,13 +93,15 @@ El PR #1 fusionado ya incluye solución, `.csproj`, migraciones y aplicación m�
 
 ## 9. Estado y entrega de B00
 
-T1 está publicado; PR #1 y PR #3 ya están fusionados; main de referencia: `8baf8fb`. La protección de main con una revisión se comprobó el 03-oct; la protección contra secretos sigue sin verificar.
+T1 está publicado; PR #1, PR #3 y PR #4 ya están fusionados; main de referencia: `709ff61`. La protección de main con una revisión se comprobó el 03-oct; la protección contra secretos sigue sin verificar.
 
-**[PR #4](https://github.com/LuciAguilar/Therapease/pull/4), rama `revision/etapa09`:** entrega conjunta de QA para revisión de Miguel. Incluye Identity, recuperación local, arquitectura, horas/Docker, HTTPS, API Q03, interrupciones Q08 y errores/registros. Los resultados por bloque están en [B00 §4](docs/planning/TherapEase-etapa09-B00.md#4-evidencia-registrada-y-límites); son ejecuciones locales, no CI ni una nueva ejecución conjunta. Quedan **siete fallos conocidos**: dos de arquitectura y cinco del filtro Q03. Se conservan visibles hasta corregir el código.
+**[PR #4](https://github.com/LuciAguilar/Therapease/pull/4), rama `revision/etapa09`:** entrega conjunta de QA, revisada por Miguel y fusionada. Incluye Identity, recuperación local, arquitectura, horas/Docker, HTTPS, API Q03, interrupciones Q08 y errores/registros. Los resultados por bloque están en [B00 §4](docs/planning/TherapEase-etapa09-B00.md#4-evidencia-registrada-y-límites); son ejecuciones locales, no CI.
+
+**[PR #5](https://github.com/LuciAguilar/Therapease/pull/5), rama `b00/correcciones-pr4`:** correcciones de Miguel con unitarias propias. Sobre `7e83c3c`: 192 unitarias y 182 de integración correctas, en ejecuciones separadas; los siete fallos anteriores están corregidos. PR #5 sigue pendiente de aprobación/fusión. E2E espera las páginas de Dulce. El estado vigente de B00 está en [B00 §4](docs/planning/TherapEase-etapa09-B00.md#4-evidencia-registrada-y-límites).
 
 | Quién | Qué debe consultar y atender |
 | --- | --- |
-| Miguel | [Informe de ajustes](docs/reviews/TherapEase-09-B00-revision-PR01.md): §6–§7 obligatorios, §9 opcional. Revisar las pruebas de Lucía, corregir su código con unitarias propias y registrar resultados. Los ajustes históricos de §2 ya están resueltos. |
+| Miguel | Ajustes del PR #5 (informe de Lucía, §2–§4): permiso de baja ampliado, cabeceras y mejoras de backend aprobadas, con unitarias propias en la misma rama. Las propuestas sobre contraseñas temporales y acceso a Q03 van en la descripción del PR. |
 | Dulce | Informe §8: mensajes ante rechazo conocido, resultado incierto y restablecimiento repetido; PageModel, unitarias y pendientes de producto. |
 | Equipo | [B00 §6–§7](docs/planning/TherapEase-etapa09-B00.md#6-siguientes-pasos-compartidos): tareas, responsables y dependencias; [AGENTS](AGENTS.md): reglas obligatorias. Cada persona puede avanzar en las tareas independientes de su alcance. |
 
@@ -117,7 +119,7 @@ dotnet test TherapEase.sln
 dotnet run --project src/Web
 ```
 
-La aplicación escucha en `http://localhost:5052` y expone `/salud`. IntegrationTests contiene los bloques de QA de B00 §4.1–§4.8, pendientes de revisión humana/fusión; hay siete fallos conocidos de arquitectura/Q03. Los 50 casos de Identity/recuperación corresponden a la ejecución del 08-oct. E2ETests sigue sin pruebas; espera los recorridos con las páginas de Dulce.
+La aplicación escucha en `http://localhost:5052` y expone `/salud`, que solo comprueba que el proceso está encendido: puede responder 200 aunque PostgreSQL no esté disponible, así que no demuestra que el acceso a datos funcione. IntegrationTests contiene los bloques de QA de B00 §4.1–§4.8 (PR #4, fusionado); sus resultados están en [B00 §4](docs/planning/TherapEase-etapa09-B00.md#4-evidencia-registrada-y-límites). E2ETests sigue sin pruebas; espera los recorridos con las páginas de Dulce.
 
 Imagen Docker (requiere Docker Desktop; salud y usuario sin privilegios se declaran en el `Dockerfile`):
 
@@ -148,18 +150,22 @@ dotnet run --project src/Web -- --crear-superusuario <nombre-de-usuario>
 dotnet run --project src/Web -- --restablecer-superusuario <nombre-de-usuario>
 ```
 
-El segundo comando es la recuperación cuando ningún superusuario puede entrar; como todo restablecimiento de contraseña, conserva el bloqueo vigente en lugar de levantarlo (cinco fallos bloquean como máximo 15 minutos). La cookie de sesión es `HttpOnly`, `Secure` y `SameSite=Lax`; cada solicitud revalida el sello y el estado del usuario contra la base, y todo lo que no declare otra política exige sesión válida.
+El segundo comando es la recuperación cuando ningún superusuario puede entrar; como todo restablecimiento de contraseña, conserva el bloqueo vigente en lugar de levantarlo (cinco fallos bloquean como máximo 15 minutos). La cookie de sesión es `HttpOnly`, `Secure` y `SameSite=Lax`; cada solicitud revalida el sello y el estado del usuario contra la base, y todo lo que no declare otra política exige sesión válida. Si Identity rechaza una operación (rol, sello, contraseña, contador de intentos), la operación se detiene y no se confirma. Permisos: administrar usuarios y consultar la auditoría son solo del Superusuario; dar de baja pacientes es de Usuaria y Superusuario, decisión provisional de Lucía del 11-oct que Dulce valida con la usuaria. La autorización se resuelve en el servidor con `IAutorizacion` y exige sesión válida, cuenta activa y sin contraseña temporal pendiente.
 
-**Consulta técnica de auditoría (Q03, sin pantalla).** Solo lectura, solo superusuario activo con sesión vigente: `GET /api/auditoria/eventos?desde=<instante>&hasta=<instante>` con opcionales `tipoRegistro` (`Paciente`, `Cita`, `Usuario`), `idRegistro` y `limite` (1 a 500, 100 por defecto). Los instantes llevan zona, por ejemplo `2026-10-01T00:00:00Z`; sin zona se rechazan. Responde `401` sin sesión, `403` sin permiso y `400` ante un filtro inválido. Devuelve en JSON el actor, el momento, el registro y los campos afectados, la acción y el hecho, nunca valores. El comando que inicia sesión y llama a este servicio queda pendiente de que existan las pantallas de acceso: Dulce implementa los `PageModel` y escribe sus unitarias en el mismo PR.
+**Cabeceras de seguridad y errores.** Toda respuesta lleva `X-Content-Type-Options: nosniff`, `Content-Security-Policy: frame-ancestors 'none'`, `X-Frame-Options: DENY` y `Referrer-Policy: no-referrer`. El contenido que exige sesión lleva además `Cache-Control: no-store`; no se aplica a los archivos estáticos ni a `/salud`, que son anónimos. Las demás restricciones de CSP se completan con las páginas y la duración de HSTS se decide al desplegar. Fuera de Development, una excepción no controlada recibe un 500 con cuerpo fijo (JSON en `/api`, HTML mínimo en las páginas) que no consulta Identity ni la base y no incluye datos de la excepción, de la solicitud ni del usuario.
 
-**Dependencias entre proyectos permitidas** (regla acordada; hoy ninguna prueba automática la verifica, porque la prueba de límites de Lucía aún no existe):
+**Consulta técnica de auditoría (Q03, sin pantalla).** Solo lectura, solo superusuario activo con sesión vigente: `GET /api/auditoria/eventos?desde=<instante>&hasta=<instante>` con opcionales `tipoRegistro` (`Paciente`, `Cita`, `Usuario`; solo nombres completos, sin distinguir mayúsculas: números y listas con comas devuelven `400`), `idRegistro` y `limite` (1 a 500, 100 por defecto). Los instantes llevan zona, por ejemplo `2026-10-01T00:00:00Z`; sin zona se rechazan. Responde `401` sin sesión, `403` sin permiso y `400` ante un filtro inválido. Devuelve en JSON el actor, el momento, el registro y los campos afectados, la acción y el hecho, nunca valores. El comando que inicia sesión y llama a este servicio queda pendiente de que existan las pantallas de acceso: Dulce implementa los `PageModel` y escribe sus unitarias en el mismo PR.
+
+**Dependencias permitidas según [AGENTS](AGENTS.md) §1.** Las 30 pruebas automáticas de límites pasan sobre el commit revisado del PR #5; el recorrido sobre páginas funcionales sigue pendiente. Estado de B00: [B00 §4](docs/planning/TherapEase-etapa09-B00.md#4-evidencia-registrada-y-límites).
 
 | Proyecto | Puede referenciar |
 | --- | --- |
 | `TherapEase.Domain` | nada |
 | `TherapEase.Application` | Domain |
 | `TherapEase.Infrastructure` | Application, Domain |
-| `TherapEase.Web` | Application; Infrastructure solo para componer la inyección de dependencias en el arranque |
+| `TherapEase.Web` | Application; Domain solo para enumeraciones y contenedores de constantes sin lógica; Infrastructure solo para componer dependencias en el arranque |
+
+Excepción aprobada por Lucía el 08-oct: Web puede usar enumeraciones y contenedores de constantes de Domain; entidades, reglas y servicios de Domain pasan siempre por Application. [AGENTS](AGENTS.md) sigue siendo la fuente de las reglas.
 
 **Estructura de carpetas.** Cada capa se organiza primero por módulo (Identidad, Pacientes, Citas, Auditoria y lo común en `Compartido`), porque `AGENTS.md` y ADR-03 piden módulos por capacidad; el espacio de nombres sigue el patrón `TherapEase.<Capa>.<Módulo>`, por ejemplo `TherapEase.Application.Pacientes`. Dentro de cada módulo, el código se separa por tipo y el espacio de nombres sigue la carpeta:
 
@@ -176,4 +182,4 @@ El segundo comando es la recuperación cuando ningún superusuario puede entrar;
 | Infrastructure | `Data`, `Migraciones`, `Configuracion` | Contexto de EF, migraciones y registro de dependencias (no pertenecen a un módulo). |
 | Web | `Pages`, `Endpoints`, `Seguridad`, `Comandos`, `Configuracion`, `Salud` | Pantallas, rutas técnicas, cookie y políticas, comandos de operador, composición y sonda de salud. |
 
-Los setters de las entidades son `internal`: solo las clases de `Reglas` del propio dominio las modifican, así ninguna otra capa salta una regla. El coordinador de CU04 va en `TherapEase.Application.Coordinadores`, fuera de Pacientes y Citas. Citas puede usar el contrato público de Pacientes; Pacientes no usa Citas; Identidad usa Auditoría y Auditoría no usa Identidad.
+Los setters de las entidades son `internal`: solo las clases de `Reglas` del propio dominio las modifican, así ninguna otra capa salta una regla. Los ámbitos de un paciente se exponen como colección de solo lectura. El coordinador de CU04 va en `TherapEase.Application.Coordinadores`, fuera de Pacientes y Citas. Citas puede usar el contrato público de Pacientes; Pacientes no usa Citas; Identidad usa Auditoría y Auditoría no usa Identidad.

@@ -43,7 +43,7 @@ public static class ConfiguracionDeSeguridad
             opciones.Cookie.SameSite = SameSiteMode.Strict;
         });
 
-        servicios.AddSingleton<IAuthorizationHandler, ManejadorDeRequisitoDePermiso>();
+        servicios.AddScoped<IAuthorizationHandler, ManejadorDeRequisitoDePermiso>();
         servicios.AddAuthorizationBuilder()
             .SetFallbackPolicy(PoliticaDeAccesoOperativo())
             .AddPolicy(PoliticasDeAutorizacion.AccesoOperativo, PoliticaDeAccesoOperativo())

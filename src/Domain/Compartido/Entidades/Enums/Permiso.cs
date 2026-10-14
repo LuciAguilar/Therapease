@@ -4,5 +4,8 @@ namespace TherapEase.Domain.Compartido.Entidades.Enums;
 public enum Permiso
 {
     AdministrarUsuarios,
-    ConsultarAuditoria
+    ConsultarAuditoria,
+
+    // Usuaria y superusuario, provisionalmente (decisión de Lucía, 11-oct-2026); Dulce valida la política operativa con la usuaria.
+    DarDeBajaPacientes
 }

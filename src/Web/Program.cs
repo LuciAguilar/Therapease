@@ -29,9 +29,11 @@ builder.Services.ConfigureHttpJsonOptions(opciones => opciones.SerializerOptions
 
 var app = builder.Build();
 
+app.UsarCabecerasDeSeguridad();
+
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error");
+    app.UsarRespuestaDeErrorGenerica();
     app.UseHsts();
 }
 

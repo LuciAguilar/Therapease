@@ -9,6 +9,8 @@ public class Paciente : EntidadAuditable
     public const int LongitudMaximaNombre = 200;
     public const int LongitudMaximaContacto = 200;
 
+    private readonly List<PacienteAmbito> _ambitos = [];
+
     internal Paciente()
     {
     }
@@ -23,5 +25,8 @@ public class Paciente : EntidadAuditable
 
     public int Version { get; internal set; }
 
-    public ICollection<PacienteAmbito> Ambitos { get; } = new List<PacienteAmbito>();
+    // Hacia afuera es de solo lectura: los ámbitos cambian únicamente mediante ReglasDePaciente. EF Core llena el campo por convención.
+    public IReadOnlyCollection<PacienteAmbito> Ambitos => _ambitos.AsReadOnly();
+
+    internal ICollection<PacienteAmbito> AmbitosEditables => _ambitos;
 }
