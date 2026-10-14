@@ -63,9 +63,23 @@ Evidencia detallada: [Identity](TherapEase-09-B00-evidencia-identidad.md), [recu
 
 El seguimiento 0.1 conserva las ejecuciones del 08–10-oct como historia. Los fallos de arquitectura/Q03 allí citados ya no son el resultado vigente. No se marcan completas las pruebas de páginas u operaciones aún inexistentes.
 
+## 0.4. Actualización de QA — 13-oct-2026
+
+| Estado | Alcance | Resultado / pendiente |
+| --- | --- | --- |
+| ✅ | PR #5 bce9409 | 258 unitarias y 182 integración, 0 fallos/omitidas; compilación Release sin errores/advertencias. Mensaje 500 corregido. |
+| ✅ | BajaPacienteTests: 14 casos | Nueve anteriores más Usuaria/Superusuario, con/sin temporal y sesión ausente. Guardado/evento reales y concurrencia conservados. L-CU04, Q03/Q07/Q08/Q20; cobertura de servidor, no página. |
+| ✅ | CabecerasSeguridadTests: 9 casos | S-30 y apoyo Q04/Q08/Q19: cabeceras reales, caché privada, estático, fallo de Identity JSON/HTML y recuperación. No sustituye navegador/CSP de recursos. |
+| ✅ | Tres mejoras de QA | Arranque con timeout tolerado, evento restaurado comprobado en HTTP, documentación de crear-roles.sql para un destino nuevo. Recuperación: 13 casos correctos. |
+| ⏳ | Revisión y fusión de QA nuevo | Miguel o Dulce revisa; Lucía decide. La aprobación de PR #4 no acredita revisión de esta ampliación. |
+| ⏳ | Páginas, navegador y producto | Mantener los casos completos pendientes; detalles y responsables en B00 §7. |
+| ✅ | Avance a Construcción/B01 | Autorizado por Lucía el 13-oct, con datos ficticios y pendientes B00/LCA visibles; no declara cierre de B00/LCA, datos reales ni nube. |
+
+Esta sección prevalece sobre estados históricos 0.1–0.3. Pruebas comentadas según el skill del proyecto. Ejecuciones locales, no CI.
+
 ## 0.3. Correspondencia del QA adicional de CU04 — PR #5
 
-**Archivo actual:** `BajaPacienteTests.cs`, preparado por Codex para QA de Lucía en la copia local de revisión. **Temporal, sin commit y fuera del PR #5.** Sus nueve casos concretan requisitos ya contemplados; no crean una funcionalidad nueva ni sustituyen los recorridos completos siguientes.
+**Archivo actual:** `BajaPacienteTests.cs`, preparado por Codex para QA de Lucía en la copia local de revisión. **Fuera del PR #5; incorporado a la entrega de QA de Lucía del 13-oct, con 14 casos.** Los nueve casos originales concretan requisitos ya contemplados; no crean una funcionalidad nueva ni sustituyen los recorridos completos siguientes.
 
 | Estado de ejecución local | Casos del archivo | Caso/requisito ya previsto | Alcance que falta |
 | --- | --- | --- | --- |
@@ -76,7 +90,7 @@ El seguimiento 0.1 conserva las ejecuciones del 08–10-oct como historia. Los f
 | ✅ | Respuesta perdida después de confirmar y nueva solicitud: 1 caso | L-CU04-02; Q08 | No duplica baja/evento. Interrupción simulada tras commit, no corte HTTP/navegador. |
 | ✅ | Baja primero y cita simultánea que espera el bloqueo: 1 caso | L-CU04-06 | PostgreSQL rechaza la cita. Falta el recorrido por servicio de reservas y repetición ampliada del caso completo. |
 | ✅ | Renombrar archivo y clase a `BajaPacienteTests` | Ajuste de nombre solicitado por Lucía el 12-oct | Comentarios y lógica conservados; el archivo sigue local, fuera del PR #5. |
-| ⏳ | Incorporar el archivo como `BajaPacienteTests.cs` | QA de Lucía, revisión humana de Miguel o Dulce | Aplicar/conservar comentarios y subir en un PR de Lucía, separado del #5 de Miguel. No se crea rama ni PR en este paso. |
+| ✅ | Incorporar el archivo como `BajaPacienteTests.cs` | QA de Lucía, revisión humana de Miguel o Dulce | Aplicar/conservar comentarios y subir en un PR de Lucía, separado del #5 de Miguel. No se crea rama ni PR en este paso. |
 
 Los identificadores de la sección 3 conservan ⏳ si su alcance completo aún falta, aunque una parte tenga ejecución ✅ aquí. La prueba automática de arquitectura verifica ubicación y dependencias; estas nueve comprueban además el comportamiento real del coordinador.
 

@@ -1,8 +1,8 @@
 # TherapEase — Ajustes del PR #5 · B00
 
-**Revisión actual: 12-oct-2026.** [PR #5](https://github.com/LuciAguilar/Therapease/pull/5), commit `60e7932a953c7af72a33837b2e6347712ae423c4`, rama `b00/correcciones-pr4`. Base `709ff615`. Autor: Miguel. Aprobación final: Lucía.
+**Revisión actual: 13-oct-2026.** [PR #5](https://github.com/LuciAguilar/Therapease/pull/5), commit `bce94091ba614e16f4cce3435697d8c58c2a31ff`, rama `b00/correcciones-pr4`. Base `709ff615`. Autor: Miguel. Aprobación final: Lucía.
 
-> **Resultado propuesto: CORREGIR menor.** Los ajustes anteriores están implementados y las pruebas pasan. Queda alinear el mensaje genérico del 500 con Q08. Pendiente auditoría solicitada por Lucía; PR #5 y B00/LCA siguen abiertos. No iniciar todavía el PR de QA.
+> **Resultado de revisión: sin bloqueantes de código.** El 500 ya pide comprobar si se guardó antes de repetir. Build Release correcto, 258 unitarias y 182 integración correctas; aprobación formal/fusión de PR #5 pendientes en GitHub. Lucía autorizó preparar el PR de QA y avanzar B01 con pendientes B00/LCA visibles.
 
 ## 1. Alcance comprobado
 
@@ -13,20 +13,20 @@
 | ✅ | Resultados de Identity | `GestorIdentidad` detiene la operación cuando Identity rechaza un cambio. Sus unitarias cubren rechazos y el orden de llamadas; la unidad de trabajo real conserva la transacción. |
 | ✅ | Ámbitos de Paciente | Colección pública de solo lectura. Guardado y recarga de dos ámbitos en PostgreSQL real correctos; sin cambios de modelo pendientes. |
 | ✅ | Cabeceras aprobadas | HTTPS real: nosniff, frame-ancestors 'none', DENY, no-referrer; no-store en contenido privado. CSS real no recibe no-store. CSP de recursos y HSTS final siguen para después. |
-| ✅ | 500 fijo sin Identity/base | API y página responden con cuerpo fijo, cabeceras y no-store al retirar SELECT de Identity. Se recuperan al devolver el permiso. **El texto aún requiere el ajuste de §2.** |
+| ✅ | 500 fijo sin Identity/base | API y página responden con cuerpo fijo, cabeceras y no-store al retirar SELECT de Identity. Se recuperan al devolver el permiso. **Mensaje corregido y comprobado en bce9409.** |
 | ✅ | README técnico | Corrige límites, excepción Web→Domain, estado del PR #4, permisos y alcance de `/salud`; conserva comandos de base, migraciones e identidad. Los 192/182 se citan como resultados históricos de 7e83c3c. |
 | ✅ | AGENTS y descripción del PR | AGENTS coincide byte por byte con `8a08307`. Descripción identifica SHA, resultados nuevos, alcance y propuestas 7–8; aprobadas por Lucía el 12-oct; el recorrido final con páginas no está implementado/probado. |
 
-**Ejecución independiente:** build Release sin errores/advertencias; **257 unitarias y 182 de integración correctas**, cero fallos/omitidas, en ejecuciones separadas. Las **9 adicionales de baja** también pasan por separado: son QA local de Lucía, fuera del PR. La comprobación HTTPS es apoyo temporal; no acredita páginas de negocio o navegador. Evidencia local identificada en las notas de revisión; no son resultados de CI.
+**Ejecución independiente:** build Release sin errores/advertencias; **258 unitarias y 182 de integración correctas**, cero fallos/omitidas, en ejecuciones separadas. Las **9 adicionales de baja** también pasan por separado: son QA local de Lucía, fuera del PR. La comprobación HTTPS es apoyo temporal; no acredita páginas de negocio o navegador. Evidencia local identificada en las notas de revisión; no son resultados de CI.
 
-## 2. Corrección de Miguel en este PR
+## 2. Correcciones verificadas
 
-| Dónde | Problema → cambio requerido |
+| Estado | Archivo / resultado |
 | --- | --- |
-| `src/Web/Configuracion/ManejadorDeErroresInesperados.cs:9` | El mensaje dice «Intenta de nuevo» para cualquier excepción. Un fallo puede ocurrir después de confirmar un guardado; repetir sin consultar puede duplicar o repetir cambios (Q08, 08B S5). Quitar esa invitación. Usar texto neutral o avisar que hay que comprobar el registro antes de repetir un cambio cuyo resultado no pudo confirmarse. Conservar cuerpo fijo, ausencia de detalles y funcionamiento sin Identity/base. |
-| `tests/TherapEase.UnitTests/Web/ManejadorDeErroresInesperadosTests.cs` | Añadir una comprobación del mensaje que evite recomendar repetir a ciegas, para JSON y HTML. Repetir las pruebas afectadas y actualizar SHA/resultados en la descripción. |
+| ✅ | ManejadorDeErroresInesperados.cs y Error.cshtml: «Ocurrió un error. Si estabas guardando algo, revisa si se guardó antes de repetirlo.». Cuerpo fijo sin Identity/base ni datos privados. |
+| ✅ | ManejadorDeErroresInesperadosTests: comprueba JSON/HTML y ausencia de «Intenta de nuevo»; descripción del PR actualizada con SHA y resultados. |
 
-**No cambiar la migración ni relajar permisos.** Miguel corrige en su misma rama del PR #5. B00 y plan se consolidan en la entrega de Lucía, después del veredicto; las pruebas de QA se incorporarán cuando ella lo indique.
+No quedan correcciones obligatorias de código identificadas para Miguel en esta revisión. Conservar la migración y los permisos. Las precisiones de §3 no bloquean; el QA nuevo lo revisa Miguel o Dulce en el PR de Lucía.
 
 ## 3. Propuestas presentadas y precisiones
 
@@ -45,7 +45,7 @@ Decisión de Lucía del 11-oct: órdenes 1–3 aprobados completos. Se conserva 
 | Quién | Alcance aprobado | Estado / entrega |
 | --- | --- | --- |
 | Miguel | Cinco cabeceras: `X-Content-Type-Options: nosniff`, `Content-Security-Policy: frame-ancestors 'none'`, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`, `Cache-Control: no-store` en contenido privado. | ✅ Incluido en PR #5; comprobación HTTPS real. Navegador posterior; no-store no se impone al CSS. |
-| Miguel | Comprobar resultados de Identity; 500 fijo independiente; ámbitos de solo lectura; aclarar `/salud`. | ✅ Incluidos en PR #5. ⏳ Mensaje del 500, §2, y aprobación/fusión. |
-| Lucía | Arranque de QA tolerante al tiempo de espera agotado; contenido del evento HTTP restaurado; documentar `crear-roles.sql` porque pg_dump no copia usuarios. | ⏳ Próximo PR conjunto de QA, con baja/cabeceras y revisión de Miguel o Dulce. No iniciado en esta revisión. |
+| Miguel | Comprobar resultados de Identity; 500 fijo independiente; ámbitos de solo lectura; aclarar `/salud`. | ✅ Incluidos en PR #5. ✅ Mensaje corregido en bce9409. ⏳ Aprobación formal/fusión. |
+| Lucía | Arranque de QA tolerante al tiempo de espera agotado; contenido del evento HTTP restaurado; documentar `crear-roles.sql` porque pg_dump no copia usuarios. | ✅ Aplicadas y probadas el 13-oct, con baja/cabeceras. ⏳ Revisión humana y fusión del PR conjunto de QA. |
 
-**Otros pendientes:** ejecución final de los procedimientos 7–8 ya aprobados, producto/PageModel con Dulce, QA restante y decisión B00/LCA. Miguel puede corregir §2 sin esperar páginas; después revisar la entrega de QA cuando Lucía la presente. No adelantar B01 ni nube. Correo noreply sigue como recomendación personal, sin reescribir historial.
+**Otros pendientes:** ejecución final de los procedimientos 7–8 ya aprobados, producto/PageModel con Dulce, QA restante y decisión B00/LCA. Miguel revisa la entrega de QA cuando Lucía la presente. B01 autorizado expresamente el 13-oct en otro chat; nube y datos reales siguen sin autorización. Correo noreply sigue como recomendación personal, sin reescribir historial.
