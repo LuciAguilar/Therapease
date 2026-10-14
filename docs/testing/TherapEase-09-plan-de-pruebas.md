@@ -72,7 +72,7 @@ El seguimiento 0.1 conserva las ejecuciones del 08–10-oct como historia. Los f
 | ✅ | BajaPacienteTests: 14 casos | Nueve anteriores más Usuaria/Superusuario, con/sin temporal y sesión ausente. Guardado/evento reales y concurrencia conservados. L-CU04, Q03/Q07/Q08/Q20; cobertura de servidor, no página. |
 | ✅ | CabecerasSeguridadTests: 9 casos | S-30 y apoyo Q04/Q08/Q19: cabeceras reales, caché privada, estático, fallo de Identity JSON/HTML y recuperación. No sustituye navegador/CSP de recursos. |
 | ✅ | Tres mejoras de QA | Arranque con timeout tolerado, evento restaurado comprobado en HTTP, documentación de crear-roles.sql para un destino nuevo. Recuperación: 13 casos correctos. |
-| ⏳ | Revisión y fusión de QA nuevo | Miguel o Dulce revisa; Lucía decide. La aprobación de PR #4 no acredita revisión de esta ampliación. |
+| ⏳ | Revisión y fusión de QA nuevo | [PR #6](https://github.com/LuciAguilar/Therapease/pull/6) publicado; revisión solicitada a Miguel/GalloNav. Lucía decide. La aprobación de PR #4 no acredita revisión de esta ampliación. |
 | ⏳ | Páginas, navegador y producto | Mantener los casos completos pendientes; detalles y responsables en B00 §7. |
 | ✅ | Avance a Construcción/B01 | Autorizado por Lucía el 13-oct, con datos ficticios y pendientes B00/LCA visibles; no declara cierre de B00/LCA, datos reales ni nube. |
 

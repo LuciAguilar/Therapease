@@ -15,6 +15,7 @@
 | PR #3: documentación compartida | ✅ Fusionado el 06-oct. | [PR #3](https://github.com/LuciAguilar/Therapease/pull/3); main `8baf8fbc34890d4710c2b78e920f10b8d3e92cb3`. |
 | PR #4: pruebas de Lucía | ✅ Revisado por Miguel y fusionado el 11-oct. | [PR #4](https://github.com/LuciAguilar/Therapease/pull/4); main `709ff615e1f1add0b008deff57e567de719b241c`. |
 | PR #5: correcciones de Miguel | ✅ Corregido, comprobado y fusionado el 13-oct, main 40785d2. | [PR #5](https://github.com/LuciAguilar/Therapease/pull/5); §4.10 e [informe](../reviews/TherapEase-09-B00-revision-PR05.md). |
+| PR #6: ampliación QA de Lucía | ✅ Publicado y listo para revisión; ⏳ revisión de Miguel y fusión. | [PR #6](https://github.com/LuciAguilar/Therapease/pull/6), revision/etapa09; código 4ca53c4, 258 unitarias/205 integración. |
 | Arquitectura | ✅ 30/30 correctas sobre PR #5; correcciones de Web y coordinador implementadas. | §4.9; páginas funcionales y aprobación del PR #5 siguen separadas. |
 | Horas y Docker del 08–09-oct | ✅ 12 correctas; reinicio real y claves/sesión conservadas. | §4.4; PR #4 revisado/fusionado; repetido en §4.9. |
 | HTTPS local del 10-oct | ✅ 12 correctas, 0 fallos/omitidas; TLS 1.3 negociado. | §4.5; PR #4 revisado/fusionado; cabeceras finales pendientes. |
@@ -339,7 +340,7 @@ Docker Desktop Linux debe estar iniciado. Pruebas comentadas según el skill del
 | Entrega agrupada | Responsable | Qué reúne |
 | --- | --- | --- |
 | **PR #5 existente** | Miguel; Lucía revisa y aprueba | Correcciones obligatorias, permiso aprobado y unitarias; las cuatro mejoras de backend y cabeceras aprobadas el 11-oct; propuestas de temporales/acceso Q03 y documentación propia. |
-| **Un próximo PR de QA, usando revision/etapa09** | Lucía; Miguel o Dulce revisa | Pruebas de baja con nombre definitivo y cobertura del permiso aprobado, las tres mejoras de QA aprobadas el 11-oct, verificaciones ejecutables disponibles y documentación/evidencia actualizada. Se prepara como una entrega conjunta después de integrar PR #5. |
+| **[PR #6](https://github.com/LuciAguilar/Therapease/pull/6), revision/etapa09** | Lucía; Miguel o Dulce revisa | Pruebas de baja con nombre definitivo y cobertura del permiso aprobado, las tres mejoras de QA aprobadas el 11-oct, verificaciones ejecutables disponibles y documentación/evidencia actualizada. Se prepara como una entrega conjunta después de integrar PR #5. |
 | **Pendientes con páginas/producto** | Dulce implementa/valida; Lucía prueba | Se agrupan cuando estén disponibles. No obligan a mantener abiertos los dos PR anteriores B01 tiene autorización expresa del 13-oct; sus criterios y pruebas se siguen en ese bloque. |
 
 No crear un PR por cada mejora. GitHub Settings y el correo local se verifican/configuran fuera de los PR; en la documentación solo se registra evidencia sin datos privados. Lucía autorizó el 13-oct preparar su PR conjunto de QA; no crear otra rama.

@@ -103,7 +103,7 @@ PR #5, `bce9409`: build Release sin errores/advertencias; 258 unitarias y 182 in
 | Dulce | [Informe PR01 §8](docs/reviews/TherapEase-09-B00-revision-PR01.md#8-mensajes-de-guardado--dulce-pagemodel-10-oct-2026): mensajes Q08; acceso mínimo/PageModel y unitarias; validar producto con la usuaria. Procedimientos aprobados en [AGENTS](AGENTS.md) §2.2–§2.3. |
 | Equipo | [B00 §7](docs/planning/TherapEase-etapa09-B00.md#7-plan-de-validación-autorizado) y [plan de pruebas](docs/testing/TherapEase-09-plan-de-pruebas.md): responsables, evidencia y pendientes. Reglas obligatorias en AGENTS. |
 
-**QA nuevo:** código `4ca53c4`, 258 unitarias y 205 integración correctas; comandos y huellas en B00 §4.10. Revisión humana y fusión de esta ampliación pendientes.
+**[PR #6 — QA nuevo](https://github.com/LuciAguilar/Therapease/pull/6):** código `4ca53c4`, 258 unitarias y 205 integración correctas; comandos y huellas en B00 §4.10. Revisión humana y fusión de esta ampliación pendientes.
 
 **Avance autorizado el 13-oct:** Lucía autoriza Construcción/B01 con Miguel en otro chat mientras termina el QA de B00. B00/LCA conservan pendientes; R04 abierto, solo datos ficticios. El QA nuevo necesita revisión de Miguel o Dulce y aprobación/fusión de Lucía. Páginas/navegador, producto, respaldo real y nube mantienen sus límites.
 
