@@ -1,6 +1,6 @@
 # TherapEase — 09/B00 · Plan y estado de validación
 
-**Actualización documental: 13-oct-2026.**
+**Actualización documental: 14-oct-2026.**
 
 > **B00/LCA conservan pendientes.** Lucía autoriza expresamente el 13-oct avanzar a Construcción/B01 con Miguel en otro chat mientras se completa QA de B00. No declara cerrada LCA. R04 sigue abierto: solo datos ficticios, sin nube.
 >
@@ -319,6 +319,36 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 ```
 
 Docker Desktop Linux debe estar iniciado. Pruebas comentadas según el skill del proyecto. TRX/manifest permanecen locales; la revisión humana del QA nuevo y su fusión están pendientes.
+
+### 4.11. Correcciones de auditoría del PR #6 — 14-oct-2026
+
+**Código probado:** `0aa32f2b4f387f02ded7b1100a74e869a0ad40d7`. La documentación posterior conserva ese código sin cambios.
+
+| Estado | Corrección / comprobación | Resultado y límite |
+| --- | --- | --- |
+| ✅ | Paquetes vulnerables de pruebas | Pkcs y Xml: 10.0.12 → 10.0.13, con referencias explícitas en UnitTests e IntegrationTests. Decisión registrada en nota posterior ADR-06. |
+| ✅ | Auditoría NuGet con transitivos | Siete proyectos: cero paquetes vulnerables reportados. Se verificó que ambos proyectos resuelven 10.0.13; no se suprimieron avisos. No es auditoría completa de SDK/runtime o imagen. |
+| ✅ | Encabezados de recuperación | Cuatro en RecuperacionRevision y cinco en RecuperacionTests, de 96 caracteres; comentarios y lógica conservados. Se comparó el texto restante con 48018df. |
+| ✅ | Build Release y repetición completa | 0 errores/advertencias; 258 unitarias y 205 integración correctas, 0 fallos/omitidas. PostgreSQL desechable/Testcontainers, datos ficticios, Docker disponible. |
+| ⏳ | Revisión humana y fusión | Mismo PR #6, misma rama revision/etapa09; Miguel revisa las correcciones y el QA anterior. Lucía decide fusión; B00/LCA mantienen pendientes. |
+
+Pruebas comentadas según el skill del proyecto. Las ejecuciones del 13-oct se conservan como historia; esta repetición usa los paquetes corregidos.
+
+```powershell
+dotnet restore TherapEase.sln --force-evaluate
+dotnet list package --vulnerable --include-transitive --format json --no-restore
+dotnet build TherapEase.sln -c Release --no-restore
+dotnet test tests/TherapEase.UnitTests/TherapEase.UnitTests.csproj -c Release --no-build --logger "trx;LogFileName=qa-unitarias-14oct.trx" --results-directory TestResults/QA-14oct
+dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj -c Release --no-build --logger "trx;LogFileName=qa-integracion-14oct.trx" --results-directory TestResults/QA-14oct
+```
+
+| Evidencia local | SHA-256 |
+| --- | --- |
+| qa-unitarias-14oct.trx | `46f81d1f23524848ac7855a377b706762331dc25fa9d21ef497e4530aef44fdd` |
+| qa-integracion-14oct.trx | `da40586b9f2a0a84a296944af5ef4d7369627e977a5a6cac806f7cfbbf010b66` |
+| paquetes-vulnerables.json | `67484d004f6a8d77f37315adf57404f69fbbb243d887b64c13d4fdb53b5f74fe` |
+
+TRX, JSON y manifest permanecen locales; se publica este resumen, sin datos privados ni registros crudos.
 
 ## 5. Cobertura y alcance de los pendientes
 

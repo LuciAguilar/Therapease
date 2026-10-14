@@ -92,3 +92,7 @@ Pruebas comentadas según el skill del proyecto. Lucía autoriza avance B01 el 1
 
 
 Repetición final: 205 integración y 258 unitarias correctas sobre código 4ca53c4; comandos/huellas en B00 §4.10. No quedaron contenedores ni imágenes de revisión.
+
+## Corrección del 14-oct
+
+Nueve encabezados ampliados a 96 caracteres en RecuperacionRevision/Tests, con comentarios y lógica conservados. Paquetes de pruebas corregidos a 10.0.13; 258 unitarias/205 integración correctas en repetición completa con Docker, incluidos los 13 casos de recuperación. Comandos/huellas en B00 §4.11; revisión humana del PR #6 pendiente.

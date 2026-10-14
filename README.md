@@ -105,6 +105,9 @@ PR #5, `bce9409`: build Release sin errores/advertencias; 258 unitarias y 182 in
 
 **[PR #6 — QA nuevo](https://github.com/LuciAguilar/Therapease/pull/6):** código `4ca53c4`, 258 unitarias y 205 integración correctas; comandos y huellas en B00 §4.10. Revisión humana y fusión de esta ampliación pendientes.
 
+
+**Corrección del PR #6, 14-oct:** Pkcs y Xml de pruebas fijados en 10.0.13; auditoría NuGet sin paquetes vulnerables reportados. Repetición: 258 unitarias y 205 integración correctas. Encabezados ampliados; B00 §4.11 conserva comandos y huellas. Miguel revisa antes de fusionar.
+
 **Avance autorizado el 13-oct:** Lucía autoriza Construcción/B01 con Miguel en otro chat mientras termina el QA de B00. B00/LCA conservan pendientes; R04 abierto, solo datos ficticios. El QA nuevo necesita revisión de Miguel o Dulce y aprobación/fusión de Lucía. Páginas/navegador, producto, respaldo real y nube mantienen sus límites.
 
 **ADR-05:** age, clave pública y custodia privada según AGENTS §2.8. Las pruebas actuales usan cifrado exclusivo de QA; no implementan el respaldo real.

@@ -29,3 +29,17 @@ Usar **un monorepo** para el primer avance. Organizar la raíz según 06B–06C:
 **Precisión aprobada el 08-oct:** aplicar la excepción Web → Domain de AGENTS §1 y la nota posterior de ADR-03: solo enumeraciones y constantes sin lógica. Las pruebas deben aceptar esa excepción y seguir rechazando entidades/reglas/servicios, ciclos y persistencia directa. La ejecución actual registra 30 casos, 28 correctos y 2 fallidos; no cierra la validación.
 
 Miguel crea los proyectos. **Lucía escribe y ejecuta la prueba automática de límites; Miguel la revisa.** La prueba debe fallar ante referencias de capa prohibidas, un ciclo entre módulos o acceso de Web directo a persistencia, e incluir al coordinador CU04 fuera de Pacientes/Citas en Application. Otro integrante reproduce construcción y pruebas (Q15). Lucía revisa arquitectura, seguridad y evidencias; Miguel o Dulce revisa los demás archivos que ella haya creado. La aprobación documental de Lucía no acredita esa revisión ni los resultados pendientes. El cierre de LCA se decide por separado, únicamente con todos los resultados ejecutables de B00.
+
+## Nota posterior — dependencias de QA, 14-oct-2026
+
+Corrección autorizada por Lucía al transmitir el veredicto CORREGIR del PR #6, conforme a 07A. Miguel revisa esta ampliación junto con el resto del PR.
+
+| Decisión / motivo | Alcance y comprobación |
+| --- | --- |
+| Fijar System.Security.Cryptography.Pkcs y System.Security.Cryptography.Xml en 10.0.13 | Referencias explícitas en UnitTests e IntegrationTests. Antes llegaban transitivamente en 10.0.12 con avisos; se conserva la misma serie 10. No cambia arquitectura, servicios, dependencias de producción ni migraciones. |
+| Verificar la actualización | Restore completo; dotnet list package --vulnerable --include-transitive no reporta paquetes vulnerables en los siete proyectos, incluidos transitivos. Ambos assets resuelven 10.0.13. Build Release sin errores/advertencias; 258 unitarias y 205 integración correctas, 0 omitidas. |
+| Conservar trazabilidad | B00 §4.11 reúne comandos y huellas. Las 30 pruebas de arquitectura están dentro de las 205 correctas; el resultado 28/30 del 08-oct anterior es histórico. Revisión humana nueva y cierre B00/LCA pendientes. |
+
+Fuentes primarias: [Pkcs, GHSA-846f-f764-76mx](https://github.com/advisories/GHSA-846f-f764-76mx), [Pkcs relacionado](https://github.com/advisories/GHSA-2fmv-rv2c-59x7), [Xml, GHSA-r955-8q5j-3h83](https://github.com/advisories/GHSA-r955-8q5j-3h83), [Xml relacionado 1](https://github.com/advisories/GHSA-7hqp-7c5m-4vq6), [Xml relacionado 2](https://github.com/advisories/GHSA-c399-9853-6jmj).
+
+La auditoría comprueba paquetes NuGet; no sustituye la revisión de SDK/runtime, imagen ni despliegue. No introduce una herramienta nueva ni autoriza nube o datos reales.

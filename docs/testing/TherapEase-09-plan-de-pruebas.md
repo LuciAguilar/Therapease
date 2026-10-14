@@ -63,6 +63,16 @@ Evidencia detallada: [Identity](TherapEase-09-B00-evidencia-identidad.md), [recu
 
 El seguimiento 0.1 conserva las ejecuciones del 08–10-oct como historia. Los fallos de arquitectura/Q03 allí citados ya no son el resultado vigente. No se marcan completas las pruebas de páginas u operaciones aún inexistentes.
 
+## 0.5. Correcciones de auditoría del PR #6 — 14-oct-2026
+
+| Estado | Comprobación | Resultado / pendiente |
+| --- | --- | --- |
+| ✅ | Dependencias de pruebas corregidas | Pkcs y Xml fijados/resueltos en 10.0.13 en UnitTests e IntegrationTests. Auditoría de siete proyectos con transitivos: cero paquetes vulnerables reportados. |
+| ✅ | Encabezados y repetición completa | Nueve encabezados ampliados sin cambiar lógica. Build Release sin errores/advertencias; 258 unitarias y 205 integración correctas, 0 fallos/omitidas. Evidencia y comandos en B00 §4.11. |
+| ⏳ | Revisión humana y fusión del PR #6 | Miguel revisa esta corrección junto con las pruebas; Lucía decide. Páginas/navegador y resto de B00 conservan sus pendientes. |
+
+Esta sección actualiza 0.4; no acredita cierre de B00/LCA ni cambia la autorización de avance a B01 con datos ficticios.
+
 ## 0.4. Actualización de QA — 13-oct-2026
 
 | Estado | Alcance | Resultado / pendiente |
