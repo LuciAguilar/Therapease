@@ -22,7 +22,7 @@ public class RecuperacionTests(PostgreSqlRevision postgres, ITestOutputHelper sa
 {
 
 
-    // ──── PÉRDIDA Y RESTAURACIÓN COMPLETA ────
+    // ──── PÉRDIDA Y RESTAURACIÓN COMPLETA ────────────────────────────────────────────────────
 
 
     /// Recupera todas las tablas en otro contenedor después de perder acceso al origen; compara y mide hasta una consulta autorizada real.
@@ -156,7 +156,7 @@ public class RecuperacionTests(PostgreSqlRevision postgres, ITestOutputHelper sa
     }
 
 
-    // ──── COPIAS ALTERADAS Y CLAVE INCORRECTA ────
+    // ──── COPIAS ALTERADAS Y CLAVE INCORRECTA ────────────────────────────────────────────────
 
 
     /// Rechaza alteraciones y clave incorrecta antes de crear tablas en el destino, incluso si se recalcula la huella externa.
@@ -197,7 +197,7 @@ public class RecuperacionTests(PostgreSqlRevision postgres, ITestOutputHelper sa
     }
 
 
-    // ──── FALLOS DE HERRAMIENTAS ────
+    // ──── FALLOS DE HERRAMIENTAS ─────────────────────────────────────────────────────────────
 
 
     /// Si pg_restore falla después de empezar, su única transacción deshace los objetos nuevos.
@@ -245,7 +245,7 @@ public class RecuperacionTests(PostgreSqlRevision postgres, ITestOutputHelper sa
     }
 
 
-    // ──── ANTIGÜEDAD Y CIFRADO ────
+    // ──── ANTIGÜEDAD Y CIFRADO ───────────────────────────────────────────────────────────────
 
 
     /// Mide la antigüedad y comprueba si cumple Q10; una copia antigua o fecha futura se informa sin impedir restaurar.
@@ -302,7 +302,7 @@ public class RecuperacionTests(PostgreSqlRevision postgres, ITestOutputHelper sa
     }
 
 
-    // ──── DATOS FICTICIOS ────
+    // ──── DATOS FICTICIOS ────────────────────────────────────────────────────────────────────
 
 
     /// Llena las tablas principales y crea un superusuario; no usa datos de personas reales.

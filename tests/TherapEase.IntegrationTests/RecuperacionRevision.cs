@@ -14,7 +14,7 @@ public static class RecuperacionRevision
 {
 
 
-    // ──── FORMATO DE PRUEBA ────
+    // ──── FORMATO DE PRUEBA ──────────────────────────────────────────────────────────────────
 
 
     private static readonly byte[] Version = "TEQA0001"u8.ToArray();
@@ -65,7 +65,7 @@ public static class RecuperacionRevision
     }
 
 
-    // ──── BASE DE DESTINO ────
+    // ──── BASE DE DESTINO ────────────────────────────────────────────────────────────────────
 
 
     /// Crea una base vacía, sin migrarla: pg_restore debe recuperar por sí mismo todo el esquema.
@@ -85,7 +85,7 @@ public static class RecuperacionRevision
     }
 
 
-    // ──── COMANDOS REALES ────
+    // ──── COMANDOS REALES ────────────────────────────────────────────────────────────────────
 
 
     /// Ejecuta pg_dump con el migrador; el archivo sin cifrar solo existe temporalmente dentro del contenedor.
@@ -135,7 +135,7 @@ public static class RecuperacionRevision
     }
 
 
-    // ──── COMPARACIÓN SIN MOSTRAR DATOS ────
+    // ──── COMPARACIÓN SIN MOSTRAR DATOS ──────────────────────────────────────────────────────
 
 
     /// Lee todas las filas de cada tabla en orden estable y compara huellas; no imprime su contenido.
