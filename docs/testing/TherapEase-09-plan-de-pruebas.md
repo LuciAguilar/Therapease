@@ -1,8 +1,8 @@
 # TherapEase — Plan de pruebas por caso de uso
 
-**Actualización: 10-oct-2026.** Referencia de pruebas de 09 basada en HU/CU y alternos de 08B, modelos de 08C, trazabilidad de 08D, reglas 07B–07C y Q01–Q20. Usar únicamente datos ficticios. Las reglas compartidas están en [AGENTS.md](../../AGENTS.md); las herramientas y organización de trabajo de cada integrante son libres, las reglas de seguridad/datos/pruebas/revisión son obligatorias.
+**Actualización: 11-oct-2026.** Referencia de pruebas de 09 basada en HU/CU y alternos de 08B, modelos de 08C, trazabilidad de 08D, reglas 07B–07C y Q01–Q20. Usar únicamente datos ficticios. Las reglas compartidas están en [AGENTS.md](../../AGENTS.md); las herramientas y organización de trabajo de cada integrante son libres, las reglas de seguridad/datos/pruebas/revisión son obligatorias.
 
-PageModel a cargo de Dulce con sus unitarias. Las cuatro condiciones de Identity están resueltas e indicadas en el informe de ajustes; Miguel las incorporó a AGENTS mediante el PR #1 ya fusionado. Las 11 comprobaciones anteriores están incorporadas y ampliadas a 37 casos de Identity, repetidos el 07-oct. Con 13 casos de recuperación, la ejecución anterior registró **50 correctos**, sin fallos/omitidas. Claude emitió **CORREGIR menor** para recuperación; ajustes de código aplicados y los 50 casos repetidos correctamente el 08-oct, 19 s, sin fallos/omitidas. Entrega conjunta publicada en [PR #4](https://github.com/LuciAguilar/Therapease/pull/4), con ampliaciones en el mismo PR; revisión humana y aprobación/fusión pendientes. [Recuperación y límites](TherapEase-09-B00-evidencia-recuperacion.md). Alcance y límites en [evidencia Identity](TherapEase-09-B00-evidencia-identidad.md). Sus resultados y límites están en [B00](../planning/TherapEase-etapa09-B00.md). Este plan no acredita por sí mismo ejecución, revisión ni cierre B00/LCA; la evidencia identifica lo realmente ejecutado.
+PageModel a cargo de Dulce con sus unitarias. Las cuatro condiciones de Identity están resueltas e indicadas en el informe de ajustes; Miguel las incorporó a AGENTS mediante el PR #1 ya fusionado. Las 11 comprobaciones anteriores están incorporadas y ampliadas a 37 casos de Identity, repetidos el 07-oct. Con 13 casos de recuperación, la ejecución anterior registró **50 correctos**, sin fallos/omitidas. Claude emitió **CORREGIR menor** para recuperación; ajustes de código aplicados y los 50 casos repetidos correctamente el 08-oct, 19 s, sin fallos/omitidas. Entrega conjunta publicada en [PR #4](https://github.com/LuciAguilar/Therapease/pull/4), con ampliaciones en el mismo PR; revisado por Miguel y fusionado el 11-oct; el alcance nuevo del PR #5 se registra debajo. [Recuperación y límites](TherapEase-09-B00-evidencia-recuperacion.md). Alcance y límites en [evidencia Identity](TherapEase-09-B00-evidencia-identidad.md). Sus resultados y límites están en [B00](../planning/TherapEase-etapa09-B00.md). Este plan no acredita por sí mismo ejecución, revisión ni cierre B00/LCA; la evidencia identifica lo realmente ejecutado.
 
 No se implementa pantalla de auditoría. Q03 conserva los eventos y consulta técnica autorizada. **Decisión de Dulce del 08-oct:** la búsqueda desde Pacientes permanece en el primer avance de diciembre. El directorio sale de CU03 y pasa a pantalla aparte posterior (B07), con la lista completa de vigentes por defecto y filtro autorizado de bajas; campos visibles y las demás políticas marcadas al final siguen pendientes de Dulce con la usuaria. [Guía del equipo](../../README.md). B00/LCA y R04 permanecen abiertos.
 
@@ -35,7 +35,7 @@ La columna **Estado** usa solo ✅ y ⏳. ✅ identifica ejecución local con ev
 | Consulta Q03 por API | 51 casos Q03 tras la auditoría: 46 correctos y 5 fallidos; la ejecución anterior repitió también 12 HTTPS correctamente. Filtros válidos, límites, permisos, solo lectura y metadatos en B00 §4.6. 0, 1, 2 y las listas Paciente,Cita / Paciente, Cita devuelven 200 en vez de 400; Miguel debe aceptar solo nombres completos. Comando final y revisión humana pendientes. |
 | Q08 de Identity | ✅ 16 casos correctos en InterrupcionesIdentidadTests: antes/después del commit, cancelación, corte real de conexión, éxito posterior y reintentos de alta/baja/rol. Cambios propios temporal y ordinario probados; en el ordinario se deja pasar su primera confirmación. Restablecer otra vez genera otra clave/evento; procedimiento pendiente. No acredita páginas, red real de escrituras, Q08 completo en pacientes/citas/pago. B00 §4.7; auditoría de Claude APROBADO; revisión humana pendiente. |
 | S-20, S-21 — API disponible | ✅ 11 casos correctos en ErroresRegistrosTests; B00 §4.8. 400/401/500 sin valores privados buscados, registros del proceso capturados y recuperación 200. ⏳ Alcance completo en otras rutas/páginas, mensaje del 500 vacío de Identity y revisión humana. Auditoría de errores/registros: APROBADO. |
-| S-30 | ⏳ Inventario y propuesta en B00 §4.5; Lucía decide, equipo implementa y QA verifica. Se conservan los otros pendientes de seguridad. |
+| S-30 | ⏳ Inventario en B00 §4.5; política aprobada por Lucía el 11-oct. Miguel implementa en PR #5 y Lucía verifica en su PR de QA. Se conservan los otros pendientes de seguridad. |
 | S-26, S-27 | Búsqueda acotada en historial/archivos e imagen histórica, y revisión de `.env.example` ficticio. No se detectaron credenciales de TherapEase dentro del alcance; las claves privadas de ejemplo de GnuTLS están clasificadas en la evidencia. No es garantía universal. |
 | A-04, S-32 | ✅ Repetidos el 08 y 09-oct en HorasDockerTests: imagen actual construida, no root, /salud 200 y HEALTHCHECK healthy; ruta sin sesión 401. 12 casos correctos; el 09-oct se verificó también la eliminación automática de la imagen. B00 §4.4. |
 | L-CU02-01/05/07, L-CU04-01/03/04, L-CU06-05, L-Q03-01/02/04 | Cobertura parcial: temporal/políticas, último superusuario concurrente, auditoría de Identity, versión EF, conservación del paciente, dos reservas SQL y consulta autorizada. Faltan los demás caminos/operaciones, formularios o recuentos previstos; no se da por completo el caso compuesto. |
@@ -47,6 +47,63 @@ La columna **Estado** usa solo ✅ y ⏳. ✅ identifica ejecución local con ev
 | Restantes | No hay evidencia suficiente para acreditar su alcance completo; permanecen ⏳. Las decisiones de producto abiertas se conservan en §6. |
 
 Evidencia detallada: [Identity](TherapEase-09-B00-evidencia-identidad.md), [recuperación y correcciones](TherapEase-09-B00-evidencia-recuperacion.md), [avance B00](../planning/TherapEase-etapa09-B00.md). El TRX local `b00-conjunto-50-corregido-08oct.trx` identifica la nueva ejecución de los 50 casos tras el veredicto; `b00-conjunto-50.trx` conserva la anterior. La visibilidad pública de A-06 ya fue decidida; medir minutos de CI sigue pendiente. B00/LCA/R04 abiertos.
+
+## 0.2. Estado vigente — 11-oct-2026
+
+| Estado | Alcance | Evidencia / límite |
+| --- | --- | --- |
+| ✅ | Revisión humana de QA del PR #4 y fusión | Miguel APPROVED sobre f06dc7b; main 709ff615. No incluye QA nuevo local. |
+| ✅ | Repetición del PR #5, 7e83c3c | 192 unitarias y 182 de integración correctas, en ejecuciones separadas; 0 fallidas/omitidas. Arquitectura 30/30 y Q03 51/51: siete fallos anteriores corregidos. B00 §4.9. |
+| ✅ | CU04 mínimo, nueve adicionales locales | PostgreSQL real: cambios/eventos, conflictos, citas frente a baja y respuesta perdida. Comentadas según el skill del proyecto. Fuera del PR de Miguel. |
+| ⏳ | Incorporación y revisión humana de las nueve adicionales | Miguel o Dulce revisa; no acreditar revisión por la de PR #4. |
+| ⏳ | Implementar permiso aprobado, actualizar README/AGENTS y aprobar PR #5 | Lucía aprobó el 11-oct Usuaria y Superusuario como provisional. Miguel implementa y prueba; Lucía revisa el nuevo commit. |
+| ✅ | Decisiones de Lucía del 11-oct, órdenes 1–3 de B00 §7 | Cabeceras y cuatro mejoras de backend incluidas en PR #5; tres mejoras de QA incluidas en el próximo PR conjunto de Lucía. Implementación, pruebas y revisión siguen ⏳. Reglas en AGENTS §2.5–§2.6. |
+| ✅ | Secret Protection y Push protection de GitHub | Captura aportada por Lucía el 12-oct: ambos botones Disable. Configuración activada; no prueba de bloqueo, ni revisión actual de main, ni garantía de ausencia de secretos. B00 §7, orden 10. |
+| ⏳ | Cobertura restante B00 | Páginas/navegador, temporales, Q03, cabeceras/secretos. B00 §7 ordena las propuestas, dependencias y entregas: mejoras de Miguel en PR #5 y un próximo PR conjunto de QA de Lucía; sin PR por cada punto. B00/LCA/R04 siguen abiertos. |
+
+El seguimiento 0.1 conserva las ejecuciones del 08–10-oct como historia. Los fallos de arquitectura/Q03 allí citados ya no son el resultado vigente. No se marcan completas las pruebas de páginas u operaciones aún inexistentes.
+
+## 0.5. Correcciones de auditoría del PR #6 — 14-oct-2026
+
+| Estado | Comprobación | Resultado / pendiente |
+| --- | --- | --- |
+| ✅ | Dependencias de pruebas corregidas | Pkcs y Xml fijados/resueltos en 10.0.13 en UnitTests e IntegrationTests. Auditoría de siete proyectos con transitivos: cero paquetes vulnerables reportados. |
+| ✅ | Encabezados y repetición completa | Nueve encabezados ampliados sin cambiar lógica. Build Release sin errores/advertencias; 258 unitarias y 205 integración correctas, 0 fallos/omitidas. Evidencia y comandos en B00 §4.11. |
+| ⏳ | Revisión humana y fusión del PR #6 | Miguel revisa esta corrección junto con las pruebas; Lucía decide. Páginas/navegador y resto de B00 conservan sus pendientes. |
+
+Esta sección actualiza 0.4; no acredita cierre de B00/LCA ni cambia la autorización de avance a B01 con datos ficticios.
+
+## 0.4. Actualización de QA — 13-oct-2026
+
+| Estado | Alcance | Resultado / pendiente |
+| --- | --- | --- |
+| ✅ | Repetición final de QA | Código 4ca53c4: 258 unitarias y 205 integración correctas, 0 fallos/omitidas. Evidencia/huellas en B00 §4.10. Revisión humana pendiente. |
+| ✅ | PR #5 bce9409 | 258 unitarias y 182 integración, 0 fallos/omitidas; compilación Release sin errores/advertencias. Mensaje 500 corregido; PR #5 fusionado el 13-oct, main 40785d2. |
+| ✅ | BajaPacienteTests: 14 casos | Nueve anteriores más Usuaria/Superusuario, con/sin temporal y sesión ausente. Guardado/evento reales y concurrencia conservados. L-CU04, Q03/Q07/Q08/Q20; cobertura de servidor, no página. |
+| ✅ | CabecerasSeguridadTests: 9 casos | S-30 y apoyo Q04/Q08/Q19: cabeceras reales, caché privada, estático, fallo de Identity JSON/HTML y recuperación. No sustituye navegador/CSP de recursos. |
+| ✅ | Tres mejoras de QA | Arranque con timeout tolerado, evento restaurado comprobado en HTTP, documentación de crear-roles.sql para un destino nuevo. Recuperación: 13 casos correctos. |
+| ⏳ | Revisión y fusión de QA nuevo | [PR #6](https://github.com/LuciAguilar/Therapease/pull/6) publicado; revisión solicitada a Miguel/GalloNav. Lucía decide. La aprobación de PR #4 no acredita revisión de esta ampliación. |
+| ⏳ | Páginas, navegador y producto | Mantener los casos completos pendientes; detalles y responsables en B00 §7. |
+| ✅ | Avance a Construcción/B01 | Autorizado por Lucía el 13-oct, con datos ficticios y pendientes B00/LCA visibles; no declara cierre de B00/LCA, datos reales ni nube. |
+
+Esta sección prevalece sobre estados históricos 0.1–0.3. Pruebas comentadas según el skill del proyecto. Ejecuciones locales, no CI.
+
+## 0.3. Correspondencia del QA adicional de CU04 — PR #5
+
+**Archivo actual:** `BajaPacienteTests.cs`, preparado por Codex para QA de Lucía en la copia local de revisión. **Fuera del PR #5; incorporado a la entrega de QA de Lucía del 13-oct, con 14 casos.** Los nueve casos originales concretan requisitos ya contemplados; no crean una funcionalidad nueva ni sustituyen los recorridos completos siguientes.
+
+| Estado de ejecución local | Casos del archivo | Caso/requisito ya previsto | Alcance que falta |
+| --- | --- | --- | --- |
+| ✅ | Baja sin citas, con cita cancelada y con cita de baja: 3 casos | L-CU04-03/05; Q03 y Q20 | Baja/evento guardados; falta salida de listas/búsquedas y recorrido autorizado desde página. Política operativa aún provisional. |
+| ✅ | Cita activa previa y cita insertada entre consulta/guardado: 2 casos | L-CU04-05/06 | Rechazo real sin baja/evento. No acredita la política final ni todas las operaciones de reservas. |
+| ✅ | Versión modificada por otra conexión: 1 caso | L-CU04-01; Q07 | Conflicto en baja, sin sobrescribir. Faltan dos ediciones de ficha y aviso en página. |
+| ✅ | Fallo real al insertar auditoría: 1 caso | Q03; regla de cambio/evento atómicos, B00 §7 paso 2 | Se revierte la baja. No acredita atomicidad de todas las operaciones restantes. |
+| ✅ | Respuesta perdida después de confirmar y nueva solicitud: 1 caso | L-CU04-02; Q08 | No duplica baja/evento. Interrupción simulada tras commit, no corte HTTP/navegador. |
+| ✅ | Baja primero y cita simultánea que espera el bloqueo: 1 caso | L-CU04-06 | PostgreSQL rechaza la cita. Falta el recorrido por servicio de reservas y repetición ampliada del caso completo. |
+| ✅ | Renombrar archivo y clase a `BajaPacienteTests` | Ajuste de nombre solicitado por Lucía el 12-oct | Comentarios y lógica conservados; el archivo sigue local, fuera del PR #5. |
+| ✅ | Incorporar el archivo como `BajaPacienteTests.cs` | QA de Lucía, revisión humana de Miguel o Dulce | Aplicar/conservar comentarios y subir en un PR de Lucía, separado del #5 de Miguel. No se crea rama ni PR en este paso. |
+
+Los identificadores de la sección 3 conservan ⏳ si su alcance completo aún falta, aunque una parte tenga ejecución ✅ aquí. La prueba automática de arquitectura verifica ubicación y dependencias; estas nueve comprueban además el comportamiento real del coordinador.
 
 ## 1. Miguel — unitarias de backend
 
@@ -129,7 +186,7 @@ Integración: xUnit + Testcontainers, con el esquema creado por **las migracione
 
 | ID | Estado | Qué hacer → qué debe pasar | Origen |
 | --- | --- | --- | --- |
-| A-01 | ⏳ | Prueba automática de límites: Web usa Application y solo enumeraciones/constantes sin lógica de Domain, salvo composición de Infrastructure; Domain sin dependencias de otras capas; Pacientes no depende de Citas; coordinador de CU04 fuera de ambos; sin ciclos. Ejecutada: 30, 28 correctas y 2 fallidas. Miguel sustituye Web → MatrizDePermisos por IAutorizacion e implementa CU04; revisión y páginas funcionales aún pendientes. | 07A, 07C, ADR-06; B00 §4.3 |
+| A-01 | ⏳ | Prueba automática de límites: Web usa Application y solo enumeraciones/constantes sin lógica de Domain, salvo composición de Infrastructure; Domain sin dependencias de otras capas; Pacientes no depende de Citas; coordinador CU04 fuera de ambos; sin ciclos. PR #5: 30/30 correctas; Miguel corrigió Web e implementó CU04. Revisó las pruebas de PR #4; falta repetir sobre PageModel funcionales. | 07A, 07C, ADR-06; B00 §4.9 |
 | A-02 | ✅ | Las migraciones crean el esquema desde cero sin errores con un usuario distinto del de la aplicación; las credenciales de migración no se usan en ejecución normal. | 07B |
 | A-03 | ✅ | Insertar por SQL directo dos citas activas solapadas → **la base** las rechaza (no solo el código). | Q06, 05C |
 | A-04 | ✅ | La imagen Docker arranca, responde la comprobación de salud y corre sin privilegios. | 05E |
@@ -324,7 +381,7 @@ Referencia: OWASP Top 10:2025, ASVS 5.0 aplicable y 07B. «Todas las rutas» = l
 | S-27 | ✅ | `.env.example` solo tiene nombres y valores ficticios. | 07B |
 | S-28 | ⏳ | La conexión a Neon usa `SSL Mode=VerifyFull` (revisión de configuración, sin conectar desde CI). | 07B, 07C |
 | S-29 | ✅ | Validación local: HTTP redirige a HTTPS y HSTS se emite en modo Production con nombre .test; localhost excluido. HttpsLocalTests, B00 §4.5. Despliegue y navegador siguen pendientes; duración HSTS final por decidir al desplegar. | Q19 |
-| S-30 | ⏳ | Cabeceras de seguridad básicas (tipo de contenido, protección contra incrustación en marcos, política de contenido). **Pendiente:** Lucía decide la propuesta de B00 §4.5; después se implementa y verifica. | ASVS |
+| S-30 | ⏳ | Cabeceras de seguridad básicas (tipo de contenido, protección contra incrustación en marcos, política de contenido). **Aprobadas el 11-oct:** política en AGENTS §2.5 y B00 §4.5. Pendiente: Miguel implementa en PR #5 y Lucía verifica en su PR de QA. | ASVS |
 | S-31 | ✅ | Reiniciar el contenedor → las sesiones siguen siendo válidas (claves de Data Protection en PostgreSQL) y no hay claves en disco. | 05D, 07B |
 | S-32 | ✅ | El proceso del contenedor no corre como administrador. | 05E |
 
@@ -366,7 +423,10 @@ Referencia: OWASP Top 10:2025, ASVS 5.0 aplicable y 07B. «Todas las rutas» = l
 | ¿Se corrige el pago de una cita cancelada o de baja? | L-CU09-05 | Dulce con la usuaria |
 | Resuelto el 04-oct: restablecimiento no levanta el bloqueo vigente | L-CU02-06 | Lucía aprobó; Miguel implementa; Lucía prueba |
 | Resuelto el 04-oct: contraseña mínima de 12 caracteres sin composición | L-CU11-02 | Lucía aprobó; Miguel implementa; Lucía prueba |
-| Cabeceras de seguridad exigidas | S-30 | Lucía |
+| Resuelto el 11-oct: cabeceras de seguridad según AGENTS §2.5 | S-30 | Lucía aprobó; Miguel implementa en PR #5 y Lucía prueba |
 | Resuelto el 04-oct: Dulce escribe los PageModel y sus unitarias | Sección 2 | Lucía confirmó; revisión distinta y aprobación final de Lucía |
 | ¿Qué campos son información relevante del directorio? | D-15, L-CU03-05–06 | Dulce con la usuaria |
 | Resuelto el 01-oct: consulta técnica sin pantalla de B00 para superusuario activo aprobada | L-Q03-03–04, S-22–S-24 | Lucía aprobó y prueba; Miguel implementa y revisa las pruebas de Lucía |
+| Resuelto el 11-oct: baja provisional de pacientes para Usuaria y Superusuario; otros permisos no se amplían | CU04, Q01; pruebas de autorización del permiso nuevo | Lucía aprobó; Miguel implementa y prueba en PR #5. Dulce valida la política operativa con la usuaria. |
+| Resuelto el 12-oct: temporales, orden 7 puntos 1–4; A para B00 ficticio, B de 24 h antes de datos reales | CU02, CU11, Q08/Q19 | Lucía aprobó; entrega/interfaz y prueba final pendientes; B no se implementa ahora |
+| Resuelto el 12-oct: Q03 por navegador autenticado, orden 8 opción A; script B no incluido | L-Q03-03–04, S-22–S-24 | Lucía aprobó; acceso/cierre de sesión de Dulce y prueba final pendientes |

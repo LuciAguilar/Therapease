@@ -76,15 +76,17 @@ public sealed class ServidorRevision : IAsyncDisposable
         try
         {
 
-            // Hasta unos 8 segundos de espera para que el servidor quede listo.
+            // Espera como máximo 40 segundos; un intento lento no cancela todo el arranque.
 
-            for (var intento = 0; intento < 80 && !proceso.HasExited; intento++)
+            var plazo = Stopwatch.StartNew();
+            while (plazo.Elapsed < TimeSpan.FromSeconds(40) && !proceso.HasExited)
             {
                 try
                 {
                     if (await servidor.EstadoAsync(null, "/salud") == 200) return servidor;
                 }
                 catch (HttpRequestException) { }   // Todavía no escucha; se reintenta.
+                catch (TaskCanceledException) { }   // Este intento agotó sus tres segundos; se vuelve a consultar.
                 await Task.Delay(100);
             }
             throw new InvalidOperationException("El servidor no estuvo disponible dentro del plazo de la prueba.");
@@ -104,10 +106,16 @@ public sealed class ServidorRevision : IAsyncDisposable
     /// (200, 401, 403…), que es lo que las pruebas comparan.
     public async Task<int> EstadoAsync(string? cookie, string ruta)
     {
+        using var respuesta = await ConsultarAsync(cookie, ruta);
+        return (int)respuesta.StatusCode;
+    }
+
+    /// Devuelve la respuesta completa para comprobar los datos recibidos; quien llama debe liberarla.
+    public async Task<HttpResponseMessage> ConsultarAsync(string? cookie, string ruta)
+    {
         using var solicitud = new HttpRequestMessage(HttpMethod.Get, ruta);
         if (cookie is not null) solicitud.Headers.Add("Cookie", cookie);
-        using var respuesta = await _cliente.SendAsync(solicitud);
-        return (int)respuesta.StatusCode;
+        return await _cliente.SendAsync(solicitud);
     }
 
 
