@@ -21,6 +21,16 @@ No se implementa pantalla de auditoría. Q03 conserva los eventos y consulta té
 - **Datos rastreables:** usar una contraseña y un contacto ficticios fáciles de buscar (p. ej. `DatoRastreable#Prueba1`, `datoRastreable@ficticio.test`) para comprobar después que no aparecen en registros (S-21).
 - No se añaden herramientas nuevas sin ADR (07A). Si Dulce quiere probar JavaScript con otra herramienta, primero ADR.
 
+## 0.7. B01: pruebas del servidor — 15-oct-2026
+
+| Estado | Comprobación | Resultado / límite |
+| --- | --- | --- |
+| ✅ | 35 casos nuevos de servidor | Altas válidas/inválidas, duplicados normalizados, rechazos sin escritura, fallo de auditoría en alta, eventos completos, cambios mutuos de los dos últimos Superusuarios y bloqueo. |
+| ✅ | Ejecución conjunta de entrega | 77 correctos: 35 nuevos y 42 existentes repetidos; 0 fallidos/omitidos. Base `ffb2494ad9da026f24a57826c45f6f530afb467b`; Release sin advertencias informadas. |
+| ⏳ | Alcance restante y revisión | Miguel o Dulce revisa las pruebas; CI de Miguel, páginas y PageModel de Dulce, navegador y propuestas B01 pendientes. No cierra B01/B00/LCA/R04. |
+
+Los resultados preliminares fallidos se conservan y sus errores de preparación están corregidos. No se modificó el backend ni se añadieron permisos. L-CU02-05 queda comprobado para las tres combinaciones descritas; S-03 cubre la muestra de veinte intentos, sin afirmar cualquier volumen. No se completan casos que incluyen formularios o navegador. [Evidencia, comandos y límites](TherapEase-09-B01-evidencia-servidor.md).
+
 ## 0.1. Seguimiento de ejecución — 08–10-oct-2026
 
 La columna **Estado** usa solo ✅ y ⏳. ✅ identifica ejecución local con evidencia para el alcance indicado; no equivale a revisión humana, aprobación, CI ni cierre. ⏳ señala que falta completar o evidenciar el caso; puede haber una parte ya probada. No se acreditan las unitarias de Miguel o Dulce a partir de las pruebas de integración de Lucía.
