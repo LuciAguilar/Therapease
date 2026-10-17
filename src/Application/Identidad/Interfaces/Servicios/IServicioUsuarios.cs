@@ -46,7 +46,7 @@ public interface IServicioUsuarios
         CancellationToken cancelacion = default
         );
 
-    // No modifica el bloqueo por intentos: levantarlo con un restablecimiento está pendiente de decisión (CU02 A8).
+    // No levanta un bloqueo vigente (máximo 15 minutos): decisión de Lucía del 04-oct-2026 (AGENTS §2.2, CU02 A8).
     Task<RespuestaServicio<ContrasenaTemporalEntregada>> RestablecerContrasenaAsync(
         Guid idUsuario, 
         CancellationToken cancelacion = default

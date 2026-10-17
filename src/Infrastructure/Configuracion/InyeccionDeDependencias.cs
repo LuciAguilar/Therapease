@@ -40,7 +40,7 @@ public static class InyeccionDeDependencias
 
         servicios.AddIdentity<Usuario, Rol>(opciones =>
             {
-                // Propuesta de Miguel, pendiente de decisión de Lucía (L-CU11-02): solo longitud, sin reglas de composición.
+                // Mínimo de 12 caracteres, sin reglas de composición: decisión de Lucía del 04-oct-2026 (AGENTS §2.2, L-CU11-02).
                 opciones.Password.RequiredLength = 12;
                 opciones.Password.RequireDigit = false;
                 opciones.Password.RequireLowercase = false;
