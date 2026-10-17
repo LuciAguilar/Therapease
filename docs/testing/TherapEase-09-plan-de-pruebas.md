@@ -1,8 +1,14 @@
 # TherapEase — Plan de pruebas por caso de uso
 
+**Publicación documental autorizada, 17-oct-2026:** este plan incorpora las decisiones aprobadas y el cierre de revisión del PR #6. La ampliación de pruebas de servidor B01 sigue pendiente de auditoría y aprobación de Lucía; sus resultados no se añaden al avance compartido por esta publicación. Las casillas se actualizan al cerrar las revisiones y aprobaciones, conservando la evidencia original.
+
+> **Entrevista recibida y revisada el 14-oct-2026:** ✅ respuestas de la psicóloga registradas en [respuestas y ajustes](../requirements/TherapEase-09-entrevista-requisitos.md). ⏳ Montos, simplificación a solo particular y cancelación automática requieren decisión de alcance/mecanismo de Lucía; no están implementados por esta actualización. B00/LCA/R04 abiertos, preparación documental sin Construcción ni pruebas nuevas. Los resultados y aprobaciones anteriores se conservan como historia.
+
 **Actualización: 11-oct-2026.** Referencia de pruebas de 09 basada en HU/CU y alternos de 08B, modelos de 08C, trazabilidad de 08D, reglas 07B–07C y Q01–Q20. Usar únicamente datos ficticios. Las reglas compartidas están en [AGENTS.md](../../AGENTS.md); las herramientas y organización de trabajo de cada integrante son libres, las reglas de seguridad/datos/pruebas/revisión son obligatorias.
 
 PageModel a cargo de Dulce con sus unitarias. Las cuatro condiciones de Identity están resueltas e indicadas en el informe de ajustes; Miguel las incorporó a AGENTS mediante el PR #1 ya fusionado. Las 11 comprobaciones anteriores están incorporadas y ampliadas a 37 casos de Identity, repetidos el 07-oct. Con 13 casos de recuperación, la ejecución anterior registró **50 correctos**, sin fallos/omitidas. Claude emitió **CORREGIR menor** para recuperación; ajustes de código aplicados y los 50 casos repetidos correctamente el 08-oct, 19 s, sin fallos/omitidas. Entrega conjunta publicada en [PR #4](https://github.com/LuciAguilar/Therapease/pull/4), con ampliaciones en el mismo PR; revisado por Miguel y fusionado el 11-oct; el alcance nuevo del PR #5 se registra debajo. [Recuperación y límites](TherapEase-09-B00-evidencia-recuperacion.md). Alcance y límites en [evidencia Identity](TherapEase-09-B00-evidencia-identidad.md). Sus resultados y límites están en [B00](../planning/TherapEase-etapa09-B00.md). Este plan no acredita por sí mismo ejecución, revisión ni cierre B00/LCA; la evidencia identifica lo realmente ejecutado.
+
+**Estado de revisión actualizado el 15-oct:** PR #6 ya revisado por Miguel y fusionado por Lucía; main `ffb2494ad9da026f24a57826c45f6f530afb467b`. Véase §0.6. Las tablas de ejecuciones anteriores conservan sus fechas/resultados; no se vuelven a encargar revisiones ya completadas. Páginas/navegador y B00/LCA/R04 siguen pendientes.
 
 No se implementa pantalla de auditoría. Q03 conserva los eventos y consulta técnica autorizada. **Decisión de Dulce del 08-oct:** la búsqueda desde Pacientes permanece en el primer avance de diciembre. El directorio sale de CU03 y pasa a pantalla aparte posterior (B07), con la lista completa de vigentes por defecto y filtro autorizado de bajas; campos visibles y las demás políticas marcadas al final siguen pendientes de Dulce con la usuaria. [Guía del equipo](../../README.md). B00/LCA y R04 permanecen abiertos.
 
@@ -21,16 +27,6 @@ No se implementa pantalla de auditoría. Q03 conserva los eventos y consulta té
 - **Datos rastreables:** usar una contraseña y un contacto ficticios fáciles de buscar (p. ej. `DatoRastreable#Prueba1`, `datoRastreable@ficticio.test`) para comprobar después que no aparecen en registros (S-21).
 - No se añaden herramientas nuevas sin ADR (07A). Si Dulce quiere probar JavaScript con otra herramienta, primero ADR.
 
-## 0.7. B01: pruebas del servidor — 15-oct-2026
-
-| Estado | Comprobación | Resultado / límite |
-| --- | --- | --- |
-| ✅ | 35 casos nuevos de servidor | Altas válidas/inválidas, duplicados normalizados, rechazos sin escritura, fallo de auditoría en alta, eventos completos, cambios mutuos de los dos últimos Superusuarios y bloqueo. |
-| ✅ | Ejecución conjunta de entrega | 77 correctos: 35 nuevos y 42 existentes repetidos; 0 fallidos/omitidos. Base `ffb2494ad9da026f24a57826c45f6f530afb467b`; Release sin advertencias informadas. |
-| ⏳ | Alcance restante y revisión | Miguel o Dulce revisa las pruebas; CI de Miguel, páginas y PageModel de Dulce, navegador y propuestas B01 pendientes. No cierra B01/B00/LCA/R04. |
-
-Los resultados preliminares fallidos se conservan y sus errores de preparación están corregidos. No se modificó el backend ni se añadieron permisos. L-CU02-05 queda comprobado para las tres combinaciones descritas; S-03 cubre la muestra de veinte intentos, sin afirmar cualquier volumen. No se completan casos que incluyen formularios o navegador. [Evidencia, comandos y límites](TherapEase-09-B01-evidencia-servidor.md).
-
 ## 0.1. Seguimiento de ejecución — 08–10-oct-2026
 
 La columna **Estado** usa solo ✅ y ⏳. ✅ identifica ejecución local con evidencia para el alcance indicado; no equivale a revisión humana, aprobación, CI ni cierre. ⏳ señala que falta completar o evidenciar el caso; puede haber una parte ya probada. No se acreditan las unitarias de Miguel o Dulce a partir de las pruebas de integración de Lucía.
@@ -45,7 +41,7 @@ La columna **Estado** usa solo ✅ y ⏳. ✅ identifica ejecución local con ev
 | Consulta Q03 por API | 51 casos Q03 tras la auditoría: 46 correctos y 5 fallidos; la ejecución anterior repitió también 12 HTTPS correctamente. Filtros válidos, límites, permisos, solo lectura y metadatos en B00 §4.6. 0, 1, 2 y las listas Paciente,Cita / Paciente, Cita devuelven 200 en vez de 400; Miguel debe aceptar solo nombres completos. Comando final y revisión humana pendientes. |
 | Q08 de Identity | ✅ 16 casos correctos en InterrupcionesIdentidadTests: antes/después del commit, cancelación, corte real de conexión, éxito posterior y reintentos de alta/baja/rol. Cambios propios temporal y ordinario probados; en el ordinario se deja pasar su primera confirmación. Restablecer otra vez genera otra clave/evento; procedimiento pendiente. No acredita páginas, red real de escrituras, Q08 completo en pacientes/citas/pago. B00 §4.7; auditoría de Claude APROBADO; revisión humana pendiente. |
 | S-20, S-21 — API disponible | ✅ 11 casos correctos en ErroresRegistrosTests; B00 §4.8. 400/401/500 sin valores privados buscados, registros del proceso capturados y recuperación 200. ⏳ Alcance completo en otras rutas/páginas, mensaje del 500 vacío de Identity y revisión humana. Auditoría de errores/registros: APROBADO. |
-| S-30 | ⏳ Inventario en B00 §4.5; política aprobada por Lucía el 11-oct. Miguel implementa en PR #5 y Lucía verifica en su PR de QA. Se conservan los otros pendientes de seguridad. |
+| S-30 | ✅ Política aprobada e implementación PR #5 comprobada; nueve casos HTTPS de QA en B00 §4.10–§4.11. ✅ Revisión/fusión de PR #6 completadas el 15-oct. ⏳ Navegador, CSP de recursos y CSS con sesión. Este seguimiento antiguo se actualiza sin acreditar pruebas nuevas. |
 | S-26, S-27 | Búsqueda acotada en historial/archivos e imagen histórica, y revisión de `.env.example` ficticio. No se detectaron credenciales de TherapEase dentro del alcance; las claves privadas de ejemplo de GnuTLS están clasificadas en la evidencia. No es garantía universal. |
 | A-04, S-32 | ✅ Repetidos el 08 y 09-oct en HorasDockerTests: imagen actual construida, no root, /salud 200 y HEALTHCHECK healthy; ruta sin sesión 401. 12 casos correctos; el 09-oct se verificó también la eliminación automática de la imagen. B00 §4.4. |
 | L-CU02-01/05/07, L-CU04-01/03/04, L-CU06-05, L-Q03-01/02/04 | Cobertura parcial: temporal/políticas, último superusuario concurrente, auditoría de Identity, versión EF, conservación del paciente, dos reservas SQL y consulta autorizada. Faltan los demás caminos/operaciones, formularios o recuentos previstos; no se da por completo el caso compuesto. |
@@ -69,9 +65,15 @@ Evidencia detallada: [Identity](TherapEase-09-B00-evidencia-identidad.md), [recu
 | ⏳ | Implementar permiso aprobado, actualizar README/AGENTS y aprobar PR #5 | Lucía aprobó el 11-oct Usuaria y Superusuario como provisional. Miguel implementa y prueba; Lucía revisa el nuevo commit. |
 | ✅ | Decisiones de Lucía del 11-oct, órdenes 1–3 de B00 §7 | Cabeceras y cuatro mejoras de backend incluidas en PR #5; tres mejoras de QA incluidas en el próximo PR conjunto de Lucía. Implementación, pruebas y revisión siguen ⏳. Reglas en AGENTS §2.5–§2.6. |
 | ✅ | Secret Protection y Push protection de GitHub | Captura aportada por Lucía el 12-oct: ambos botones Disable. Configuración activada; no prueba de bloqueo, ni revisión actual de main, ni garantía de ausencia de secretos. B00 §7, orden 10. |
-| ⏳ | Cobertura restante B00 | Páginas/navegador, temporales, Q03, cabeceras/secretos. B00 §7 ordena las propuestas, dependencias y entregas: mejoras de Miguel en PR #5 y un próximo PR conjunto de QA de Lucía; sin PR por cada punto. B00/LCA/R04 siguen abiertos. |
+| ⏳ | Cobertura restante B00 | Páginas/navegador, temporales, Q03, cabeceras/secretos. B00 §7 ordena las propuestas, dependencias y entregas: mejoras de Miguel en PR #5 y QA de Lucía en PR #6, ambos ya revisados y fusionados; sin PR por cada punto. B00/LCA/R04 siguen abiertos. |
 
 El seguimiento 0.1 conserva las ejecuciones del 08–10-oct como historia. Los fallos de arquitectura/Q03 allí citados ya no son el resultado vigente. No se marcan completas las pruebas de páginas u operaciones aún inexistentes.
+
+## 0.6. PR #6 revisado y fusionado — 15-oct-2026
+
+✅ Miguel aprobó la versión `0db344a`; Lucía fusionó mediante squash en `ffb2494ad9da026f24a57826c45f6f530afb467b`. No se repitieron pruebas por actualizar este plan. Se conservan los resultados de B00 y siguen pendientes páginas/navegador, producto y cierre B00/LCA/R04.
+
+⏳ Seguimientos de revisión: tres tiempos de espera agotados en el primer arranque pasaron aislados y en la segunda ejecución completa; Miguel los atribuye a carga de arranque. S-30 debe añadir CSS con sesión, porque la prueba anterior solo cubre CSS sin sesión. Observación no bloqueante para PR #6; no se da por ejecutado ese caso.
 
 ## 0.5. Correcciones de auditoría del PR #6 — 14-oct-2026
 
@@ -79,7 +81,7 @@ El seguimiento 0.1 conserva las ejecuciones del 08–10-oct como historia. Los f
 | --- | --- | --- |
 | ✅ | Dependencias de pruebas corregidas | Pkcs y Xml fijados/resueltos en 10.0.13 en UnitTests e IntegrationTests. Auditoría de siete proyectos con transitivos: cero paquetes vulnerables reportados. |
 | ✅ | Encabezados y repetición completa | Nueve encabezados ampliados sin cambiar lógica. Build Release sin errores/advertencias; 258 unitarias y 205 integración correctas, 0 fallos/omitidas. Evidencia y comandos en B00 §4.11. |
-| ⏳ | Revisión humana y fusión del PR #6 | Miguel revisa esta corrección junto con las pruebas; Lucía decide. Páginas/navegador y resto de B00 conservan sus pendientes. |
+| ✅ | Revisión humana y fusión del PR #6 | [Miguel aprobó](https://github.com/LuciAguilar/Therapease/pull/6#pullrequestreview-5528518803) `0db344a`; Lucía fusionó mediante squash el 15-oct en `ffb2494ad9da026f24a57826c45f6f530afb467b`. Páginas/navegador y resto de B00 conservan sus pendientes. |
 
 Esta sección actualiza 0.4; no acredita cierre de B00/LCA ni cambia la autorización de avance a B01 con datos ficticios.
 
@@ -87,12 +89,12 @@ Esta sección actualiza 0.4; no acredita cierre de B00/LCA ni cambia la autoriza
 
 | Estado | Alcance | Resultado / pendiente |
 | --- | --- | --- |
-| ✅ | Repetición final de QA | Código 4ca53c4: 258 unitarias y 205 integración correctas, 0 fallos/omitidas. Evidencia/huellas en B00 §4.10. Revisión humana pendiente. |
+| ✅ | Repetición final de QA | Código 4ca53c4: 258 unitarias y 205 integración correctas, 0 fallos/omitidas. Evidencia/huellas en B00 §4.10. Revisión humana posterior completada en PR #6 el 15-oct. |
 | ✅ | PR #5 bce9409 | 258 unitarias y 182 integración, 0 fallos/omitidas; compilación Release sin errores/advertencias. Mensaje 500 corregido; PR #5 fusionado el 13-oct, main 40785d2. |
 | ✅ | BajaPacienteTests: 14 casos | Nueve anteriores más Usuaria/Superusuario, con/sin temporal y sesión ausente. Guardado/evento reales y concurrencia conservados. L-CU04, Q03/Q07/Q08/Q20; cobertura de servidor, no página. |
 | ✅ | CabecerasSeguridadTests: 9 casos | S-30 y apoyo Q04/Q08/Q19: cabeceras reales, caché privada, estático, fallo de Identity JSON/HTML y recuperación. No sustituye navegador/CSP de recursos. |
 | ✅ | Tres mejoras de QA | Arranque con timeout tolerado, evento restaurado comprobado en HTTP, documentación de crear-roles.sql para un destino nuevo. Recuperación: 13 casos correctos. |
-| ⏳ | Revisión y fusión de QA nuevo | [PR #6](https://github.com/LuciAguilar/Therapease/pull/6) publicado; revisión solicitada a Miguel/GalloNav. Lucía decide. La aprobación de PR #4 no acredita revisión de esta ampliación. |
+| ✅ | Revisión y fusión de QA nuevo | [PR #6](https://github.com/LuciAguilar/Therapease/pull/6) revisado por Miguel sobre `0db344a` y fusionado por Lucía el 15-oct en `ffb2494`. Esta ampliación tiene su propia revisión, distinta de PR #4. |
 | ⏳ | Páginas, navegador y producto | Mantener los casos completos pendientes; detalles y responsables en B00 §7. |
 | ✅ | Avance a Construcción/B01 | Autorizado por Lucía el 13-oct, con datos ficticios y pendientes B00/LCA visibles; no declara cierre de B00/LCA, datos reales ni nube. |
 
@@ -136,7 +138,7 @@ Los identificadores de la sección 3 conservan ⏳ si su alcance completo aún f
 | M-08 | ⏳ | Actualizar con una versión anterior → conflicto, sin sobrescribir. | HU06, Q07 |
 | M-09 | ⏳ | Actualizar por el flujo ordinario una ficha dada de baja → rechaza e informa su condición. | CU04 A4 |
 | M-10 | ⏳ | Baja → `Condicion = Baja`, `FechaBaja` e `IdUsuarioBaja` llenos. Recuperar → `Vigente` y ambos vacíos. | 08C regla 7, Q20 |
-| M-11 | ⏳ | Baja de paciente con citas activas → rechaza. **Pendiente.** | HU07, CU04 A2 |
+| M-11 | ⏳ | Base B00: rechazar baja con cita activa. Entrevista solicita cancelación automática: cambiar expectativa solo tras aprobación/implementación; baja/cancelaciones/eventos atómicos y pago conservado. | HU07, CU04 A2; entrevista 1 |
 | M-12 | ⏳ | Alta y actualización llenan fecha y usuario de `EntidadAuditable`. | 08C |
 
 ### Citas y pago: CU05–CU09 (B03–B06)
@@ -145,8 +147,8 @@ Los identificadores de la sección 3 conservan ⏳ si su alcance completo aún f
 | --- | --- | --- | --- |
 | M-13 ★ | ⏳ | Cita activa solo si está agendada **y** vigente (probar las 4 combinaciones). | Q06 |
 | M-14 ★ | ⏳ | Agendar con inicio ≥ fin, paciente inexistente o de baja, o ámbito que el paciente no tiene → rechaza. | HU09, CU06 A1 |
-| M-15 ★ | ⏳ | Cruce: solapada con una activa → rechaza, aunque sea de otro ámbito. Cancelada o de baja → no bloquea. Contigua (10–11 y 11–12) → permite. **Pendiente** la contigua. | HU09, CU06 A2 |
-| M-16 ★ | ⏳ | Una cita nueva queda agendada, vigente y con pago pendiente. **Pendiente** el pago inicial. | 08C §2 |
+| M-15 ★ | ⏳ | Cruce: solapada con una activa → rechaza, aunque sea de otro ámbito. Cancelada o de baja → no bloquea. Contigua (10–11 y 11–12) → permite. ✅ Preferencia recibida: contiguas sí; ⏳ ejecución del caso restante. | HU09, CU06 A2 |
+| M-16 ★ | ⏳ | Una cita nueva queda agendada, vigente y con pago pendiente. ✅ Respuesta recibida: inicial Pendiente; ⏳ pruebas. | 08C §2 |
 | M-17 ★ | ⏳ | El pago solo acepta Pagado o Pendiente. | HU13, CU09 A6 |
 | M-18 | ⏳ | Reprogramar conserva el pago. Cita cancelada, de baja o con paciente de baja → rechaza. | HU10, CU07 A3–A4 |
 | M-19 | ⏳ | Cancelar → cancelada, conserva pago y condición. | HU11, Q20 |
@@ -258,9 +260,9 @@ Integración: xUnit + Testcontainers, con el esquema creado por **las migracione
 | L-CU04-02 ★ | ⏳ | Cortar la respuesta después de guardar → al consultar, el dato es coherente y no se anunció éxito. | Q08 |
 | L-CU04-03 | ⏳ | Baja → sale de listas y búsquedas, aparece en «Pacientes de baja» y sigue en la base. | Q20 |
 | L-CU04-04 | ⏳ | Recuperar → vuelve a las listas; se limpian los datos de baja; el evento histórico se conserva. | Q20, 08C |
-| L-CU04-05 | ⏳ | Baja con citas activas → rechazada. **Pendiente.** | CU04 A2 |
+| L-CU04-05 | ⏳ | Base B00 probada: rechazo con cita activa. La entrevista pide cancelación automática al dar de baja paciente; cambiar expectativa solo tras decisión/implementación, con baja/cancelaciones/eventos atómicos, pago y concurrencia protegidos. | CU04 A2 |
 | L-CU04-06 | ⏳ | Dar de baja al paciente mientras se le agenda una cita, al mismo tiempo y repetido muchas veces → nunca queda una cita activa de un paciente de baja. | CU06 A3 |
-| L-CU04-07 | ⏳ | Retirar un ámbito con citas. **Pendiente.** | CU04 A5 |
+| L-CU04-07 | ⏳ | Retirar ámbito conserva el original de las citas según entrevista. Recuperar/reprogramar con ámbito retirado y el cambio a solo particular siguen pendientes; probar tras concretarlos. | CU04 A5 |
 
 ### CU05 — Consultar agenda (B03) ★
 
@@ -314,7 +316,7 @@ Integración: xUnit + Testcontainers, con el esquema creado por **las migracione
 | L-CU09-02 | ⏳ | Uno cambia el pago y otro reprograma la misma cita a la vez → aviso de conflicto. | CU09 A1 |
 | L-CU09-03 | ⏳ | Cancelar o dar de baja no cambia el pago (verificar en la base). | HU13 CA3 |
 | L-CU09-04 | ⏳ | Enviar a mano un valor distinto de Pagado/Pendiente → rechaza. | CU09 A6 |
-| L-CU09-05 | ⏳ | Corregir el pago de una cita cancelada o de baja. **Pendiente.** | CU09 A3–A4 |
+| L-CU09-05 | ⏳ | Respuesta recibida: permitir corrección autorizada del pago en cancelada y rechazarla en cita de baja; cancelar/baja conservan pago. Montos requieren decisión de alcance y reglas. | CU09 A3–A4 |
 
 ### Q03 — Auditoría en base (captura desde B01; sin pantalla CU10 en 09)
 
@@ -323,9 +325,9 @@ Integración: xUnit + Testcontainers, con el esquema creado por **las migracione
 | L-Q03-01 ★ | ⏳ | Cada cambio de paciente, cita, pago y usuario genera exactamente un evento con actor, momento, registro/campo y hecho. | Q03 |
 | L-Q03-02 ★ | ⏳ | Si el evento no se puede guardar → el cambio tampoco se guarda. | Q03, S4 |
 | L-Q03-03 ★ | ✅ | El usuario de aplicación puede insertar eventos, pero `UPDATE`/`DELETE` se deniegan en PostgreSQL. La consulta técnica autorizada devuelve únicamente actor, momento, registro/campo y hecho. | Q03, 07B, B00 aprobado |
-| L-Q03-04 ★ | ⏳ | Consulta técnica aprobada por Lucía: comando de lectura → servidor valida superusuario activo; sin sesión, sesión revocada o rol sin permiso → denegación, sin eventos. No hay operación de edición ni borrado. | Q03, Q01–Q02, B00 aprobado |
+| L-Q03-04 ★ | ⏳ | Opción A aprobada el 12-oct: Superusuario activo sin temporal entra por CU01 y abre la URL de consulta en la misma ventana, con cookie/permisos vigentes. Sin sesión, revocada o sin permiso: denegación sin eventos. Sin pantalla de auditoría ni script B. Falta recorrido real con páginas y navegador. | Q03, Q01–Q02, AGENTS §2.3 |
 
-Lucía aprobó el 01-oct la consulta sin pantalla de B00 mediante un comando de lectura que llama al servidor y exige permiso actual de superusuario. Q03 conserva su meta. Permisos PostgreSQL y salida de metadatos comprobados; API con 46 correctas y 5 fallos de números/listas (B00 §4.6). Faltan corregir ese filtro, completar acceso/comando final y revisión humana; captura y atomicidad de todas las operaciones siguen ⏳.
+Consulta Q03 sin pantalla: opción A de navegador autenticado aprobada el 12-oct, con cookie/permiso vigente. El filtro fue corregido en PR #5; 51/51 históricas según B00 §4.9. Falta recorrido final con acceso/cierre de sesión de Dulce y navegador; captura/atomicidad de todas las operaciones continúan con su cobertura parcial. Sin comando/script B ni ejecución nueva por esta actualización.
 
 ### Recorrido completo Q16 (desde B04) ★
 
@@ -391,7 +393,7 @@ Referencia: OWASP Top 10:2025, ASVS 5.0 aplicable y 07B. «Todas las rutas» = l
 | S-27 | ✅ | `.env.example` solo tiene nombres y valores ficticios. | 07B |
 | S-28 | ⏳ | La conexión a Neon usa `SSL Mode=VerifyFull` (revisión de configuración, sin conectar desde CI). | 07B, 07C |
 | S-29 | ✅ | Validación local: HTTP redirige a HTTPS y HSTS se emite en modo Production con nombre .test; localhost excluido. HttpsLocalTests, B00 §4.5. Despliegue y navegador siguen pendientes; duración HSTS final por decidir al desplegar. | Q19 |
-| S-30 | ⏳ | Cabeceras de seguridad básicas (tipo de contenido, protección contra incrustación en marcos, política de contenido). **Aprobadas el 11-oct:** política en AGENTS §2.5 y B00 §4.5. Pendiente: Miguel implementa en PR #5 y Lucía verifica en su PR de QA. | ASVS |
+| S-30 | ✅ / ⏳ | Cabeceras aprobadas el 11-oct, implementadas en PR #5 bce9409 y comprobadas con nueve casos HTTPS de CabecerasSeguridadTests (B00 §4.10–§4.11, PR #6). ⏳ Navegador, CSP de recursos y caso CSS con sesión; revisión humana/fusión de PR #6 completadas el 15-oct; HSTS final al despliegue autorizado. No atribuir ejecución nueva a esta corrección. | ASVS, AGENTS §2.5 |
 | S-31 | ✅ | Reiniciar el contenedor → las sesiones siguen siendo válidas (claves de Data Protection en PostgreSQL) y no hay claves en disco. | 05D, 07B |
 | S-32 | ✅ | El proceso del contenedor no corre como administrador. | 05E |
 
@@ -426,17 +428,35 @@ Referencia: OWASP Top 10:2025, ASVS 5.0 aplicable y 07B. «Todas las rutas» = l
 
 | Decisión | Pruebas afectadas | Quién decide |
 | --- | --- | --- |
-| ¿Se permiten citas contiguas? | M-15, L-CU06-03 | Dulce con la usuaria |
-| ¿El pago empieza en Pendiente? | M-16 | Dulce con la usuaria |
-| ¿Se impide la baja o se cancelan primero las citas existentes? El bloqueo de cita activa con paciente de baja se conserva. | M-11, L-CU04-05 | Dulce con la usuaria |
-| ¿Qué pasa al retirar un ámbito con citas? | L-CU04-07 | Dulce con la usuaria |
-| ¿Se corrige el pago de una cita cancelada o de baja? | L-CU09-05 | Dulce con la usuaria |
+| ✅ Respuesta: citas contiguas sí. | M-15, L-CU06-03 | Preferencia de la usuaria recibida; ⏳ implementación/QA del alcance restante. |
+| ✅ Respuesta: estado inicial Pendiente. | M-16 | Respuesta recibida; ⏳ monto inicial si se aprueba ampliación, pruebas pendientes. |
+| ✅ Respuesta: cancelar automáticamente al dar de baja paciente; ⏳ cambio de regla por aprobar. | M-11, L-CU04-05 | Lucía decide impacto; Miguel propone operación atómica/eventos/concurrencia. Base B00 sigue rechazando con activa. |
+| ✅ Respuesta: retirarlo conservando original en citas; ⏳ recuperación con ámbito retirado y solo particular. | L-CU04-07 | Dulce concreta alternos; Lucía decide cambio de alcance. |
+| ✅ Respuesta: cancelada sí, de baja no; ⏳ montos solicitados por aprobar. | L-CU09-05, HU13/CU09 | Lucía decide alcance de montos, Dulce detalla, Miguel implementa y Lucía prueba. |
 | Resuelto el 04-oct: restablecimiento no levanta el bloqueo vigente | L-CU02-06 | Lucía aprobó; Miguel implementa; Lucía prueba |
 | Resuelto el 04-oct: contraseña mínima de 12 caracteres sin composición | L-CU11-02 | Lucía aprobó; Miguel implementa; Lucía prueba |
-| Resuelto el 11-oct: cabeceras de seguridad según AGENTS §2.5 | S-30 | Lucía aprobó; Miguel implementa en PR #5 y Lucía prueba |
+| Resuelto el 11-oct: cabeceras según AGENTS §2.5, implementadas/probadas en PR #5 y QA posterior | S-30 | ✅ Implementación y evidencia histórica; ✅ revisión/fusión QA nuevo completadas el 15-oct; ⏳ navegador, CSP de recursos y CSS con sesión. |
 | Resuelto el 04-oct: Dulce escribe los PageModel y sus unitarias | Sección 2 | Lucía confirmó; revisión distinta y aprobación final de Lucía |
-| ¿Qué campos son información relevante del directorio? | D-15, L-CU03-05–06 | Dulce con la usuaria |
+| ✅ Respuesta: nombre en lista; nacimiento/apellidos para distinguir homónimos; directorio prioridad posterior 3. | D-15, L-CU03-05–06 | ⏳ Concretar selección/formatos y capacidad; no volver a pedir preferencia ya recibida. |
 | Resuelto el 01-oct: consulta técnica sin pantalla de B00 para superusuario activo aprobada | L-Q03-03–04, S-22–S-24 | Lucía aprobó y prueba; Miguel implementa y revisa las pruebas de Lucía |
 | Resuelto el 11-oct: baja provisional de pacientes para Usuaria y Superusuario; otros permisos no se amplían | CU04, Q01; pruebas de autorización del permiso nuevo | Lucía aprobó; Miguel implementa y prueba en PR #5. Dulce valida la política operativa con la usuaria. |
 | Resuelto el 12-oct: temporales, orden 7 puntos 1–4; A para B00 ficticio, B de 24 h antes de datos reales | CU02, CU11, Q08/Q19 | Lucía aprobó; entrega/interfaz y prueba final pendientes; B no se implementa ahora |
 | Resuelto el 12-oct: Q03 por navegador autenticado, orden 8 opción A; script B no incluido | L-Q03-03–04, S-22–S-24 | Lucía aprobó; acceso/cierre de sesión de Dulce y prueba final pendientes |
+
+## Ajuste de cobertura por entrevista del 14-oct-2026
+
+### Respuestas recibidas que sustituyen esperas de producto
+
+| Estado | Respuesta recibida | Pendiente que permanece |
+| --- | --- | --- |
+| ✅ | Paciente: nombre completo, teléfono, correo, nacimiento, escuela/grupo; anotación de edad. Tutor siempre en menores; homónimos por nacimiento y apellidos; lista solo nombre. | ⏳ Campos/formatos/obligatoriedad, datos del tutor y edad calculada o guardada; escuela/grupo ante «solo particular». |
+| ✅ | Citas contiguas permitidas; pago inicial Pendiente; corregir pago cancelada sí, de baja no. | ⏳ Implementación/QA restante; horario aclarado por Lucía (9–15: 1 h; desde 15: posibilidad de 30 min, hasta 19); límite de 19 por precisar. |
+| ✅ | Solicita solo particular, montos y cancelación automática de citas al dar de baja paciente. | ⏳ Aprobación de cambios frente a la base y mecanismo/modelo/pruebas; conservar invariantes y pago. |
+| ✅ | Solo la usuaria operativa; Usuario con nombre completo y correo; pantallas «Están bien»; logotipo en inicio. | ⏳ Contratos/validaciones de campos, versión exacta de pantallas y recurso visual; no recuperación por correo. |
+| ✅ | Recorrido de diciembre conforme; después expediente/notas 1, reportes 2, directorio 3, reprogramar/cancelar 4. | ⏳ Baja/recuperación sin número; capacidad/secuencia técnica, sin renumerar B/HU/CU ni adelantar clínico. |
+| ✅ | Expediente: motivo, antecedentes, notas y plan; anotaciones iniciales/por cita. Reportes: citas por mes y pacientes atendidos; anotación de lista de espera. | ⏳ Modelo/vínculo/indicadores/proceso; capacidades futuras, sin HU/CU nuevos por inferencia. |
+| ✅ | Papel, práctica declarada de 5 años, acceso real solo la usuaria y consulta antes de decidir eliminación. | ⏳ R04, política detallada y revisión antes de datos reales. No borrar automáticamente ni archivar indefinidamente. |
+
+Todos los estados ⏳ de ejecución se conservan. Incorporar a los casos existentes de CU01/CU02 (datos de Usuario), CU03/CU04 (campos/tutor/homónimos/baja), CU05–CU09 (horario/montos/pago) y futuros CU-F11–F13 el alcance aprobado cuando se implemente. No crear IDs ficticios ni contar respuestas de entrevista como casos correctos.
+
+**Horario aclarado por Lucía, 14-oct:** ✅ 9:00–15:00, sesiones de 1 h; desde 15:00 puede haber sesiones de 30 min, hasta 19:00. ⏳ Último inicio o término a 19:00, días y cruce de las 15:00 por concretar. Referencia America/Hermosillo; no acredita implementación ni pruebas.

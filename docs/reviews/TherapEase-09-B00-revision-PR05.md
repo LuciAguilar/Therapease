@@ -1,5 +1,7 @@
 # TherapEase — Ajustes del PR #5 · B00
 
+> **Continuidad documental del 14-oct-2026:** ✅ respuestas de producto recibidas en [registro de entrevista](../requirements/TherapEase-09-entrevista-requisitos.md). Este informe conserva revisión/evidencia histórica: montos, solo particular y cancelación automática no se atribuyen al código probado B00. ⏳ Detalle/aprobación/implementación de cambios; B00/LCA/R04 abiertos y esta preparación no autoriza Construcción.
+
 **Revisión actual: 13-oct-2026.** [PR #5](https://github.com/LuciAguilar/Therapease/pull/5), commit `bce94091ba614e16f4cce3435697d8c58c2a31ff`, rama `b00/correcciones-pr4`. Base `709ff615`. Autor: Miguel. Aprobación final: Lucía.
 
 > **Resultado de revisión: sin bloqueantes de código.** El 500 ya pide comprobar si se guardó antes de repetir. Build Release correcto, 258 unitarias y 182 integración correctas; PR #5 aprobado y fusionado por Lucía el 13-oct; main 40785d2. Lucía autorizó preparar el PR de QA y avanzar B01 con pendientes B00/LCA visibles.

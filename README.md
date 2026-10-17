@@ -1,5 +1,9 @@
 # TherapEase — Guía de arranque del equipo en 09
 
+**Estado vigente y lectura para Miguel — 17-oct-2026:** B01 está abierto por decisión de Lucía; B00/LCA/R04 siguen abiertos. PR #5 y PR #6 ya están revisados y fusionados. Empezar por AGENTS, este README y el [plan B01](docs/planning/TherapEase-etapa09-B01.md), especialmente §2, §3.2, §4 y §6. La [entrevista recibida](docs/requirements/TherapEase-09-entrevista-requisitos.md) registra respuestas y propuestas aún pendientes; no autoriza programar sus cambios de alcance. Las pruebas nuevas de Lucía esperan auditoría y aprobación. Esta publicación reúne solo documentos, mediante nuevo commit en `revision/etapa09`, sin PR.
+
+> **Actualización del 14-oct-2026:** ✅ entrevista recibida; [respuestas, cambios y autorizaciones pendientes](docs/requirements/TherapEase-09-entrevista-requisitos.md). ⏳ Montos, solo particular y cancelación automática cambian la base y requieren decisión de Lucía antes de código. Nombre completo/correo de Usuario y conformidad general a pantallas ya recibidos; falta detalle y pruebas. B00/LCA/R04 abiertos; esta preparación no autoriza Construcción.
+
 **Actualización documental: 10-oct-2026.** La base de esta guía, AGENTS, ADR-01…06 y el plan B00 fueron aprobados el 01-oct. Esta actualización separa ajustes para el equipo de las notas personales y alinea el estado parcial de B00. Los cambios de documentación inicial pueden comunicarse a Lucía; no se acredita una revisión no recibida.
 
 **T1 aprobado y publicado:** Lucía aprobó los 22 archivos de documentación, reglas y carpetas base el 01-oct-2026 y realizó el primer push a [LuciAguilar/Therapease](https://github.com/LuciAguilar/Therapease), repositorio público. La validación ejecutable de B00 y la decisión de cierre de LCA siguen pendientes.
@@ -24,6 +28,9 @@
 | Modelos e interfaces | [docs/requirements/TherapEase-etapa08-modelos-interfaces.md](docs/requirements/TherapEase-etapa08-modelos-interfaces.md) | Entidades, relaciones y propuestas de pantallas/campos. |
 | Backlog y trazabilidad | [docs/planning/TherapEase-etapa08-backlog-trazabilidad.md](docs/planning/TherapEase-etapa08-backlog-trazabilidad.md) | B00–B08 y relación con Q/R/ADR. |
 | Plan y estado B00 | [docs/planning/TherapEase-etapa09-B00.md](docs/planning/TherapEase-etapa09-B00.md) | Resultados, pendientes, siguientes pasos y puerta LCA. |
+| Plan B01 | [Acceso e identidad segura](docs/planning/TherapEase-etapa09-B01.md) | Trabajo de cada persona, decisiones aprobadas, propuestas y orden de entrega. |
+| Respuestas y ajustes | [Entrevista de requisitos](docs/requirements/TherapEase-09-entrevista-requisitos.md) | Preferencias recibidas, decisiones que faltan y alcance pendiente. |
+| Avance y organización | [Avance Scrum](docs/planning/TherapEase-avance-Scrum.md) | Bloques y organización del trabajo; no acredita Sprints ni avances de QA no aprobados. |
 | Plan de pruebas | [docs/testing/TherapEase-09-plan-de-pruebas.md](docs/testing/TherapEase-09-plan-de-pruebas.md) | Casos por persona y caso de uso. |
 | Ajustes del PR #1 | [docs/reviews/TherapEase-09-B00-revision-PR01.md](docs/reviews/TherapEase-09-B00-revision-PR01.md) | Correcciones concretas y mejoras propuestas para Miguel/Dulce. |
 | ADR-01…05 | [docs/architecture/adr/ADR-01-a-05-provisionales.md](docs/architecture/adr/ADR-01-a-05-provisionales.md) | Decisiones arquitectónicas y sus límites. |
@@ -34,11 +41,11 @@ Las adendas de 09 y las decisiones incorporadas a AGENTS rigen el trabajo vigent
 
 ## 3. Qué hace cada persona primero
 
-| Persona | Ahora, durante B00 | Entrega y siguiente paso |
+| Persona | Trabajo actual B01 y pendientes B00 | Entrega y siguiente paso |
 | --- | --- | --- |
-| **Lucía** | Revisar los cambios críticos y la evidencia parcial; preparar límites, integración crítica y seguridad de B00. Revisar esta actualización documental antes de fusionarla. | PR propio de las 11 pruebas adicionales con revisión de Miguel/Dulce; completar evidencia y decidir LCA. |
-| **Miguel** | PR #1 corregido y fusionado. Continuar la validación de B00 con sus unitarias propias y atender los pendientes ejecutables del plan. | Nuevo commit identificable, build y comandos/resultados. Mantener el bloqueo PostgreSQL. Revisa la prueba de límites; él o Dulce revisa las demás pruebas de Lucía. |
-| **Dulce** | Validar con la usuaria las políticas provisionales de citas/pago, campos y prioridades. Coordinar contratos con Miguel y preparar PageModel/Razor mínimo para comprobar el acceso de B00. | Registrar respuestas y pendientes reales, unitarias propias y checklist visual. El frontend posterior depende de la decisión LCA y las prioridades acordadas. |
+| **Lucía** | Auditar sus pruebas con Claude y resolver observaciones; aprobar las propuestas nuevas de Miguel y conservar QA pendiente B00. | Miguel o Dulce revisa sus pruebas. Después de auditoría y aprobaciones, actualizar documentos de avance y autorizar el commit/publicación de QA. |
+| **Miguel** | Aprovechar el servidor y las pruebas B00; completar acceso, usuarios, sesiones y contraseñas y preparar CI. Presentar juntas las propuestas de [B01 §3.2](docs/planning/TherapEase-etapa09-B01.md#32-propuesta-que-miguel-debe-presentar-antes-de-programarla). | Unitarias propias y evidencia por cambio. Aplicar el detalle aprobado y coordinar con Dulce; no implementar propuestas pendientes antes de la decisión de Lucía. |
+| **Dulce** | PageModel, Razor, formularios y navegación del acceso, usuarios y cambio propio; unitarias del código que escriba. Concretar mensajes/campos pendientes con la usuaria y el equipo. | Integrar las funciones del servidor con protección de formularios y HTTPS local. No necesita esperar pacientes/citas/pagos para B01. |
 
 **PageModel asignado:** Lucía confirmó el 04-oct-2026 que lo escribe Dulce. Unitarias en el mismo PR, revisión distinta y aprobación de Lucía, conforme a [AGENTS.md](AGENTS.md).
 
@@ -62,14 +69,14 @@ Ver [AGENTS.md — Reglas por cambio](AGENTS.md).
 | Resuelto el 04-oct: PageModel a cargo de Dulce | Lucía confirmó; Dulce implementa y escribe unitarias | Revisión distinta y aprobación de Lucía. |
 | Respaldo: decisión de Lucía del 10-oct registrada | Implementación pendiente de autorización | Opción A, age, validación diaria antes de cifrar y simulacro mensual; reglas vigentes en AGENTS §2.8 y nota posterior ADR-05. No crear repo, conectar Neon ni configurar flujo. |
 | Revisión de documentación inicial | Miguel o Dulce comunica observaciones con su propio método; Lucía confirma cambios | Pendiente y no bloqueante; guía, AGENTS y ADR corregidos ya aprobados por Lucía. |
-| Revisión de código/pruebas, resultados B00 y decisión LCA | Autor distinto del revisor en cada PR; aprobación final de Lucía | Miguel/Dulce revisa pruebas de Lucía. Construcción continúa pendiente de evidencia y decisión LCA. |
+| Revisión de código/pruebas, resultados B00 y decisión LCA | Autor distinto del revisor en cada PR; aprobación final de Lucía | Miguel/Dulce revisa pruebas de Lucía. Construcción B01 está abierta por decisión posterior; el cierre B00/LCA sigue esperando evidencia y decisión de Lucía. |
 | Acceso, procedencia, conservación y eliminación de datos reales; TOTP | Lucía con la usuaria y responsables técnicos | R04 sigue abierto: no utilizar datos reales. |
 
 GitHub permite descargar artefactos a personas autenticadas con lectura del repositorio; en uno público ese acceso no restringe el respaldo al equipo. El cifrado no convierte el artefacto en privado. [Fuente oficial: descarga de artefactos](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/download-workflow-artifacts). La nota posterior ADR-05 del 10-oct registra la decisión aprobada de cifrado, custodia y validación; su implementación no está autorizada. No se ha creado el repo de respaldo ni configurado el flujo.
 
 ## 7. Cómo dejar trabajo revisable sin depender de una llamada
 
-En cada PR: B/HU/CU/Q afectados, qué se implementó, criterios cubiertos, comandos y resultados, pendientes y persona revisora. Adjuntar evidencia ficticia y sin secretos. Miguel documenta cómo arrancar, migrar y reproducir; Dulce deja respuestas de producto y capturas ficticias; Lucía añade resultados de sus pruebas cuando los ejecute. La menor disponibilidad de Lucía permite preparar trabajo revisable, no fusionar cambios críticos sin su revisión ni dar por aprobada LCA.
+En cada PR: B/HU/CU/Q afectados, qué se implementó, criterios cubiertos, comandos y resultados, pendientes y persona revisora. Adjuntar evidencia ficticia y sin secretos. Miguel documenta cómo arrancar, migrar y reproducir; Dulce deja respuestas de producto y capturas ficticias; Los documentos de avance incorporan los cambios y resultados de la entrega después de cerrar la auditoría y las aprobaciones; antes se conserva la evidencia local pendiente. La menor disponibilidad de Lucía permite preparar trabajo revisable, no fusionar cambios críticos sin su revisión ni dar por aprobada LCA.
 
 ## 8. Instalar antes de empezar
 
@@ -99,16 +106,16 @@ PR #5, `bce9409`: build Release sin errores/advertencias; 258 unitarias y 182 in
 
 | Quién | Qué debe consultar y atender |
 | --- | --- |
-| Miguel | Revisar el PR conjunto de QA: BajaPacienteTests, CabecerasSeguridadTests, ServidorRevision y RecuperacionTests; resultados en [B00 §4.10](docs/planning/TherapEase-etapa09-B00.md#410-revisión-y-ampliación-qa--13-oct-2026). [Informe PR05](docs/reviews/TherapEase-09-B00-revision-PR05.md): sin bloqueantes de código restantes. |
+| Miguel | PR #6 revisado y fusionado. Continuar servidor de acceso, sesiones, contraseñas y unitarias; preparar CI y presentar propuesta pendiente de [B01 §3.2](docs/planning/TherapEase-etapa09-B01.md#32-propuesta-que-miguel-debe-presentar-antes-de-programarla). No reasignar PageModel de Dulce. |
 | Dulce | [Informe PR01 §8](docs/reviews/TherapEase-09-B00-revision-PR01.md#8-mensajes-de-guardado--dulce-pagemodel-10-oct-2026): mensajes Q08; acceso mínimo/PageModel y unitarias; validar producto con la usuaria. Procedimientos aprobados en [AGENTS](AGENTS.md) §2.2–§2.3. |
 | Equipo | [B00 §7](docs/planning/TherapEase-etapa09-B00.md#7-plan-de-validación-autorizado) y [plan de pruebas](docs/testing/TherapEase-09-plan-de-pruebas.md): responsables, evidencia y pendientes. Reglas obligatorias en AGENTS. |
 
-**[PR #6 — QA nuevo](https://github.com/LuciAguilar/Therapease/pull/6):** código `4ca53c4`, 258 unitarias y 205 integración correctas; comandos y huellas en B00 §4.10. Revisión humana y fusión de esta ampliación pendientes.
+**[PR #6 — QA incorporado](https://github.com/LuciAguilar/Therapease/pull/6):** Miguel aprobó `0db344a`; Lucía fusionó mediante squash el 15-oct en `ffb2494ad9da026f24a57826c45f6f530afb467b`. Código probado final `0aa32f2`: 258 unitarias y 205 integración correctas; comandos y huellas en B00 §4.11. No son pruebas nuevas de esta actualización. B00/LCA/R04 siguen abiertos.
 
 
-**Corrección del PR #6, 14-oct:** Pkcs y Xml de pruebas fijados en 10.0.13; auditoría NuGet sin paquetes vulnerables reportados. Repetición: 258 unitarias y 205 integración correctas. Encabezados ampliados; B00 §4.11 conserva comandos y huellas. Miguel revisa antes de fusionar.
+**Corrección del PR #6, 14-oct:** Pkcs y Xml de pruebas fijados en 10.0.13; auditoría NuGet sin paquetes vulnerables reportados. Repetición: 258 unitarias y 205 integración correctas. Encabezados ampliados; B00 §4.11 conserva comandos y huellas. Miguel revisó estas correcciones y Lucía fusionó PR #6 el 15-oct. Mantener seguimiento de tiempos de espera y CSS con sesión; páginas y navegador pendientes.
 
-**Avance autorizado el 13-oct:** Lucía autoriza Construcción/B01 con Miguel en otro chat mientras termina el QA de B00. B00/LCA conservan pendientes; R04 abierto, solo datos ficticios. El QA nuevo necesita revisión de Miguel o Dulce y aprobación/fusión de Lucía. Páginas/navegador, producto, respaldo real y nube mantienen sus límites.
+**Avance autorizado el 13-oct:** Lucía autoriza Construcción/B01 con Miguel en otro chat mientras termina el QA de B00. B00/LCA conservan pendientes; R04 abierto, solo datos ficticios. El QA nuevo ya fue revisado por Miguel y fusionado por Lucía el 15-oct. Páginas/navegador, producto, respaldo real y nube mantienen sus límites.
 
 **ADR-05:** age, clave pública y custodia privada según AGENTS §2.8. Las pruebas actuales usan cifrado exclusivo de QA; no implementan el respaldo real.
 
@@ -159,7 +166,7 @@ El segundo comando es la recuperación cuando ningún superusuario puede entrar;
 
 **Cabeceras de seguridad y errores.** Toda respuesta lleva `X-Content-Type-Options: nosniff`, `Content-Security-Policy: frame-ancestors 'none'`, `X-Frame-Options: DENY` y `Referrer-Policy: no-referrer`. El contenido que exige sesión lleva además `Cache-Control: no-store`; no se impone a los archivos estáticos. `/salud` ya impide caché por el framework y `/Error` por ResponseCache. Las demás restricciones de CSP se completan con las páginas y la duración de HSTS se decide al desplegar. Fuera de Development, una excepción no controlada recibe un 500 con cuerpo fijo (JSON en `/api`, HTML mínimo en las páginas) que no consulta Identity ni la base y no incluye datos de la excepción, de la solicitud ni del usuario.
 
-**Consulta técnica de auditoría (Q03, sin pantalla).** Solo lectura, solo superusuario activo con sesión vigente: `GET /api/auditoria/eventos?desde=<instante>&hasta=<instante>` con opcionales `tipoRegistro` (`Paciente`, `Cita`, `Usuario`; solo nombres completos, sin distinguir mayúsculas: números y listas con comas devuelven `400`), `idRegistro` y `limite` (1 a 500, 100 por defecto). Los instantes llevan zona, por ejemplo `2026-10-01T00:00:00Z`; sin zona se rechazan. Responde `401` sin sesión, `403` sin permiso y `400` ante un filtro inválido. Devuelve en JSON el actor, el momento, el registro y los campos afectados, la acción y el hecho, nunca valores. El comando que inicia sesión y llama a este servicio queda pendiente de que existan las pantallas de acceso: Dulce implementa los `PageModel` y escribe sus unitarias en el mismo PR.
+**Consulta técnica de auditoría (Q03, sin pantalla).** Solo lectura, solo superusuario activo con sesión vigente: `GET /api/auditoria/eventos?desde=<instante>&hasta=<instante>` con opcionales `tipoRegistro` (`Paciente`, `Cita`, `Usuario`; solo nombres completos, sin distinguir mayúsculas: números y listas con comas devuelven `400`), `idRegistro` y `limite` (1 a 500, 100 por defecto). Los instantes llevan zona, por ejemplo `2026-10-01T00:00:00Z`; sin zona se rechazan. Responde `401` sin sesión, `403` sin permiso y `400` ante un filtro inválido. Devuelve en JSON el actor, el momento, el registro y los campos afectados, la acción y el hecho, nunca valores. Opción A aprobada el 12-oct: el Superusuario activo sin temporal inicia sesión en el navegador y abre la URL en la misma ventana, con su cookie y permisos. No se incluye el script B. El recorrido final espera las páginas de acceso/salida de Dulce y su prueba de navegador; Dulce escribe PageModel y unitarias.
 
 **Dependencias permitidas según [AGENTS](AGENTS.md) §1.** Las 30 pruebas automáticas de límites pasan sobre el commit revisado del PR #5; el recorrido sobre páginas funcionales sigue pendiente. Estado de B00: [B00 §4](docs/planning/TherapEase-etapa09-B00.md#4-evidencia-registrada-y-límites).
 
@@ -188,3 +195,9 @@ Excepción aprobada por Lucía el 08-oct: Web puede usar enumeraciones y contene
 | Web | `Pages`, `Endpoints`, `Seguridad`, `Comandos`, `Configuracion`, `Salud` | Pantallas, rutas técnicas, cookie y políticas, comandos de operador, composición y sonda de salud. |
 
 Los setters de las entidades son `internal`: solo las clases de `Reglas` del propio dominio las modifican, así ninguna otra capa salta una regla. Los ámbitos de un paciente se exponen como colección de solo lectura. El coordinador de CU04 va en `TherapEase.Application.Coordinadores`, fuera de Pacientes y Citas. Citas puede usar el contrato público de Pacientes; Pacientes no usa Citas; Identidad usa Auditoría y Auditoría no usa Identidad.
+
+## Preparación de B01 y respuestas recibidas
+
+[Plan B01](docs/planning/TherapEase-etapa09-B01.md): trabajo de Miguel/CI y QA autorizado que puede avanzar sin páginas; PageModel y formularios de Dulce; navegador cuando estén disponibles. La entrevista acepta el recorrido de diciembre y registra campos, tutor, homónimos/lista, contiguas, pago inicial/correcciones y prioridades futuras. Los comandos técnicos y resultados históricos anteriores se conservan; no describen montos o cancelación automática implementados. Revisar el registro de entrevista antes de retomar pendientes de producto. No publicar fuentes originales ni checklist personal.
+
+**Horario aclarado por Lucía, 14-oct:** ✅ 9:00–15:00, sesiones de 1 h; desde 15:00 puede haber sesiones de 30 min, hasta 19:00. ⏳ Último inicio o término a 19:00, días y cruce de las 15:00 por concretar. Referencia America/Hermosillo; no acredita implementación ni pruebas.
