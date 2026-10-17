@@ -8,4 +8,7 @@ public class Usuario : IdentityUser<Guid>
     public bool Activo { get; set; } = true;
 
     public bool DebeCambiarContrasena { get; set; }
+
+    // Vacío hasta que el superusuario lo capture: las cuentas anteriores y la del comando de arranque no lo tienen.
+    public string NombreCompleto { get; set; } = string.Empty;
 }

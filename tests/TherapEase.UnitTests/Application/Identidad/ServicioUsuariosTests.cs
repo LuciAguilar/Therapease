@@ -14,6 +14,8 @@ public class ServicioUsuariosTests
 {
     private static readonly DateTimeOffset Ahora = new(2026, 10, 5, 15, 0, 0, TimeSpan.Zero);
 
+    private const string NombreCompletoValido = "Usuaria Ficticia Pérez";
+
     private readonly GestorIdentidadFalso _gestor = new();
     private readonly UnidadDeTrabajoFalsa _unidad = new();
     private readonly RepositorioAuditoriaFalso _repositorioAuditoria = new();
@@ -34,7 +36,7 @@ public class ServicioUsuariosTests
     [Fact]
     public async Task CrearUsuario_ConSuperusuarioActivo_CreaConContrasenaTemporalQueDebeCambiarse()
     {
-        var respuesta = await _servicio.CrearUsuarioAsync("usuaria1", NombresDeRol.Usuaria);
+        var respuesta = await _servicio.CrearUsuarioAsync("usuaria1", NombresDeRol.Usuaria, NombreCompletoValido);
 
         Assert.True(respuesta.Exito);
         var creacion = Assert.Single(_gestor.Creaciones);
@@ -48,7 +50,7 @@ public class ServicioUsuariosTests
     [Fact]
     public async Task CrearUsuario_RegistraEventoConElActorQueLoCreo()
     {
-        var respuesta = await _servicio.CrearUsuarioAsync("usuaria1", NombresDeRol.Usuaria);
+        var respuesta = await _servicio.CrearUsuarioAsync("usuaria1", NombresDeRol.Usuaria, NombreCompletoValido);
 
         var evento = Assert.Single(_repositorioAuditoria.Eventos);
         Assert.Equal(_superusuario.IdUsuario, evento.IdUsuarioActor);
@@ -63,7 +65,7 @@ public class ServicioUsuariosTests
     {
         _gestor.Agregar("usuaria1", NombresDeRol.Usuaria);
 
-        var respuesta = await _servicio.CrearUsuarioAsync("usuaria1", NombresDeRol.Usuaria);
+        var respuesta = await _servicio.CrearUsuarioAsync("usuaria1", NombresDeRol.Usuaria, NombreCompletoValido);
 
         Assert.False(respuesta.Exito);
         Assert.Equal(MensajesDeIdentidad.NombreDeUsuarioDuplicado, respuesta.Mensaje);
@@ -76,7 +78,7 @@ public class ServicioUsuariosTests
     [InlineData("Administrador")]
     public async Task CrearUsuario_ConRolInexistenteONoPermitido_RechazaSinCrear(string rol)
     {
-        var respuesta = await _servicio.CrearUsuarioAsync("usuaria1", rol);
+        var respuesta = await _servicio.CrearUsuarioAsync("usuaria1", rol, NombreCompletoValido);
 
         Assert.False(respuesta.Exito);
         Assert.Empty(_gestor.Creaciones);
@@ -87,7 +89,7 @@ public class ServicioUsuariosTests
     [InlineData("   ")]
     public async Task CrearUsuario_SinNombre_Rechaza(string nombre)
     {
-        var respuesta = await _servicio.CrearUsuarioAsync(nombre, NombresDeRol.Usuaria);
+        var respuesta = await _servicio.CrearUsuarioAsync(nombre, NombresDeRol.Usuaria, NombreCompletoValido);
 
         Assert.False(respuesta.Exito);
         Assert.Empty(_gestor.Creaciones);
@@ -98,7 +100,7 @@ public class ServicioUsuariosTests
     {
         _autorizacion.Permisos.Clear();
 
-        var respuesta = await _servicio.CrearUsuarioAsync("usuaria1", NombresDeRol.Usuaria);
+        var respuesta = await _servicio.CrearUsuarioAsync("usuaria1", NombresDeRol.Usuaria, NombreCompletoValido);
 
         Assert.False(respuesta.Exito);
         Assert.Equal(MensajesDeIdentidad.SinPermiso, respuesta.Mensaje);
@@ -111,7 +113,7 @@ public class ServicioUsuariosTests
     {
         _repositorioAuditoria.ExcepcionAlAgregar = new InvalidOperationException("fallo simulado");
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _servicio.CrearUsuarioAsync("usuaria1", NombresDeRol.Usuaria));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _servicio.CrearUsuarioAsync("usuaria1", NombresDeRol.Usuaria, NombreCompletoValido));
 
         Assert.Equal(0, _unidad.Confirmaciones);
         Assert.Equal(1, _unidad.Reversiones);
@@ -233,7 +235,7 @@ public class ServicioUsuariosTests
     [Fact]
     public async Task Eventos_DeUsuarioRolYContrasena_NoContienenContrasenaNiNombreDeUsuario()
     {
-        var creada = await _servicio.CrearUsuarioAsync("usuaria_canario", NombresDeRol.Usuaria);
+        var creada = await _servicio.CrearUsuarioAsync("usuaria_canario", NombresDeRol.Usuaria, NombreCompletoValido);
         var idCreada = creada.Datos!.Usuario.IdUsuario;
         var restablecida = await _servicio.RestablecerContrasenaAsync(idCreada);
         await _servicio.CambiarRolAsync(idCreada, NombresDeRol.Superusuario);
@@ -485,7 +487,330 @@ public class ServicioUsuariosTests
     {
         static string[] Propiedades(Type tipo) => tipo.GetProperties().Select(p => p.Name).Order().ToArray();
 
-        Assert.Equal(["Activo", "DebeCambiarContrasena", "IdUsuario", "NombreUsuario", "Rol"], Propiedades(typeof(DatosUsuario)));
+        Assert.Equal(["Activo", "DebeCambiarContrasena", "IdUsuario", "NombreCompleto", "NombreUsuario", "Rol"], Propiedades(typeof(DatosUsuario)));
         Assert.Equal(["Correo", "Datos"], Propiedades(typeof(FichaDeUsuario)));
+    }
+
+    // ──── Nombre completo y correo al crear ────
+
+    [Fact]
+    public async Task CrearUsuario_ConNombreCompletoYCorreo_LosGuardaRecortadosYElCorreoEnMinusculas()
+    {
+        var respuesta = await _servicio.CrearUsuarioAsync("usuaria1", NombresDeRol.Usuaria, "  Ana Ficticia  ", "  ANA@Ficticio.MX ");
+
+        Assert.True(respuesta.Exito);
+        var creacion = Assert.Single(_gestor.Creaciones);
+        Assert.Equal("Ana Ficticia", creacion.NombreCompleto);
+        Assert.Equal("ana@ficticio.mx", creacion.Correo);
+        Assert.Equal("Ana Ficticia", respuesta.Datos!.Usuario.NombreCompleto);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task CrearUsuario_SinCorreo_NoGuardaNingunCorreo(string? correo)
+    {
+        var respuesta = await _servicio.CrearUsuarioAsync("usuaria1", NombresDeRol.Usuaria, NombreCompletoValido, correo);
+
+        Assert.True(respuesta.Exito);
+        Assert.Null(Assert.Single(_gestor.Creaciones).Correo);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData("A")]
+    [InlineData("Ana\tFicticia")]
+    public async Task CrearUsuario_ConNombreCompletoInvalido_RechazaSinCrearNiRegistrarEvento(string? nombreCompleto)
+    {
+        var respuesta = await _servicio.CrearUsuarioAsync("usuaria1", NombresDeRol.Usuaria, nombreCompleto!);
+
+        Assert.False(respuesta.Exito);
+        Assert.Equal(MensajesDeIdentidad.NombreCompletoInvalido, respuesta.Mensaje);
+        Assert.Null(respuesta.Datos);
+        AssertSinEscrituras();
+    }
+
+    [Fact]
+    public async Task CrearUsuario_ConNombreCompletoDeMasDeCientoCincuentaCaracteres_Rechaza()
+    {
+        var respuesta = await _servicio.CrearUsuarioAsync("usuaria1", NombresDeRol.Usuaria, new string('a', 151));
+
+        Assert.False(respuesta.Exito);
+        Assert.Equal(MensajesDeIdentidad.NombreCompletoInvalido, respuesta.Mensaje);
+        AssertSinEscrituras();
+    }
+
+    [Theory]
+    [InlineData("erika@ficticio")]
+    [InlineData("erika@.com")]
+    [InlineData("erika@ficticio..mx")]
+    [InlineData("erika")]
+    [InlineData("eri ka@ficticio.mx")]
+    public async Task CrearUsuario_ConCorreoInvalido_RechazaSinCrearNiRegistrarEvento(string correo)
+    {
+        var respuesta = await _servicio.CrearUsuarioAsync("usuaria1", NombresDeRol.Usuaria, NombreCompletoValido, correo);
+
+        Assert.False(respuesta.Exito);
+        Assert.Equal(MensajesDeIdentidad.CorreoInvalido, respuesta.Mensaje);
+        Assert.Null(respuesta.Datos);
+        AssertSinEscrituras();
+    }
+
+    [Fact]
+    public async Task CrearUsuario_ConNombreDeUsuarioYNombreCompletoInvalidos_InformaPrimeroDelNombreDeUsuario()
+    {
+        var respuesta = await _servicio.CrearUsuarioAsync("", NombresDeRol.Usuaria, "A");
+
+        Assert.Equal(MensajesDeIdentidad.DatosDeUsuarioInvalidos, respuesta.Mensaje);
+        AssertSinEscrituras();
+    }
+
+    [Fact]
+    public async Task CrearUsuario_ElEventoDeAltaListaElNombreCompletoYElCorreoSoloSiSeCapturo()
+    {
+        await _servicio.CrearUsuarioAsync("usuaria1", NombresDeRol.Usuaria, NombreCompletoValido);
+        await _servicio.CrearUsuarioAsync("usuaria2", NombresDeRol.Usuaria, NombreCompletoValido, "usuaria2@ficticio.mx");
+
+        Assert.Equal(2, _repositorioAuditoria.Eventos.Count);
+        Assert.Equal(["NombreUsuario", "Rol", "DebeCambiarContrasena", "NombreCompleto"], _repositorioAuditoria.Eventos[0].CamposAfectados);
+        Assert.Equal(["NombreUsuario", "Rol", "DebeCambiarContrasena", "NombreCompleto", "Correo"], _repositorioAuditoria.Eventos[1].CamposAfectados);
+        Assert.All(_repositorioAuditoria.Eventos, e => Assert.Equal(AccionAuditoria.Alta, e.Accion));
+    }
+
+    [Fact]
+    public async Task CrearUsuario_ElEventoDeAltaNoContieneNombreCompletoNiCorreo()
+    {
+        await _servicio.CrearUsuarioAsync("usuaria1", NombresDeRol.Usuaria, "Canario Nombre Ficticio", "canario@ficticio.mx");
+
+        var evento = Assert.Single(_repositorioAuditoria.Eventos);
+        var texto = $"{evento.Hecho}|{string.Join(',', evento.CamposAfectados)}";
+        Assert.DoesNotContain("Canario", texto);
+        Assert.DoesNotContain("canario@ficticio.mx", texto);
+    }
+
+    // ──── Actualizar nombre completo y correo ────
+
+    private DatosUsuario CrearCuentaConDatos(string nombreCompleto = "Ana Ficticia", string? correo = "ana@ficticio.mx", bool activo = true)
+    {
+        var cuenta = _gestor.Agregar("usuaria1", NombresDeRol.Usuaria, activo: activo, nombreCompleto: nombreCompleto);
+        if (correo is not null)
+        {
+            _gestor.Correos[cuenta.IdUsuario] = correo;
+        }
+
+        return cuenta;
+    }
+
+    [Fact]
+    public async Task ActualizarDatosDeCuenta_ConNombreYCorreoNuevos_GuardaYDevuelveLaFichaActualizada()
+    {
+        var cuenta = CrearCuentaConDatos();
+
+        var respuesta = await _servicio.ActualizarDatosDeCuentaAsync(cuenta.IdUsuario, "  Ana María Ficticia  ", "  ANA.MARIA@Ficticio.MX ");
+
+        Assert.True(respuesta.Exito);
+        Assert.Equal("Datos actualizados.", respuesta.Mensaje);
+        Assert.Equal("Ana María Ficticia", respuesta.Datos!.Datos.NombreCompleto);
+        Assert.Equal("ana.maria@ficticio.mx", respuesta.Datos.Correo);
+        Assert.Equal("Ana María Ficticia", _gestor.Usuarios[cuenta.IdUsuario].NombreCompleto);
+        Assert.Equal("ana.maria@ficticio.mx", _gestor.Correos[cuenta.IdUsuario]);
+        Assert.Equal(1, _unidad.Confirmaciones);
+    }
+
+    [Theory]
+    [InlineData("Ana María Ficticia", "ana@ficticio.mx", new[] { "NombreCompleto" })]
+    [InlineData("Ana Ficticia", "otra@ficticio.mx", new[] { "Correo" })]
+    [InlineData("Ana María Ficticia", "otra@ficticio.mx", new[] { "NombreCompleto", "Correo" })]
+    [InlineData("Ana Ficticia", null, new[] { "Correo" })]
+    public async Task ActualizarDatosDeCuenta_RegistraUnEventoSoloConLosCamposQueCambiaron(string nombreNuevo, string? correoNuevo, string[] camposEsperados)
+    {
+        var cuenta = CrearCuentaConDatos();
+
+        await _servicio.ActualizarDatosDeCuentaAsync(cuenta.IdUsuario, nombreNuevo, correoNuevo);
+
+        var evento = Assert.Single(_repositorioAuditoria.Eventos);
+        Assert.Equal(_superusuario.IdUsuario, evento.IdUsuarioActor);
+        Assert.Equal(cuenta.IdUsuario, evento.IdRegistro);
+        Assert.Equal(TipoRegistroAuditoria.Usuario, evento.TipoRegistro);
+        Assert.Equal(AccionAuditoria.Actualizacion, evento.Accion);
+        Assert.Equal(camposEsperados, evento.CamposAfectados);
+        Assert.Equal(Ahora, evento.FechaEvento);
+    }
+
+    [Fact]
+    public async Task ActualizarDatosDeCuenta_SinCambios_NoRegistraEventoNiEscribeNada()
+    {
+        var cuenta = CrearCuentaConDatos();
+
+        var respuesta = await _servicio.ActualizarDatosDeCuentaAsync(cuenta.IdUsuario, "Ana Ficticia", "ana@ficticio.mx");
+
+        Assert.True(respuesta.Exito);
+        Assert.Equal("No hubo cambios.", respuesta.Mensaje);
+        Assert.Empty(_repositorioAuditoria.Eventos);
+    }
+
+    [Fact]
+    public async Task ActualizarDatosDeCuenta_ConElMismoCorreoEscritoConOtrasMayusculasYEspacios_NoLoTomaComoCambio()
+    {
+        var cuenta = CrearCuentaConDatos();
+
+        var respuesta = await _servicio.ActualizarDatosDeCuentaAsync(cuenta.IdUsuario, "  Ana Ficticia ", "  ANA@Ficticio.MX ");
+
+        Assert.Equal("No hubo cambios.", respuesta.Mensaje);
+        Assert.Empty(_repositorioAuditoria.Eventos);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task ActualizarDatosDeCuenta_SinCorreo_QuitaElCorreoGuardado(string? correoNuevo)
+    {
+        var cuenta = CrearCuentaConDatos();
+
+        var respuesta = await _servicio.ActualizarDatosDeCuentaAsync(cuenta.IdUsuario, "Ana Ficticia", correoNuevo);
+
+        Assert.True(respuesta.Exito);
+        Assert.Null(respuesta.Datos!.Correo);
+        Assert.False(_gestor.Correos.ContainsKey(cuenta.IdUsuario));
+        Assert.Equal(["Correo"], Assert.Single(_repositorioAuditoria.Eventos).CamposAfectados);
+    }
+
+    [Fact]
+    public async Task ActualizarDatosDeCuenta_CompletaElNombreDeUnaCuentaQueNoLoTenia()
+    {
+        var cuenta = CrearCuentaConDatos(nombreCompleto: "", correo: null);
+
+        var respuesta = await _servicio.ActualizarDatosDeCuentaAsync(cuenta.IdUsuario, "Ana Ficticia", null);
+
+        Assert.True(respuesta.Exito);
+        Assert.Equal(["NombreCompleto"], Assert.Single(_repositorioAuditoria.Eventos).CamposAfectados);
+    }
+
+    [Fact]
+    public async Task ActualizarDatosDeCuenta_NoCierraSesionesNiTocaElResto()
+    {
+        var cuenta = CrearCuentaConDatos();
+
+        await _servicio.ActualizarDatosDeCuentaAsync(cuenta.IdUsuario, "Ana María Ficticia", "nuevo@ficticio.mx");
+
+        Assert.Empty(_gestor.SesionesRevocadas);
+        Assert.Empty(_gestor.ContrasenasEstablecidas);
+        var despues = _gestor.Usuarios[cuenta.IdUsuario];
+        Assert.Equal(cuenta.Rol, despues.Rol);
+        Assert.Equal(cuenta.Activo, despues.Activo);
+        Assert.Equal(cuenta.DebeCambiarContrasena, despues.DebeCambiarContrasena);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("A")]
+    public async Task ActualizarDatosDeCuenta_ConNombreInvalido_RechazaSinTocarNada(string? nombreNuevo)
+    {
+        var cuenta = CrearCuentaConDatos();
+
+        var respuesta = await _servicio.ActualizarDatosDeCuentaAsync(cuenta.IdUsuario, nombreNuevo!, "ana@ficticio.mx");
+
+        Assert.False(respuesta.Exito);
+        Assert.Equal(MensajesDeIdentidad.NombreCompletoInvalido, respuesta.Mensaje);
+        Assert.Empty(_gestor.ActualizacionesDeDatos);
+        AssertSinEscrituras();
+    }
+
+    [Fact]
+    public async Task ActualizarDatosDeCuenta_ConCorreoInvalido_RechazaSinTocarNada()
+    {
+        var cuenta = CrearCuentaConDatos();
+
+        var respuesta = await _servicio.ActualizarDatosDeCuentaAsync(cuenta.IdUsuario, "Ana Ficticia", "ana@ficticio");
+
+        Assert.False(respuesta.Exito);
+        Assert.Equal(MensajesDeIdentidad.CorreoInvalido, respuesta.Mensaje);
+        Assert.Empty(_gestor.ActualizacionesDeDatos);
+        Assert.Equal("ana@ficticio.mx", _gestor.Correos[cuenta.IdUsuario]);
+        AssertSinEscrituras();
+    }
+
+    [Fact]
+    public async Task ActualizarDatosDeCuenta_SinPermisoDeAdministracion_RechazaSinTocarNada()
+    {
+        var cuenta = CrearCuentaConDatos();
+        _autorizacion.Permisos.Clear();
+
+        var respuesta = await _servicio.ActualizarDatosDeCuentaAsync(cuenta.IdUsuario, "Otro Nombre", "otro@ficticio.mx");
+
+        Assert.False(respuesta.Exito);
+        Assert.Equal(MensajesDeIdentidad.SinPermiso, respuesta.Mensaje);
+        Assert.Empty(_gestor.ActualizacionesDeDatos);
+        Assert.Equal("Ana Ficticia", _gestor.Usuarios[cuenta.IdUsuario].NombreCompleto);
+        AssertSinEscrituras();
+    }
+
+    [Fact]
+    public async Task ActualizarDatosDeCuenta_DeUnaCuentaInexistente_Rechaza()
+    {
+        var respuesta = await _servicio.ActualizarDatosDeCuentaAsync(Guid.NewGuid(), "Ana Ficticia", null);
+
+        Assert.False(respuesta.Exito);
+        Assert.Equal(MensajesDeIdentidad.UsuarioNoEncontrado, respuesta.Mensaje);
+        Assert.Empty(_gestor.ActualizacionesDeDatos);
+        AssertSinEscrituras();
+    }
+
+    [Fact]
+    public async Task ActualizarDatosDeCuenta_SiLaAuditoriaFalla_NoConfirmaElCambio()
+    {
+        var cuenta = CrearCuentaConDatos();
+        _repositorioAuditoria.ExcepcionAlAgregar = new InvalidOperationException("fallo simulado");
+
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => _servicio.ActualizarDatosDeCuentaAsync(cuenta.IdUsuario, "Ana María Ficticia", "ana@ficticio.mx"));
+
+        Assert.Equal(0, _unidad.Confirmaciones);
+        Assert.Equal(1, _unidad.Reversiones);
+    }
+
+    [Fact]
+    public async Task ActualizarDatosDeCuenta_PermiteCorregirUnaCuentaDesactivadaYLaPropiaDelSuperusuario()
+    {
+        var desactivada = CrearCuentaConDatos(activo: false);
+
+        var deLaDesactivada = await _servicio.ActualizarDatosDeCuentaAsync(desactivada.IdUsuario, "Ana Corregida", null);
+        var propia = await _servicio.ActualizarDatosDeCuentaAsync(_superusuario.IdUsuario, "Super Ficticio", null);
+
+        Assert.True(deLaDesactivada.Exito);
+        Assert.True(propia.Exito);
+        Assert.Equal(2, _repositorioAuditoria.Eventos.Count);
+    }
+
+    [Fact]
+    public async Task ActualizarDatosDeCuenta_ElEventoNoContieneNombreNiCorreo()
+    {
+        var cuenta = CrearCuentaConDatos();
+
+        await _servicio.ActualizarDatosDeCuentaAsync(cuenta.IdUsuario, "Canario Nombre Ficticio", "canario@ficticio.mx");
+
+        var evento = Assert.Single(_repositorioAuditoria.Eventos);
+        var texto = $"{evento.Hecho}|{string.Join(',', evento.CamposAfectados)}";
+        Assert.DoesNotContain("Canario", texto);
+        Assert.DoesNotContain("canario@ficticio.mx", texto);
+        Assert.DoesNotContain("Ana Ficticia", texto);
+    }
+
+    [Fact]
+    public async Task ListarUsuarios_ConTexto_BuscaTambienPorNombreCompletoYLoDevuelveEnLaLista()
+    {
+        _gestor.Agregar("usuaria1", NombresDeRol.Usuaria, nombreCompleto: "María Fernández");
+        _gestor.Agregar("usuaria2", NombresDeRol.Usuaria, nombreCompleto: "Luis Ficticio");
+
+        var respuesta = await _servicio.ListarUsuariosAsync("FERN");
+
+        var coincidencia = Assert.Single(respuesta.Datos!);
+        Assert.Equal("usuaria1", coincidencia.NombreUsuario);
+        Assert.Equal("María Fernández", coincidencia.NombreCompleto);
     }
 }

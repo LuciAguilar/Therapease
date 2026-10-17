@@ -18,9 +18,20 @@ public interface IServicioUsuarios
         CancellationToken cancelacion = default
         );
 
+    // El nombre completo es obligatorio (2 a 150 caracteres); el correo es opcional, no tiene que ser único y no sirve para entrar.
     Task<RespuestaServicio<ContrasenaTemporalEntregada>> CrearUsuarioAsync(
         string nombreUsuario, 
         string rol, 
+        string nombreCompleto,
+        string? correo = null,
+        CancellationToken cancelacion = default
+        );
+
+    // Reemplaza nombre completo y correo (sin correo = quitarlo). No cierra sesiones. Con evento solo si algo cambió, y sin valores.
+    Task<RespuestaServicio<FichaDeUsuario>> ActualizarDatosDeCuentaAsync(
+        Guid idUsuario,
+        string nombreCompleto,
+        string? correo,
         CancellationToken cancelacion = default
         );
 

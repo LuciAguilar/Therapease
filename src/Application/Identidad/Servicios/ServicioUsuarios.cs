@@ -69,7 +69,7 @@ public class ServicioUsuarios : IServicioUsuarios
     }
 
     public async Task<RespuestaServicio<ContrasenaTemporalEntregada>> CrearUsuarioAsync(
-        string nombreUsuario, string rol, CancellationToken cancelacion = default)
+        string nombreUsuario, string rol, string nombreCompleto, string? correo = null, CancellationToken cancelacion = default)
     {
         if (await ObtenerActorAutorizadoAsync(cancelacion) is not { } idActor)
         {
@@ -82,6 +82,16 @@ public class ServicioUsuarios : IServicioUsuarios
             return RespuestaServicio<ContrasenaTemporalEntregada>.Fallida(MensajesDeIdentidad.DatosDeUsuarioInvalidos);
         }
 
+        if (!ReglasDeDatosDeCuenta.EsNombreCompletoValido(nombreCompleto, out var nombreCompletoLimpio))
+        {
+            return RespuestaServicio<ContrasenaTemporalEntregada>.Fallida(MensajesDeIdentidad.NombreCompletoInvalido);
+        }
+
+        if (!ReglasDeDatosDeCuenta.EsCorreoValido(correo, out var correoLimpio))
+        {
+            return RespuestaServicio<ContrasenaTemporalEntregada>.Fallida(MensajesDeIdentidad.CorreoInvalido);
+        }
+
         var contrasena = GeneradorDeContrasenaTemporal.Generar();
         var idNuevo = Guid.CreateVersion7();
         ResultadoCreacionDeUsuario? resultado = null;
@@ -90,12 +100,20 @@ public class ServicioUsuarios : IServicioUsuarios
         {
             await _unidad.EjecutarAsync(async ct =>
             {
-                resultado = await _gestor.CrearAsync(idNuevo, nombre, rol, contrasena, debeCambiarContrasena: true, ct);
+                resultado = await _gestor.CrearAsync(
+                    idNuevo, nombre, rol, contrasena, debeCambiarContrasena: true, nombreCompletoLimpio, correoLimpio, ct);
                 if (resultado == ResultadoCreacionDeUsuario.Creado)
                 {
+                    // Solo nombres de campo; el correo figura únicamente si se capturó.
+                    var campos = new List<string> { "NombreUsuario", "Rol", "DebeCambiarContrasena", "NombreCompleto" };
+                    if (correoLimpio is not null)
+                    {
+                        campos.Add("Correo");
+                    }
+
                     await _auditoria.RegistrarHechoDeCambioAsync(
                         idActor, TipoRegistroAuditoria.Usuario, idNuevo, AccionAuditoria.Alta,
-                        ["NombreUsuario", "Rol", "DebeCambiarContrasena"], "Se creó un usuario con contraseña temporal.", ct);
+                        campos, "Se creó un usuario con contraseña temporal.", ct);
                 }
             }, cancelacion);
         }
@@ -107,7 +125,7 @@ public class ServicioUsuarios : IServicioUsuarios
         return resultado switch
         {
             ResultadoCreacionDeUsuario.Creado => RespuestaServicio<ContrasenaTemporalEntregada>.Correcta(
-                new ContrasenaTemporalEntregada(new DatosUsuario(idNuevo, nombre, rol, true, true), contrasena),
+                new ContrasenaTemporalEntregada(new DatosUsuario(idNuevo, nombre, rol, true, true, nombreCompletoLimpio), contrasena),
                 "Usuario creado. Entrega la contraseña temporal por un canal seguro."),
             ResultadoCreacionDeUsuario.NombreDuplicado => RespuestaServicio<ContrasenaTemporalEntregada>.Fallida(MensajesDeIdentidad.NombreDeUsuarioDuplicado),
             _ => RespuestaServicio<ContrasenaTemporalEntregada>.Fallida(MensajesDeIdentidad.DatosDeUsuarioInvalidos)
@@ -200,6 +218,66 @@ public class ServicioUsuarios : IServicioUsuarios
         }
 
         return RespuestaServicio<DatosUsuario>.Correcta(objetivo with { Activo = false }, "Usuario desactivado.");
+    }
+
+    public async Task<RespuestaServicio<FichaDeUsuario>> ActualizarDatosDeCuentaAsync(
+        Guid idUsuario, string nombreCompleto, string? correo, CancellationToken cancelacion = default)
+    {
+        if (await ObtenerActorAutorizadoAsync(cancelacion) is not { } idActor)
+        {
+            return RespuestaServicio<FichaDeUsuario>.Fallida(MensajesDeIdentidad.SinPermiso);
+        }
+
+        if (!ReglasDeDatosDeCuenta.EsNombreCompletoValido(nombreCompleto, out var nombreCompletoLimpio))
+        {
+            return RespuestaServicio<FichaDeUsuario>.Fallida(MensajesDeIdentidad.NombreCompletoInvalido);
+        }
+
+        if (!ReglasDeDatosDeCuenta.EsCorreoValido(correo, out var correoLimpio))
+        {
+            return RespuestaServicio<FichaDeUsuario>.Fallida(MensajesDeIdentidad.CorreoInvalido);
+        }
+
+        var actual = await _gestor.ObtenerFichaAsync(idUsuario, cancelacion);
+        if (actual is null)
+        {
+            return RespuestaServicio<FichaDeUsuario>.Fallida(MensajesDeIdentidad.UsuarioNoEncontrado);
+        }
+
+        CamposActualizados? cambios = null;
+
+        try
+        {
+            await _unidad.EjecutarAsync(async ct =>
+            {
+                cambios = await _gestor.ActualizarDatosAsync(idUsuario, nombreCompletoLimpio, correoLimpio, ct);
+                if (cambios.Hubo)
+                {
+                    // Solo los nombres de los campos que cambiaron; nunca su valor.
+                    var campos = new List<string>();
+                    if (cambios.NombreCompleto)
+                    {
+                        campos.Add("NombreCompleto");
+                    }
+
+                    if (cambios.Correo)
+                    {
+                        campos.Add("Correo");
+                    }
+
+                    await _auditoria.RegistrarHechoDeCambioAsync(
+                        idActor, TipoRegistroAuditoria.Usuario, idUsuario, AccionAuditoria.Actualizacion,
+                        campos, "Se actualizaron los datos de una cuenta.", ct);
+                }
+            }, cancelacion);
+        }
+        catch (ReglaDeNegocioException excepcion)
+        {
+            return RespuestaServicio<FichaDeUsuario>.Fallida(excepcion.Message);
+        }
+
+        var ficha = new FichaDeUsuario(actual.Datos with { NombreCompleto = nombreCompletoLimpio }, correoLimpio);
+        return RespuestaServicio<FichaDeUsuario>.Correcta(ficha, cambios!.Hubo ? "Datos actualizados." : "No hubo cambios.");
     }
 
     public async Task<RespuestaServicio<ContrasenaTemporalEntregada>> RestablecerContrasenaAsync(

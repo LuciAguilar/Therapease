@@ -35,9 +35,11 @@ public class GestorIdentidad : IGestorIdentidad
         var consulta = _contexto.Users.AsNoTracking();
         if (!string.IsNullOrEmpty(busqueda))
         {
-            // Contains con parámetro (no LIKE): % y _ escritos por la persona se buscan como texto. El nombre normalizado ya no distingue mayúsculas.
+            // Contains con parámetro (no LIKE): % y _ escritos por la persona se buscan como texto.
+            // El nombre de usuario se compara normalizado; el nombre completo, en mayúsculas en ambos lados.
             var normalizado = _usuarios.NormalizeName(busqueda)!;
-            consulta = consulta.Where(u => u.NormalizedUserName!.Contains(normalizado));
+            var mayusculas = busqueda.ToUpperInvariant();
+            consulta = consulta.Where(u => u.NormalizedUserName!.Contains(normalizado) || u.NombreCompleto.ToUpper().Contains(mayusculas));
         }
 
         // Solo se proyectan las columnas de DatosUsuario: el hash, el sello y los contadores de fallos nunca salen de la base.
@@ -50,6 +52,7 @@ public class GestorIdentidad : IGestorIdentidad
                 u.UserName,
                 u.Activo,
                 u.DebeCambiarContrasena,
+                u.NombreCompleto,
                 Rol = _contexto.UserRoles
                     .Where(ur => ur.UserId == u.Id)
                     .Join(_contexto.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => r.Name)
@@ -57,7 +60,7 @@ public class GestorIdentidad : IGestorIdentidad
             })
             .ToListAsync(cancelacion);
 
-        return filas.Select(f => new DatosUsuario(f.Id, f.UserName!, f.Rol ?? string.Empty, f.Activo, f.DebeCambiarContrasena)).ToList();
+        return filas.Select(f => new DatosUsuario(f.Id, f.UserName!, f.Rol ?? string.Empty, f.Activo, f.DebeCambiarContrasena, f.NombreCompleto)).ToList();
     }
 
     public async Task<FichaDeUsuario?> ObtenerFichaAsync(Guid idUsuario, CancellationToken cancelacion = default)
@@ -119,12 +122,15 @@ public class GestorIdentidad : IGestorIdentidad
     }
 
     public async Task<ResultadoCreacionDeUsuario> CrearAsync(
-        Guid idUsuario, string nombreUsuario, string rol, string contrasena, bool debeCambiarContrasena, CancellationToken cancelacion = default)
+        Guid idUsuario, string nombreUsuario, string rol, string contrasena, bool debeCambiarContrasena,
+        string? nombreCompleto = null, string? correo = null, CancellationToken cancelacion = default)
     {
         var usuario = new Usuario
         {
             Id = idUsuario,
             UserName = nombreUsuario,
+            NombreCompleto = nombreCompleto ?? string.Empty,
+            Email = correo,
             Activo = true,
             DebeCambiarContrasena = debeCambiarContrasena,
             LockoutEnabled = true
@@ -140,6 +146,27 @@ public class GestorIdentidad : IGestorIdentidad
 
         Exigir(await _usuarios.AddToRoleAsync(usuario, rol), "asignar el rol");
         return ResultadoCreacionDeUsuario.Creado;
+    }
+
+    public async Task<CamposActualizados> ActualizarDatosAsync(
+        Guid idUsuario, string nombreCompleto, string? correo, CancellationToken cancelacion = default)
+    {
+        var usuario = await ObtenerEntidadAsync(idUsuario);
+        var cambios = new CamposActualizados(
+            NombreCompleto: !string.Equals(usuario.NombreCompleto, nombreCompleto, StringComparison.Ordinal),
+            Correo: !string.Equals(usuario.Email, correo, StringComparison.Ordinal));
+        if (!cambios.Hubo)
+        {
+            return cambios;
+        }
+
+        usuario.NombreCompleto = nombreCompleto;
+        usuario.Email = correo;
+
+        // Se asignan las propiedades y se guarda con UpdateAsync, que no toca el sello de seguridad.
+        // SetEmailAsync no sirve aquí: renueva el sello y cerraría las sesiones de la persona, y el correo no interviene en el acceso.
+        Exigir(await _usuarios.UpdateAsync(usuario), "actualizar los datos de la cuenta");
+        return cambios;
     }
 
     public async Task CambiarRolAsync(Guid idUsuario, string nuevoRol, CancellationToken cancelacion = default)
@@ -228,6 +255,7 @@ public class GestorIdentidad : IGestorIdentidad
     private async Task<DatosUsuario> ADatosAsync(Usuario usuario)
     {
         var roles = await _usuarios.GetRolesAsync(usuario);
-        return new DatosUsuario(usuario.Id, usuario.UserName!, roles.FirstOrDefault() ?? string.Empty, usuario.Activo, usuario.DebeCambiarContrasena);
+        return new DatosUsuario(
+            usuario.Id, usuario.UserName!, roles.FirstOrDefault() ?? string.Empty, usuario.Activo, usuario.DebeCambiarContrasena, usuario.NombreCompleto);
     }
 }

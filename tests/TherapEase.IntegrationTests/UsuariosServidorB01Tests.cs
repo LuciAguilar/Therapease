@@ -45,7 +45,7 @@ public class UsuariosServidorB01Tests(PostgreSqlRevision postgres) : IClassFixtu
         var anterior = await EstadoAsync(escenario);
 
         // Act
-        var respuesta = await solicitud.Obtener<IServicioUsuarios>().CrearUsuarioAsync(nombre!, rol!);
+        var respuesta = await solicitud.Obtener<IServicioUsuarios>().CrearUsuarioAsync(nombre!, rol!, "Nombre Ficticio");
 
         // Assert
         Assert.False(respuesta.Exito);
@@ -71,7 +71,7 @@ public class UsuariosServidorB01Tests(PostgreSqlRevision postgres) : IClassFixtu
         var nombre = new string('a', 50);
 
         // Act
-        var respuesta = await solicitud.Obtener<IServicioUsuarios>().CrearUsuarioAsync($"  {nombre}  ", rol);
+        var respuesta = await solicitud.Obtener<IServicioUsuarios>().CrearUsuarioAsync($"  {nombre}  ", rol, "Nombre Ficticio");
 
         // Assert
         Assert.True(respuesta.Exito);
@@ -114,7 +114,7 @@ public class UsuariosServidorB01Tests(PostgreSqlRevision postgres) : IClassFixtu
 
         // Act
         var respuesta = await solicitud.Obtener<IServicioUsuarios>()
-            .CrearUsuarioAsync("  OBJETIVO-B01  ", "Superusuario");
+            .CrearUsuarioAsync("  OBJETIVO-B01  ", "Superusuario", "Nombre Ficticio");
 
         // Assert
         Assert.False(respuesta.Exito);
@@ -242,7 +242,7 @@ public class UsuariosServidorB01Tests(PostgreSqlRevision postgres) : IClassFixtu
 
         // Act + Assert
         await Assert.ThrowsAsync<DbUpdateException>(() => solicitud.Obtener<IServicioUsuarios>()
-            .CrearUsuarioAsync("alta-ficticia-b01", "Usuaria"));
+            .CrearUsuarioAsync("alta-ficticia-b01", "Usuaria", "Nombre Ficticio"));
         await ComprobarSinCambiosAsync(escenario, anterior);
     }
 }

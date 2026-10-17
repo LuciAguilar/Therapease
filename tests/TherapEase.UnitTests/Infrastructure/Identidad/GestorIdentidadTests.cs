@@ -329,4 +329,120 @@ public class GestorIdentidadTests
     {
         Assert.Null(await _gestor.ObtenerFichaAsync(Guid.NewGuid()));
     }
+
+    // ──── Nombre completo y correo ────
+
+    [Fact]
+    public async Task CrearAsync_ConNombreCompletoYCorreo_LosAsignaALaCuentaCreada()
+    {
+        await _gestor.CrearAsync(Guid.NewGuid(), "nuevo", "Usuaria", "contrasena-valida-123", true, "Ana Ficticia", "ana@ficticio.mx");
+
+        var creada = Assert.Single(_usuarios.UsuariosCreados);
+        Assert.Equal("Ana Ficticia", creada.NombreCompleto);
+        Assert.Equal("ana@ficticio.mx", creada.Email);
+    }
+
+    // El comando de arranque crea al primer superusuario sin nombre ni correo; el nombre queda vacío hasta que el superusuario lo capture.
+    [Fact]
+    public async Task CrearAsync_SinNombreCompletoNiCorreo_DejaElNombreVacioYSinCorreo()
+    {
+        await _gestor.CrearAsync(Guid.NewGuid(), "primer-superusuario", "Superusuario", "contrasena-valida-123", true);
+
+        var creada = Assert.Single(_usuarios.UsuariosCreados);
+        Assert.Equal(string.Empty, creada.NombreCompleto);
+        Assert.Null(creada.Email);
+    }
+
+    [Fact]
+    public async Task ObtenerAsync_IncluyeElNombreCompletoDeLaCuenta()
+    {
+        _usuario.NombreCompleto = "Operador Ficticio";
+
+        var datos = await _gestor.ObtenerAsync(_usuario.Id);
+
+        Assert.Equal("Operador Ficticio", datos!.NombreCompleto);
+    }
+
+    [Fact]
+    public async Task ObtenerFichaAsync_IncluyeElNombreCompletoYElCorreo()
+    {
+        _usuario.NombreCompleto = "Operador Ficticio";
+        _usuario.Email = "operador@ficticio.mx";
+
+        var ficha = await _gestor.ObtenerFichaAsync(_usuario.Id);
+
+        Assert.Equal("Operador Ficticio", ficha!.Datos.NombreCompleto);
+        Assert.Equal("operador@ficticio.mx", ficha.Correo);
+    }
+
+    [Fact]
+    public async Task ActualizarDatosAsync_ConCambios_GuardaConUpdateAsyncYNuncaRenuevaElSello()
+    {
+        _usuario.NombreCompleto = "Operador Ficticio";
+        _usuario.Email = "operador@ficticio.mx";
+
+        var cambios = await _gestor.ActualizarDatosAsync(_usuario.Id, "Operador Nuevo", "nuevo@ficticio.mx");
+
+        Assert.Equal(new CamposActualizados(true, true), cambios);
+        Assert.Equal("Operador Nuevo", _usuario.NombreCompleto);
+        Assert.Equal("nuevo@ficticio.mx", _usuario.Email);
+        // Sin UpdateSecurityStampAsync ni SetEmailAsync: el sello no cambia y las sesiones abiertas siguen válidas.
+        Assert.Equal(["UpdateAsync"], _usuarios.Llamadas);
+    }
+
+    [Fact]
+    public async Task ActualizarDatosAsync_SinCambios_NoEscribeNada()
+    {
+        _usuario.NombreCompleto = "Operador Ficticio";
+        _usuario.Email = "operador@ficticio.mx";
+
+        var cambios = await _gestor.ActualizarDatosAsync(_usuario.Id, "Operador Ficticio", "operador@ficticio.mx");
+
+        Assert.False(cambios.Hubo);
+        Assert.Empty(_usuarios.Llamadas);
+    }
+
+    [Theory]
+    [InlineData("Operador Nuevo", "operador@ficticio.mx", true, false)]
+    [InlineData("Operador Ficticio", "otro@ficticio.mx", false, true)]
+    [InlineData("Operador Ficticio", null, false, true)]
+    public async Task ActualizarDatosAsync_InformaSoloDeLosCamposQueCambiaron(string nombre, string? correo, bool cambioNombre, bool cambioCorreo)
+    {
+        _usuario.NombreCompleto = "Operador Ficticio";
+        _usuario.Email = "operador@ficticio.mx";
+
+        var cambios = await _gestor.ActualizarDatosAsync(_usuario.Id, nombre, correo);
+
+        Assert.Equal(new CamposActualizados(cambioNombre, cambioCorreo), cambios);
+        Assert.Equal(correo, _usuario.Email);
+    }
+
+    [Fact]
+    public async Task ActualizarDatosAsync_CompletaElNombreDeUnaCuentaSinNombreNiCorreo()
+    {
+        var cambios = await _gestor.ActualizarDatosAsync(_usuario.Id, "Operador Ficticio", null);
+
+        Assert.Equal(new CamposActualizados(true, false), cambios);
+        Assert.Equal("Operador Ficticio", _usuario.NombreCompleto);
+    }
+
+    [Fact]
+    public async Task ActualizarDatosAsync_SiIdentityRechazaElCambio_DetieneSinRevelarNombreNiCorreo()
+    {
+        Falla("UpdateAsync");
+
+        var excepcion = await Assert.ThrowsAsync<InvalidOperationException>(
+            () => _gestor.ActualizarDatosAsync(_usuario.Id, "Nombre Canario", "canario@ficticio.mx"));
+
+        AssertMensajeSinDatosPrivados(excepcion);
+        Assert.DoesNotContain("Canario", excepcion.Message);
+        Assert.DoesNotContain("canario@ficticio.mx", excepcion.Message);
+    }
+
+    [Fact]
+    public async Task ActualizarDatosAsync_DeUnaCuentaInexistente_Falla()
+    {
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => _gestor.ActualizarDatosAsync(Guid.NewGuid(), "Nombre Ficticio", null));
+    }
 }

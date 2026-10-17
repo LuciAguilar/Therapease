@@ -21,7 +21,7 @@ public class AuditoriaServidorB01Tests(PostgreSqlRevision postgres) : IClassFixt
     /// Cada operación confirmada guarda exactamente su evento, con actor y cuenta correctos.
     /// Ni el evento ni los registros contienen las contraseñas, cookies o conexión utilizadas.
     [Theory]
-    [InlineData("crear", "Alta", "NombreUsuario,Rol,DebeCambiarContrasena")]
+    [InlineData("crear", "Alta", "NombreUsuario,Rol,DebeCambiarContrasena,NombreCompleto")]
     [InlineData("cambiar-rol", "Actualizacion", "Rol")]
     [InlineData("desactivar", "Desactivacion", "Activo")]
     [InlineData("restablecer", "ReinicioContrasena", "Contrasena")]
@@ -53,7 +53,7 @@ public class AuditoriaServidorB01Tests(PostgreSqlRevision postgres) : IClassFixt
         switch (operacion)
         {
             case "crear":
-                var alta = await servicio.CrearUsuarioAsync("objetivo-b01", "Usuaria");
+                var alta = await servicio.CrearUsuarioAsync("objetivo-b01", "Usuaria", "Nombre Ficticio");
                 Assert.True(alta.Exito);
                 Assert.NotNull(alta.Datos);
                 objetivo = alta.Datos.Usuario.IdUsuario;

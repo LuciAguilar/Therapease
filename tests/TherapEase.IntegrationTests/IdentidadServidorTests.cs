@@ -242,7 +242,7 @@ public class IdentidadServidorTests(PostgreSqlRevision postgres) : IClassFixture
         Assert.True((await autorizacion.AuthorizeAsync(solicitud.Contexto.User, PoliticasDeAutorizacion.CambiarContrasenaPropia)).Succeeded);
         Assert.False((await autorizacion.AuthorizeAsync(solicitud.Contexto.User, PoliticasDeAutorizacion.AccesoOperativo)).Succeeded);
         Assert.False((await autorizacion.AuthorizeAsync(solicitud.Contexto.User, PoliticasDeAutorizacion.AdministrarUsuarios)).Succeeded);
-        Assert.False((await solicitud.Obtener<IServicioUsuarios>().CrearUsuarioAsync("no-permitida", "Usuaria")).Exito);
+        Assert.False((await solicitud.Obtener<IServicioUsuarios>().CrearUsuarioAsync("no-permitida", "Usuaria", "Nombre Ficticio")).Exito);
 
         // Act: cambiar la contraseña
 
@@ -692,7 +692,7 @@ public class IdentidadServidorTests(PostgreSqlRevision postgres) : IClassFixture
         using (var solicitud = new SolicitudIdentidad(proveedor, actorCookie))
         {
             Assert.True(await solicitud.AutenticarAsync());
-            var respuesta = await solicitud.Obtener<IServicioUsuarios>().CrearUsuarioAsync("datoRastreable-nombre-ficticio", "Usuaria");
+            var respuesta = await solicitud.Obtener<IServicioUsuarios>().CrearUsuarioAsync("datoRastreable-nombre-ficticio", "Usuaria", "Nombre Ficticio");
             Assert.True(respuesta.Exito);
             creada = respuesta.Datos!;
         }
