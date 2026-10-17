@@ -6,6 +6,18 @@ namespace TherapEase.Application.Identidad.Interfaces.Servicios;
 // CU02: solo un superusuario activo; el actor es la sesión en curso. Cada cambio y su evento se confirman juntos.
 public interface IServicioUsuarios
 {
+    // Consultas de solo lectura, sin evento de auditoría. Exigen el mismo permiso y no devuelven hash, sello ni contadores.
+    // La búsqueda es opcional, parcial y sin distinguir mayúsculas; el resultado va ordenado por nombre de usuario, con un tope fijo e incluye cuentas desactivadas.
+    Task<RespuestaServicio<IReadOnlyList<DatosUsuario>>> ListarUsuariosAsync(
+        string? busqueda = null,
+        CancellationToken cancelacion = default
+        );
+
+    Task<RespuestaServicio<FichaDeUsuario>> ObtenerUsuarioAsync(
+        Guid idUsuario,
+        CancellationToken cancelacion = default
+        );
+
     Task<RespuestaServicio<ContrasenaTemporalEntregada>> CrearUsuarioAsync(
         string nombreUsuario, 
         string rol, 

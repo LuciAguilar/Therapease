@@ -33,6 +33,26 @@ internal class GestorIdentidadFalso : IGestorIdentidad
     public Task<DatosUsuario?> ObtenerAsync(Guid idUsuario, CancellationToken cancelacion = default) =>
         Task.FromResult(Usuarios.GetValueOrDefault(idUsuario));
 
+    public Dictionary<Guid, string> Correos { get; } = [];
+
+    public List<(string? Busqueda, int Maximo)> Listados { get; } = [];
+
+    public Task<IReadOnlyList<DatosUsuario>> ListarAsync(string? busqueda, int maximo, CancellationToken cancelacion = default)
+    {
+        Listados.Add((busqueda, maximo));
+        IReadOnlyList<DatosUsuario> resultado = Usuarios.Values
+            .Where(u => busqueda is null || u.NombreUsuario.Contains(busqueda, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(u => u.NombreUsuario, StringComparer.OrdinalIgnoreCase)
+            .Take(maximo)
+            .ToList();
+        return Task.FromResult(resultado);
+    }
+
+    public Task<FichaDeUsuario?> ObtenerFichaAsync(Guid idUsuario, CancellationToken cancelacion = default) =>
+        Task.FromResult(Usuarios.TryGetValue(idUsuario, out var datos)
+            ? new FichaDeUsuario(datos, Correos.GetValueOrDefault(idUsuario))
+            : null);
+
     public Task<DatosUsuario?> ObtenerPorNombreAsync(string nombreUsuario, CancellationToken cancelacion = default) =>
         Task.FromResult(Usuarios.Values.FirstOrDefault(u => string.Equals(u.NombreUsuario, nombreUsuario, StringComparison.OrdinalIgnoreCase)));
 

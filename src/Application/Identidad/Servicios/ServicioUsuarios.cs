@@ -36,6 +36,38 @@ public class ServicioUsuarios : IServicioUsuarios
         _usuarioActual = usuarioActual;
     }
 
+    public async Task<RespuestaServicio<IReadOnlyList<DatosUsuario>>> ListarUsuariosAsync(
+        string? busqueda = null, CancellationToken cancelacion = default)
+    {
+        if (!await TienePermisoDeAdministracionAsync(cancelacion))
+        {
+            return RespuestaServicio<IReadOnlyList<DatosUsuario>>.Fallida(MensajesDeIdentidad.SinPermiso);
+        }
+
+        var texto = busqueda?.Trim();
+        if (texto?.Length > LimitesDeIdentidad.LongitudMaximaBusquedaDeUsuarios)
+        {
+            return RespuestaServicio<IReadOnlyList<DatosUsuario>>.Fallida(MensajesDeIdentidad.BusquedaDeUsuariosInvalida);
+        }
+
+        var usuarios = await _gestor.ListarAsync(
+            string.IsNullOrEmpty(texto) ? null : texto, LimitesDeIdentidad.MaximoDeUsuariosListados, cancelacion);
+        return RespuestaServicio<IReadOnlyList<DatosUsuario>>.Correcta(usuarios);
+    }
+
+    public async Task<RespuestaServicio<FichaDeUsuario>> ObtenerUsuarioAsync(Guid idUsuario, CancellationToken cancelacion = default)
+    {
+        if (!await TienePermisoDeAdministracionAsync(cancelacion))
+        {
+            return RespuestaServicio<FichaDeUsuario>.Fallida(MensajesDeIdentidad.SinPermiso);
+        }
+
+        var ficha = await _gestor.ObtenerFichaAsync(idUsuario, cancelacion);
+        return ficha is null
+            ? RespuestaServicio<FichaDeUsuario>.Fallida(MensajesDeIdentidad.UsuarioNoEncontrado)
+            : RespuestaServicio<FichaDeUsuario>.Correcta(ficha);
+    }
+
     public async Task<RespuestaServicio<ContrasenaTemporalEntregada>> CrearUsuarioAsync(
         string nombreUsuario, string rol, CancellationToken cancelacion = default)
     {
@@ -211,6 +243,10 @@ public class ServicioUsuarios : IServicioUsuarios
                 "Contraseña restablecida. Entrega la contraseña temporal por un canal seguro.")
             : RespuestaServicio<ContrasenaTemporalEntregada>.Fallida(MensajesDeIdentidad.DatosDeUsuarioInvalidos);
     }
+
+    // Las consultas no necesitan al actor, solo el permiso vigente (cuenta activa, sin temporal pendiente).
+    private Task<bool> TienePermisoDeAdministracionAsync(CancellationToken cancelacion) =>
+        _autorizacion.TienePermisoAsync(Permiso.AdministrarUsuarios, cancelacion);
 
     private async Task<Guid?> ObtenerActorAutorizadoAsync(CancellationToken cancelacion) =>
         await _autorizacion.TienePermisoAsync(Permiso.AdministrarUsuarios, cancelacion) ? _usuarioActual.IdUsuario : null;

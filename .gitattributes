@@ -1,0 +1,2 @@
+# Los scripts de scripts/ci corren en Linux (runner de GitHub): deben terminar en LF aunque se editen en Windows.
+*.sh text eol=lf

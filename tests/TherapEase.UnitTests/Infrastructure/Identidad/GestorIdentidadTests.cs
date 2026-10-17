@@ -297,4 +297,36 @@ public class GestorIdentidadTests
 
         AssertMensajeSinDatosPrivados(excepcion);
     }
+
+    // ──── Ficha ────
+
+    [Fact]
+    public async Task ObtenerFichaAsync_DevuelveLosDatosDeLaCuentaYSuCorreo_SinTocarLaCuenta()
+    {
+        _usuario.Email = "operador@ficticio.mx";
+        _usuario.Activo = false;
+        _usuario.DebeCambiarContrasena = true;
+
+        var ficha = await _gestor.ObtenerFichaAsync(_usuario.Id);
+
+        Assert.NotNull(ficha);
+        Assert.Equal(new DatosUsuario(_usuario.Id, "operador-ficticio", "Usuaria", false, true), ficha.Datos);
+        Assert.Equal("operador@ficticio.mx", ficha.Correo);
+        Assert.Empty(_usuarios.Llamadas);
+    }
+
+    [Fact]
+    public async Task ObtenerFichaAsync_SinCorreoGuardado_DevuelveCorreoNulo()
+    {
+        var ficha = await _gestor.ObtenerFichaAsync(_usuario.Id);
+
+        Assert.NotNull(ficha);
+        Assert.Null(ficha.Correo);
+    }
+
+    [Fact]
+    public async Task ObtenerFichaAsync_DeUnaCuentaInexistente_DevuelveNulo()
+    {
+        Assert.Null(await _gestor.ObtenerFichaAsync(Guid.NewGuid()));
+    }
 }

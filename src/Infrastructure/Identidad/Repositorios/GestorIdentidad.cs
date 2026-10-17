@@ -30,6 +30,42 @@ public class GestorIdentidad : IGestorIdentidad
         return usuario is null ? null : await ADatosAsync(usuario);
     }
 
+    public async Task<IReadOnlyList<DatosUsuario>> ListarAsync(string? busqueda, int maximo, CancellationToken cancelacion = default)
+    {
+        var consulta = _contexto.Users.AsNoTracking();
+        if (!string.IsNullOrEmpty(busqueda))
+        {
+            // Contains con parámetro (no LIKE): % y _ escritos por la persona se buscan como texto. El nombre normalizado ya no distingue mayúsculas.
+            var normalizado = _usuarios.NormalizeName(busqueda)!;
+            consulta = consulta.Where(u => u.NormalizedUserName!.Contains(normalizado));
+        }
+
+        // Solo se proyectan las columnas de DatosUsuario: el hash, el sello y los contadores de fallos nunca salen de la base.
+        var filas = await consulta
+            .OrderBy(u => u.NormalizedUserName)
+            .Take(maximo)
+            .Select(u => new
+            {
+                u.Id,
+                u.UserName,
+                u.Activo,
+                u.DebeCambiarContrasena,
+                Rol = _contexto.UserRoles
+                    .Where(ur => ur.UserId == u.Id)
+                    .Join(_contexto.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => r.Name)
+                    .FirstOrDefault()
+            })
+            .ToListAsync(cancelacion);
+
+        return filas.Select(f => new DatosUsuario(f.Id, f.UserName!, f.Rol ?? string.Empty, f.Activo, f.DebeCambiarContrasena)).ToList();
+    }
+
+    public async Task<FichaDeUsuario?> ObtenerFichaAsync(Guid idUsuario, CancellationToken cancelacion = default)
+    {
+        var usuario = await _usuarios.FindByIdAsync(idUsuario.ToString());
+        return usuario is null ? null : new FichaDeUsuario(await ADatosAsync(usuario), usuario.Email);
+    }
+
     public async Task<DatosUsuario?> ObtenerPorNombreAsync(string nombreUsuario, CancellationToken cancelacion = default)
     {
         var usuario = await _usuarios.FindByNameAsync(nombreUsuario);

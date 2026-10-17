@@ -244,4 +244,248 @@ public class ServicioUsuariosTests
         Assert.DoesNotContain(restablecida.Datos!.ContrasenaTemporal, texto);
         Assert.DoesNotContain("usuaria_canario", texto);
     }
+
+    // ──── Lista y ficha de usuarios ────
+
+    private ServicioUsuarios CrearServicioConAutorizacionReal()
+    {
+        var autorizacion = new Autorizacion(_actual, _gestor);
+        var auditoria = new ServicioAuditoria(_repositorioAuditoria, autorizacion, new RelojFijo(Ahora));
+        return new ServicioUsuarios(_gestor, _unidad, auditoria, autorizacion, _actual);
+    }
+
+    private void AssertSinEscrituras()
+    {
+        Assert.Empty(_repositorioAuditoria.Eventos);
+        Assert.Equal(0, _unidad.Confirmaciones);
+        Assert.Empty(_gestor.Creaciones);
+        Assert.Empty(_gestor.ContrasenasEstablecidas);
+        Assert.Empty(_gestor.SesionesRevocadas);
+    }
+
+    [Fact]
+    public async Task ListarUsuarios_ConSuperusuarioActivo_DevuelveTodasLasCuentasOrdenadasPorNombreIncluidasLasDesactivadas()
+    {
+        _gestor.Agregar("zoe", NombresDeRol.Usuaria);
+        _gestor.Agregar("Ana", NombresDeRol.Usuaria, activo: false);
+        _gestor.Agregar("mariana", NombresDeRol.Usuaria, debeCambiar: true);
+
+        var respuesta = await _servicio.ListarUsuariosAsync();
+
+        Assert.True(respuesta.Exito);
+        var usuarios = respuesta.Datos!;
+        Assert.Equal(["Ana", "mariana", "super1", "zoe"], usuarios.Select(u => u.NombreUsuario));
+        Assert.False(usuarios.Single(u => u.NombreUsuario == "Ana").Activo);
+        Assert.True(usuarios.Single(u => u.NombreUsuario == "mariana").DebeCambiarContrasena);
+        Assert.Equal(NombresDeRol.Superusuario, usuarios.Single(u => u.NombreUsuario == "super1").Rol);
+    }
+
+    [Fact]
+    public async Task ListarUsuarios_ConTexto_FiltraPorNombreSinDistinguirMayusculas()
+    {
+        _gestor.Agregar("mariana.ficticia", NombresDeRol.Usuaria);
+        _gestor.Agregar("MARIO.ficticio", NombresDeRol.Usuaria);
+        _gestor.Agregar("luis.ficticio", NombresDeRol.Usuaria);
+
+        var respuesta = await _servicio.ListarUsuariosAsync("mar");
+
+        Assert.True(respuesta.Exito);
+        Assert.Equal(["mariana.ficticia", "MARIO.ficticio"], respuesta.Datos!.Select(u => u.NombreUsuario));
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task ListarUsuarios_SinTextoOSoloEspacios_NoFiltra(string? busqueda)
+    {
+        _gestor.Agregar("usuaria1", NombresDeRol.Usuaria);
+
+        var respuesta = await _servicio.ListarUsuariosAsync(busqueda);
+
+        Assert.True(respuesta.Exito);
+        Assert.Equal(2, respuesta.Datos!.Count);
+        Assert.Null(Assert.Single(_gestor.Listados).Busqueda);
+    }
+
+    [Fact]
+    public async Task ListarUsuarios_QuitaLosEspaciosExterioresDelTexto()
+    {
+        _gestor.Agregar("usuaria1", NombresDeRol.Usuaria);
+
+        var respuesta = await _servicio.ListarUsuariosAsync("  usuaria  ");
+
+        Assert.Equal("usuaria", Assert.Single(_gestor.Listados).Busqueda);
+        Assert.Equal("usuaria1", Assert.Single(respuesta.Datos!).NombreUsuario);
+    }
+
+    [Fact]
+    public async Task ListarUsuarios_ConMasDeCienCuentas_DevuelveSoloCien()
+    {
+        for (var i = 0; i < 120; i++)
+        {
+            _gestor.Agregar($"cuenta{i:000}", NombresDeRol.Usuaria);
+        }
+
+        var respuesta = await _servicio.ListarUsuariosAsync();
+
+        Assert.Equal(100, LimitesDeIdentidad.MaximoDeUsuariosListados);
+        Assert.Equal(100, Assert.Single(_gestor.Listados).Maximo);
+        Assert.Equal(100, respuesta.Datos!.Count);
+    }
+
+    [Fact]
+    public async Task ListarUsuarios_ConTextoSinCoincidencias_DevuelveListaVaciaCorrecta()
+    {
+        var respuesta = await _servicio.ListarUsuariosAsync("nadie");
+
+        Assert.True(respuesta.Exito);
+        Assert.Empty(respuesta.Datos!);
+    }
+
+    [Fact]
+    public async Task ListarUsuarios_ConTextoDeLongitudMaximaSeAcepta_YConUnCaracterMasSeRechaza()
+    {
+        var limite = new string('a', LimitesDeIdentidad.LongitudMaximaBusquedaDeUsuarios);
+
+        var aceptada = await _servicio.ListarUsuariosAsync(limite);
+        var rechazada = await _servicio.ListarUsuariosAsync(limite + "a");
+
+        Assert.True(aceptada.Exito);
+        Assert.False(rechazada.Exito);
+        Assert.Equal(MensajesDeIdentidad.BusquedaDeUsuariosInvalida, rechazada.Mensaje);
+        Assert.Null(rechazada.Datos);
+        Assert.Single(_gestor.Listados);
+    }
+
+    [Fact]
+    public async Task ListarUsuarios_SinPermisoDeAdministracion_RechazaSinConsultar()
+    {
+        _autorizacion.Permisos.Clear();
+
+        var respuesta = await _servicio.ListarUsuariosAsync();
+
+        Assert.False(respuesta.Exito);
+        Assert.Equal(MensajesDeIdentidad.SinPermiso, respuesta.Mensaje);
+        Assert.Null(respuesta.Datos);
+        Assert.Empty(_gestor.Listados);
+    }
+
+    [Fact]
+    public async Task ListarUsuarios_NoEscribeNiRegistraEventos()
+    {
+        _gestor.Agregar("usuaria1", NombresDeRol.Usuaria);
+
+        await _servicio.ListarUsuariosAsync();
+        await _servicio.ListarUsuariosAsync("usuaria");
+
+        AssertSinEscrituras();
+    }
+
+    // Cuenta con permiso por rol pero sin sesión válida, desactivada o con la contraseña temporal pendiente: la autorización real rechaza ambas consultas.
+    [Theory]
+    [InlineData("usuaria", false, false)]
+    [InlineData("desactivado", true, false)]
+    [InlineData("conTemporal", false, true)]
+    [InlineData("sinSesion", false, false)]
+    public async Task Consultas_SinSesionValidaOConCuentaSinPermisoVigente_SeRechazanConLaAutorizacionReal(string caso, bool desactivado, bool temporalPendiente)
+    {
+        var rol = caso == "usuaria" ? NombresDeRol.Usuaria : NombresDeRol.Superusuario;
+        var cuenta = _gestor.Agregar($"cuenta-{caso}", rol, activo: !desactivado, debeCambiar: temporalPendiente);
+        _actual.IdUsuario = caso == "sinSesion" ? null : cuenta.IdUsuario;
+        var servicio = CrearServicioConAutorizacionReal();
+
+        var lista = await servicio.ListarUsuariosAsync();
+        var ficha = await servicio.ObtenerUsuarioAsync(_superusuario.IdUsuario);
+
+        Assert.False(lista.Exito);
+        Assert.Equal(MensajesDeIdentidad.SinPermiso, lista.Mensaje);
+        Assert.False(ficha.Exito);
+        Assert.Equal(MensajesDeIdentidad.SinPermiso, ficha.Mensaje);
+        Assert.Null(ficha.Datos);
+        Assert.Empty(_gestor.Listados);
+    }
+
+    [Fact]
+    public async Task Consultas_ConSuperusuarioActivoYSinTemporalPendiente_FuncionanConLaAutorizacionReal()
+    {
+        _actual.IdUsuario = _superusuario.IdUsuario;
+        var servicio = CrearServicioConAutorizacionReal();
+
+        var lista = await servicio.ListarUsuariosAsync();
+        var ficha = await servicio.ObtenerUsuarioAsync(_superusuario.IdUsuario);
+
+        Assert.True(lista.Exito);
+        Assert.True(ficha.Exito);
+    }
+
+    [Fact]
+    public async Task ObtenerUsuario_ConSuperusuarioActivo_DevuelveLosDatosYElCorreo()
+    {
+        var cuenta = _gestor.Agregar("usuaria1", NombresDeRol.Usuaria, debeCambiar: true);
+        _gestor.Correos[cuenta.IdUsuario] = "usuaria1@ficticio.mx";
+
+        var respuesta = await _servicio.ObtenerUsuarioAsync(cuenta.IdUsuario);
+
+        Assert.True(respuesta.Exito);
+        Assert.Equal(cuenta, respuesta.Datos!.Datos);
+        Assert.Equal("usuaria1@ficticio.mx", respuesta.Datos.Correo);
+    }
+
+    [Fact]
+    public async Task ObtenerUsuario_DeUnaCuentaDesactivadaSinCorreo_LaDevuelveConCorreoNulo()
+    {
+        var cuenta = _gestor.Agregar("usuaria1", NombresDeRol.Usuaria, activo: false);
+
+        var respuesta = await _servicio.ObtenerUsuarioAsync(cuenta.IdUsuario);
+
+        Assert.True(respuesta.Exito);
+        Assert.False(respuesta.Datos!.Datos.Activo);
+        Assert.Null(respuesta.Datos.Correo);
+    }
+
+    [Fact]
+    public async Task ObtenerUsuario_DeUnaCuentaInexistente_RespondeNoEncontradoSinOtrosDatos()
+    {
+        var respuesta = await _servicio.ObtenerUsuarioAsync(Guid.NewGuid());
+
+        Assert.False(respuesta.Exito);
+        Assert.Equal(MensajesDeIdentidad.UsuarioNoEncontrado, respuesta.Mensaje);
+        Assert.Null(respuesta.Datos);
+    }
+
+    [Fact]
+    public async Task ObtenerUsuario_SinPermisoDeAdministracion_RespondeIgualParaCuentaExistenteQueInexistente()
+    {
+        var existente = _gestor.Agregar("usuaria1", NombresDeRol.Usuaria);
+        _autorizacion.Permisos.Clear();
+
+        var deExistente = await _servicio.ObtenerUsuarioAsync(existente.IdUsuario);
+        var deInexistente = await _servicio.ObtenerUsuarioAsync(Guid.NewGuid());
+
+        Assert.False(deExistente.Exito);
+        Assert.False(deInexistente.Exito);
+        Assert.Equal(MensajesDeIdentidad.SinPermiso, deExistente.Mensaje);
+        Assert.Equal(deExistente.Mensaje, deInexistente.Mensaje);
+        Assert.Null(deExistente.Datos);
+    }
+
+    [Fact]
+    public async Task ObtenerUsuario_NoEscribeNiRegistraEventos()
+    {
+        var cuenta = _gestor.Agregar("usuaria1", NombresDeRol.Usuaria);
+
+        await _servicio.ObtenerUsuarioAsync(cuenta.IdUsuario);
+
+        AssertSinEscrituras();
+    }
+
+    [Fact]
+    public void LosModelosDeConsulta_SoloExponenLosCamposPrevistos_SinHashSelloNiContadores()
+    {
+        static string[] Propiedades(Type tipo) => tipo.GetProperties().Select(p => p.Name).Order().ToArray();
+
+        Assert.Equal(["Activo", "DebeCambiarContrasena", "IdUsuario", "NombreUsuario", "Rol"], Propiedades(typeof(DatosUsuario)));
+        Assert.Equal(["Correo", "Datos"], Propiedades(typeof(FichaDeUsuario)));
+    }
 }

@@ -7,6 +7,11 @@ public interface IGestorIdentidad
 {
     Task<DatosUsuario?> ObtenerAsync(Guid idUsuario, CancellationToken cancelacion = default);
 
+    // Lectura sin bloqueos. Coincidencia parcial con el nombre de usuario sin distinguir mayúsculas (nulo = todos), orden por nombre, incluye cuentas desactivadas.
+    Task<IReadOnlyList<DatosUsuario>> ListarAsync(string? busqueda, int maximo, CancellationToken cancelacion = default);
+
+    Task<FichaDeUsuario?> ObtenerFichaAsync(Guid idUsuario, CancellationToken cancelacion = default);
+
     // Solo para el procedimiento de operador; el acceso usa VerificarCredencialesAsync para no revelar si el usuario existe.
     Task<DatosUsuario?> ObtenerPorNombreAsync(string nombreUsuario, CancellationToken cancelacion = default);
 

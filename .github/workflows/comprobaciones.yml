@@ -1,0 +1,215 @@
+# Comprobaciones automáticas por cambio (AGENTS 2.7): compilación, pruebas, límites de capas, paquetes, fijaciones, secretos, migraciones e imagen.
+# Solo usa acciones oficiales de GitHub, fijadas por SHA completo (S-34); el número de versión va en el comentario.
+# Cambiar una acción o un digest es un cambio que se revisa. Los scripts viven en scripts/ci y se pueden ejecutar igual en local.
+name: Comprobaciones
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Permisos mínimos: ningún trabajo escribe en el repositorio.
+permissions:
+  contents: read
+
+# Un cambio nuevo en el mismo PR cancela la ejecución anterior para no gastar minutos (A-06); en main nunca se cancela.
+concurrency:
+  group: comprobaciones-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  DOTNET_NOLOGO: "1"
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "1"
+  VISIBILIDAD_REPOSITORIO: ${{ github.event.repository.visibility }}
+  SHA_DEL_CAMBIO: ${{ github.event.pull_request.head.sha || github.sha }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  compilacion-y-unitarias:
+    name: Compilación y pruebas unitarias
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Marcar el inicio del trabajo
+        run: echo "INICIO_TRABAJO=$(date +%s)" >> "$GITHUB_ENV"
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
+        with:
+          global-json-file: global.json
+
+      - name: Restaurar paquetes
+        run: dotnet restore TherapEase.sln
+
+      - name: Compilar sin errores ni advertencias
+        run: dotnet build TherapEase.sln --configuration Release --no-restore -warnaserror
+
+      - name: Pruebas unitarias
+        run: >
+          dotnet test tests/TherapEase.UnitTests --configuration Release --no-build
+          --logger "trx;LogFileName=unitarias.trx" --results-directory resultados
+
+      # A-01 no necesita Docker: se ejecuta aquí para fallar pronto, antes de gastar minutos en la integración.
+      - name: Reglas de arquitectura (A-01)
+        run: >
+          dotnet test tests/TherapEase.IntegrationTests --configuration Release --no-build
+          --filter "FullyQualifiedName~ArquitecturaTests"
+          --logger "trx;LogFileName=arquitectura.trx" --results-directory resultados
+
+      - name: Resumir pruebas unitarias
+        if: always()
+        run: bash scripts/ci/resumir-resultados.sh resultados/unitarias.trx "Unitarias"
+
+      - name: Resumir reglas de arquitectura
+        if: always()
+        run: bash scripts/ci/resumir-resultados.sh resultados/arquitectura.trx "Reglas de arquitectura (A-01)"
+
+      - name: Guardar resultados (TRX)
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: resultados-unitarias-y-arquitectura
+          path: resultados/*.trx
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Registrar la ejecución (A-06)
+        if: always()
+        env:
+          RESULTADO: ${{ job.status }}
+        run: bash scripts/ci/registrar-ejecucion.sh "Compilación y pruebas unitarias" "$INICIO_TRABAJO" "$RESULTADO"
+
+  integracion:
+    name: Integración con PostgreSQL desechable
+    # Si la compilación o las unitarias fallan no se gastan minutos en la integración.
+    needs: compilacion-y-unitarias
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Marcar el inicio del trabajo
+        run: echo "INICIO_TRABAJO=$(date +%s)" >> "$GITHUB_ENV"
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
+        with:
+          global-json-file: global.json
+
+      - name: Restaurar y compilar
+        run: |
+          dotnet restore tests/TherapEase.IntegrationTests
+          dotnet build tests/TherapEase.IntegrationTests --configuration Release --no-restore -warnaserror
+
+      # Testcontainers levanta PostgreSQL con el Docker del runner. Sin reintentos: una falla intermitente debe verse, no ocultarse.
+      - name: Pruebas de integración
+        run: >
+          dotnet test tests/TherapEase.IntegrationTests --configuration Release --no-build
+          --logger "trx;LogFileName=integracion.trx" --results-directory resultados
+
+      - name: Resumir pruebas de integración
+        if: always()
+        run: bash scripts/ci/resumir-resultados.sh resultados/integracion.trx "Integración con PostgreSQL"
+
+      - name: Guardar resultados (TRX)
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: resultados-integracion
+          path: resultados/*.trx
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Registrar la ejecución (A-06)
+        if: always()
+        env:
+          RESULTADO: ${{ job.status }}
+        run: bash scripts/ci/registrar-ejecucion.sh "Integración con PostgreSQL desechable" "$INICIO_TRABAJO" "$RESULTADO"
+
+  seguridad-e-integridad:
+    name: Paquetes, fijaciones, secretos y migraciones
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Marcar el inicio del trabajo
+        run: echo "INICIO_TRABAJO=$(date +%s)" >> "$GITHUB_ENV"
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
+        with:
+          global-json-file: global.json
+
+      - name: Restaurar paquetes
+        run: dotnet restore TherapEase.sln
+
+      - name: Paquetes NuGet sin vulnerabilidades altas ni críticas (S-33)
+        run: bash scripts/ci/revisar-paquetes-vulnerables.sh
+
+      - name: Acciones e imágenes base fijadas (S-34)
+        run: bash scripts/ci/revisar-fijaciones.sh
+
+      - name: Sin archivos sensibles versionados
+        run: bash scripts/ci/revisar-archivos-sensibles.sh
+
+      # El modelo y la última migración deben coincidir: así ningún cambio de base llega sin su migración revisable.
+      # No se conecta a ninguna base; la cadena es ficticia y solo la exige la fábrica de diseño.
+      - name: Migraciones al día con el modelo
+        env:
+          ConnectionStrings__Migraciones: Host=localhost;Database=ficticia;Username=ficticio;Password=ficticia
+        run: |
+          dotnet tool restore
+          dotnet ef migrations has-pending-model-changes --project src/Infrastructure --startup-project src/Web
+
+      - name: Registrar la ejecución (A-06)
+        if: always()
+        env:
+          RESULTADO: ${{ job.status }}
+        run: bash scripts/ci/registrar-ejecucion.sh "Paquetes, fijaciones, secretos y migraciones" "$INICIO_TRABAJO" "$RESULTADO"
+
+  imagen:
+    name: Imagen de contenedor
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Marcar el inicio del trabajo
+        run: echo "INICIO_TRABAJO=$(date +%s)" >> "$GITHUB_ENV"
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Construir la imagen
+        run: docker build --tag therapease:comprobacion .
+
+      # 05E: contenedor sin privilegios y con comprobación de salud.
+      - name: La imagen no corre como root y define su comprobación de salud
+        run: |
+          usuario="$(docker image inspect --format '{{.Config.User}}' therapease:comprobacion)"
+          salud="$(docker image inspect --format '{{if .Config.Healthcheck}}definida{{end}}' therapease:comprobacion)"
+          echo "Usuario del contenedor: ${usuario:-<vacío>}; comprobación de salud: ${salud:-<ninguna>}"
+          if [ -z "$usuario" ] || [ "$usuario" = "0" ] || [ "$usuario" = "root" ]; then
+            echo "::error::La imagen corre como root o sin usuario definido."
+            exit 1
+          fi
+          if [ "$salud" != "definida" ]; then
+            echo "::error::La imagen no define HEALTHCHECK."
+            exit 1
+          fi
+
+      - name: Registrar la ejecución (A-06)
+        if: always()
+        env:
+          RESULTADO: ${{ job.status }}
+        run: bash scripts/ci/registrar-ejecucion.sh "Imagen de contenedor" "$INICIO_TRABAJO" "$RESULTADO"
