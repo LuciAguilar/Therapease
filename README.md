@@ -44,7 +44,7 @@ Las adendas de 09 y las decisiones incorporadas a AGENTS rigen el trabajo vigent
 | Persona | Trabajo actual B01 y pendientes B00 | Entrega y siguiente paso |
 | --- | --- | --- |
 | **Lucía** | Auditar sus pruebas con Claude y resolver observaciones; aprobar las propuestas nuevas de Miguel y conservar QA pendiente B00. | Miguel o Dulce revisa sus pruebas. Después de auditoría y aprobaciones, actualizar documentos de avance y autorizar el commit/publicación de QA. |
-| **Miguel** | Aprovechar el servidor y las pruebas B00; completar acceso, usuarios, sesiones y contraseñas y preparar CI. Presentar juntas las propuestas de [B01 §3.2](docs/planning/TherapEase-etapa09-B01.md#32-propuesta-que-miguel-debe-presentar-antes-de-programarla). | Unitarias propias y evidencia por cambio. Aplicar el detalle aprobado y coordinar con Dulce; no implementar propuestas pendientes antes de la decisión de Lucía. |
+| **Miguel** | Completar acceso, usuarios, sesiones y contraseñas, y el CI, en la rama `b01/acceso-y-usuarios`. Ya están programados la lista y ficha de usuarios, nombre y correo y los permisos explícitos (aprobados el 17-oct); faltan los eventos de acceso. Ver el [avance de B01](#avance-de-b01-en-la-rama-de-miguel--17-oct-2026). | Unitarias propias y evidencia por cambio. Un PR con lista, nombre/correo, permisos y CI, y otro con los eventos de acceso. Coordinar con Dulce mediante el [contrato para páginas](docs/planning/TherapEase-etapa09-B01-contrato-para-paginas.md). |
 | **Dulce** | PageModel, Razor, formularios y navegación del acceso, usuarios y cambio propio; unitarias del código que escriba. Concretar mensajes/campos pendientes con la usuaria y el equipo. | Integrar las funciones del servidor con protección de formularios y HTTPS local. No necesita esperar pacientes/citas/pagos para B01. |
 
 **PageModel asignado:** Lucía confirmó el 04-oct-2026 que lo escribe Dulce. Unitarias en el mismo PR, revisión distinta y aprobación de Lucía, conforme a [AGENTS.md](AGENTS.md).
@@ -106,7 +106,7 @@ PR #5, `bce9409`: build Release sin errores/advertencias; 258 unitarias y 182 in
 
 | Quién | Qué debe consultar y atender |
 | --- | --- |
-| Miguel | PR #6 revisado y fusionado. Continuar servidor de acceso, sesiones, contraseñas y unitarias; preparar CI y presentar propuesta pendiente de [B01 §3.2](docs/planning/TherapEase-etapa09-B01.md#32-propuesta-que-miguel-debe-presentar-antes-de-programarla). No reasignar PageModel de Dulce. |
+| Miguel | PR #6 revisado y fusionado. Continuar en la rama `b01/acceso-y-usuarios`; estado en el [avance de B01](#avance-de-b01-en-la-rama-de-miguel--17-oct-2026). No reasignar PageModel de Dulce. |
 | Dulce | [Informe PR01 §8](docs/reviews/TherapEase-09-B00-revision-PR01.md#8-mensajes-de-guardado--dulce-pagemodel-10-oct-2026): mensajes Q08; acceso mínimo/PageModel y unitarias; validar producto con la usuaria. Procedimientos aprobados en [AGENTS](AGENTS.md) §2.2–§2.3. |
 | Equipo | [B00 §7](docs/planning/TherapEase-etapa09-B00.md#7-plan-de-validación-autorizado) y [plan de pruebas](docs/testing/TherapEase-09-plan-de-pruebas.md): responsables, evidencia y pendientes. Reglas obligatorias en AGENTS. |
 
@@ -128,6 +128,16 @@ dotnet build TherapEase.sln
 dotnet test TherapEase.sln
 dotnet run --project src/Web
 ```
+
+Comprobaciones del CI en local (desde la raíz, con Git Bash; el `bash` de WSL sin distribución instalada no sirve). La primera necesita un `dotnet restore` previo:
+
+```bash
+bash scripts/ci/revisar-paquetes-vulnerables.sh   # falla ante una vulnerabilidad alta o crítica en paquetes NuGet
+bash scripts/ci/revisar-fijaciones.sh             # acciones por SHA, imagen base por digest, permisos del flujo
+bash scripts/ci/revisar-archivos-sensibles.sh     # .env, credenciales o claves privadas versionados
+```
+
+El flujo también comprueba que el modelo y las migraciones coinciden (`dotnet ef migrations has-pending-model-changes --project src/Infrastructure --startup-project src/Web`, con una `ConnectionStrings__Migraciones` ficticia: no se conecta a ninguna base) y que la imagen del `Dockerfile` no corre como root y define su comprobación de salud.
 
 La aplicación escucha en `http://localhost:5052` y expone `/salud`, que solo comprueba que el proceso está encendido: puede responder 200 aunque PostgreSQL no esté disponible, así que no demuestra que el acceso a datos funcione. IntegrationTests contiene los bloques de QA de B00 §4.1–§4.8 (PR #4, fusionado); sus resultados están en [B00 §4](docs/planning/TherapEase-etapa09-B00.md#4-evidencia-registrada-y-límites). E2ETests sigue sin pruebas; espera los recorridos con las páginas de Dulce.
 
@@ -155,14 +165,14 @@ Las migraciones las aplica solo `therapease_migrador`; la aplicación se conecta
 
 **Reglas de citas implementadas.** Activa = agendada y vigente; solo las activas bloquean horarios. La base impone por sí misma que dos citas activas no se crucen y que nunca exista una cita activa de un paciente de baja (restricción de exclusión y triggers de `EsquemaInicial`); esa protección se conserva. Cancelar no es baja y conserva el pago. Ninguna cita se cancela ni se recupera automáticamente. **Provisional, pendiente de validar con la usuaria (Dulce):** (1) la política para las citas existentes al dar de baja a un paciente: hoy la baja se rechaza mientras haya citas activas, y la alternativa sería cancelarlas primero; (2) el pago inicial «Pendiente»; (3) las citas seguidas sin hueco, que hoy se permiten porque el intervalo es `[inicio, fin)`. Lo provisional es la política de atención a las citas existentes, no el bloqueo de la base.
 
-**Identidad y acceso.** Los usuarios y roles los administra ASP.NET Core Identity; los roles `Usuaria` y `Superusuario` los siembra la migración. Con la aplicación configurada (`ConnectionStrings__TherapEase`), el primer superusuario se crea con un comando que se ejecuta solo en la máquina del operador: entrega una contraseña temporal únicamente por su consola, una sola vez, sin escribirla en los registros del servidor, sin correo y sin contraseña fija en el código. Condiciones decididas por Lucía: la contraseña tiene mínimo 12 caracteres y no exige combinaciones de letras, números o símbolos, y la sesión caduca tras 30 minutos sin actividad. Documentarlas no acredita que sus mecanismos estén completamente probados: la evidencia de QA en servidor está en B00 §4.1; los recorridos de navegador siguen pendientes.
+**Identidad y acceso.** Los usuarios y roles los administra ASP.NET Core Identity; los roles `Usuaria` y `Superusuario` los siembra la migración. Con la aplicación configurada (`ConnectionStrings__TherapEase`), el primer superusuario se crea con un comando que se ejecuta solo en la máquina del operador: entrega una contraseña temporal únicamente por su consola, una sola vez, sin escribirla en los registros del servidor, sin correo y sin contraseña fija en el código. Condiciones decididas por Lucía: la contraseña tiene mínimo 12 caracteres y no exige combinaciones de letras, números o símbolos, y la sesión caduca tras 30 minutos sin actividad. Cada cuenta tiene nombre completo (obligatorio al crear desde CU02, de 2 a 150 caracteres; el primer superusuario lo recibe vacío y el Superusuario lo completa después) y un correo opcional que no sirve para entrar ni para recuperar contraseñas (aprobado el 17-oct). Documentarlas no acredita que sus mecanismos estén completamente probados: la evidencia de QA en servidor está en B00 §4.1; los recorridos de navegador siguen pendientes.
 
 ```powershell
 dotnet run --project src/Web -- --crear-superusuario <nombre-de-usuario>
 dotnet run --project src/Web -- --restablecer-superusuario <nombre-de-usuario>
 ```
 
-El segundo comando es la recuperación cuando ningún superusuario puede entrar; como todo restablecimiento de contraseña, conserva el bloqueo vigente en lugar de levantarlo (cinco fallos bloquean como máximo 15 minutos). La cookie de sesión es `HttpOnly`, `Secure` y `SameSite=Lax`; cada solicitud revalida el sello y el estado del usuario contra la base, y todo lo que no declare otra política exige sesión válida. Si Identity rechaza una operación (rol, sello, contraseña, contador de intentos), la operación se detiene y no se confirma. Permisos: administrar usuarios y consultar la auditoría son solo del Superusuario; dar de baja pacientes es de Usuaria y Superusuario, decisión provisional de Lucía del 11-oct que Dulce valida con la usuaria. La autorización se resuelve en el servidor con `IAutorizacion` y exige sesión válida, cuenta activa y sin contraseña temporal pendiente.
+El segundo comando es la recuperación cuando ningún superusuario puede entrar; como todo restablecimiento de contraseña, conserva el bloqueo vigente en lugar de levantarlo (cinco fallos bloquean como máximo 15 minutos). La cookie de sesión es `HttpOnly`, `Secure` y `SameSite=Lax`; cada solicitud revalida el sello y el estado del usuario contra la base, y todo lo que no declare otra política exige sesión válida. Si Identity rechaza una operación (rol, sello, contraseña, contador de intentos), la operación se detiene y no se confirma. Permisos: administrar usuarios y consultar la auditoría son solo del Superusuario; dar de baja pacientes es de Usuaria y Superusuario, decisión provisional de Lucía del 11-oct que Dulce valida con la usuaria. La matriz de permisos es explícita por rol y una prueba falla si se añade un permiso sin decidirlo. La autorización se resuelve en el servidor con `IAutorizacion` y exige sesión válida, cuenta activa y sin contraseña temporal pendiente.
 
 **Cabeceras de seguridad y errores.** Toda respuesta lleva `X-Content-Type-Options: nosniff`, `Content-Security-Policy: frame-ancestors 'none'`, `X-Frame-Options: DENY` y `Referrer-Policy: no-referrer`. El contenido que exige sesión lleva además `Cache-Control: no-store`; no se impone a los archivos estáticos. `/salud` ya impide caché por el framework y `/Error` por ResponseCache. Las demás restricciones de CSP se completan con las páginas y la duración de HSTS se decide al desplegar. Fuera de Development, una excepción no controlada recibe un 500 con cuerpo fijo (JSON en `/api`, HTML mínimo en las páginas) que no consulta Identity ni la base y no incluye datos de la excepción, de la solicitud ni del usuario.
 
@@ -195,6 +205,15 @@ Excepción aprobada por Lucía el 08-oct: Web puede usar enumeraciones y contene
 | Web | `Pages`, `Endpoints`, `Seguridad`, `Comandos`, `Configuracion`, `Salud` | Pantallas, rutas técnicas, cookie y políticas, comandos de operador, composición y sonda de salud. |
 
 Los setters de las entidades son `internal`: solo las clases de `Reglas` del propio dominio las modifican, así ninguna otra capa salta una regla. Los ámbitos de un paciente se exponen como colección de solo lectura. El coordinador de CU04 va en `TherapEase.Application.Coordinadores`, fuera de Pacientes y Citas. Citas puede usar el contrato público de Pacientes; Pacientes no usa Citas; Identidad usa Auditoría y Auditoría no usa Identidad.
+
+## Avance de B01 en la rama de Miguel — 17-oct-2026
+
+Rama `b01/acceso-y-usuarios`, código probado `c3f2b63de2fce7e5f265119ba292f6c2017d93c5`: 386 unitarias y 240 de integración correctas (esta última en la segunda ejecución; la primera tuvo 10 fallos por tiempo de espera agotado, atribuidos a la carga de la máquina). Ejecución local, no CI; todavía sin PR. Comandos, entorno y huellas en el [plan de pruebas §0.7](docs/testing/TherapEase-09-plan-de-pruebas.md#07-avance-de-miguel-en-b01--17-oct-2026).
+
+- **Servidor:** permisos escritos uno por uno, lista y ficha de usuarios, nombre completo y correo con su migración, edición por el Superusuario y consulta de datos propios. Faltan los eventos de acceso, salida y bloqueo: aprobados el 17-oct, esperan que se anote su excepción en AGENTS §2.3.
+- **Para Dulce:** [contrato de las funciones para las páginas](docs/planning/TherapEase-etapa09-B01-contrato-para-paginas.md).
+- **CI:** `.github/workflows/comprobaciones.yml` y `scripts/ci/`. Comprobado en local; **nunca se ejecutó en GitHub**. Va en el mismo PR que lo anterior; los eventos de acceso irán en otro. Cómo ejecutar sus comprobaciones en local, en §10.
+- **Decisiones:** [propuesta de Miguel](docs/planning/TherapEase-etapa09-B01-propuesta.md), con las decisiones de Lucía del 17-oct y el estado de cada punto.
 
 ## Preparación de B01 y respuestas recibidas
 

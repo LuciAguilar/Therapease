@@ -18,7 +18,7 @@ Este documento cumple dos entregas que pide el [plan B01](TherapEase-etapa09-B01
 | ✅ | Sesión y cookie | `ConfiguracionDeSeguridad` | 30 minutos con renovación; `HttpOnly`, `Secure`, `SameSite=Lax`; sello revisado en cada solicitud; claves en PostgreSQL. | Nada. |
 | ✅ / ⏳ | Auditoría y consulta Q03 | `IServicioAuditoria`, `/api/auditoria/eventos` | Registra cada cambio de usuario y contraseña, sin valores. | Hechos de acceso, salida y bloqueo (§3.2). |
 | ✅ | Cabeceras y error 500 fijo | `CabecerasDeSeguridad`, `ManejadorDeErroresInesperados` | Incorporados en el PR #5. | Probar con las páginas. |
-| ⏳ | Comprobaciones automáticas (CI) | `.github/workflows` | No existe ningún flujo; la carpeta solo tiene `.gitkeep`. | Preparar GitHub Actions. No depende de ninguna decisión. |
+| ⏳ | Comprobaciones automáticas (CI) | `.github/workflows` | En `main` no existe ningún flujo; la carpeta solo tiene `.gitkeep`. La rama de Miguel ya trae uno (§6). | Ejecutarlo en GitHub: nunca se ha ejecutado. |
 
 ### 1.2. Pruebas disponibles
 
@@ -182,4 +182,22 @@ Cada asunto tiene **hoy**, **recomendación**, **ejemplo**, **si algo falla**, *
 3. **Lista y ficha de usuarios** (§3.1).
 4. **Eventos de acceso** (§3.2): toca el inicio de sesión, la salida y el cambio de contraseña propia, así que va aparte y con revisión cuidadosa.
 
-Cada cambio lleva sus unitarias en el mismo PR. Propongo dos PR: uno con los puntos 1 a 3 y otro con el 4. Las comprobaciones automáticas (CI) van en un PR propio y pueden empezar ya. Después de cada PR actualizo este documento, el plan de pruebas y el README técnico con la fecha, la versión y los resultados.
+Cada cambio lleva sus unitarias en el mismo PR. Dos PR: uno con los puntos 1 a 3 y las comprobaciones automáticas (CI), y otro con el 4. El CI va en el mismo PR por indicación de Miguel del 17-oct, no en uno aparte. Después de cada PR actualizo este documento, el plan de pruebas y el README técnico con la fecha, la versión y los resultados.
+
+
+## 6. Estado de implementación — 17-oct-2026
+
+Rama `b01/acceso-y-usuarios`, código probado `c3f2b63de2fce7e5f265119ba292f6c2017d93c5`, con unitarias en cada cambio; todavía sin PR. Resultados, comandos y huellas en el [plan de pruebas §0.7](../testing/TherapEase-09-plan-de-pruebas.md#07-avance-de-miguel-en-b01--17-oct-2026). Falta la revisión de otra persona y la aprobación final de Lucía.
+
+| # de §1.3 | Qué | Estado |
+| --- | --- | --- |
+| 1 | Consulta para elegir un usuario y ver su ficha (§3.1) | ✅ Programada: `ListarUsuariosAsync` y `ObtenerUsuarioAsync`. |
+| 2 | Eventos de acceso, salida y bloqueo (§3.2) | ⏳ Aprobados, sin programar: falta anotar la excepción en AGENTS §2.3 y confirmar el registro técnico. |
+| 3 | Nombre completo y correo (§3.3) | ✅ Programados, con la migración `NombreCompletoDeUsuario`, la edición por el Superusuario y la consulta de datos propios. El evento de alta también lista `NombreCompleto` y, si se capturó, `Correo` (decisión de Lucía, 17-oct). |
+| 4 | Permisos del Superusuario escritos uno por uno (§3.4) | ✅ Programados, con la prueba de completitud. |
+| 5 | Protección de intentos con nombres desconocidos | Fuera de B01, por decisión de Lucía. |
+| 6 | Comprobaciones automáticas (CI) | ✅ / ⏳ Preparadas en local; nunca se ejecutaron en GitHub. |
+| 7 | Contrato de cada función para Dulce | ✅ [Contrato para páginas](TherapEase-etapa09-B01-contrato-para-paginas.md). |
+| 8 | Cinco comentarios del código que decían «pendiente de decisión» | ✅ Actualizados con la decisión del 04-oct. |
+
+Las precisiones de Miguel marcadas en §3 (la ficha, la forma del error al entrar, el puerto `IRegistroTecnico`, el dominio del correo, los campos del evento de actualización y los datos propios con temporal pendiente) siguen pendientes de confirmación de Lucía; el código ya las aplica salvo `IRegistroTecnico` y el error al entrar, que dependen de los eventos de acceso.

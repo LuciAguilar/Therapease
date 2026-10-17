@@ -69,6 +69,32 @@ Evidencia detallada: [Identity](TherapEase-09-B00-evidencia-identidad.md), [recu
 
 El seguimiento 0.1 conserva las ejecuciones del 08–10-oct como historia. Los fallos de arquitectura/Q03 allí citados ya no son el resultado vigente. No se marcan completas las pruebas de páginas u operaciones aún inexistentes.
 
+## 0.7. Avance de Miguel en B01 — 17-oct-2026
+
+Rama `b01/acceso-y-usuarios`: parte de `main` `ffb2494`, incluye los documentos del equipo y las pruebas de servidor de Lucía, que siguen pendientes de auditoría y no se cuentan aquí como evidencia aprobada. ✅ identifica ejecución local con evidencia para el alcance indicado; no equivale a revisión humana, aprobación ni CI. Las casillas de §1, §3 y §4 conservan su estado hasta cerrar esas revisiones. No se crearon identificadores nuevos: Lucía asigna los de los casos que siguen.
+
+| Dato de la ejecución | Valor |
+| --- | --- |
+| Fecha y zona | 17-oct-2026, de 15:17 a 15:26, UTC−7 (Hermosillo). |
+| Código probado | `c3f2b63de2fce7e5f265119ba292f6c2017d93c5`, sin cambios locales. |
+| Entorno | Windows 11 Home 10.0.26200, .NET SDK 10.0.401, Docker Desktop 29.4.0, PostgreSQL 17 desechable con Testcontainers. Ejecución local, no CI. |
+| Comandos | `dotnet build TherapEase.sln`; `dotnet test tests/TherapEase.UnitTests`; `dotnet test tests/TherapEase.IntegrationTests`. |
+| Compilación | 0 advertencias y 0 errores. |
+| Unitarias | **386 correctas**, 0 fallidas, 0 omitidas (antes eran 258; de ellas, 252 son de identidad). |
+| Integración, 240 casos (incluye 30 de arquitectura) | **1.ª ejecución, 4 min 20 s: 230 correctas y 10 fallidas, todas por tiempo de espera agotado** (lecturas de Npgsql de 15 a 20 s y solicitudes HTTP de 3 a 5 s; ninguna falló una aserción). Fueron 5 de `IdentidadServidorTests`, 2 de `UsuariosServidorB01Tests`, y una de `HttpsLocalTests`, `RecuperacionTests` e `InterrupcionesIdentidadTests`. Miguel las atribuye a la carga de la máquina: al terminar quedaban 2.4 GB libres de 15.6 GB; no se probó otra causa. **2.ª ejecución sobre el mismo código, 3 min 7 s: 240 correctas**, 0 fallidas, 0 omitidas. |
+| Archivos locales (no versionados) | `TestResults/b01-miguel-unitarias-17oct.trx` (SHA-256 `cd81bef094b06963124fc26b585137264f460ddfc29600a6a8dfe1ee11513f6a`); `b01-miguel-integracion-17oct.trx` (1.ª, `85c4f280d0664b3dd61617181ab268441e5bcce8dba73bcfc0324cf4f7884275`); `b01-miguel-integracion-17oct-segunda.trx` (2.ª, `0a6342fc4f58ddd07cb47df29080b9285d64753be81f855d88ac0c8001e8c8f9`). |
+
+| Estado | Alcance | Resultado / pendiente |
+| --- | --- | --- |
+| ✅ | Permisos del Superusuario escritos uno por uno ([propuesta §3.4](../planning/TherapEase-etapa09-B01-propuesta.md), aprobada el 17-oct) | `MatrizDePermisosTests`, 22 casos: tabla por rol y permiso, prueba de completitud, un permiso sin decisión se niega y la tabla no se modifica desde fuera. Control negativo: al añadir un permiso sin decidirlo, la prueba de completitud falló; el experimento se revirtió. Cambio de permisos: Lucía lo revisa. |
+| ✅ | Lista y ficha de usuarios (§3.1) | Casos en `ServicioUsuariosTests` y `GestorIdentidadTests`: permiso `AdministrarUsuarios`, sin temporal pendiente, incluye desactivadas, tope de 100, búsqueda y sin hash, sello ni contadores. Comprobado además a mano contra PostgreSQL desechable con una prueba temporal que **no se conservó** (orden, mayúsculas, `%` y `_` como texto, SQL inyectado, más de 100 cuentas). ⏳ La prueba de base de datos es de Lucía. |
+| ✅ | Nombre completo y correo (§3.3) | `ReglasDeDatosDeCuentaTests` (38), `ServicioCuentaPropiaTests` (6) y casos nuevos en `ServicioUsuariosTests` y `GestorIdentidadTests`: validaciones, alta que exige el nombre, actualización que solo registra los campos cambiados y sin valores, datos propios y comando de arranque sin nombre. Migración `NombreCompletoDeUsuario`: SQL de subida y de reversión revisados; revertirla elimina los nombres. Comprobado a mano con una prueba temporal no conservada: editar los datos **no cambia el sello de seguridad** y la sesión sigue válida; como control, `SetEmailAsync` de Identity sí lo cambia. ⏳ Prueba de base de datos de Lucía. |
+| ✅ | Evento de alta con los campos nuevos | El evento de alta lista `NombreCompleto` y, si se capturó, `Correo`, sin valores. |
+| ✅ | Cambios en pruebas existentes de Lucía | Seis archivos de integración: 10 llamadas a `CrearUsuarioAsync` ahora pasan un nombre completo; dos conteos de migraciones pasaron de 2 a 3 (`RevisionDatosTests`, `RecuperacionTests`); un campo esperado del evento de alta (`AuditoriaServidorB01Tests`). No cambian lo que cada prueba comprueba. Lucía debe revisarlos. |
+| ✅ / ⏳ | Comprobaciones automáticas (A-06, S-33, S-34) | Flujo `.github/workflows/comprobaciones.yml` y `scripts/ci/`. Comprobado en local: análisis estático del flujo con actionlint; los pasos de compilación, unitarias, arquitectura, paquetes, fijaciones, archivos sensibles y migraciones, en Linux con el SDK de la imagen del `Dockerfile`; la imagen construida corre sin root y con salud definida. Controles negativos que fallan como deben: acción sin SHA, imagen sin digest, `.env` versionado, paquete con vulnerabilidad alta, prueba omitida y modelo sin migración. ⏳ **Nunca se ejecutó en GitHub** y la integración no se comprobó en Linux; S-33, S-34 y A-06 siguen ⏳ hasta la primera ejecución real y la medición de minutos de Lucía. |
+| ⏳ | Eventos de acceso, salida y bloqueo | Aprobados el 17-oct; no programados: falta anotar la excepción en AGENTS §2.3 y confirmar el registro técnico. |
+| ⏳ | Páginas, navegador y revisión | Contrato para Dulce en [contrato para páginas](../planning/TherapEase-etapa09-B01-contrato-para-paginas.md). Falta la revisión de otra persona, la aprobación final de Lucía y la conexión con las páginas. |
+
 ## 0.6. PR #6 revisado y fusionado — 15-oct-2026
 
 ✅ Miguel aprobó la versión `0db344a`; Lucía fusionó mediante squash en `ffb2494ad9da026f24a57826c45f6f530afb467b`. No se repitieron pruebas por actualizar este plan. Se conservan los resultados de B00 y siguen pendientes páginas/navegador, producto y cierre B00/LCA/R04.
@@ -203,7 +229,7 @@ Integración: xUnit + Testcontainers, con el esquema creado por **las migracione
 | A-03 | ✅ | Insertar por SQL directo dos citas activas solapadas → **la base** las rechaza (no solo el código). | Q06, 05C |
 | A-04 | ✅ | La imagen Docker arranca, responde la comprobación de salud y corre sin privilegios. | 05E |
 | A-05 | ✅ | Respaldo cifrado, huella SHA-256 correcta y restauración en PostgreSQL desechable con los mismos datos. | Q10, 05E |
-| A-06 | ⏳ | Lucía registra la decisión de visibilidad del repositorio antes de crearlo y mide minutos de CI por PR, indicando visibilidad, tipo de runner y duración por trabajo. | R01, 07C, ajuste B00 del 01-oct |
+| A-06 | ⏳ | Lucía registra la decisión de visibilidad del repositorio antes de crearlo y mide minutos de CI por PR, indicando visibilidad, tipo de runner y duración por trabajo. El flujo preparado por Miguel deja en el resumen de cada trabajo el runner, la visibilidad, la duración, el commit y el enlace (§0.7); sin ejecución en GitHub todavía. | R01, 07C, ajuste B00 del 01-oct |
 | A-07 | ✅ | Con PostgreSQL/Testcontainers y el usuario real de la aplicación: `INSERT` en `EventoAuditoria` permitido; `UPDATE`, `DELETE` y cambio de esquema denegados. | Q03, 07B; S-22–S-23 |
 
 ### CU01 — Acceder y cerrar sesión (B01) ★
@@ -401,8 +427,8 @@ Referencia: OWASP Top 10:2025, ASVS 5.0 aplicable y 07B. «Todas las rutas» = l
 
 | ID | Estado | Qué hacer → qué debe pasar | Origen |
 | --- | --- | --- | --- |
-| S-33 | ⏳ | La CI audita paquetes NuGet y falla ante una vulnerabilidad alta. | 05E A03 |
-| S-34 | ⏳ | Acciones de GitHub fijadas por SHA; imagen base fijada por digest. | 07B |
+| S-33 | ⏳ | La CI audita paquetes NuGet y falla ante una vulnerabilidad alta. Preparado en `scripts/ci/revisar-paquetes-vulnerables.sh` y comprobado en local con un paquete vulnerable; sin ejecución en GitHub (§0.7). | 05E A03 |
+| S-34 | ⏳ | Acciones de GitHub fijadas por SHA; imagen base fijada por digest. Preparado en `scripts/ci/revisar-fijaciones.sh` y en el flujo, con acciones oficiales fijadas; comprobado en local; sin ejecución en GitHub (§0.7). | 07B |
 | S-35 | ⏳ | Revisión de vulnerabilidades con Astra sobre código y configuración; los hallazgos altos se corrigen antes de la demo. Si se revisa la app publicada, antes se necesita la autorización de Lucía para publicar. | Prompt maestro §10, §12 |
 
 ### Antes de datos reales (futuro)
@@ -442,6 +468,7 @@ Referencia: OWASP Top 10:2025, ASVS 5.0 aplicable y 07B. «Todas las rutas» = l
 | Resuelto el 11-oct: baja provisional de pacientes para Usuaria y Superusuario; otros permisos no se amplían | CU04, Q01; pruebas de autorización del permiso nuevo | Lucía aprobó; Miguel implementa y prueba en PR #5. Dulce valida la política operativa con la usuaria. |
 | Resuelto el 12-oct: temporales, orden 7 puntos 1–4; A para B00 ficticio, B de 24 h antes de datos reales | CU02, CU11, Q08/Q19 | Lucía aprobó; entrega/interfaz y prueba final pendientes; B no se implementa ahora |
 | Resuelto el 12-oct: Q03 por navegador autenticado, orden 8 opción A; script B no incluido | L-Q03-03–04, S-22–S-24 | Lucía aprobó; acceso/cierre de sesión de Dulce y prueba final pendientes |
+| Resuelto el 17-oct: lista y ficha de usuarios, nombre completo y correo, permisos explícitos y eventos de acceso, salida y bloqueo ([propuesta](../planning/TherapEase-etapa09-B01-propuesta.md)) | CU02, CU11, L-CU02-07, S-12, S-24 | Lucía aprobó; Miguel implementó todo salvo los eventos (§0.7). Lucía añade las pruebas de base de datos y asigna identificadores; Dulce usa el [contrato](../planning/TherapEase-etapa09-B01-contrato-para-paginas.md). |
 
 ## Ajuste de cobertura por entrevista del 14-oct-2026
 
