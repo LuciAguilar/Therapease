@@ -193,16 +193,14 @@ jobs:
       - name: Construir la imagen
         run: docker build --tag therapease:comprobacion .
 
-      # 05E: contenedor sin privilegios y con comprobación de salud.
-      - name: La imagen no corre como root y define su comprobación de salud
+      # 05E: contenedor sin privilegios (usuario configurado y efectivo, sin aceptar 0:0 ni root:root) y con comprobación de salud.
+      - name: La imagen no corre como administrador
+        run: bash scripts/ci/revisar-usuario-de-imagen.sh therapease:comprobacion
+
+      - name: La imagen define su comprobación de salud
         run: |
-          usuario="$(docker image inspect --format '{{.Config.User}}' therapease:comprobacion)"
           salud="$(docker image inspect --format '{{if .Config.Healthcheck}}definida{{end}}' therapease:comprobacion)"
-          echo "Usuario del contenedor: ${usuario:-<vacío>}; comprobación de salud: ${salud:-<ninguna>}"
-          if [ -z "$usuario" ] || [ "$usuario" = "0" ] || [ "$usuario" = "root" ]; then
-            echo "::error::La imagen corre como root o sin usuario definido."
-            exit 1
-          fi
+          echo "Comprobación de salud: ${salud:-<ninguna>}"
           if [ "$salud" != "definida" ]; then
             echo "::error::La imagen no define HEALTHCHECK."
             exit 1

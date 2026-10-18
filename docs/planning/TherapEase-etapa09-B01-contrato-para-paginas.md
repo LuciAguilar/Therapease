@@ -1,6 +1,6 @@
 # TherapEase — B01 · Contrato de las funciones del servidor para las páginas
 
-**Borrador del 17-oct-2026.** Autor: Miguel. Para: Dulce. Revisa: Lucía. Rama `b01/acceso-y-usuarios`, código de referencia en el commit `d18cf29` (aún sin PR; llegará a `main` con el PR de Miguel).
+**Borrador del 17-oct-2026.** Autor: Miguel. Para: Dulce. Revisa: Lucía. Rama `b01/acceso-y-usuarios`, código de referencia en el commit `d18cf29` ([PR #7](https://github.com/LuciAguilar/Therapease/pull/7); llegará a `main` con ese PR).
 
 Este documento cumple la entrega «explicar qué recibe y devuelve cada función, sus errores y la entrega de temporales» del [plan B01](TherapEase-etapa09-B01.md) (§2). Dice **cómo llamar a cada función desde un PageModel**, qué responde y qué debe hacer la página con cada resultado. Las páginas, los formularios, los mensajes en pantalla y la navegación son de Dulce; aquí solo se fija lo que el servidor garantiza y lo que la página no debe romper. **No contiene páginas ni código de interfaz.** ✅ indica algo que ya está en el código y con pruebas; ⏳ indica algo pendiente de decisión de Lucía.
 
@@ -23,7 +23,7 @@ Este documento cumple la entrega «explicar qué recibe y devuelve cada función
 
 - Mostrar `Mensaje` **como texto** (Razor lo codifica; no usar `Html.Raw` ni `innerHTML`).
 - No decidir nada leyendo el texto del mensaje. Si hace falta distinguir un caso, comparar con la constante de `MensajesDeIdentidad` (§4).
-- Un resultado con `Exito = false` **no se anuncia nunca como éxito** y no dejó nada guardado.
+- Un resultado con `Exito = false` **no se anuncia nunca como éxito** y no completó la acción. **Una excepción importante:** un intento fallido de contraseña, al entrar o al cambiarla, sí deja guardado el aumento del contador de bloqueo; cinco seguidos bloquean la cuenta 15 minutos aunque cada respuesta haya sido un fallo.
 
 ### 1.3. Cuando algo falla de verdad: error 500 fijo
 
