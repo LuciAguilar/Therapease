@@ -208,7 +208,7 @@ Los setters de las entidades son `internal`: solo las clases de `Reglas` del pro
 
 ## Avance de B01 en la rama de Miguel — 17-oct-2026
 
-Rama `b01/acceso-y-usuarios`, código probado `c3f2b63de2fce7e5f265119ba292f6c2017d93c5`: 386 unitarias y 240 de integración correctas (esta última en la segunda ejecución; la primera tuvo 10 fallos por tiempo de espera agotado, atribuidos a la carga de la máquina). Ejecución local, no CI; todavía sin PR. Comandos, entorno y huellas en el [plan de pruebas §0.7](docs/testing/TherapEase-09-plan-de-pruebas.md#07-avance-de-miguel-en-b01--17-oct-2026).
+Rama `b01/acceso-y-usuarios`, código probado `c3f2b63de2fce7e5f265119ba292f6c2017d93c5`: 386 unitarias y 240 de integración correctas (esta última en la segunda ejecución, con 35 pruebas de Lucía que después se retiraron de este PR; la primera tuvo 10 fallos por tiempo de espera agotado, atribuidos a la carga de la máquina). Ejecución local, no CI; todavía sin PR. Comandos, entorno y huellas en el [plan de pruebas §0.7](docs/testing/TherapEase-09-plan-de-pruebas.md#07-avance-de-miguel-en-b01--17-oct-2026).
 
 - **Servidor:** permisos escritos uno por uno, lista y ficha de usuarios, nombre completo y correo con su migración, edición por el Superusuario y consulta de datos propios. Faltan los eventos de acceso, salida y bloqueo: aprobados el 17-oct, esperan que se anote su excepción en AGENTS §2.3.
 - **Para Dulce:** [contrato de las funciones para las páginas](docs/planning/TherapEase-etapa09-B01-contrato-para-paginas.md).

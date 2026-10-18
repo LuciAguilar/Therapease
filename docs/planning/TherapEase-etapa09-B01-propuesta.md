@@ -26,9 +26,9 @@ Este documento cumple dos entregas que pide el [plan B01](TherapEase-etapa09-B01
 | --- | --- | --- |
 | ✅ | Unitarias de toda la solución | **258 correctas, 0 fallidas**, ejecutadas el 17-oct-2026 a las 11:59 (UTC−7) sobre `e918a3d`. De ellas, **124** son de acceso, usuarios, contraseñas y permisos: `GestorIdentidad` 29, `ServicioUsuarios` 21, `Autorizacion` 16, `MatrizDePermisos` 15, `ServicioContrasena` 11, `ServicioArranqueDeIdentidad` 9, `ServicioAcceso` 7, `ManejadorDeRequisitoDePermiso` 6, `ReglasDeRol` 5, `GeneradorDeContrasenaTemporal` 4 y `ContrasenaTemporalEntregada` 1. |
 | ✅ | Integración de B00 (servidor y PostgreSQL desechable) | Resultados en [B00 §4.1, §4.7 y §4.10–§4.11](TherapEase-etapa09-B00.md). Los casos de identidad son `IdentidadServidorTests` 21, `InterrupcionesIdentidadTests` 16 y `IdentidadComplementariaTests` 5. **No se repitieron en este documento.** |
-| ⏳ | 35 casos de servidor de Lucía | `UsuariosServidorB01Tests` 24, `AuditoriaServidorB01Tests` 6 y `ConcurrenciaServidorB01Tests` 5. Están en esta rama, pero esperan auditoría ([AGENTS](../../AGENTS.md) §3); **no se cuentan como evidencia aprobada.** |
+| ⏳ | 35 casos de servidor de Lucía | `UsuariosServidorB01Tests` 24, `AuditoriaServidorB01Tests` 6 y `ConcurrenciaServidorB01Tests` 5. **Retirados de este PR por decisión de Lucía (18-oct):** ella los adaptará a los cambios del PR y los entregará en uno propio, para revisión de Miguel; esperan auditoría ([AGENTS](../../AGENTS.md) §3) y **no se cuentan como evidencia aprobada.** |
 
-En total, esta rama lista 240 casos de integración. Después de cada cambio se guardan nueva fecha, versión y resultados; no se copian conteos anteriores.
+Sin esos 35, esta rama lista los 205 casos de integración de `main`. Después de cada cambio se guardan nueva fecha, versión y resultados; no se copian conteos anteriores.
 
 ### 1.3. Lo que falta completar, en orden
 

@@ -37,7 +37,7 @@ Un **PR** es una solicitud para revisar cambios. El **SHA** identifica una versi
 
 ### Avance de Miguel en su rama — 17-oct-2026
 
-Rama `b01/acceso-y-usuarios`, código probado `c3f2b63de2fce7e5f265119ba292f6c2017d93c5`; todavía sin PR ni publicación. Ejecución local, no CI: 386 unitarias correctas y 240 de integración correctas en la segunda ejecución (la primera tuvo 10 fallos por tiempo de espera agotado). Comandos, entorno y huellas en el [plan de pruebas §0.7](../testing/TherapEase-09-plan-de-pruebas.md#07-avance-de-miguel-en-b01--17-oct-2026). Las pruebas de servidor de Lucía incluidas en la rama siguen sin auditar.
+Rama `b01/acceso-y-usuarios`, código probado `c3f2b63de2fce7e5f265119ba292f6c2017d93c5`; todavía sin PR ni publicación. Ejecución local, no CI: 386 unitarias correctas y 240 de integración correctas en la segunda ejecución, con 35 pruebas de Lucía que después se retiraron (la primera ejecución tuvo 10 fallos por tiempo de espera agotado). Comandos, entorno y huellas en el [plan de pruebas §0.7](../testing/TherapEase-09-plan-de-pruebas.md#07-avance-de-miguel-en-b01--17-oct-2026). Las pruebas de servidor B01 de Lucía se retiraron de este PR por decisión suya (18-oct): las adaptará y las entregará en un PR propio.
 
 | Estado | Qué hay en la rama | Dónde verlo |
 | --- | --- | --- |
