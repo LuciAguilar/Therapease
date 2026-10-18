@@ -18,6 +18,7 @@ public static class ServiciosDeAplicacion
         servicios.AddScoped<IServicioIdentidad, ServicioIdentidad>();
         servicios.AddScoped<IServicioAcceso, ServicioAcceso>();
         servicios.AddScoped<IServicioUsuarios, ServicioUsuarios>();
+        servicios.AddScoped<IServicioCuentaPropia, ServicioCuentaPropia>();
         servicios.AddScoped<IServicioContrasena, ServicioContrasena>();
         servicios.AddScoped<IServicioArranqueDeIdentidad, ServicioArranqueDeIdentidad>();
         servicios.AddScoped<ICoordinadorDeBajaDePaciente, CoordinadorDeBajaDePaciente>();

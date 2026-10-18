@@ -17,6 +17,8 @@ internal sealed class UserManagerFalso : UserManager<Usuario>
 
     public List<string> Llamadas { get; } = [];
 
+    public List<Usuario> UsuariosCreados { get; } = [];
+
     public IList<string> RolesActuales { get; set; } = ["Usuaria"];
 
     public bool Bloqueado { get; set; }
@@ -36,7 +38,11 @@ internal sealed class UserManagerFalso : UserManager<Usuario>
 
     public override Task<Usuario?> FindByIdAsync(string userId) => Task.FromResult(Usuarios.GetValueOrDefault(userId));
 
-    public override Task<IdentityResult> CreateAsync(Usuario user, string password) => Registrar(nameof(CreateAsync));
+    public override Task<IdentityResult> CreateAsync(Usuario user, string password)
+    {
+        UsuariosCreados.Add(user);
+        return Registrar(nameof(CreateAsync));
+    }
 
     public override Task<IdentityResult> UpdateAsync(Usuario user) => Registrar(nameof(UpdateAsync));
 

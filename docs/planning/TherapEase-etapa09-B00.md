@@ -1,5 +1,7 @@
 # TherapEase — 09/B00 · Plan y estado de validación
 
+> **Entrevista recibida y revisada el 14-oct-2026:** ✅ respuestas de la psicóloga registradas en [respuestas y ajustes](../requirements/TherapEase-09-entrevista-requisitos.md). ⏳ Montos, simplificación a solo particular y cancelación automática requieren decisión de alcance/mecanismo de Lucía; no están implementados por esta actualización. B00/LCA/R04 abiertos, preparación documental sin Construcción ni pruebas nuevas. Los resultados y aprobaciones anteriores se conservan como historia.
+
 **Actualización documental: 14-oct-2026.**
 
 > **B00/LCA conservan pendientes.** Lucía autoriza expresamente el 13-oct avanzar a Construcción/B01 con Miguel en otro chat mientras se completa QA de B00. No declara cerrada LCA. R04 sigue abierto: solo datos ficticios, sin nube.
@@ -15,7 +17,7 @@
 | PR #3: documentación compartida | ✅ Fusionado el 06-oct. | [PR #3](https://github.com/LuciAguilar/Therapease/pull/3); main `8baf8fbc34890d4710c2b78e920f10b8d3e92cb3`. |
 | PR #4: pruebas de Lucía | ✅ Revisado por Miguel y fusionado el 11-oct. | [PR #4](https://github.com/LuciAguilar/Therapease/pull/4); main `709ff615e1f1add0b008deff57e567de719b241c`. |
 | PR #5: correcciones de Miguel | ✅ Corregido, comprobado y fusionado el 13-oct, main 40785d2. | [PR #5](https://github.com/LuciAguilar/Therapease/pull/5); §4.10 e [informe](../reviews/TherapEase-09-B00-revision-PR05.md). |
-| PR #6: ampliación QA de Lucía | ✅ Publicado y listo para revisión; ⏳ revisión de Miguel y fusión. | [PR #6](https://github.com/LuciAguilar/Therapease/pull/6), revision/etapa09; código 4ca53c4, 258 unitarias/205 integración. |
+| PR #6: ampliación QA de Lucía | ✅ Miguel revisó la versión `0db344a`; Lucía fusionó mediante squash el 15-oct. | [PR #6](https://github.com/LuciAguilar/Therapease/pull/6); main `ffb2494ad9da026f24a57826c45f6f530afb467b`. Resultados anteriores en §4.10–§4.11; sin nueva ejecución por esta actualización. |
 | Arquitectura | ✅ 30/30 correctas sobre PR #5; correcciones de Web y coordinador implementadas. | §4.9; páginas funcionales y aprobación del PR #5 siguen separadas. |
 | Horas y Docker del 08–09-oct | ✅ 12 correctas; reinicio real y claves/sesión conservadas. | §4.4; PR #4 revisado/fusionado; repetido en §4.9. |
 | HTTPS local del 10-oct | ✅ 12 correctas, 0 fallos/omitidas; TLS 1.3 negociado. | §4.5; PR #4 revisado/fusionado; cabeceras finales pendientes. |
@@ -53,18 +55,18 @@
 | Auditoría y directorio | Aprobado | Sin pantalla de auditoría; consulta técnica autorizada Q03. Directorio separado y posterior (B07), fuera de CU03: lista completa de vigentes por defecto y filtro autorizado de bajas. Decisión de Dulce del 08-oct; registrar y buscar desde Pacientes se mantiene en el primer avance de diciembre. |
 | Repositorio público | Aprobado | Documentación seleccionada y datos ficticios. Secret Protection y Push protection activadas: captura aportada por Lucía el 12-oct (ambos botones Disable). Verifica configuración, no una prueba de bloqueo ni ausencia de secretos. |
 | Destino de respaldo | Opción A aprobada | Repositorio privado aparte, artefacto privado 14 días; no crear ni configurar todavía. |
-| Permiso de baja | Aprobado e implementado para Usuaria y Superusuario, provisional | Comprobado en bce9409 y 14 casos de QA. La política operativa de citas existentes espera a Dulce con la usuaria. |
+| Permiso de baja | Aprobado e implementado para Usuaria y Superusuario, provisional | Comprobado en bce9409 y 14 casos de QA. ✅ Entrevista solicita cancelación automática; ⏳ decisión/implementación/pruebas del cambio, sin alterar la evidencia histórica ni el invariante PostgreSQL. |
 | Cabeceras S-30 | Aprobadas el 11-oct, implementadas y comprobadas el 13-oct | Nueve casos HTTPS en §4.10. Faltan navegador, CSP de recursos y HSTS de despliegue. |
 | Respaldo: cifrado, claves y validación | Aprobado el 10-oct, ADR-05 posterior | age con clave pública en GitHub; clave privada de Lucía en su gestor fuera de GitHub, copia de Miguel. Restaurar/comparar antes de cifrar; volcado solo en ejecutor. Simulacro mensual de Lucía; antigüedad >24 h no bloquea y genera incidencia. Implementación no autorizada. |
 
-| Pendiente de producto | Responsable de obtener respuesta | Impacto |
-| --- | --- | --- |
-| Citas existentes al dar de baja al paciente: impedir o cancelar primero | Dulce con la usuaria | CU04; no retirar el bloqueo de la base ni cancelar automáticamente. |
-| Citas contiguas y pago inicial «Pendiente» | Dulce con la usuaria | Reglas hoy provisionales; no validarlas por omisión. |
-| Retirar un ámbito con citas, incluidas agendadas de baja recuperables | Dulce con la usuaria | Baja/recuperación coherente. |
-| Corregir pago de una cita cancelada o de baja | Dulce con la usuaria | Permisos y alternos del pago. |
-| Campos de paciente/cita/directorio, ámbitos, duplicados y menores/tutor | Dulce con la usuaria | Validar antes del frontend afectado; `NombreCompleto`/`Correo` no se presuponen necesarios. |
-| Pantallas de 08C, navegación y resto de prioridades/corte B00–B04 para 04-dic | Dulce con la usuaria y equipo | Registrar y buscar pacientes en el primer avance ya se mantiene. Directorio aparte posterior decidido el 08-oct; los demás compromisos y campos siguen por validar. B05–B06 dependen de capacidad. |
+| Estado | Respuesta de producto / pendiente | Responsable | Impacto |
+| --- | --- | --- | --- |
+| ✅ / ⏳ | Baja con citas: respuesta recibida, solicita cancelación automática. | Dulce registra; Miguel propone; Lucía decide cambio | B00 conserva rechazo hasta aprobación/implementación/pruebas; operación atómica, concurrencia, pago y eventos protegidos. |
+| ✅ / ⏳ | Contiguas sí y pago inicial Pendiente, respuestas recibidas. | Dulce registra; Miguel/Lucía verifican alcance | No son decisiones abiertas; pruebas/servicios/formularios restantes siguen pendientes. |
+| ✅ / ⏳ | Retirar ámbito permitido conservando original en citas. | Dulce concreta; Lucía decide alcance | Recuperación/reprogramación con ámbito retirado no respondida; «solo particular» cambia aplicabilidad. |
+| ✅ / ⏳ | Corregir pago: cancelada sí, de baja no. Montos solicitados. | Dulce detalla; Lucía decide montos; Miguel implementa | Cambios/pruebas pendientes; cancelar/baja conservan pago por sí mismos. |
+| ✅ / ⏳ | Campos paciente/Usuario, tutor, homónimos y lista respondidos. | Dulce concreta con usuaria; Lucía revisa alcance | Ver entrevista: datos solicitados recibidos; formatos/obligatoriedad/tutor, montos/solo particular y horario requieren concreción. |
+| ✅ / ⏳ | Pantallas «Están bien», recorrido diciembre aceptado y prioridades posteriores recibidas. | Dulce/equipo | Identificar versión, adaptar cambios, acordar capacidad y prioridad de bajas sin numerar. No aprobación de código/navegador. |
 
 ## 4. Evidencia registrada y límites
 
@@ -299,11 +301,11 @@ Los TRX y el manifiesto local identifican el commit y las huellas. Sin contenedo
 | CabecerasSeguridadTests | 9 casos correctos: cuatro cabeceras en salud, CSS, API y páginas; no-store privado, CSS sin no-store; 500 JSON/HTML con SELECT de Identity retirado, mensaje seguro y recuperación 200 al restituirlo. No es navegador. |
 | Recuperación | 13 casos correctos, conservando cifrado de QA. La consulta restaurada compara ahora identificador de evento y paciente, tipo, acción y hecho; ya no basta recibir 200. |
 | Arranque de QA | ServidorRevision reintenta cuando una consulta de salud agota sus 3 s, con ventana de arranque de 40 s y limpieza si falla. La selección afectada pasó; no se fuerza artificialmente un arranque lento. |
-| Ejecución de ampliación | 36/36 (14 baja + 9 cabeceras + 13 recuperación), 0 fallos/omitidas. Pruebas comentadas según el skill del proyecto. Revisión humana de Miguel o Dulce pendiente. |
+| Ejecución de ampliación | 36/36 (14 baja + 9 cabeceras + 13 recuperación), 0 fallos/omitidas. Pruebas comentadas según el skill del proyecto. Revisión posterior de Miguel completada en PR #6 el 15-oct. |
 | Entrega | Misma rama revision/etapa09, un PR conjunto de QA. Notas personales y TestResults no se publican. PR #5 fusionado por Lucía en main 40785d2; revisión humana APPROVED registrada en GitHub. El conector no pudo fusionarlo (403). |
 | Avance B01 | Autorizado expresamente por Lucía el 13-oct, con datos ficticios y pendientes B00/LCA visibles. No autoriza nube, datos reales, cierre de riesgos ni fusión del QA sin revisión distinta. |
 
-Las secciones 4.1–4.9 conservan las ejecuciones históricas. Para resultados y pendientes actuales prevalecen esta sección y las tablas de §7. El cifrado real age, páginas/navegador, producto, revisión humana del QA nuevo y consolidación de LCA siguen separados.
+Las secciones 4.1–4.9 conservan las ejecuciones históricas. Para resultados y pendientes actuales prevalecen esta sección y las tablas de §7. El cifrado real age, páginas/navegador, producto y consolidación de LCA siguen separados. Revisión humana y fusión del QA nuevo completadas el 15-oct mediante PR #6.
 
 
 **Repetición final en revision/etapa09:** código `4ca53c490eb69265c3853576d2be3ba2d89ff4dc`, sobre main `40785d2`: **258 unitarias y 205 integración correctas**, 0 fallos/omitidas, en ejecuciones separadas. Compilación de los proyectos afectados sin advertencias/errores. Sin cambios de producción. No quedaron contenedores Testcontainers ni imágenes therapease-b00-* tras las pruebas.
@@ -318,7 +320,7 @@ dotnet test tests/TherapEase.UnitTests/TherapEase.UnitTests.csproj -c Release --
 dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj -c Release --logger "trx;LogFileName=qa-integracion.trx" --results-directory TestResults/QA
 ```
 
-Docker Desktop Linux debe estar iniciado. Pruebas comentadas según el skill del proyecto. TRX/manifest permanecen locales; la revisión humana del QA nuevo y su fusión están pendientes.
+Docker Desktop Linux debe estar iniciado. Pruebas comentadas según el skill del proyecto. TRX/manifest permanecen locales; revisión humana y fusión del QA nuevo completadas el 15-oct mediante PR #6.
 
 ### 4.11. Correcciones de auditoría del PR #6 — 14-oct-2026
 
@@ -330,7 +332,7 @@ Docker Desktop Linux debe estar iniciado. Pruebas comentadas según el skill del
 | ✅ | Auditoría NuGet con transitivos | Siete proyectos: cero paquetes vulnerables reportados. Se verificó que ambos proyectos resuelven 10.0.13; no se suprimieron avisos. No es auditoría completa de SDK/runtime o imagen. |
 | ✅ | Encabezados de recuperación | Cuatro en RecuperacionRevision y cinco en RecuperacionTests, de 96 caracteres; comentarios y lógica conservados. Se comparó el texto restante con 48018df. |
 | ✅ | Build Release y repetición completa | 0 errores/advertencias; 258 unitarias y 205 integración correctas, 0 fallos/omitidas. PostgreSQL desechable/Testcontainers, datos ficticios, Docker disponible. |
-| ⏳ | Revisión humana y fusión | Mismo PR #6, misma rama revision/etapa09; Miguel revisa las correcciones y el QA anterior. Lucía decide fusión; B00/LCA mantienen pendientes. |
+| ✅ | Revisión humana y fusión | [Miguel aprobó](https://github.com/LuciAguilar/Therapease/pull/6#pullrequestreview-5528518803) `0db344a`; Lucía fusionó PR #6 el 15-oct en `ffb2494ad9da026f24a57826c45f6f530afb467b`. B00/LCA mantienen sus demás pendientes. |
 
 Pruebas comentadas según el skill del proyecto. Las ejecuciones del 13-oct se conservan como historia; esta repetición usa los paquetes corregidos.
 
@@ -350,16 +352,18 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 
 TRX, JSON y manifest permanecen locales; se publica este resumen, sin datos privados ni registros crudos.
 
+**Seguimiento de revisión, 15-oct:** Miguel aprobó PR #6 tras repetir 258 unitarias y 205 integración correctas. Informó tres tiempos de espera agotados al arrancar Docker que pasaron aislados y en la segunda ejecución completa. Dejó como observación no bloqueante la renovación de cookie/no-store del CSS con sesión, caso no cubierto por la prueba de CSS anónima. Mantener ambos seguimientos; no son pruebas nuevas de esta actualización.
+
 ## 5. Cobertura y alcance de los pendientes
 
 | Área | Avance vigente | Lo que falta |
 | --- | --- | --- |
-| Arquitectura | 30/30 sobre PR #5; pruebas del PR #4 revisadas por Miguel. CU04 mínimo implementado y nueve adicionales locales correctas. | Revisión del QA adicional; límites sobre PageModel funcionales. |
+| Arquitectura | 30/30 sobre PR #5; pruebas del PR #4 revisadas por Miguel. CU04 mínimo implementado y nueve adicionales locales correctas. | QA adicional revisado en PR #6; faltan límites sobre PageModel funcionales. |
 | Datos Q03/Q06/Q07/Q08/Q20 | Q03 51/51; persistencia/Identity/recuperación repetidas dentro de 182/182. CU04 mínimo probado con PostgreSQL. | Acceso final Q03; restantes operaciones, estados, concurrencia e interrupciones disponibles del plan §7. |
 | Horas y Docker | 12/12 en la suite repetida; revisión humana del PR #4 registrada. | Interfaz/navegador cuando existan páginas. |
 | Identidad y seguridad | QA de servidor revisado; HTTPS, Q08 y errores/registros repetidos. | Entrega segura de temporales, PageModel/navegador y validación de cabeceras. Secret Protection/Push protection activadas según captura del 12-oct; reverificación actual de main pendiente. |
 | Recuperación local | Procedimiento QA repetido; PR #4 revisado/fusionado. ADR-05 decidido, sin implementación real. | Mantener límites de carga/operación; respaldo real solo con autorización posterior. |
-| Decisión LCA | B01 autorizado expresamente por Lucía el 13-oct mientras termina B00. | No acredita cierre LCA: páginas, revisión humana del QA y consolidación de riesgos residuales siguen pendientes. |
+| Decisión LCA | B01 autorizado expresamente por Lucía el 13-oct mientras termina B00. | No acredita cierre LCA: páginas y consolidación de riesgos residuales siguen pendientes; revisión del QA completada en PR #6. |
 
 > §7 reúne los pendientes conocidos; pueden aparecer nuevos hallazgos. Las funciones completas de B01–B08 y la operación real se distinguen en §9. No quedan autorizadas por una fusión parcial.
 
@@ -370,7 +374,7 @@ TRX, JSON y manifest permanecen locales; se publica este resumen, sin datos priv
 | Entrega agrupada | Responsable | Qué reúne |
 | --- | --- | --- |
 | **PR #5 existente** | Miguel; Lucía revisa y aprueba | Correcciones obligatorias, permiso aprobado y unitarias; las cuatro mejoras de backend y cabeceras aprobadas el 11-oct; propuestas de temporales/acceso Q03 y documentación propia. |
-| **[PR #6](https://github.com/LuciAguilar/Therapease/pull/6), revision/etapa09** | Lucía; Miguel o Dulce revisa | Pruebas de baja con nombre definitivo y cobertura del permiso aprobado, las tres mejoras de QA aprobadas el 11-oct, verificaciones ejecutables disponibles y documentación/evidencia actualizada. Se prepara como una entrega conjunta después de integrar PR #5. |
+| **[PR #6](https://github.com/LuciAguilar/Therapease/pull/6), revision/etapa09** | Lucía; Miguel o Dulce revisa | Pruebas de baja con nombre definitivo y cobertura del permiso aprobado, las tres mejoras de QA aprobadas el 11-oct, verificaciones ejecutables disponibles y documentación/evidencia actualizada. Entrega conjunta revisada por Miguel y fusionada mediante PR #6 el 15-oct; main `ffb2494`. |
 | **Pendientes con páginas/producto** | Dulce implementa/valida; Lucía prueba | Se agrupan cuando estén disponibles. No obligan a mantener abiertos los dos PR anteriores B01 tiene autorización expresa del 13-oct; sus criterios y pruebas se siguen en ese bloque. |
 
 No crear un PR por cada mejora. GitHub Settings y el correo local se verifican/configuran fuera de los PR; en la documentación solo se registra evidencia sin datos privados. Lucía autorizó el 13-oct preparar su PR conjunto de QA; no crear otra rama.
@@ -383,7 +387,7 @@ No crear un PR por cada mejora. GitHub Settings y el correo local se verifican/c
 
 ### Orden para agrupar los pendientes actuales
 
-> **Decisión de Lucía, 11-oct-2026: órdenes 1–3 aprobados completos.** Las filas 1–3 marcan la decisión; las tareas 4–6 y la ejecución de QA de 12 están realizadas, §4.10. La revisión humana y fusión del QA nuevo siguen pendientes en 14.
+> **Decisión de Lucía, 11-oct-2026: órdenes 1–3 aprobados completos.** Las filas 1–3 marcan la decisión; las tareas 4–6 y la ejecución de QA de 12 están realizadas, §4.10. La revisión humana y fusión del QA nuevo se completaron el 15-oct en la fila 14.
 >
 > Los números indican prioridad de trabajo, **no nuevas etapas ni nuevos identificadores de pruebas**. Se puede avanzar en paralelo donde no exista dependencia. Aprobar el alcance no acredita ejecución ni aprobación del PR. El detalle de cada tarea permanece en los pasos 1–4 siguientes y §8.
 
@@ -391,7 +395,7 @@ No crear un PR por cada mejora. GitHub Settings y el correo local se verifican/c
 | -------- | ------ | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | **1**    | ✅      | **Lucía: cabeceras S-30 aprobadas.**                                      | `X-Content-Type-Options: nosniff`, `Content-Security-Policy: frame-ancestors 'none'`, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer` y `Cache-Control: no-store` en contenido privado. CSP de recursos se completa con las páginas; HSTS final se decide al desplegar. | Miguel implementa en PR #5 (6); Lucía verifica en su PR de QA (12).                                   |
 | **2**    | ✅      | **Lucía: paquete completo de backend aprobado.**                          | comprobar resultados de Identity, respuesta genérica del error 500 independiente de Identity/base de datos, ámbitos de Paciente de solo lectura y aclarar que `/salud` mide el proceso, no la disponibilidad de PostgreSQL. Implementación y comprobación realizadas, §4.10.           | Incluido en PR #5 (5), con unitarias propias.                                                         |
-| **3**    | ✅      | **Lucía: paquete completo de QA aprobado.**                               | arranque de QA más tolerante al tiempo de espera agotado, comprobar el contenido del evento HTTP restaurado además del 200 y documentar `crear-roles.sql` para un servidor nuevo porque `pg_dump` no copia los usuarios de PostgreSQL. Preparación y ejecución realizadas, §4.10.      | Incluido con las pruebas de baja/cabeceras en su próximo PR conjunto de QA (12).                      |
+| **3**    | ✅      | **Lucía: paquete completo de QA aprobado.**                               | arranque de QA más tolerante al tiempo de espera agotado, comprobar el contenido del evento HTTP restaurado además del 200 y documentar `crear-roles.sql` para un servidor nuevo porque `pg_dump` no copia los usuarios de PostgreSQL. Preparación y ejecución realizadas, §4.10.      | Incluido con las pruebas de baja/cabeceras en PR #6 ya revisado y fusionado (12–14).                      |
 | **4**    | ✅      | **Miguel: ajustes obligatorios del PR #5.**                               | Implementado en bce9409 y comprobado con 258 unitarias/182 integración; ampliación QA de §4.10. | PR #5 existente.                                                                                      |
 | **5**    | ✅      | **Miguel: aplicar las cuatro mejoras de backend aprobadas.**              | Implementado en bce9409 y comprobado con 258 unitarias/182 integración; ampliación QA de §4.10. | Mismo PR #5.                                                                                          |
 | **6**    | ✅      | **Miguel: configurar cabeceras aprobadas.**                               | Implementado en bce9409 y comprobado con 258 unitarias/182 integración; ampliación QA de §4.10. | Mismo PR #5; QA en la entrega de Lucía.                                                               |
@@ -400,10 +404,10 @@ No crear un PR por cada mejora. GitHub Settings y el correo local se verifican/c
 | **9**    | ✅      | **Lucía: procedimientos 7–8 decididos.**                                  | Orden 7 puntos 1–4, caducidad A provisional y B antes de datos reales; orden 8 opción A. Aprobar el procedimiento no acredita implementación ni autoriza datos reales.                                                                                                          | Registrar en AGENTS y ADR-05; sin PR por la decisión sola.                                            |
 | **10** | ✅ | **Lucía: secretos y revisión exigida en main verificados.** | Secret Protection/Push protection: captura 12-oct. Main exigió al menos una revisión con permisos de escritura, según bloqueo comunicado por Lucía el 13-oct; después registró APPROVED y fusión de PR #5. No se ensayó un push con secreto ni se inspeccionaron otras reglas de main. | Configuración y ejecución del flujo de revisión; no garantía universal de seguridad. |
 | **11**   | ⏳      | **Cada autor: correo noreply para futuros commits.**                      | Recomendación opcional de privacidad. No incluye reescribir historial publicado.                                                                                                                                                                                                | Configuración personal, sin PR propio.                                                                |
-| **12** | ✅ | **Lucía: QA reunido y ejecutado.** | Baja 14, cabeceras 9, recuperación 13 y arranque mejorado; copia de roles documentada. Revisión/fusión separadas en 14. | Un PR conjunto de QA en revision/etapa09; sin notas personales. |
+| **12** | ✅ | **Lucía: QA reunido y ejecutado.** | Baja 14, cabeceras 9, recuperación 13 y arranque mejorado; copia de roles documentada. Revisión/fusión completadas en 14. | Un PR conjunto de QA en revision/etapa09; sin notas personales. |
 | **13** | ✅ | **Lucía: PR #5 revisado, aprobado y fusionado.** | bce9409: build correcto, 258 unitarias/182 integración; main 40785d2. | Fusión squash del 13-oct; B00/LCA conservan pendientes. |
-| **14**   | ⏳      | **Miguel o Dulce: revisar el PR de QA; Lucía decide fusión.**             | Revisar código y evidencia del nuevo alcance; la aprobación de PR #4 no lo cubre. Se publica el conjunto, sin PR por archivo.                                                                                                                                                   | Próximo PR de QA de Lucía, después de integrar #5, en revision/etapa09.                               |
-| **15**   | ⏳      | **Dulce: validar políticas de producto con la usuaria.**                  | Citas contiguas, pago inicial, tratamiento de citas al dar de baja, retirada de ámbitos con citas y pago en citas canceladas/de baja. Campos del directorio: avance posterior. Lucía confirma decisiones; no exigir respuestas para mejoras independientes.                     | Registrar respuestas en los documentos existentes; aplicar en el bloque autorizado.                   |
+| **14** | ✅ | **Miguel revisó QA; Lucía aprobó la fusión.** | Miguel aprobó `0db344a`; PR #6 fusionado mediante squash el 15-oct en `ffb2494ad9da026f24a57826c45f6f530afb467b`. No cierra B00/LCA. | PR #6 completado; conservar evidencia local y rama revision/etapa09. |
+| **15** | ✅ / ⏳ | **Dulce: respuestas de producto recibidas; concretar cambios restantes.** | Contiguas/pago inicial/corrección cancelada y baja, campos, lista, tutor, pantallas y prioridades recibidos. Montos, solo particular y cancelar automáticamente cambian la base; Lucía decide. Horario, prioridad de bajas y recuperación con ámbito retirado siguen pendientes. | Documento de entrevista; no pruebas nuevas ni cambio del backend B00. |
 | **16**   | ⏳      | **Dulce: acceso mínimo/PageModel y unitarias.**                           | Llamadas a Application y mensajes Q08 acordados; revisión distinta del autor. B01 autorizado por Lucía el 13-oct en otro chat; mantener trazabilidad del acceso mínimo B00.                                                                                                                                                     | Su entrega del acceso mínimo de B00.                                                                  |
 | **17**   | ⏳      | **Lucía: completar validaciones que aún necesitan servicios/páginas.**    | Navegador, cookies, antifalsificación, horas y mensajes; demás estados, conflictos, eventos y concurrencia de los pasos siguientes. Miguel/Dulce aportan lo que falte del alcance autorizado.                                                                                   | Entrega agrupada posterior cuando existan esas partes; no frena el QA independiente disponible ahora. |
 | ****18** | ⏳      | **Lucía: consolidar evidencia y decidir B00/LCA.**                        | Pendientes de la puerta tratados expresamente, resultados identificados y revisión humana.                                                                                                                                                                                      | Decisión final; no se deduce de fusionar un PR parcial.                                               |
@@ -418,7 +422,7 @@ No crear un PR por cada mejora. GitHub Settings y el correo local se verifican/c
 | ✅ | Resolver la llamada directa Web → MatrizDePermisos y repetir las pruebas de límites. | Miguel corrige; Lucía prueba | PR #5 usa IAutorizacion con registro por solicitud; arquitectura 30/30, §4.9. |
 | ✅ | Revisar humanamente las pruebas de arquitectura. | Miguel | Revisión APPROVED en PR #4 el 11-oct; autor distinto de Lucía. |
 | ✅ | Implementar coordinador CU04 en Application, fuera de Pacientes/Citas. | Miguel | PR #5; ubicación correcta, sin ciclo ni dependencia inversa. No autoriza B02 completo. |
-| ✅ | Probar ubicación y operación real del CU04 mínimo. | Lucía; Miguel revisa el nuevo QA | Arquitectura 30/30 y nueve adicionales locales con PostgreSQL real; revisión humana de estas últimas pendiente. |
+| ✅ | Probar ubicación y operación real del CU04 mínimo. | Lucía; Miguel revisó el QA | Arquitectura 30/30 y nueve adicionales locales con PostgreSQL real; revisión humana posterior completada en PR #6 el 15-oct. |
 | ⏳ | Repetir límites sobre PageModel funcionales. | Lucía; Miguel revisa | Depende de las páginas de Dulce; ErrorModel no acredita páginas aún inexistentes. |
 | ✅ | Repetir imagen, arranque, salud y ejecución sin privilegios para el código vigente. | Lucía prueba; Miguel corrige | Imagen actual construida; HEALTHCHECK healthy, HTTP 200 y usuario no root (§4.4). |
 | ✅ | Comprobar `America/Hermosillo` dentro de la imagen. | Lucía prueba; Miguel corrige | DLL real de imagen ejecutada bajo UTC, Nueva York y Madrid; 6 fechas por zona (§4.4). |
@@ -461,9 +465,9 @@ No crear un PR por cada mejora. GitHub Settings y el correo local se verifican/c
 | ⏳ | Probar cookies reales y renovación por actividad; cookie manipulada/ausente, redirección externa y caché tras salir. | Lucía | Navegador y acceso mínimo; no reutilizar el resultado de componentes como prueba de páginas. |
 | ⏳ | Probar antifalsificación, permisos por URL/envío directo y validación de las rutas disponibles. | Lucía prueba; Miguel/Dulce corrigen | PageModel disponibles; ampliar con las rutas de cada bloque posterior. |
 | ✅ | Probar errores/respuestas y registros de la API disponible. | Lucía prueba; Miguel/Dulce corrigen | 11 correctas; búsqueda de valores privados y fallos reales de lectura, §4.8. |
-| ⏳ | Completar revisión de errores/registros/eventos en otras operaciones y páginas. | Lucía prueba; Miguel/Dulce corrigen | No acreditar toda 09; S-20/S-21 siguen parciales. 500 fijo corregido y comprobado en PR #5; revisión humana del QA nuevo pendiente. |
+| ⏳ | Completar revisión de errores/registros/eventos en otras operaciones y páginas. | Lucía prueba; Miguel/Dulce corrigen | No acreditar toda 09; S-20/S-21 siguen parciales. 500 fijo corregido y comprobado en PR #5; QA nuevo revisado y fusionado en PR #6. Falta cobertura de las demás operaciones y páginas. |
 | ✅ | Probar HTTPS local, certificado, redirección, cookie renovada y HSTS de modo Production local. | Lucía | 12 correctas; servidor real y PostgreSQL desechable. Sin navegador ni despliegue (§4.5). |
-| ✅ | Implementar y comprobar las cabeceras aprobadas el 11-oct. | Miguel implementó; Lucía probó | Nueve casos HTTPS del 13-oct, §4.10; navegador y revisión humana del QA pendientes. |
+| ✅ | Implementar y comprobar las cabeceras aprobadas el 11-oct. | Miguel implementó; Lucía probó | Nueve casos HTTPS del 13-oct, §4.10; QA revisado en PR #6. Navegador y caso CSS con sesión pendientes. |
 | ✅ | Reiniciar el contenedor de aplicación y comprobar continuidad de claves/sesión, sin claves en disco. | Lucía prueba; Miguel corrige | Reinicio real, cookie previa y evento correctos; claves PostgreSQL iguales y sin key-*.xml observados en /app, /home/app y /tmp. No acredita TLS (§4.4). |
 
 ### Paso 4. Recuperación y decisión
@@ -485,8 +489,8 @@ No crear un PR por cada mejora. GitHub Settings y el correo local se verifican/c
 | --- | --- |
 | Consulta técnica Q03 | API de lectura por HTTPS: 51/51 correctas sobre PR #5. Opción A aprobada el 12-oct: navegador autenticado de superusuario; falta acceso/cierre de sesión de Dulce y prueba final. Sin pantalla de auditoría. |
 | Respaldo aprobado | Decisión del 10-oct en ADR-05 y AGENTS §2.8: age/clave pública, restaurar y comparar antes de cifrar, volcado solo en ejecutor, 14 días privados y simulacro mensual de Lucía. No crear repo, conectar Neon ni configurar flujo. |
-| Permiso de baja | Aprobado e implementado para Usuaria y Superusuario, provisional | Comprobado en bce9409 y 14 casos de QA. La política operativa de citas existentes espera a Dulce con la usuaria. |
-| Cabeceras S-30 | Implementadas en PR #5, comprobadas por nueve casos HTTPS de QA; revisión humana nueva y navegador pendientes. |
+| Permiso de baja | Aprobado e implementado para Usuaria y Superusuario, provisional; comprobado en bce9409 y 14 casos de QA. ✅ La entrevista pide cancelación automática de citas; ⏳ cambio por decidir/implementar/probar, sin alterar resultados históricos ni el invariante PostgreSQL. |
+| Cabeceras S-30 | Implementadas en PR #5, comprobadas por nueve casos HTTPS de QA; revisión humana completada en PR #6. Navegador y CSS con sesión pendientes. |
 | QA y respaldo real | Cifrar/Abrir mantienen AES-256-GCM exclusivo de QA. Las pruebas de cifrado se reemplazan por age al implementar; volcado, restauración, comparación, fallos y antigüedad se conservan. La decisión no acredita operación real ni autoriza modificar las pruebas ahora. |
 
 | Orden en §7 | Mejoras incluidas y recomendación restante | Quién / entrega | Situación |
@@ -494,7 +498,7 @@ No crear un PR por cada mejora. GitHub Settings y el correo local se verifican/c
 | **2 → 5** | Comprobar resultados de `UpdateAsync`, `AddToRoleAsync` y `RemovePasswordAsync`. | Miguel; PR #5, incluido | Aprobada el 11-oct; Implementado y comprobado en PR #5, bce9409. |
 | **2 → 5** | Ámbitos de Paciente como colección de solo lectura; aclarar alcance de `/salud`. | Miguel; mismo PR #5, incluido | Aprobadas el 11-oct; Implementado/documentado en bce9409. |
 | **2 → 5** | Respuesta 500 genérica independiente de Identity/base de datos. | Miguel; mismo PR #5, incluido | Aprobada el 11-oct; Implementado y comprobado en PR #5, bce9409. |
-| **3 → 12** | Comprobar el evento HTTP restaurado además del 200; documentar `crear-roles.sql` para servidor nuevo. | Lucía; mismo PR de QA, incluidas | Aprobadas el 11-oct; Aplicadas y comprobadas el 13-oct; revisión humana pendiente. |
+| **3 → 12** | Comprobar el evento HTTP restaurado además del 200; documentar `crear-roles.sql` para servidor nuevo. | Lucía; mismo PR de QA, incluidas | Aprobadas el 11-oct; Aplicadas y comprobadas el 13-oct; revisión humana posterior y fusión completadas en PR #6 el 15-oct. |
 | **3 → 12** | Mejorar tolerancia del arranque de ServidorRevision ante timeout. | Lucía; mismo PR de QA, incluida | Aprobada el 11-oct; hallazgo de Miguel, no reproducido en el último conjunto. Corrección aplicada; selección afectada correcta, sin forzar un arranque lento. |
 | **11** | Correo noreply en futuros commits. | Cada autor; configuración personal | No incluye reescribir historial publicado ni un PR independiente. |
 
@@ -519,3 +523,5 @@ No crear un PR por cada mejora. GitHub Settings y el correo local se verifican/c
 > **Documentación:** ajustes en `docs/reviews/`, B00 en `docs/planning/`, pruebas/evidencia en `docs/testing/`, reglas en AGENTS y entrada técnica en README. El StarUML de 08 es un antecedente: no autoriza la pantalla de auditoría retirada.
 >
 > **Cierre:** publicar documentos, fusionar un PR parcial y cerrar LCA son decisiones distintas. Conservar los pendientes visibles y actualizar este documento cuando exista nueva evidencia o decisión.
+
+**Horario aclarado por Lucía, 14-oct:** ✅ 9:00–15:00, sesiones de 1 h; desde 15:00 puede haber sesiones de 30 min, hasta 19:00. ⏳ Último inicio o término a 19:00, días y cruce de las 15:00 por concretar. Referencia America/Hermosillo; no acredita implementación ni pruebas.

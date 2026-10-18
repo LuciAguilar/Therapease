@@ -14,7 +14,11 @@ internal class GestorIdentidadFalso : IGestorIdentidad
 
     public HashSet<Guid> Bloqueados { get; } = [];
 
-    public List<(Guid Id, string Nombre, string Rol, string Contrasena, bool DebeCambiar)> Creaciones { get; } = [];
+    public List<(Guid Id, string Nombre, string Rol, string Contrasena, bool DebeCambiar, string? NombreCompleto, string? Correo)> Creaciones { get; } = [];
+
+    public List<(Guid Id, string NombreCompleto, string? Correo)> ActualizacionesDeDatos { get; } = [];
+
+    public Exception? ExcepcionAlActualizarDatos { get; set; }
 
     public List<(Guid Id, string Contrasena, bool DebeCambiar)> ContrasenasEstablecidas { get; } = [];
 
@@ -22,9 +26,10 @@ internal class GestorIdentidadFalso : IGestorIdentidad
 
     public Exception? ExcepcionAlCambiarRol { get; set; }
 
-    public DatosUsuario Agregar(string nombre, string rol, string contrasena = "contrasena-valida-123", bool activo = true, bool debeCambiar = false)
+    public DatosUsuario Agregar(
+        string nombre, string rol, string contrasena = "contrasena-valida-123", bool activo = true, bool debeCambiar = false, string nombreCompleto = "")
     {
-        var usuario = new DatosUsuario(Guid.NewGuid(), nombre, rol, activo, debeCambiar);
+        var usuario = new DatosUsuario(Guid.NewGuid(), nombre, rol, activo, debeCambiar, nombreCompleto);
         Usuarios[usuario.IdUsuario] = usuario;
         Contrasenas[usuario.IdUsuario] = contrasena;
         return usuario;
@@ -32,6 +37,28 @@ internal class GestorIdentidadFalso : IGestorIdentidad
 
     public Task<DatosUsuario?> ObtenerAsync(Guid idUsuario, CancellationToken cancelacion = default) =>
         Task.FromResult(Usuarios.GetValueOrDefault(idUsuario));
+
+    public Dictionary<Guid, string> Correos { get; } = [];
+
+    public List<(string? Busqueda, int Maximo)> Listados { get; } = [];
+
+    public Task<IReadOnlyList<DatosUsuario>> ListarAsync(string? busqueda, int maximo, CancellationToken cancelacion = default)
+    {
+        Listados.Add((busqueda, maximo));
+        IReadOnlyList<DatosUsuario> resultado = Usuarios.Values
+            .Where(u => busqueda is null
+                || u.NombreUsuario.Contains(busqueda, StringComparison.OrdinalIgnoreCase)
+                || u.NombreCompleto.Contains(busqueda, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(u => u.NombreUsuario, StringComparer.OrdinalIgnoreCase)
+            .Take(maximo)
+            .ToList();
+        return Task.FromResult(resultado);
+    }
+
+    public Task<FichaDeUsuario?> ObtenerFichaAsync(Guid idUsuario, CancellationToken cancelacion = default) =>
+        Task.FromResult(Usuarios.TryGetValue(idUsuario, out var datos)
+            ? new FichaDeUsuario(datos, Correos.GetValueOrDefault(idUsuario))
+            : null);
 
     public Task<DatosUsuario?> ObtenerPorNombreAsync(string nombreUsuario, CancellationToken cancelacion = default) =>
         Task.FromResult(Usuarios.Values.FirstOrDefault(u => string.Equals(u.NombreUsuario, nombreUsuario, StringComparison.OrdinalIgnoreCase)));
@@ -65,17 +92,53 @@ internal class GestorIdentidadFalso : IGestorIdentidad
     }
 
     public Task<ResultadoCreacionDeUsuario> CrearAsync(
-        Guid idUsuario, string nombreUsuario, string rol, string contrasena, bool debeCambiarContrasena, CancellationToken cancelacion = default)
+        Guid idUsuario, string nombreUsuario, string rol, string contrasena, bool debeCambiarContrasena,
+        string? nombreCompleto = null, string? correo = null, CancellationToken cancelacion = default)
     {
-        Creaciones.Add((idUsuario, nombreUsuario, rol, contrasena, debeCambiarContrasena));
+        Creaciones.Add((idUsuario, nombreUsuario, rol, contrasena, debeCambiarContrasena, nombreCompleto, correo));
         if (Usuarios.Values.Any(u => string.Equals(u.NombreUsuario, nombreUsuario, StringComparison.OrdinalIgnoreCase)))
         {
             return Task.FromResult(ResultadoCreacionDeUsuario.NombreDuplicado);
         }
 
-        Usuarios[idUsuario] = new DatosUsuario(idUsuario, nombreUsuario, rol, true, debeCambiarContrasena);
+        Usuarios[idUsuario] = new DatosUsuario(idUsuario, nombreUsuario, rol, true, debeCambiarContrasena, nombreCompleto ?? string.Empty);
+        if (correo is not null)
+        {
+            Correos[idUsuario] = correo;
+        }
+
         Contrasenas[idUsuario] = contrasena;
         return Task.FromResult(ResultadoCreacionDeUsuario.Creado);
+    }
+
+    // Igual que el gestor real: compara con lo guardado y solo informa de lo que cambió; no toca sesiones.
+    public Task<CamposActualizados> ActualizarDatosAsync(Guid idUsuario, string nombreCompleto, string? correo, CancellationToken cancelacion = default)
+    {
+        if (ExcepcionAlActualizarDatos is not null)
+        {
+            throw ExcepcionAlActualizarDatos;
+        }
+
+        var actual = Usuarios[idUsuario];
+        var correoActual = Correos.GetValueOrDefault(idUsuario);
+        var cambios = new CamposActualizados(
+            NombreCompleto: actual.NombreCompleto != nombreCompleto,
+            Correo: correoActual != correo);
+        if (cambios.Hubo)
+        {
+            Usuarios[idUsuario] = actual with { NombreCompleto = nombreCompleto };
+            if (correo is null)
+            {
+                Correos.Remove(idUsuario);
+            }
+            else
+            {
+                Correos[idUsuario] = correo;
+            }
+        }
+
+        ActualizacionesDeDatos.Add((idUsuario, nombreCompleto, correo));
+        return Task.FromResult(cambios);
     }
 
     public Task CambiarRolAsync(Guid idUsuario, string nuevoRol, CancellationToken cancelacion = default)

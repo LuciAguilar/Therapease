@@ -95,4 +95,4 @@ Repetición final: 205 integración y 258 unitarias correctas sobre código 4ca5
 
 ## Corrección del 14-oct
 
-Nueve encabezados ampliados a 96 caracteres en RecuperacionRevision/Tests, con comentarios y lógica conservados. Paquetes de pruebas corregidos a 10.0.13; 258 unitarias/205 integración correctas en repetición completa con Docker, incluidos los 13 casos de recuperación. Comandos/huellas en B00 §4.11; revisión humana del PR #6 pendiente.
+Nueve encabezados ampliados a 96 caracteres en RecuperacionRevision/Tests, con comentarios y lógica conservados. Paquetes de pruebas corregidos a 10.0.13; 258 unitarias/205 integración correctas en repetición completa con Docker, incluidos los 13 casos de recuperación. Comandos/huellas en B00 §4.11; revisión humana de Miguel y fusión del PR #6 completadas el 15-oct en `ffb2494ad9da026f24a57826c45f6f530afb467b`. Resultados anteriores conservados, sin nueva ejecución ni cierre B00/LCA.

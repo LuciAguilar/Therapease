@@ -6,7 +6,7 @@ using TherapEase.Web.Configuracion;
 
 namespace TherapEase.Web.Comandos;
 
-// Propuesta de Miguel, pendiente de decisión de Lucía: procedimientos de operador que entregan la contraseña temporal por la salida estándar, una sola vez.
+// Procedimientos de operador aprobados por Lucía el 04-oct-2026 (AGENTS §2.2): se ejecutan solo desde la máquina del operador y la contraseña temporal sale únicamente por la consola, una sola vez.
 public static class ComandosDeIdentidad
 {
     public const string CrearSuperusuario = "--crear-superusuario";
