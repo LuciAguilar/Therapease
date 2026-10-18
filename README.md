@@ -212,7 +212,7 @@ Rama `b01/acceso-y-usuarios`, código probado `c3f2b63de2fce7e5f265119ba292f6c20
 
 - **Servidor:** permisos escritos uno por uno, lista y ficha de usuarios, nombre completo y correo con su migración, edición por el Superusuario y consulta de datos propios. Faltan los eventos de acceso, salida y bloqueo: aprobados el 17-oct, esperan que se anote su excepción en AGENTS §2.3.
 - **Para Dulce:** [contrato de las funciones para las páginas](docs/planning/TherapEase-etapa09-B01-contrato-para-paginas.md).
-- **CI:** `.github/workflows/comprobaciones.yml` y `scripts/ci/`. Comprobado en local y ejecutado una vez en GitHub (PR #7): 7 fallos de integración por corregir, el resto correcto. Va en el mismo PR que lo anterior; los eventos de acceso irán en otro. Cómo ejecutar sus comprobaciones en local, en §10.
+- **CI:** `.github/workflows/comprobaciones.yml` y `scripts/ci/`. Comprobado en local y en GitHub (PR #7): la ejecución 2, del 18-oct, terminó correcta en sus cuatro trabajos; la 1 tuvo 7 fallos de integración que ya se corrigieron. Va en el mismo PR que lo anterior; los eventos de acceso irán en otro. Cómo ejecutar sus comprobaciones en local, en §10.
 - **Decisiones:** [propuesta de Miguel](docs/planning/TherapEase-etapa09-B01-propuesta.md), con las decisiones de Lucía del 17-oct y el estado de cada punto.
 
 ## Preparación de B01 y respuestas recibidas

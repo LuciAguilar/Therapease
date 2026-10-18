@@ -18,7 +18,7 @@ Este documento cumple dos entregas que pide el [plan B01](TherapEase-etapa09-B01
 | ✅ | Sesión y cookie | `ConfiguracionDeSeguridad` | 30 minutos con renovación; `HttpOnly`, `Secure`, `SameSite=Lax`; sello revisado en cada solicitud; claves en PostgreSQL. | Nada. |
 | ✅ / ⏳ | Auditoría y consulta Q03 | `IServicioAuditoria`, `/api/auditoria/eventos` | Registra cada cambio de usuario y contraseña, sin valores. | Hechos de acceso, salida y bloqueo (§3.2). |
 | ✅ | Cabeceras y error 500 fijo | `CabecerasDeSeguridad`, `ManejadorDeErroresInesperados` | Incorporados en el PR #5. | Probar con las páginas. |
-| ⏳ | Comprobaciones automáticas (CI) | `.github/workflows` | En `main` no existe ningún flujo; la carpeta solo tiene `.gitkeep`. La rama de Miguel ya trae uno (§6). | Se ejecutó por primera vez en el PR #7 (§6). |
+| Correcto en GitHub | Comprobaciones automáticas (CI) | `.github/workflows` | En `main` no existe ningún flujo; la carpeta solo tiene `.gitkeep`. La rama de Miguel ya trae uno (§6). | Se ejecutó dos veces en el PR #7 y la segunda terminó correcta (§6). |
 
 ### 1.2. Pruebas disponibles
 
@@ -196,7 +196,7 @@ Rama `b01/acceso-y-usuarios`, código probado `c3f2b63de2fce7e5f265119ba292f6c20
 | 3 | Nombre completo y correo (§3.3) | ✅ Programados, con la migración `NombreCompletoDeUsuario`, la edición por el Superusuario y la consulta de datos propios. El evento de alta también lista `NombreCompleto` y, si se capturó, `Correo` (decisión de Lucía, 17-oct). |
 | 4 | Permisos del Superusuario escritos uno por uno (§3.4) | ✅ Programados, con la prueba de completitud. |
 | 5 | Protección de intentos con nombres desconocidos | Fuera de B01, por decisión de Lucía. |
-| 6 | Comprobaciones automáticas (CI) | ✅ / ⏳ Comprobadas en local y ejecutadas una vez en GitHub (PR #7): la integración tuvo 7 fallos por una causa probable en la ayuda de pruebas de Docker, ya corregida y por comprobar; los demás trabajos terminaron correctamente. |
+| 6 | Comprobaciones automáticas (CI) | Comprobadas en local y en GitHub (PR #7): la ejecución 2, del 18-oct, terminó correcta en sus cuatro trabajos; la 1 tuvo 7 fallos de integración, por una causa probable en la ayuda de pruebas de Docker, ya corregida. Falta que Lucía compruebe el flujo y mida los minutos. |
 | 7 | Contrato de cada función para Dulce | ✅ [Contrato para páginas](TherapEase-etapa09-B01-contrato-para-paginas.md). |
 | 8 | Cinco comentarios del código que decían «pendiente de decisión» | ✅ Actualizados con la decisión del 04-oct. |
 
