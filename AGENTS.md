@@ -37,6 +37,8 @@
 
 ## 3. Límites vigentes
 
+- ✅ **Entrega 3 — Sesiones aprobada con ajuste menor por Lucía, 19-oct-2026:** dos comentarios aclarados; 24 correctas en la ejecución del 18-oct (8 nuevas y 16 repetidas). Autoriza el commit local `test: verificar sesiones de acceso`, sin push. Revisión humana pendiente en el PR conjunto. Refactorización de ayudas autorizada para preparar y probar; su auditoría y aprobación siguen pendientes antes de un commit separado.
+
 - **Rama global de Lucía — regla permanente, 18-oct-2026:** `revision/etapa09` reúne sus entregas. Antes de empezar cada entrega, ejecutar `git fetch` y `git merge origin/main`, sin `reset` y conservando todos los cambios locales. No abrir otra rama sin consultarla. Sus PR se fusionan con **Create a merge commit**, nunca con squash.
 - **Excepción única para publicar Entrega 1:** se permite igualar la rama de GitHub con `git push --force-with-lease` únicamente cuando Lucía lo autorice expresamente en ese momento. Esa autorización todavía no se ha dado. La excepción retirará de esa rama `5f6d0c2`, `62d7841` y `e918a3d`, ya incorporados en `main` o retirados; no autoriza `--force`, reescrituras futuras ni publicar ahora.
 - ✅ **Entrega 1 — Servidor aprobada por Lucía, 18-oct-2026:** 86 correctas, sin fallidas ni omitidas. Autoriza el commit local `test: verificar servidor de usuarios`, sin push. La revisión humana de sus pruebas se hará en el PR conjunto; las entregas siguientes conservan su auditoría y autorización antes de cualquier commit/publicación.

@@ -8,7 +8,7 @@ En B01 haremos que una persona pueda entrar a TherapEase con su usuario y contra
 
 Parte del servidor ya existe y fue probada en B00. Miguel debe aprovecharla y completar lo que falte. Dulce prepara las páginas y su funcionamiento. Lucía comprueba que todo trabaje junto.
 
-**✅ Construcción B01 abierta. PR #7 aprobado y fusionado por Lucía el 18-oct**, en `922a4e32705c50fa7b559bd95ad19f86800bcba2`. Incluye usuarios, nombre/correo, permisos explícitos y CI. Los eventos y las páginas siguen pendientes. Lucía aprobó Entrega 1 de QA —Servidor, 86 correctas— y su commit local, sin push. Permisos también está aprobado: 50 de integración y 44 unitarias existentes correctas, commit local autorizado sin push. Sesiones, Contraseñas y la revisión de Miguel siguen pendientes. B00, LCA y R04 siguen abiertos: solo ficticios, sin nube ni gastos.
+**✅ Construcción B01 abierta. PR #7 aprobado y fusionado por Lucía el 18-oct**, en `922a4e32705c50fa7b559bd95ad19f86800bcba2`. Incluye usuarios, nombre/correo, permisos explícitos y CI. Los eventos y las páginas siguen pendientes. Lucía aprobó Entrega 1 de QA —Servidor, 86 correctas— y su commit local, sin push. Permisos también está aprobado: 50 de integración y 44 unitarias existentes correctas, commit local autorizado sin push. Sesiones aprobado por Lucía el 19-oct: 24 correctas, con dos comentarios aclarados y commit local autorizado sin push. Contraseñas y la revisión de Miguel siguen pendientes. B00, LCA y R04 siguen abiertos: solo ficticios, sin nube ni gastos.
 
 ✅ indica una decisión aprobada o un resultado anterior identificado. ⏳ indica trabajo pendiente. Los resultados B00 conservan su versión y fecha. Los resultados locales de QA B01 se incorporarán al avance compartido cuando terminen la auditoría y las aprobaciones; no se acreditan aquí.
 
@@ -82,7 +82,7 @@ Miguel se encarga del **servidor**: código que comprueba usuarios, contraseñas
 | ⏳ | Dulce | PageModel y sus unitarias: acceso, salida, usuarios y contraseña propia. |
 | ⏳ | Dulce | Formularios con protección contra envíos ajenos, mensajes, navegación, temporales seguras y conexión con las funciones de Miguel. |
 | ⏳ | Dulce | Resolver las observaciones de diseño de §4.2 en su PR; revisión distinta y aprobación de Lucía. |
-| ✅ / ⏳ | Lucía | ✅ Entrega 1 —Servidor— aprobada con 86 correctas y commit local autorizado. ✅ Entrega 2 —Permisos— aprobada con ajuste de comentario y commit local autorizado. ⏳ Sesiones, Contraseñas y revisión de Miguel. Un PR para las cuatro al terminar. |
+| ✅ / ⏳ | Lucía | ✅ Entrega 1 —Servidor— aprobada con 86 correctas y commit local autorizado. ✅ Entrega 2 —Permisos— aprobada con ajuste de comentario y commit local autorizado. ✅ Entrega 3 —Sesiones— aprobada con ajuste de comentarios: 24 correctas; commit local autorizado, sin push. ⏳ Contraseñas y revisión de Miguel. Un PR para las cuatro al terminar. |
 | ⏳ | Lucía | Probar formularios, navegador y Q03 al recibir las páginas; aprobar el cierre solo con evidencia y revisión humana. |
 
 
