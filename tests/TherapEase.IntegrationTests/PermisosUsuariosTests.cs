@@ -4,9 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using TherapEase.Application.Compartido.Interfaces.Servicios;
 using TherapEase.Application.Compartido.Modelos;
 using TherapEase.Application.Identidad.Constantes;
-using TherapEase.Application.Identidad.Interfaces.Repositorios;
 using TherapEase.Application.Identidad.Interfaces.Servicios;
-using TherapEase.Application.Identidad.Modelos;
 using TherapEase.Domain.Compartido.Entidades.Enums;
 using TherapEase.Web.Seguridad;
 using TherapEase.Web.Seguridad.Requisitos;
@@ -131,15 +129,9 @@ public class PermisosUsuariosTests(PostgreSqlRevision postgres) : IClassFixture<
         // Arrange
         var escenario = await postgres.Crear();
         using var proveedor = escenario.Servicios();
-        await CrearAsync(proveedor, "operador-ficticio", "Superusuario");
-        var objetivo = Guid.NewGuid();
-        using (var alcance = proveedor.CreateScope())
-        {
-            var resultado = await alcance.ServiceProvider.GetRequiredService<IGestorIdentidad>().CrearAsync(
-                objetivo, "ficha-ficticia", "Usuaria", Contrasena, false, "Nombre Ficticio", "ficha@ficticio.mx");
-            Assert.Equal(ResultadoCreacionDeUsuario.Creado, resultado);
-        }
-        var cookie = await EntrarAsync(proveedor, "operador-ficticio");
+        var objetivo = await CrearAsync(proveedor, "ficha-ficticia",
+            nombreCompleto: "Nombre Ficticio", correo: "ficha@ficticio.mx");
+        var cookie = await PrepararSuperusuarioAsync(proveedor);
         using var solicitud = new SolicitudIdentidad(proveedor, cookie);
         Assert.True(await solicitud.AutenticarAsync());
         var anterior = await EstadoAsync(escenario);

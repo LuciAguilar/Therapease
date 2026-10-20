@@ -38,8 +38,7 @@ public class UsuariosServidorTests(PostgreSqlRevision postgres) : IClassFixture<
         // Arrange
         var escenario = await postgres.Crear();
         using var proveedor = escenario.Servicios();
-        await CrearAsync(proveedor, "operador-ficticio", "Superusuario");
-        var cookie = await EntrarAsync(proveedor, "operador-ficticio");
+        var cookie = await PrepararSuperusuarioAsync(proveedor);
         using var solicitud = new SolicitudIdentidad(proveedor, cookie);
         Assert.True(await solicitud.AutenticarAsync());
         var anterior = await EstadoAsync(escenario);
@@ -64,8 +63,7 @@ public class UsuariosServidorTests(PostgreSqlRevision postgres) : IClassFixture<
         // Arrange
         var escenario = await postgres.Crear();
         using var proveedor = escenario.Servicios();
-        await CrearAsync(proveedor, "operador-ficticio", "Superusuario");
-        var cookie = await EntrarAsync(proveedor, "operador-ficticio");
+        var cookie = await PrepararSuperusuarioAsync(proveedor);
         using var solicitud = new SolicitudIdentidad(proveedor, cookie);
         Assert.True(await solicitud.AutenticarAsync());
         var nombre = new string('a', 50);
@@ -103,7 +101,6 @@ public class UsuariosServidorTests(PostgreSqlRevision postgres) : IClassFixture<
         // Arrange
         var escenario = await postgres.Crear();
         using var proveedor = escenario.Servicios();
-        await CrearAsync(proveedor, "operador-ficticio", "Superusuario");
         var objetivo = await CrearAsync(proveedor, "objetivo-ficticio");
 
         // Desactiva al usuario directo en la base de datos, solo para preparar la prueba.
@@ -111,7 +108,7 @@ public class UsuariosServidorTests(PostgreSqlRevision postgres) : IClassFixture<
         if (inactiva)
             await PostgreSqlRevision.Sql(escenario.App,
                 $"""UPDATE "AspNetUsers" SET "Activo"=false WHERE "Id"='{objetivo}'""");
-        var cookie = await EntrarAsync(proveedor, "operador-ficticio");
+        var cookie = await PrepararSuperusuarioAsync(proveedor);
         using var solicitud = new SolicitudIdentidad(proveedor, cookie);
         Assert.True(await solicitud.AutenticarAsync());
         var anterior = await EstadoAsync(escenario);
@@ -141,8 +138,7 @@ public class UsuariosServidorTests(PostgreSqlRevision postgres) : IClassFixture<
         // Arrange
         var escenario = await postgres.Crear();
         using var proveedor = escenario.Servicios();
-        await CrearAsync(proveedor, "operador-ficticio", "Superusuario");
-        var cookie = await EntrarAsync(proveedor, "operador-ficticio");
+        var cookie = await PrepararSuperusuarioAsync(proveedor);
         using var solicitud = new SolicitudIdentidad(proveedor, cookie);
         Assert.True(await solicitud.AutenticarAsync());
         var servicio = solicitud.Obtener<IServicioUsuarios>();
@@ -174,9 +170,8 @@ public class UsuariosServidorTests(PostgreSqlRevision postgres) : IClassFixture<
         // Arrange
         var escenario = await postgres.Crear();
         using var proveedor = escenario.Servicios();
-        await CrearAsync(proveedor, "operador-ficticio", "Superusuario");
         var objetivo = await CrearAsync(proveedor, "objetivo-ficticio");
-        var cookie = await EntrarAsync(proveedor, "operador-ficticio");
+        var cookie = await PrepararSuperusuarioAsync(proveedor);
         using var solicitud = new SolicitudIdentidad(proveedor, cookie);
         Assert.True(await solicitud.AutenticarAsync());
         var anterior = await EstadoAsync(escenario);
@@ -234,20 +229,14 @@ public class UsuariosServidorTests(PostgreSqlRevision postgres) : IClassFixture<
         // Arrange
         var escenario = await postgres.Crear();
         using var proveedor = escenario.Servicios();
-        await CrearAsync(proveedor, "operador-ficticio", "Superusuario");
-        var cookie = await EntrarAsync(proveedor, "operador-ficticio");
+        var cookie = await PrepararSuperusuarioAsync(proveedor);
         using var solicitud = new SolicitudIdentidad(proveedor, cookie);
         Assert.True(await solicitud.AutenticarAsync());
         var anterior = await EstadoAsync(escenario);
 
         // Simula que la base de datos no puede guardar la auditoría.
 
-        await PostgreSqlRevision.Sql(escenario.Migrador, """
-            CREATE FUNCTION fallo_alta_auditoria() RETURNS trigger LANGUAGE plpgsql AS $$
-                BEGIN RAISE EXCEPTION 'Fallo ficticio de registro de auditoria'; END $$;
-            CREATE TRIGGER fallo_alta_auditoria BEFORE INSERT ON "EventoAuditoria"
-                FOR EACH ROW EXECUTE FUNCTION fallo_alta_auditoria();
-            """);
+        await SimularFalloDeAuditoriaAsync(escenario);
 
         // Act + Assert
         await Assert.ThrowsAsync<DbUpdateException>(() => solicitud.Obtener<IServicioUsuarios>()

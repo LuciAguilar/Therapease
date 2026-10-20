@@ -59,10 +59,8 @@ public class SesionesHttpsTests(SesionesHttpsRevision revision) : IClassFixture<
         using var posterior = Entorno.Escenario.Servicios(reloj.Configurar);
 
         // Act + Assert
-        using (var solicitud = new SolicitudIdentidad(posterior, Entorno.Cookie))
-            Assert.False(await solicitud.AutenticarAsync());
-        using (var solicitud = new SolicitudIdentidad(posterior, renovada))
-            Assert.True(await solicitud.AutenticarAsync());
+        Assert.False(await CookieSigueSirviendoAsync(posterior, Entorno.Cookie));
+        Assert.True(await CookieSigueSirviendoAsync(posterior, renovada));
     }
 
 

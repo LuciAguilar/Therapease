@@ -64,12 +64,9 @@ public class SesionesServidorTests(PostgreSqlRevision postgres) : IClassFixture<
         }
 
         // Assert
-        using (var solicitud = new SolicitudIdentidad(proveedor, primera))
-            Assert.False(await solicitud.AutenticarAsync());
-        using (var solicitud = new SolicitudIdentidad(proveedor, otraPropia))
-            Assert.False(await solicitud.AutenticarAsync());
-        using (var solicitud = new SolicitudIdentidad(proveedor, ajena))
-            Assert.True(await solicitud.AutenticarAsync());
+        Assert.False(await CookieSigueSirviendoAsync(proveedor, primera));
+        Assert.False(await CookieSigueSirviendoAsync(proveedor, otraPropia));
+        Assert.True(await CookieSigueSirviendoAsync(proveedor, ajena));
     }
 
     /// Otra aplicación no puede aceptar la cookie, aunque tenga acceso a la misma base de prueba.
@@ -87,12 +84,8 @@ public class SesionesServidorTests(PostgreSqlRevision postgres) : IClassFixture<
         using var mismaAplicacion = escenario.Servicios();
 
         // Act
-        bool ajena;
-        using (var solicitud = new SolicitudIdentidad(otraAplicacion, cookie))
-            ajena = await solicitud.AutenticarAsync();
-        bool misma;
-        using (var solicitud = new SolicitudIdentidad(mismaAplicacion, cookie))
-            misma = await solicitud.AutenticarAsync();
+        var ajena = await CookieSigueSirviendoAsync(otraAplicacion, cookie);
+        var misma = await CookieSigueSirviendoAsync(mismaAplicacion, cookie);
 
         // Assert
         Assert.False(ajena);

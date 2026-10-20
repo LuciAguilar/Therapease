@@ -24,21 +24,19 @@ public static class ServidorIdentidadRevision
     public const string Contrasena = "contrasenaficticiaservidor";
     public const string NuevaContrasena = "nuevacontrasenaficticiaservidor";
 
-    /// Crea un usuario ficticio antes de la prueba.
-    /// Se guarda directo, sin dejar registro en la auditoría.
+    /// Crea un usuario ficticio directo en la base de datos, sin generar auditoría.
     public static async Task<Guid> CrearAsync(ServiceProvider proveedor, string nombre,
-        string rol = "Usuaria", bool temporal = false)
+        string rol = "Usuaria", bool temporal = false, string? nombreCompleto = null, string? correo = null)
     {
         using var alcance = proveedor.CreateScope();
         var id = Guid.NewGuid();
         var resultado = await alcance.ServiceProvider.GetRequiredService<IGestorIdentidad>()
-            .CrearAsync(id, nombre, rol, Contrasena, temporal);
+            .CrearAsync(id, nombre, rol, Contrasena, temporal, nombreCompleto, correo);
         Assert.Equal(ResultadoCreacionDeUsuario.Creado, resultado);
         return id;
     }
 
-    /// Inicia sesión con el usuario ficticio y devuelve su cookie.
-    /// La cookie no se guarda en los resultados de la prueba.
+    /// Inicia sesión con el usuario ficticio y devuelve su cookie, sin guardarla en archivos.
     public static async Task<string> EntrarAsync(ServiceProvider proveedor, string nombre,
         string contrasena = Contrasena)
     {
@@ -47,6 +45,29 @@ public static class ServidorIdentidadRevision
             .IniciarSesionAsync(nombre, contrasena)).Exito, "No se abrió la sesión ficticia.");
         return solicitud.CookieEmitida();
     }
+
+    /// Crea al Superusuario ficticio y devuelve la cookie de su sesión.
+    public static async Task<string> PrepararSuperusuarioAsync(ServiceProvider proveedor)
+    {
+        await CrearAsync(proveedor, "operador-ficticio", "Superusuario");
+        return await EntrarAsync(proveedor, "operador-ficticio");
+    }
+
+    /// Comprueba si la cookie aún permite entrar, sin guardar su valor ni cambiar la prueba.
+    public static async Task<bool> CookieSigueSirviendoAsync(ServiceProvider proveedor, string cookie)
+    {
+        using var solicitud = new SolicitudIdentidad(proveedor, cookie);
+        return await solicitud.AutenticarAsync();
+    }
+
+    /// Hace fallar el guardado de la auditoría para comprobar que tampoco se guarde el cambio.
+    public static Task SimularFalloDeAuditoriaAsync(Escenario escenario) =>
+        PostgreSqlRevision.Sql(escenario.Migrador, """
+            CREATE FUNCTION rechazar_evento_de_revision() RETURNS trigger LANGUAGE plpgsql AS $$
+            BEGIN RAISE EXCEPTION 'Fallo ficticio de auditoria'; END $$;
+            CREATE TRIGGER rechazar_evento_de_revision BEFORE INSERT ON "EventoAuditoria"
+            FOR EACH ROW EXECUTE FUNCTION rechazar_evento_de_revision();
+            """);
 
 
     // ──── CONSULTA DE LO GUARDADO ──────────────────────────────────────────────────────────
@@ -70,7 +91,13 @@ public static class ServidorIdentidadRevision
     /// Falla si algo cambió en la base de datos.
     /// El mensaje de error no muestra contraseñas ni datos internos.
     public static async Task ComprobarSinCambiosAsync(Escenario escenario, string anterior) =>
-        Assert.True(anterior == await EstadoAsync(escenario), "La operación rechazada dejó cambios guardados.");
+        Assert.True(anterior == await EstadoAsync(escenario),
+            "La operación rechazada dejó cambios guardados.");
+
+    /// Lee la fila de un usuario para comparar al rechazado en los cambios simultáneos.
+    public static Task<string> UsuarioGuardadoAsync(Escenario escenario, Guid id) =>
+        PostgreSqlRevision.Valor<string>(escenario.App,
+            $"""SELECT row_to_json(u)::text FROM "AspNetUsers" u WHERE "Id"='{id}'""");
 }
 
 

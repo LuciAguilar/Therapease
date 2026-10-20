@@ -42,8 +42,7 @@ public class ConcurrenciaServidorTests(PostgreSqlRevision postgres) : IClassFixt
             opciones => opciones.AddInterceptors(espera)));
         var anteriores = new Dictionary<Guid, string>();
         foreach (var id in new[] { primero, segundo })
-            anteriores[id] = await PostgreSqlRevision.Valor<string>(escenario.App,
-                $"""SELECT row_to_json(u)::text FROM "AspNetUsers" u WHERE "Id"='{id}'""");
+            anteriores[id] = await UsuarioGuardadoAsync(escenario, id);
 
         // Un superusuario intenta desactivar al otro o quitarle el rol.
 
@@ -75,9 +74,8 @@ public class ConcurrenciaServidorTests(PostgreSqlRevision postgres) : IClassFixt
         Assert.Equal(1L, await PostgreSqlRevision.Valor<long>(escenario.App,
             """SELECT count(*) FROM "EventoAuditoria" e"""));
         var rechazado = resultados[0] ? primero : segundo;
-        var guardado = await PostgreSqlRevision.Valor<string>(escenario.App,
-            $"""SELECT row_to_json(u)::text FROM "AspNetUsers" u WHERE "Id"='{rechazado}'""");
-        Assert.True(anteriores[rechazado] == guardado, "La cuenta rechazada no quedó como antes.");
+        var guardado = await UsuarioGuardadoAsync(escenario, rechazado);
+        Assert.True(anteriores[rechazado] == guardado, "El usuario rechazado no quedó como antes.");
         Assert.Equal("Superusuario", await PostgreSqlRevision.Valor<string>(escenario.App, $"""
             SELECT r."Name" FROM "AspNetRoles" r JOIN "AspNetUserRoles" ur ON ur."RoleId"=r."Id"
             WHERE ur."UserId"='{rechazado}'

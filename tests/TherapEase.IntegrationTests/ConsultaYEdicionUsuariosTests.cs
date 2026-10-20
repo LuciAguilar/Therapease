@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.DependencyInjection;
-using TherapEase.Application.Identidad.Interfaces.Repositorios;
 using TherapEase.Application.Identidad.Interfaces.Servicios;
 using TherapEase.Application.Identidad.Modelos;
 using TherapEase.Infrastructure.Identidad.Entidades;
 using TherapEase.Infrastructure.Data;
+using static TherapEase.IntegrationTests.ServidorIdentidadRevision;
 
 namespace TherapEase.IntegrationTests;
 
@@ -30,14 +30,14 @@ public class ConsultaYEdicionUsuariosTests(PostgreSqlRevision postgres) : IClass
         // Arrange
         var escenario = await postgres.Crear();
         using var servicios = escenario.Servicios();
-        await CrearAsync(servicios, "operador-ficticio", "Superusuario");
-        var buscada = await CrearAsync(servicios, "usuaria-ficticia", nombre: "María Fernández");
+        var buscada = await CrearAsync(servicios, "usuaria-ficticia",
+            nombreCompleto: "María Fernández");
 
         // Crea 105 usuarios ficticios para comprobar que la lista se corta en 100.
 
         for (var i = 0; i < 105; i++)
-            await CrearAsync(servicios, $"fila-{i:000}", nombre: $"Usuario Ficticio {i:000}");
-        var cookie = await EntrarAsync(servicios, "operador-ficticio");
+            await CrearAsync(servicios, $"fila-{i:000}");
+        var cookie = await PrepararSuperusuarioAsync(servicios);
         using var solicitud = new SolicitudIdentidad(servicios, cookie);
         Assert.True(await solicitud.AutenticarAsync());
         var usuarios = solicitud.Obtener<IServicioUsuarios>();
@@ -70,8 +70,7 @@ public class ConsultaYEdicionUsuariosTests(PostgreSqlRevision postgres) : IClass
         // Arrange
         var escenario = await postgres.Crear();
         using var servicios = escenario.Servicios();
-        await CrearAsync(servicios, "operador-ficticio", "Superusuario");
-        var cookie = await EntrarAsync(servicios, "operador-ficticio");
+        var cookie = await PrepararSuperusuarioAsync(servicios);
         using var solicitud = new SolicitudIdentidad(servicios, cookie);
         Assert.True(await solicitud.AutenticarAsync());
 
@@ -92,7 +91,8 @@ public class ConsultaYEdicionUsuariosTests(PostgreSqlRevision postgres) : IClass
         var entidad = await gestor.FindByIdAsync(usuario.Id.ToString());
         Assert.True(await gestor.CheckPasswordAsync(entidad!, entrega.ContrasenaTemporal));
         var evento = Assert.Single(await lectura.EventosAuditoria.ToListAsync());
-        Assert.Equal(new[] { "NombreUsuario", "Rol", "DebeCambiarContrasena", "NombreCompleto", "Correo" }, evento.CamposAfectados);
+        Assert.Equal(new[] { "NombreUsuario", "Rol", "DebeCambiarContrasena", "NombreCompleto", "Correo" },
+            evento.CamposAfectados);
         Assert.DoesNotContain("Nombre Marcador Ficticio", evento.Hecho);
         Assert.DoesNotContain("marcador@ficticio.mx", evento.Hecho);
         Assert.False(evento.Hecho.Contains(entrega.ContrasenaTemporal, StringComparison.Ordinal));
@@ -175,10 +175,8 @@ public class ConsultaYEdicionUsuariosTests(PostgreSqlRevision postgres) : IClass
         Assert.True(usuario.SecurityStamp == sello, "La edición cambió el sello de seguridad.");
         var evento = Assert.Single(await contexto.EventosAuditoria.ToListAsync());
         Assert.Equal(new[] { "NombreCompleto", "Correo" }, evento.CamposAfectados);
-        using (var solicitud = new SolicitudIdentidad(servicios, primera))
-            Assert.True(await solicitud.AutenticarAsync());
-        using (var solicitud = new SolicitudIdentidad(servicios, segunda))
-            Assert.True(await solicitud.AutenticarAsync());
+        Assert.True(await CookieSigueSirviendoAsync(servicios, primera));
+        Assert.True(await CookieSigueSirviendoAsync(servicios, segunda));
     }
 
     /// Cambiar solo el correo conserva el nombre y registra únicamente Correo en la auditoría.
@@ -188,8 +186,8 @@ public class ConsultaYEdicionUsuariosTests(PostgreSqlRevision postgres) : IClass
         // Arrange
         var escenario = await postgres.Crear();
         using var servicios = escenario.Servicios();
-        await CrearAsync(servicios, "operador-ficticio", "Superusuario");
-        var objetivo = await CrearAsync(servicios, "objetivo-ficticio");
+        var objetivo = await CrearAsync(servicios, "objetivo-ficticio",
+            nombreCompleto: "Nombre Ficticio", correo: "contacto@ficticio.mx");
         string nombreAnterior;
         string? selloAnterior;
         await using (var lectura = escenario.Contexto())
@@ -199,7 +197,7 @@ public class ConsultaYEdicionUsuariosTests(PostgreSqlRevision postgres) : IClass
             selloAnterior = anterior.SecurityStamp;
             Assert.Equal("contacto@ficticio.mx", anterior.Email);
         }
-        var cookie = await EntrarAsync(servicios, "operador-ficticio");
+        var cookie = await PrepararSuperusuarioAsync(servicios);
         using var solicitud = new SolicitudIdentidad(servicios, cookie);
         Assert.True(await solicitud.AutenticarAsync());
 
@@ -227,33 +225,22 @@ public class ConsultaYEdicionUsuariosTests(PostgreSqlRevision postgres) : IClass
         // Arrange
         var escenario = await postgres.Crear();
         using var servicios = escenario.Servicios();
-        await CrearAsync(servicios, "operador-ficticio", "Superusuario");
         var objetivo = await CrearAsync(servicios, "objetivo-ficticio");
-        var cookie = await EntrarAsync(servicios, "operador-ficticio");
-        var anterior = await PostgreSqlRevision.Valor<string>(escenario.App,
-            $"""SELECT row_to_json(u)::text FROM "AspNetUsers" u WHERE "Id"='{objetivo}'""");
+        var cookie = await PrepararSuperusuarioAsync(servicios);
+        using var solicitud = new SolicitudIdentidad(servicios, cookie);
+        Assert.True(await solicitud.AutenticarAsync());
+        var anterior = await EstadoAsync(escenario);
 
         // Simula que la base de datos no puede guardar la auditoría.
 
-        await PostgreSqlRevision.Sql(escenario.Migrador, """
-            CREATE FUNCTION rechazar_evento_de_revision() RETURNS trigger LANGUAGE plpgsql AS $$
-            BEGIN RAISE EXCEPTION 'Fallo ficticio de auditoria'; END $$;
-            CREATE TRIGGER rechazar_evento_de_revision BEFORE INSERT ON "EventoAuditoria"
-            FOR EACH ROW EXECUTE FUNCTION rechazar_evento_de_revision();
-            """);
-        using var solicitud = new SolicitudIdentidad(servicios, cookie);
-        Assert.True(await solicitud.AutenticarAsync());
+        await SimularFalloDeAuditoriaAsync(escenario);
 
         // Act + Assert
         await Assert.ThrowsAsync<DbUpdateException>(() => solicitud.Obtener<IServicioUsuarios>()
             .ActualizarDatosDeCuentaAsync(objetivo, "Nombre Nuevo Ficticio", "nuevo@ficticio.mx"));
 
         // Assert
-        var posterior = await PostgreSqlRevision.Valor<string>(escenario.App,
-            $"""SELECT row_to_json(u)::text FROM "AspNetUsers" u WHERE "Id"='{objetivo}'""");
-        Assert.True(anterior == posterior, "El fallo dejó datos del usuario modificados.");
-        await using var lectura = escenario.Contexto();
-        Assert.Empty(await lectura.EventosAuditoria.ToListAsync());
+        await ComprobarSinCambiosAsync(escenario, anterior);
     }
 
 
@@ -268,7 +255,8 @@ public class ConsultaYEdicionUsuariosTests(PostgreSqlRevision postgres) : IClass
         // Arrange
         var escenario = await postgres.Crear();
         using var servicios = escenario.Servicios();
-        var id = await CrearAsync(servicios, "operador-ficticio", "Superusuario");
+        var id = await CrearAsync(servicios, "operador-ficticio", "Superusuario",
+            nombreCompleto: "Nombre Ficticio");
         var anterior = await PostgreSqlRevision.Valor<string>(escenario.App,
             $"""SELECT (to_jsonb(u)-'NombreCompleto')::text FROM "AspNetUsers" u WHERE "Id"='{id}'""");
 
@@ -280,7 +268,10 @@ public class ConsultaYEdicionUsuariosTests(PostgreSqlRevision postgres) : IClass
         // Act: vuelve a la versión sin la columna y después rehace el cambio
         await migrador.GetService<IMigrator>().MigrateAsync("20261003202126_IdentidadYAcceso");
         var sinColumna = await PostgreSqlRevision.Valor<long>(escenario.App,
-            """SELECT count(*) FROM information_schema.columns WHERE table_name='AspNetUsers' AND column_name='NombreCompleto'""");
+            """
+            SELECT count(*) FROM information_schema.columns
+            WHERE table_name='AspNetUsers' AND column_name='NombreCompleto'
+            """);
         await migrador.Database.MigrateAsync();
 
         // Assert
@@ -292,30 +283,4 @@ public class ConsultaYEdicionUsuariosTests(PostgreSqlRevision postgres) : IClass
             $"""SELECT "NombreCompleto" FROM "AspNetUsers" WHERE "Id"='{id}'"""));
     }
 
-
-    // ──── PREPARACIÓN FICTICIA ─────────────────────────────────────────────────────────────
-
-
-    /// Crea un usuario ficticio directo en la base de datos.
-    /// No pasa por el alta normal, para no dejar registros de auditoría ajenos a la prueba.
-    private static async Task<Guid> CrearAsync(ServiceProvider servicios, string usuario,
-        string rol = "Usuaria", bool temporal = false, string nombre = "Nombre Ficticio")
-    {
-        using var alcance = servicios.CreateScope();
-        var id = Guid.NewGuid();
-        var resultado = await alcance.ServiceProvider.GetRequiredService<IGestorIdentidad>().CrearAsync(
-            id, usuario, rol, "contrasena-ficticia-de-revision", temporal, nombre, "contacto@ficticio.mx");
-        Assert.Equal(ResultadoCreacionDeUsuario.Creado, resultado);
-        return id;
-    }
-
-    /// Inicia sesión con el usuario ficticio y devuelve su cookie, sin guardarla en archivos.
-    private static async Task<string> EntrarAsync(ServiceProvider servicios, string usuario)
-    {
-        using var solicitud = new SolicitudIdentidad(servicios);
-        Assert.True((await solicitud.Obtener<IServicioAcceso>()
-            .IniciarSesionAsync(usuario, "contrasena-ficticia-de-revision")).Exito);
-        return solicitud.CookieEmitida();
-    }
 }
-
