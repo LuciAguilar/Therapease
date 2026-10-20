@@ -1,5 +1,8 @@
 # TherapEase — Plan de pruebas por caso de uso
 
+**QA de las cuatro entregas aprobado por Lucía y repetido el 19-oct-2026:** Servidor 86; Permisos 50 de integración y 44 unitarias; Sesiones 24; Contraseñas 62 de integración y 16 unitarias. Sin fallidas ni omitidas. Son los mismos casos; las ejecuciones se solapan y no se suman como pruebas distintas. Contraseñas incluye 28 casos nuevos. Evidencia final y filtros en el manifest de la repetición y los cuatro informes. Commit local autorizado, sin push; revisión humana de Miguel, CI y páginas/navegador pendientes. No cierra B01/B00/LCA/R04. Los párrafos fechados siguientes conservan la historia de cada entrega.
+
+
 **Sesiones aprobado por Lucía el 19-oct-2026:** 24 correctas en la ejecución del 18-oct, 8 nuevas y 16 repetidas; dos comentarios aclarados. Commit local autorizado sin push. Evidencia y límites en `TherapEase-09-B01-evidencia-sesiones.md`; revisión humana y navegador pendientes. Contraseñas conserva su entrega.
 
 

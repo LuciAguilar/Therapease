@@ -1,6 +1,6 @@
 # TherapEase — B01 · Pruebas del servidor
 
-**18-oct-2026 · Servidor adaptado tras fusionar PR #7; correcciones de auditoría resueltas y Entrega 1 aprobada por Lucía. Revisión humana pendiente.**
+**Repetición final: 19-oct-2026. Entrega 1 aprobada por Lucía; revisión humana y CI del PR conjunto pendientes.**
 
 Se comprueban los servicios existentes de usuarios, acceso y contraseñas con PostgreSQL desechable, sin páginas. La ejecución final reúne **44 casos propios y 42 existentes: 86 correctos, 0 fallidos y 0 omitidos**. Se usaron los nombres finales y se conservaron intactos los comentarios corregidos por Claude, incluido `// Act + Assert` en el bloque que ejecuta cambios y comprueba sus respuestas.
 
@@ -11,11 +11,11 @@ Se comprueban los servicios existentes de usuarios, acceso y contraseñas con Po
 | Dato | Registro |
 | --- | --- |
 | Aplicación | `922a4e32705c50fa7b559bd95ad19f86800bcba2`, squash de PR #7 aprobado por Lucía. |
-| Referencia de trabajo | `revision/etapa09` en `922a4e3`, con QA local sin commit. |
+| Referencia de trabajo | `revision/etapa09` sobre `bbf7aed`, refactorización aprobada, con ajustes autorizados de Contraseñas. |
 | Entorno | Windows; SDK .NET 10.0.402; Docker Desktop Linux 29.8.1; imagen `postgres:17`; Testcontainers 4.15.0; xUnit 2.9.3. |
 | Base de datos | Nueva por caso, con migraciones reales y usuarios separados de aplicación y migrador. Solo datos ficticios. |
-| Inicio y fin del resultado | `2026-10-18T19:26:58.5661215-07:00` → `2026-10-18T19:27:34.2478003-07:00`; desplazamiento UTC−07:00, America/Hermosillo. |
-| Archivos del resultado | `servidor-correo.trx` y `manifest-final.json`; el manifest identifica fuentes, huellas y contadores. |
+| Inicio y fin del resultado | `2026-10-19T20:32:36.8924245-07:00` → `2026-10-19T20:33:13.4220040-07:00`. |
+| Archivos del resultado | `servidor.trx` y `manifest-final.json`; el manifest identifica fuentes, huellas y contadores. |
 
 El [PR #7](https://github.com/LuciAguilar/Therapease/pull/7) se fusionó el 18-oct sin los cuatro archivos antiguos de Lucía ni su informe. Se actualizó su rama conservando los cambios locales y se adaptaron cinco llamadas de alta al nombre completo, además de los campos del evento. Se incorporaron al mismo proyecto las ocho comprobaciones de consultas y edición que se usaron durante la revisión del PR. Se agregó el caso de cambio solo de correo solicitado en la auditoría. No se cambiaron servicios de producción, migraciones, permisos ni paquetes.
 
@@ -41,9 +41,9 @@ Archivos en `tests/TherapEase.IntegrationTests/`: `UsuariosServidorTests.cs`, `C
 
 | Estado | Correctas | Fallidas | Omitidas | Duración informada |
 | --- | --- | --- | --- | --- |
-| ✅ | **86** | **0** | **0** | **20 s** |
+| ✅ | **86** | **0** | **0** | **19 s** |
 
-Compilación Release sin advertencias informadas. Resultado: `servidor-correo.trx`. SHA-256: `4938de0a3af0c496771be4a25be7cc4424a3e498c265df68ea90cdff19416efb`.
+Compilación Release sin advertencias informadas. Resultado: `servidor.trx`. SHA-256: `572024f228a981af0db5bea1806bdda57b364728a2ebec54f0be83c4af0d62de`.
 
 ## 4. Cómo repetirlo
 
@@ -51,10 +51,10 @@ Desde la raíz del repositorio, con Docker disponible y el SDK indicado por `glo
 
 ```powershell
 $env:THERAPEASE_EVIDENCIA_Q08 = Join-Path (Get-Location) 'TestResults/servidor/interrupciones'
-dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj -c Release --filter 'FullyQualifiedName~UsuariosServidorTests|FullyQualifiedName~ConcurrenciaServidorTests|FullyQualifiedName~AuditoriaServidorTests|FullyQualifiedName~IdentidadServidorTests|FullyQualifiedName~IdentidadComplementariaTests|FullyQualifiedName~InterrupcionesIdentidadTests|FullyQualifiedName~ConsultaYEdicionUsuariosTests' --logger 'trx;LogFileName=servidor-correo.trx' --results-directory TestResults/servidor
+dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj -c Release --filter 'FullyQualifiedName~UsuariosServidorTests|FullyQualifiedName~ConcurrenciaServidorTests|FullyQualifiedName~AuditoriaServidorTests|FullyQualifiedName~IdentidadServidorTests|FullyQualifiedName~IdentidadComplementariaTests|FullyQualifiedName~InterrupcionesIdentidadTests|FullyQualifiedName~ConsultaYEdicionUsuariosTests' --logger 'trx;LogFileName=servidor.trx' --results-directory TestResults/servidor
 ```
 
-La ejecución registrada usó `--no-restore` porque las dependencias ya estaban descargadas y `--environment` para indicar dónde guardar los resultados de interrupciones. No se incorporan dependencias nuevas. Para ejecutar únicamente los 44 propios de esta entrega, usar el filtro `FullyQualifiedName~UsuariosServidorTests|FullyQualifiedName~ConcurrenciaServidorTests|FullyQualifiedName~AuditoriaServidorTests|FullyQualifiedName~ConsultaYEdicionUsuariosTests`.
+La ejecución registrada usó `--no-restore` porque las dependencias ya estaban descargadas y la variable `THERAPEASE_EVIDENCIA_Q08` para guardar los resúmenes de interrupciones. No se incorporan dependencias nuevas. Para ejecutar únicamente los 44 propios de esta entrega, usar el filtro `FullyQualifiedName~UsuariosServidorTests|FullyQualifiedName~ConcurrenciaServidorTests|FullyQualifiedName~AuditoriaServidorTests|FullyQualifiedName~ConsultaYEdicionUsuariosTests`.
 
 ## 5. Qué sigue pendiente
 

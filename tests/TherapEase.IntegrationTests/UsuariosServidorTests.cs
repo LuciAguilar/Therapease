@@ -85,7 +85,7 @@ public class UsuariosServidorTests(PostgreSqlRevision postgres) : IClassFixture<
         Assert.NotNull(guardado);
         Assert.Equal(nombre, guardado.UserName);
         Assert.True(guardado.DebeCambiarContrasena);
-        Assert.True(await usuarios.CheckPasswordAsync(guardado, datos.ContrasenaTemporal));
+        Assert.True(await ContrasenaFuncionaAsync(proveedor, datos.Usuario.IdUsuario, datos.ContrasenaTemporal));
         Assert.Equal(rol, Assert.Single(await usuarios.GetRolesAsync(guardado)));
         Assert.Equal(1L, await PostgreSqlRevision.Valor<long>(escenario.App,
             """SELECT count(*) FROM "EventoAuditoria" e"""));

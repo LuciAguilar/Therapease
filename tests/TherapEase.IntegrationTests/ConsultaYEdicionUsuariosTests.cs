@@ -1,11 +1,8 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.Extensions.DependencyInjection;
 using TherapEase.Application.Identidad.Interfaces.Servicios;
 using TherapEase.Application.Identidad.Modelos;
-using TherapEase.Infrastructure.Identidad.Entidades;
 using TherapEase.Infrastructure.Data;
 using static TherapEase.IntegrationTests.ServidorIdentidadRevision;
 
@@ -86,10 +83,7 @@ public class ConsultaYEdicionUsuariosTests(PostgreSqlRevision postgres) : IClass
         Assert.True(usuario.NombreCompleto == "Nombre Marcador Ficticio");
         Assert.True(usuario.Email == "marcador@ficticio.mx");
         Assert.True(usuario.DebeCambiarContrasena);
-        using var alcance = servicios.CreateScope();
-        var gestor = alcance.ServiceProvider.GetRequiredService<UserManager<Usuario>>();
-        var entidad = await gestor.FindByIdAsync(usuario.Id.ToString());
-        Assert.True(await gestor.CheckPasswordAsync(entidad!, entrega.ContrasenaTemporal));
+        Assert.True(await ContrasenaFuncionaAsync(servicios, usuario.Id, entrega.ContrasenaTemporal));
         var evento = Assert.Single(await lectura.EventosAuditoria.ToListAsync());
         Assert.Equal(new[] { "NombreUsuario", "Rol", "DebeCambiarContrasena", "NombreCompleto", "Correo" },
             evento.CamposAfectados);

@@ -122,19 +122,19 @@ public class ConcurrenciaServidorTests(PostgreSqlRevision postgres) : IClassFixt
         await Task.WhenAll(intentos).WaitAsync(TimeSpan.FromSeconds(45));
 
         // Assert
-        Assert.True(await PostgreSqlRevision.Valor<bool>(escenario.App,
-            $"""SELECT "LockoutEnd">CURRENT_TIMESTAMP AND "AccessFailedCount"=0 FROM "AspNetUsers" WHERE "Id"='{objetivo}'"""));
-        var fin = await PostgreSqlRevision.Valor<DateTime>(escenario.App,
-            $"""SELECT "LockoutEnd" FROM "AspNetUsers" WHERE "Id"='{objetivo}'""");
-        Assert.InRange(fin, antes.UtcDateTime.AddMinutes(15), DateTime.UtcNow.AddMinutes(15));
+        Assert.Equal(0, await IntentosFallidosAsync(escenario, objetivo));
+        var fin = await FinDeBloqueoAsync(escenario, objetivo);
+        Assert.NotNull(fin);
+        Assert.True(fin.Value > DateTimeOffset.UtcNow);
+        Assert.InRange(fin.Value, antes.AddMinutes(15), DateTimeOffset.UtcNow.AddMinutes(15));
         using (var solicitud = new SolicitudIdentidad(proveedor))
         {
             Assert.False((await solicitud.Obtener<IServicioAcceso>()
                 .IniciarSesionAsync("objetivo-ficticio", Contrasena)).Exito);
             Assert.Equal(0, solicitud.Contexto.Response.Headers.SetCookie.Count);
         }
-        Assert.True(await PostgreSqlRevision.Valor<bool>(escenario.App,
-            $"""SELECT "LockoutEnd" IS NULL AND "AccessFailedCount"=0 FROM "AspNetUsers" WHERE "Id"='{otra}'"""));
+        Assert.Null(await FinDeBloqueoAsync(escenario, otra));
+        Assert.Equal(0, await IntentosFallidosAsync(escenario, otra));
         Assert.False(string.IsNullOrEmpty(await EntrarAsync(proveedor, "otra-ficticio")));
     }
 
@@ -154,28 +154,28 @@ public class ConcurrenciaServidorTests(PostgreSqlRevision postgres) : IClassFixt
                 .IniciarSesionAsync("objetivo-ficticio", "contrasena-incorrecta-ficticia")).Exito);
         }
         for (var intento = 0; intento < 4; intento++) await FallarAsync();
-        Assert.Equal(4, await PostgreSqlRevision.Valor<int>(escenario.App,
-            $"""SELECT "AccessFailedCount" FROM "AspNetUsers" WHERE "Id"='{objetivo}'"""));
+        Assert.Equal(4, await IntentosFallidosAsync(escenario, objetivo));
 
         // Act
         await EntrarAsync(proveedor, "  OBJETIVO-FICTICIO  ");
 
         // Assert
-        Assert.Equal(0, await PostgreSqlRevision.Valor<int>(escenario.App,
-            $"""SELECT "AccessFailedCount" FROM "AspNetUsers" WHERE "Id"='{objetivo}'"""));
+        Assert.Equal(0, await IntentosFallidosAsync(escenario, objetivo));
 
         // Act
         for (var intento = 0; intento < 4; intento++) await FallarAsync();
 
         // Assert
-        Assert.True(await PostgreSqlRevision.Valor<bool>(escenario.App,
-            $"""SELECT "LockoutEnd" IS NULL AND "AccessFailedCount"=4 FROM "AspNetUsers" WHERE "Id"='{objetivo}'"""));
+        Assert.Null(await FinDeBloqueoAsync(escenario, objetivo));
+        Assert.Equal(4, await IntentosFallidosAsync(escenario, objetivo));
 
         // Act
         await FallarAsync();
 
         // Assert
-        Assert.True(await PostgreSqlRevision.Valor<bool>(escenario.App,
-            $"""SELECT "LockoutEnd">CURRENT_TIMESTAMP AND "AccessFailedCount"=0 FROM "AspNetUsers" WHERE "Id"='{objetivo}'"""));
+        var fin = await FinDeBloqueoAsync(escenario, objetivo);
+        Assert.NotNull(fin);
+        Assert.True(fin.Value > DateTimeOffset.UtcNow);
+        Assert.Equal(0, await IntentosFallidosAsync(escenario, objetivo));
     }
 }

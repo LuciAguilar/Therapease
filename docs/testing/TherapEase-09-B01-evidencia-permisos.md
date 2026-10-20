@@ -19,12 +19,12 @@ Referencias: HU01–HU03/HU15; CU01, CU02 y CU11; Q01/Q02/Q19; L-CU02-03/04/06 y
 
 ## 2. Versión y resultados
 
-Base local: `e815de6844934e5f07677f66d0d7b02aba29dab8`, commit aprobado de Servidor, más `PermisosUsuariosTests.cs` sin commit. Antes de empezar se ejecutaron fetch y merge de `origin/main`, `922a4e3`; el merge indicó que ya estaba actualizado. Sin reset ni push.
+Repetición final del 19-oct: base local `bbf7aed`, refactorización aprobada, con ajustes autorizados de Contraseñas. Main `922a4e3`, verificado con fetch y merge, ya actualizado. Sin reset ni push.
 
 | Ejecución final | Correctas | Fallidas | Omitidas | Duración informada |
 | --- | --- | --- | --- | --- |
-| Integración | **50** | 0 | 0 | 17 s |
-| Unitarias existentes | **44** | 0 | 0 | 150 ms |
+| Integración | **50** | 0 | 0 | 21 s |
+| Unitarias existentes | **44** | 0 | 0 | 79 ms |
 
 Release, .NET SDK 10.0.402, PostgreSQL 17/Testcontainers e Identity reales; mismas dependencias. La preparación HTTP usa HTTPS local real. Las solicitudes de administración usan `SolicitudIdentidad`, con autenticación real dentro de la prueba; no son solicitudes a formularios ni recorridos de navegador.
 
@@ -44,9 +44,9 @@ La ejecución registrada usó además `--no-restore` y una ubicación separada p
 
 ## 4. Qué falta
 
-- ✅ Auditoría y aprobación de Lucía recibidas. Se ajustaron tres encabezados de 95 a 94 caracteres; solo comentarios. Se conservan las ejecuciones registradas, sin presentarlas como repetidas por este ajuste. Commit local autorizado.
+- ✅ Auditoría y aprobación de Lucía recibidas. Se ajustaron tres encabezados de 95 a 94 caracteres; solo comentarios. Las 50 de integración y 44 unitarias se repitieron el 19-oct junto con las otras entregas. Commit local autorizado.
 - Revisión humana de Miguel en el PR conjunto y CI de ese futuro PR.
 - Formularios, todas las rutas, campos adicionales, navegación y navegador: esperan PageModel/páginas de Dulce. No se completan S-11/S-12 por estas pruebas de servicios.
-- Sesiones y Contraseñas conservan sus entregas. B01/B00/LCA/R04 siguen abiertos; sin datos reales, nube ni gastos.
+- Las cuatro entregas tienen aprobación local; su revisión humana y las pruebas de páginas/navegador siguen pendientes. B01/B00/LCA/R04 siguen abiertos; sin datos reales, nube ni gastos.
 
 La regla de publicación se decide aparte. Estas pruebas no autorizan push ni force-with-lease.

@@ -1,9 +1,14 @@
 using System.Data.Common;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using TherapEase.Application.Identidad.Interfaces.Repositorios;
 using TherapEase.Application.Identidad.Interfaces.Servicios;
 using TherapEase.Application.Identidad.Modelos;
+using TherapEase.Domain.Auditoria.Entidades;
+using TherapEase.Domain.Auditoria.Entidades.Enums;
+using TherapEase.Infrastructure.Identidad.Entidades;
 
 namespace TherapEase.IntegrationTests;
 
@@ -60,6 +65,16 @@ public static class ServidorIdentidadRevision
         return await solicitud.AutenticarAsync();
     }
 
+    /// Comprueba una contraseña con Identity, sin mostrarla ni escribirla en archivos.
+    public static async Task<bool> ContrasenaFuncionaAsync(ServiceProvider proveedor, Guid id, string contrasena)
+    {
+        using var alcance = proveedor.CreateScope();
+        var gestor = alcance.ServiceProvider.GetRequiredService<UserManager<Usuario>>();
+        var usuario = await gestor.FindByIdAsync(id.ToString());
+        Assert.NotNull(usuario);
+        return await gestor.CheckPasswordAsync(usuario, contrasena);
+    }
+
     /// Hace fallar el guardado de la auditoría para comprobar que tampoco se guarde el cambio.
     public static Task SimularFalloDeAuditoriaAsync(Escenario escenario) =>
         PostgreSqlRevision.Sql(escenario.Migrador, """
@@ -98,6 +113,27 @@ public static class ServidorIdentidadRevision
     public static Task<string> UsuarioGuardadoAsync(Escenario escenario, Guid id) =>
         PostgreSqlRevision.Valor<string>(escenario.App,
             $"""SELECT row_to_json(u)::text FROM "AspNetUsers" u WHERE "Id"='{id}'""");
+
+    /// Lee los eventos de una acción para comprobar lo que quedó guardado.
+    public static async Task<List<EventoAuditoria>> EventosDeAccionAsync(Escenario escenario, AccionAuditoria accion)
+    {
+        await using var lectura = escenario.Contexto();
+        return await lectura.EventosAuditoria.AsNoTracking().Where(e => e.Accion == accion).ToListAsync();
+    }
+
+    /// Lee cuántos intentos fallidos tiene el usuario.
+    public static async Task<int> IntentosFallidosAsync(Escenario escenario, Guid id)
+    {
+        await using var lectura = escenario.Contexto();
+        return await lectura.Users.Where(u => u.Id == id).Select(u => u.AccessFailedCount).SingleAsync();
+    }
+
+    /// Lee hasta cuándo está bloqueado el usuario; sin bloqueo devuelve null.
+    public static async Task<DateTimeOffset?> FinDeBloqueoAsync(Escenario escenario, Guid id)
+    {
+        await using var lectura = escenario.Contexto();
+        return await lectura.Users.Where(u => u.Id == id).Select(u => u.LockoutEnd).SingleAsync();
+    }
 }
 
 

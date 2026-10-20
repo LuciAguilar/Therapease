@@ -1,6 +1,6 @@
 # TherapEase — B01 · Pruebas de sesiones
 
-**Ejecución: 18-oct-2026. Aprobación de Lucía: 19-oct-2026, con dos comentarios aclarados; commit local autorizado, sin push.**
+**Repetición final: 19-oct-2026. Aprobada por Lucía; commit local autorizado, sin push.**
 
 Se comprueba cuándo vence una sesión, cómo se renueva y cuándo debe dejar de servir. Solo datos ficticios; Identity y PostgreSQL reales, con HTTPS local en los casos indicados. No se cambió producción ni se añadieron paquetes.
 
@@ -22,11 +22,11 @@ Referencias: HU01–HU03/HU15; CU01/CU02/CU11; Q02/Q19; L-CU01-02/03 y L-CU02-03
 
 | Correctas | Fallidas | Omitidas | Duración informada |
 | --- | --- | --- | --- |
-| **24** —8 nuevas y 16 repetidas— | **0** | **0** | **9 s** |
+| **24** —8 nuevas y 16 repetidas— | **0** | **0** | **12 s** |
 
-Release; .NET SDK 10.0.402, PostgreSQL 17/Testcontainers e Identity reales. Base local `0e2484d8b62098e1b463f793c84e72dae5a8aeac`, commit aprobado de Permisos, más tres archivos nuevos de QA. Fetch y merge de main realizados antes de empezar; main `922a4e3`, ya actualizado. Sin reset ni push.
+Release; .NET SDK 10.0.402, PostgreSQL 17/Testcontainers e Identity reales. Base local `bbf7aed`, refactorización aprobada, con ajustes autorizados de Contraseñas. Fetch y merge de main realizados antes de empezar; main `922a4e3`, ya actualizado. Sin reset ni push.
 
-Evidencia final: `sesiones-verificadas.trx` y `manifest-final.json`, con horarios, huellas, filtros y fuentes. Las cookies permanecen en memoria; los mensajes de los casos nuevos no muestran sus valores. Pruebas comentadas según la skill del proyecto, encabezados de 94 caracteres.
+Evidencia final: `sesiones.trx` y `manifest-final.json`, con horarios, huellas, filtros y fuentes. Las cookies permanecen en memoria; los mensajes de los casos nuevos no muestran sus valores. Pruebas comentadas según la skill del proyecto, encabezados de 94 caracteres.
 
 ## 3. Código y repetición
 
@@ -42,4 +42,4 @@ Para repetir las 24, usar la propiedad `filtro` del manifest de la ejecución en
 
 ## 4. Pendientes
 
-Auditoría de Sesiones resuelta y aprobación de Lucía recibida el 19-oct. Solo se aclararon dos comentarios; no se presenta como nueva la ejecución del 18-oct. Revisión humana de Miguel y CI en el PR conjunto. El navegador y las páginas/PageModel de Dulce siguen pendientes: HTTP y clientes de prueba no demuestran su recorrido real, cerrar el navegador o volver atrás. B01/B00/LCA/R04 continúan abiertos; sin nube ni gastos. Contraseñas conserva su entrega.
+Auditoría de Sesiones resuelta y aprobación de Lucía recibida el 19-oct. Las 24 se repitieron el 19-oct con los mismos casos y las ayudas finales. Revisión humana de Miguel y CI en el PR conjunto. El navegador y las páginas/PageModel de Dulce siguen pendientes: HTTP y clientes de prueba no demuestran su recorrido real, cerrar el navegador o volver atrás. B01/B00/LCA/R04 continúan abiertos; sin nube ni gastos. Contraseñas conserva su entrega.
