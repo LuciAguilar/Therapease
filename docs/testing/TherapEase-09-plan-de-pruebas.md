@@ -1,5 +1,17 @@
 # TherapEase — Plan de pruebas por caso de uso
 
+**QA de las cuatro entregas aprobado por Lucía y repetido el 19-oct-2026:** Servidor 86; Permisos 50 de integración y 44 unitarias; Sesiones 24; Contraseñas 62 de integración y 16 unitarias. Sin fallidas ni omitidas. Son los mismos casos; las ejecuciones se solapan y no se suman como pruebas distintas. Contraseñas incluye 28 casos nuevos. Evidencia final y filtros en el manifest de la repetición y los cuatro informes. Commit local autorizado, sin push; revisión humana de Miguel, CI y páginas/navegador pendientes. No cierra B01/B00/LCA/R04. Los párrafos fechados siguientes conservan la historia de cada entrega.
+
+
+**Sesiones aprobado por Lucía el 19-oct-2026:** 24 correctas en la ejecución del 18-oct, 8 nuevas y 16 repetidas; dos comentarios aclarados. Commit local autorizado sin push. Evidencia y límites en `TherapEase-09-B01-evidencia-sesiones.md`; revisión humana y navegador pendientes. Contraseñas conserva su entrega.
+
+
+**Entrega 2 —Permisos— aprobada con ajuste menor por Lucía, 18-oct:** 50 de integración (34 nuevas y 16 existentes) y 44 unitarias existentes correctas, sin fallidas/omitidas. Solo se acortaron encabezados a 94 caracteres; no se repitieron las pruebas por este cambio de comentario. Commit local autorizado, sin push; revisión humana en el PR conjunto pendiente. No completa las páginas ni todas las rutas de S-11/S-12. Evidencia y alcance en el informe de Permisos.
+
+**Entrega 1 de QA —Servidor— aprobada por Lucía el 18-oct-2026:** 86 correctas, 0 fallidas y 0 omitidas, Release, base `922a4e3` con QA local. Correcciones de auditoría resueltas; incluye el caso de cambiar solo correo con auditoría únicamente `Correo`. Evidencia `servidor-correo.trx` y `manifest-final.json`; detalle en el informe de Servidor. Commit local autorizado, sin push. Revisión humana de Miguel en el futuro PR conjunto y QA de Contraseñas pendiente. No cierra B01/B00/LCA/R04.
+
+**Actualización aprobada, 18-oct-2026:** ✅ Propuesta de Miguel aprobada el 17-oct; PR #7 revisado, aprobado por Lucía y fusionado en `922a4e32705c50fa7b559bd95ad19f86800bcba2`. CI revisada sobre `a2047ec`, ejecución 39152597181: cuatro trabajos correctos, 386 unitarias y 205 de integración; las 30 de arquitectura ya están en esas 205. Estos son resultados de la revisión del PR, no una ejecución nueva por editar el plan. ⏳ QA propio de Lucía y páginas/navegador conservan sus revisiones y pruebas pendientes. El seguimiento por persona está en B01 §2.
+
 **Publicación documental autorizada, 17-oct-2026:** este plan incorpora las decisiones aprobadas y el cierre de revisión del PR #6. La ampliación de pruebas de servidor B01 sigue pendiente de auditoría y aprobación de Lucía; sus resultados no se añaden al avance compartido por esta publicación. Las casillas se actualizan al cerrar las revisiones y aprobaciones, conservando la evidencia original.
 
 > **Entrevista recibida y revisada el 14-oct-2026:** ✅ respuestas de la psicóloga registradas en [respuestas y ajustes](../requirements/TherapEase-09-entrevista-requisitos.md). ⏳ Montos, simplificación a solo particular y cancelación automática requieren decisión de alcance/mecanismo de Lucía; no están implementados por esta actualización. B00/LCA/R04 abiertos, preparación documental sin Construcción ni pruebas nuevas. Los resultados y aprobaciones anteriores se conservan como historia.
