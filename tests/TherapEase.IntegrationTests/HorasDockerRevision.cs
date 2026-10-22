@@ -60,8 +60,11 @@ public sealed class HorasDockerRevision : IAsyncLifetime
 
             // Un puerto asignado explícitamente se conserva cuando Docker reinicia el contenedor.
 
+            // En Linux (por ejemplo, el runner de GitHub) host.docker.internal no existe por sí solo: se mapea a la puerta de enlace del anfitrión.
+            // Docker Desktop ya lo resuelve; la opción no le cambia nada.
             var arranque = await DockerAsync("run", "--detach", "--name", _nombre,
                 "--label", "therapease.revision=b00-horas-docker", "--publish", $"127.0.0.1:{numero}:8080",
+                "--add-host", "host.docker.internal:host-gateway",
                 "--env", "ConnectionStrings__TherapEase=" + conexion, "--env", "TZ=Europe/Madrid", Imagen);
             ExigirExito(arranque, "arranque del contenedor");
             _contenedorCreado = true;

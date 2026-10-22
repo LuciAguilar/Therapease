@@ -78,3 +78,21 @@ Volcados sin cifrar: solo temporales dentro del contenedor, modo 0600 comprobado
 - Q10–Q11 conservan revisión, reproducción y operación pendientes. Sin cierre B00/LCA ni autorización B01/Construcción.
 
 Referencias primarias: [pg_dump 17](https://www.postgresql.org/docs/17/app-pgdump.html), [pg_restore 17](https://www.postgresql.org/docs/17/app-pgrestore.html), [Testcontainers](https://dotnet.testcontainers.org/api/create_docker_container/), [AES-GCM .NET](https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.aesgcm?view=net-10.0).
+
+## 6. Ampliación QA — 13-oct-2026
+
+| Estado | Mejora / evidencia |
+| --- | --- |
+| ✅ | Recuperación: 13 casos correctos en la selección de 36 del 13-oct. Además del HTTP 200, se comprueban evento/registro, tipo, acción y hecho restaurados. |
+| ✅ | ServidorRevision captura el timeout de cada intento de salud y sigue consultando dentro de su ventana de 40 s; conserva limpieza si falla. No se provocó aquí un arranque lento artificial. |
+| ✅ | README §10 documenta crear base vacía y ejecutar scripts/db/crear-roles.sql antes de restaurar en un servidor nuevo; pg_dump no copia roles globales. Testcontainers los prepara para QA. |
+| ⏳ | Miguel o Dulce revisa esta ampliación; no queda cubierta por la revisión de PR #4. Páginas, navegador, volumen real, age y respaldo diario siguen pendientes. |
+
+Pruebas comentadas según el skill del proyecto. Lucía autoriza avance B01 el 13-oct con pendientes B00/LCA visibles; no declara cierre de LCA ni autoriza datos reales/nube.
+
+
+Repetición final: 205 integración y 258 unitarias correctas sobre código 4ca53c4; comandos/huellas en B00 §4.10. No quedaron contenedores ni imágenes de revisión.
+
+## Corrección del 14-oct
+
+Nueve encabezados ampliados a 96 caracteres en RecuperacionRevision/Tests, con comentarios y lógica conservados. Paquetes de pruebas corregidos a 10.0.13; 258 unitarias/205 integración correctas en repetición completa con Docker, incluidos los 13 casos de recuperación. Comandos/huellas en B00 §4.11; revisión humana de Miguel y fusión del PR #6 completadas el 15-oct en `ffb2494ad9da026f24a57826c45f6f530afb467b`. Resultados anteriores conservados, sin nueva ejecución ni cierre B00/LCA.

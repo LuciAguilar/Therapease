@@ -8,6 +8,9 @@ public static class MensajesDeIdentidad
     public const string SinPermiso = "No tienes permiso para realizar esta operación.";
     public const string UsuarioNoEncontrado = "No se encontró el usuario.";
     public const string DatosDeUsuarioInvalidos = "Los datos del usuario no son válidos.";
+    public const string NombreCompletoInvalido = "El nombre completo no es válido.";
+    public const string CorreoInvalido = "El correo no es válido.";
+    public const string BusquedaDeUsuariosInvalida = "El texto de búsqueda no es válido.";
     public const string NombreDeUsuarioDuplicado = "El nombre de usuario ya existe.";
     public const string UltimoSuperusuario = "Debe quedar al menos un superusuario activo.";
     public const string CambioDeContrasenaNoRealizado = "No fue posible cambiar la contraseña. Verifica los datos e intenta de nuevo.";

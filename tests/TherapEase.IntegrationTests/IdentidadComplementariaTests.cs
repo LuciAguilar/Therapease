@@ -85,7 +85,7 @@ public class IdentidadComplementariaTests(PostgreSqlRevision postgres) : IClassF
 
         // Act + Assert: ninguna operación de administración se permite
         var servicio = solicitud.Obtener<IServicioUsuarios>();
-        Assert.False((await servicio.CrearUsuarioAsync("intrusa-ficticia", "Usuaria")).Exito);
+        Assert.False((await servicio.CrearUsuarioAsync("intrusa-ficticia", "Usuaria", "Nombre Ficticio")).Exito);
         Assert.False((await servicio.RestablecerContrasenaAsync(id)).Exito);
         Assert.False((await servicio.DesactivarUsuarioAsync(id)).Exito);
         Assert.False((await servicio.CambiarRolAsync(id, rol == "Usuaria" ? "Superusuario" : "Usuaria")).Exito);

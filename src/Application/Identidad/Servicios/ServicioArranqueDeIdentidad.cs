@@ -47,7 +47,7 @@ public class ServicioArranqueDeIdentidad : IServicioArranqueDeIdentidad
         {
             await _unidad.EjecutarAsync(async ct =>
             {
-                resultado = await _gestor.CrearAsync(idNuevo, nombre, NombresDeRol.Superusuario, contrasena, debeCambiarContrasena: true, ct);
+                resultado = await _gestor.CrearAsync(idNuevo, nombre, NombresDeRol.Superusuario, contrasena, debeCambiarContrasena: true, cancelacion: ct);
                 if (resultado == ResultadoCreacionDeUsuario.Creado)
                 {
                     // Sin sesión previa, el propio usuario creado figura como actor del alta inicial.

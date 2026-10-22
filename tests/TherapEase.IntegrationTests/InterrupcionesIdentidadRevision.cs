@@ -107,7 +107,7 @@ public sealed class InterrupcionesIdentidadRevision : IDisposable
         if (operacion is "crear" or "restablecer")
         {
             var respuesta = operacion == "crear"
-                ? await servicio.CrearUsuarioAsync(NombreObjetivo, "Usuaria", cancelacion)
+                ? await servicio.CrearUsuarioAsync(NombreObjetivo, "Usuaria", "Nombre Ficticio", cancelacion: cancelacion)
                 : await servicio.RestablecerContrasenaAsync(_objetivo, cancelacion);
             var temporalVerificada = false;
             if (respuesta.Exito && respuesta.Datos is { } datos)

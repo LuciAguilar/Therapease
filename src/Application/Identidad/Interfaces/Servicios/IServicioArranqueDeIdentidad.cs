@@ -3,7 +3,7 @@ using TherapEase.Application.Identidad.Modelos;
 
 namespace TherapEase.Application.Identidad.Interfaces.Servicios;
 
-// Propuesta de Miguel, pendiente de decisión de Lucía: procedimiento de operador, sin correo ni contraseña fija en el código.
+// Procedimiento de operador aprobado por Lucía el 04-oct-2026 (AGENTS §2.2), sin correo ni contraseña fija en el código.
 public interface IServicioArranqueDeIdentidad
 {
     // Solo mientras no exista ningún superusuario activo.

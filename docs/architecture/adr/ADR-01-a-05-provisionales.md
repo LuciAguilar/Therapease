@@ -1,5 +1,9 @@
 # TherapEase — ADR-01 a ADR-05
 
+> **Entrevista recibida y revisada el 14-oct-2026:** ✅ respuestas de la psicóloga registradas en [respuestas y ajustes](../../requirements/TherapEase-09-entrevista-requisitos.md). ⏳ Montos, simplificación a solo particular y cancelación automática requieren decisión de alcance/mecanismo de Lucía; no están implementados por esta actualización. B00/LCA/R04 abiertos, preparación documental sin Construcción ni pruebas nuevas. Los resultados y aprobaciones anteriores se conservan como historia.
+
+**Alcance de las referencias a asistentes — 04-oct-2026:** las revisiones con Codex/Claude aquí citadas corresponden al método personal de Lucía. Miguel y Dulce eligen sus herramientas y organización de revisión; usan este ADR como contexto. Las reglas compartidas están en AGENTS. Esta aclaración no modifica las decisiones arquitectónicas ni el texto fuente transcrito.
+
 **Estado de este archivo:** transcripción corregida y aceptada por Lucía el 01-oct-2026 tras el veredicto CORREGIR (ajuste menor), que permite aprobar sin otra auditoría. Lucía confirmó la fidelidad con el texto de 04 que aportó. No es una prueba ejecutable: arquitectura y stack siguen sujetos a la validación de LCA en B00. Se conserva el nombre provisional para no romper referencias.
 
 **Procedencia declarada:** chat **«04 - Arquitectura»**, entrega 04D v0.2 («Patrones, ADR y trazabilidad») y correcciones 04D v0.3 aprobadas por Lucía el **21-sep-2026**. El veredicto recibido el 01-oct contrastó esta transcripción con el texto aportado por Lucía; sus cuatro correcciones quedan aplicadas y aprobadas. Las líneas «Estado y revisión» se identifican como notas de transcripción, sin atribuirlas al texto fuente. Las notas de continuidad se separan de las decisiones de 04. La matriz Q01–Q20/R01–R05 vigente está en `TherapEase-etapa08-backlog-trazabilidad.md`.
@@ -63,7 +67,7 @@
 - **Nota de transcripción — Estado y revisión:** candidata; compatible con 04C y 05C–05D. En 04D, el respaldo diario estaba pendiente para 05E. No forma parte del texto fuente de 04.
 - **Prueba futura 04D:** accesos, registros, restauración y recorrido de 30 minutos en 09.
 
-**Continuidad posterior:** 05E definió documentalmente el respaldo diario y su verificación de restauración; 07B detalló Identity, sesiones, TLS y auditoría. Lucía exigió TOTP con app autenticadora **antes de usar datos reales** en 08B. La incorporación de ese mecanismo exige revisar el impacto en ADR-05 conforme a 07A antes de implementarse. **R04 sigue abierto:** procedencia, acceso, conservación y eliminación definitiva se deciden con Usuaria antes de cualquier dato real; este ADR no los resuelve.
+**Continuidad posterior:** 05E definió documentalmente el respaldo diario y su verificación de restauración; 07B detalló Identity, sesiones, TLS y auditoría. Lucía exigió TOTP con app autenticadora **antes de usar datos reales** en 08B. La incorporación de ese mecanismo exige revisar el impacto en ADR-05 conforme a 07A antes de implementarse. **R04 sigue abierto:** procedencia, acceso, conservación y eliminación definitiva se deciden con la usuaria antes de cualquier dato real; este ADR no los resuelve.
 
 ### Nota posterior ADR-05 — opción A del respaldo (antecedente del 01-oct)
 
@@ -73,19 +77,7 @@ El repo público contiene aplicación y documentación; el privado alojará el f
 
 **Consecuencia:** separar respaldo de la visibilidad pública sin cambiar Q10–Q11 ni retención. **Validación pendiente:** demostrar que personas sin acceso no descargan artefactos, que el flujo cifra y verifica la huella, que restaura correctamente en PostgreSQL desechable y que un fallo genera la incidencia a Lucía. La recuperación completa cronometrada sigue en el plan de Lucía.
 
-**Límite actual:** no crear aún el repo de respaldo ni conectar con Neon. B00 puede continuar con PostgreSQL desechable y datos ficticios. La ayuda solicitada posteriormente para herramientas y cuentas Render/Neon no configura este respaldo ni acredita despliegue autorizado. Codex propone esta concreción, Claude audita y Lucía decide su implementación.
-
-### Nota posterior ADR-05 — dependencia de QA en B00 (06-oct-2026)
-
-**Concreción propuesta para revisión y decisión:** incorporar `Testcontainers.PostgreSql` 4.15.0 al proyecto `TherapEase.IntegrationTests`, con xUnit 2.9.3 existente. Testcontainers/PostgreSQL desechable ya forman parte del stack acordado; esta nota registra la versión y la referencia de pruebas conforme a 07A. Se prepararon y ejecutaron 37 casos locales con datos ficticios; la revisión humana de Miguel o Dulce y la aprobación de la entrega siguen pendientes. Las dependencias de ejecución de la aplicación permanecen iguales.
-
-La clase de apoyo usa servicios Identity y migraciones reales, usuarios separados y una base por caso. El reloj controlado de cookie y el contexto HTTP de componente viven solo en pruebas. No agrega rutas a la aplicación, no acredita páginas/navegador/TLS ni implementa el respaldo privado. Q10–Q11 y LCA conservan sus pendientes. Esta nota no modifica la transcripción ni las decisiones originales de 04.
-
-### Propuesta de validación local Q10–Q11 — 07-oct-2026
-
-Solo para pruebas B00: `pg_dump`/`pg_restore` 17 del contenedor y AES-256-GCM mediante `System.Security.Cryptography` de .NET, sin paquetes nuevos. Clave aleatoria de 32 bytes solo en memoria, valor aleatorio nuevo de 12 bytes por copia, autenticación de 16 bytes y SHA-256 del archivo cifrado. Fecha y versión del formato de prueba autenticadas; rechazar copia/clave inválidas antes de escribir en destino. Restaurar en una transacción en otro PostgreSQL desechable; comparar todas las tablas, permisos, identidad y tiempos.
-
-**Propuesto, no aprobado para producción:** el formato, cifrado y clave efímera permiten únicamente la demostración local. Gestión y recuperación de claves duraderas, usuario de respaldo, retención diaria de 14 días, repositorio privado, incidencia automática, nube y pruebas a carga objetivo siguen pendientes de auditoría y decisión. No cambia ADR-05 original ni acredita Q10–Q11 completos o cierre LCA. Lucía autorizó elaborar y ejecutar la validación local; Miguel o Dulce debe revisar sus pruebas.
+**Límite actual:** no crear aún el repo de respaldo ni conectar con Neon. B00 puede continuar con PostgreSQL desechable y datos ficticios. La ayuda solicitada posteriormente para herramientas y cuentas Render/Neon no configura este respaldo ni acredita despliegue autorizado. Lucía prepara y audita personalmente esta concreción con Codex/Claude y decide su implementación; Miguel y Dulce siguen su propio método.
 
 **Ajuste de la propuesta — 08-oct-2026, veredicto de Claude aplicado por autorización de Lucía:** la antigüedad se mide y se informa para Q10; no es condición para impedir la restauración. En un incidente se restaura la copia más reciente disponible e íntegra aunque tenga más de 24 horas, registrando el incumplimiento de Q10, para no prolongar la caída Q11. Una fecha futura se informa como anomalía de medición. La integridad y la clave correcta siguen siendo obligatorias. El código de QA separa medición y restauración; su nueva ejecución del 08-oct fue correcta (50 casos en conjunto); revisión humana y aprobación siguen pendientes.
 
@@ -106,6 +98,39 @@ Solo para pruebas B00: `pg_dump`/`pg_restore` 17 del contenedor y AES-256-GCM me
 
 **Límite:** no crear el repositorio de respaldos, conectar Neon ni implementar el flujo. No instalar age ni generar/guardar claves en esta entrega documental. Rotación de claves, usuario/permisos de respaldo, política de sesiones tras incidente, carga objetivo y demás detalles operativos siguen pendientes donde corresponda. La aprobación no acredita funcionamiento diario/mensual ni cierra B00/LCA/R04.
 
+### Nota posterior ADR-05 — temporales y acceso Q03 (12-oct-2026)
+
+**Decisión de Lucía, aprobada documentalmente.** No altera la transcripción original de 04. AGENTS §2.2–§2.3 conserva las reglas completas.
+
+| Tema | Decisión | Implementación / evidencia pendiente |
+| --- | --- | --- |
+| Temporales, orden 7 | Puntos 1–4 aprobados: verificar identidad por canal conocido distinto al de entrega; temporal una vez, sin secretos en registros/URL/TempData; nuevo restablecimiento ante respuesta perdida, sin reintento automático; acceso solo CU11 y revocación acordada. | Entrega desde páginas y recorrido final pendientes. Solo registrar eventos de cambios confirmados: dos si ambos intentos confirmaron; uno si el primero se revirtió. |
+| Caducidad A | B00 con datos ficticios, sin vencimiento adicional de la temporal. Otro restablecimiento invalida la anterior. No cambia sesión de 30 min ni bloqueo vigente. | Mantener evidencia local y límites del alcance; no acredita navegador. |
+| Caducidad B | Temporal de 24 h obligatoria antes de datos reales: fecha de emisión, migración y pruebas. | Trabajo posterior; no implementar ahora. No autoriza datos reales ni resuelve R04/TOTP. |
+| Q03, orden 8 | Opción A: superusuario activo, sin temporal, accede con navegador autenticado y abre la URL en la misma ventana; cookie y permisos vigentes. | Acceso/cierre de sesión de Dulce y prueba final. Sin pantalla de auditoría; script B no incluido. |
+
+La decisión no cierra B00/LCA y no cambia el respaldo ni autoriza nube.
+
 ## Estado del traslado y aprobación — 01-oct-2026
 
 Lucía autorizó el traslado el 30-sep-2026. El 01-oct aportó el veredicto de contraste y aprobó las cuatro correcciones, la fidelidad y los demás puntos documentales de B00/ADR-06/Q03. No consta una nueva auditoría ni revisión humana de Miguel o Dulce; esta aprobación no las inventa. Los ADR pueden separarse posteriormente conservando identificadores y procedencia. LCA sigue abierta hasta resultados ejecutables y decisión de Lucía; R04 sigue abierto.
+
+### Nota posterior ADR-05 — dependencia de QA en B00 (06-oct-2026)
+
+**Concreción propuesta para revisión y decisión:** incorporar `Testcontainers.PostgreSql` 4.15.0 al proyecto `TherapEase.IntegrationTests`, con xUnit 2.9.3 existente. Testcontainers/PostgreSQL desechable ya forman parte del stack acordado; esta nota registra la versión y la referencia de pruebas conforme a 07A. Se prepararon y ejecutaron 37 casos locales con datos ficticios; la revisión humana de Miguel o Dulce y la aprobación de la entrega siguen pendientes. Las dependencias de ejecución de la aplicación permanecen iguales.
+
+La clase de apoyo usa servicios Identity y migraciones reales, usuarios separados y una base por caso. El reloj controlado de cookie y el contexto HTTP de componente viven solo en pruebas. No agrega rutas a la aplicación, no acredita páginas/navegador/TLS ni implementa el respaldo privado. Q10–Q11 y LCA conservan sus pendientes. Esta nota no modifica la transcripción ni las decisiones originales de 04.
+
+
+### Propuesta de validación local Q10–Q11 — 07-oct-2026
+
+Solo para pruebas B00: `pg_dump`/`pg_restore` 17 del contenedor y AES-256-GCM mediante `System.Security.Cryptography` de .NET, sin paquetes nuevos. Clave aleatoria de 32 bytes solo en memoria, valor aleatorio nuevo de 12 bytes por copia, autenticación de 16 bytes y SHA-256 del archivo cifrado. Fecha y versión del formato de prueba autenticadas; rechazar copia/clave inválidas antes de escribir en destino. Restaurar en una transacción en otro PostgreSQL desechable; comparar todas las tablas, permisos, identidad y tiempos.
+
+**Propuesto, no aprobado para producción:** el formato, cifrado y clave efímera permiten únicamente la demostración local. Gestión y recuperación de claves duraderas, usuario de respaldo, retención diaria de 14 días, repositorio privado, incidencia automática, nube y pruebas a carga objetivo siguen pendientes de auditoría y decisión. No cambia ADR-05 original ni acredita Q10–Q11 completos o cierre LCA. Lucía autorizó elaborar y ejecutar la validación local; Miguel o Dulce debe revisar sus pruebas.
+
+
+## Nota posterior documental — entrevista del 14-oct-2026
+
+✅ Entrevista recibida; cambios de requisitos registrados, no implementación autorizada. ⏳ Solo particular puede cambiar el modelo de ámbitos; montos requieren definir datos/reglas/migración; cancelación automática en baja requiere atomicidad/eventos/concurrencia y pago conservado conforme a ADR-04. Miguel propone impacto y Lucía decide antes de modificar mecanismos Q/R. No se elige tecnología nueva por esta entrevista.
+
+✅ Campos de Usuario/Paciente/Tutor solicitados, pantallas aceptadas en general y preferencias futuras recibidas. ⏳ Detalle/contratos/persistencia y pruebas. Papel/5 años/solo la usuaria/consulta antes de eliminar son insumos R04, no política legal aprobada. Se conserva texto original de ADR, historia ejecutada y límites B00/LCA/R04. Véase el registro local de entrevista.
