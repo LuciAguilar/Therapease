@@ -206,7 +206,7 @@ Las precisiones de Miguel marcadas en §3 (la ficha, la forma del error al entra
 
 ## 7. Estado de implementación de los eventos de acceso — 22-oct-2026
 
-Rama `b00/correcciones-pr4`, usada como rama de trabajo por indicación de Miguel; cambios sin commit, sin PR y sin CI todavía. Resultados, comandos, huellas y los ajustes a pruebas de Lucía en el [plan de pruebas §0.8](../testing/TherapEase-09-plan-de-pruebas.md#08-avance-de-miguel-en-b01-eventos-de-acceso-salida-y-bloqueo--22-oct-2026). Falta la revisión de otra persona y la aprobación final de Lucía.
+Rama `b00/correcciones-pr4`, usada como rama de trabajo por indicación de Miguel; código probado en el commit `e3f227c`; PR y CI pendientes. Resultados, comandos, huellas y los ajustes a pruebas de Lucía en el [plan de pruebas §0.8](../testing/TherapEase-09-plan-de-pruebas.md#08-avance-de-miguel-en-b01-eventos-de-acceso-salida-y-bloqueo--22-oct-2026). Falta la revisión de otra persona y la aprobación final de Lucía.
 
 | Qué | Estado |
 | --- | --- |

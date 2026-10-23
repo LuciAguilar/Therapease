@@ -83,12 +83,12 @@ El seguimiento 0.1 conserva las ejecuciones del 08–10-oct como historia. Los f
 
 ## 0.8. Avance de Miguel en B01: eventos de acceso, salida y bloqueo — 22-oct-2026
 
-Rama `b00/correcciones-pr4`, usada como rama de trabajo por indicación de Miguel. Sus 10 commits son el PR #5, que `main` ya tiene fusionado con squash; se le trajo `origin/main` (`7a73e0a`, con el PR #7 y el PR #8 de Lucía) en el commit `231b2a2`, cuyo árbol es idéntico al de `main`. Todo lo de este apartado está **sin commit**: el SHA del PR se anotará en su descripción. Una ejecución local no equivale a revisión humana, aprobación ni CI. Las casillas de §1, §3 y §4 conservan su estado hasta cerrar esas revisiones.
+Rama `b00/correcciones-pr4`, usada como rama de trabajo por indicación de Miguel. Sus 10 commits son el PR #5, que `main` ya tiene fusionado con squash; se le trajo `origin/main` (`7a73e0a`, con el PR #7 y el PR #8 de Lucía) en el commit `231b2a2`, cuyo árbol es idéntico al de `main`. El código está en el commit `e3f227c`, ya publicado en la rama; el enlace del PR y el resultado del CI se anotan en su descripción. Una ejecución local no equivale a revisión humana, aprobación ni CI. Las casillas de §1, §3 y §4 conservan su estado hasta cerrar esas revisiones.
 
 | Dato de la ejecución | Valor |
 | --- | --- |
 | Fecha y zona | 22-oct-2026, de 11:43 a 12:09, UTC−7 (Hermosillo). |
-| Código probado | Árbol de trabajo sobre `231b2a2`, con 37 archivos modificados o nuevos sin commit (los de código y pruebas, sin cambios desde la ejecución final de integración de las 12:03; después solo se editaron documentos). |
+| Código probado | Commit `e3f227cb79a1450d9cc8d1b88f4f09cc50680062` (sobre `231b2a2`), publicado por Miguel el 22-oct con 37 archivos. Las pruebas se ejecutaron sobre el árbol de trabajo antes del commit; los archivos de código y pruebas no cambiaron desde la ejecución final de integración de las 12:03, y después solo se editaron documentos. |
 | Entorno | Windows 11 Home 10.0.26200, .NET SDK 10.0.401, Docker Desktop (motor 29.4.0), PostgreSQL 17 desechable con Testcontainers. Ejecución local, no CI. |
 | Compilación | Release con `-warnaserror`: 0 advertencias y 0 errores. |
 | Unitarias | **422 correctas**, 0 fallidas, 0 omitidas. Antes eran 386: son **36 nuevas**. |
