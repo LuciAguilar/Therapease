@@ -75,7 +75,7 @@ public class GestorIdentidad : IGestorIdentidad
         return usuario is null ? null : await ADatosAsync(usuario);
     }
 
-    public async Task<DatosUsuario?> VerificarCredencialesAsync(string nombreUsuario, string contrasena, CancellationToken cancelacion = default)
+    public async Task<ResultadoDeVerificacion> VerificarCredencialesAsync(string nombreUsuario, string contrasena, CancellationToken cancelacion = default)
     {
         var normalizado = _usuarios.NormalizeName(nombreUsuario);
         var usuario = await BloquearUsuarioAsync(normalizado, cancelacion);
@@ -83,42 +83,40 @@ public class GestorIdentidad : IGestorIdentidad
         if (usuario is null)
         {
             _hasher.VerifyHashedPassword(new Usuario(), HashFicticio, contrasena);
-            return null;
+            return new ResultadoDeVerificacion(null);
         }
 
         // Con el bloqueo vigente no se evalúa la contraseña: una correcta tampoco abre sesión (CU01 A2).
         if (!usuario.Activo || await _usuarios.IsLockedOutAsync(usuario))
         {
             _hasher.VerifyHashedPassword(new Usuario(), HashFicticio, contrasena);
-            return null;
+            return new ResultadoDeVerificacion(null);
         }
 
         if (!await _usuarios.CheckPasswordAsync(usuario, contrasena))
         {
-            Exigir(await _usuarios.AccessFailedAsync(usuario), "registrar un intento fallido");
-            return null;
+            return new ResultadoDeVerificacion(null, await RegistrarFalloAsync(usuario) ? usuario.Id : null);
         }
 
         Exigir(await _usuarios.ResetAccessFailedCountAsync(usuario), "reiniciar los intentos fallidos");
-        return await ADatosAsync(usuario);
+        return new ResultadoDeVerificacion(await ADatosAsync(usuario));
     }
 
-    public async Task<bool> VerificarContrasenaActualAsync(Guid idUsuario, string contrasena, CancellationToken cancelacion = default)
+    public async Task<ResultadoDeContrasenaActual> VerificarContrasenaActualAsync(Guid idUsuario, string contrasena, CancellationToken cancelacion = default)
     {
         var usuario = await BloquearUsuarioAsync(idUsuario, cancelacion);
         if (usuario is not { Activo: true } || await _usuarios.IsLockedOutAsync(usuario))
         {
-            return false;
+            return new ResultadoDeContrasenaActual(Correcta: false);
         }
 
         if (!await _usuarios.CheckPasswordAsync(usuario, contrasena))
         {
-            Exigir(await _usuarios.AccessFailedAsync(usuario), "registrar un intento fallido");
-            return false;
+            return new ResultadoDeContrasenaActual(Correcta: false, BloqueoNuevo: await RegistrarFalloAsync(usuario));
         }
 
         Exigir(await _usuarios.ResetAccessFailedCountAsync(usuario), "reiniciar los intentos fallidos");
-        return true;
+        return new ResultadoDeContrasenaActual(Correcta: true);
     }
 
     public async Task<ResultadoCreacionDeUsuario> CrearAsync(
@@ -234,6 +232,14 @@ public class GestorIdentidad : IGestorIdentidad
             throw new InvalidOperationException(
                 $"Identity rechazó la operación «{operacion}» ({string.Join(", ", resultado.Errors.Select(e => e.Code))}).");
         }
+    }
+
+    // Cuenta el fallo y dice si con él empezó el bloqueo. Quien llama ya comprobó que no estaba bloqueada, y al llegar al límite Identity fija el vencimiento
+    // en este mismo paso, así que un bloqueo vigente después del fallo es uno nuevo: de ese modo se informa una sola vez por bloqueo.
+    private async Task<bool> RegistrarFalloAsync(Usuario usuario)
+    {
+        Exigir(await _usuarios.AccessFailedAsync(usuario), "registrar un intento fallido");
+        return await _usuarios.IsLockedOutAsync(usuario);
     }
 
     private async Task<Usuario> ObtenerEntidadAsync(Guid idUsuario) =>

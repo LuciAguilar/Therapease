@@ -121,6 +121,15 @@ public static class ServidorIdentidadRevision
         return await lectura.EventosAuditoria.AsNoTracking().Where(e => e.Accion == accion).ToListAsync();
     }
 
+    /// Condición SQL para contar solo cambios de datos, sobre la tabla con el alias «e».
+    /// Deja fuera entradas, salidas y bloqueos: estas pruebas inician sesión para prepararse y esos eventos no son lo que miden.
+    public const string SoloCambiosSql = """e."Accion" NOT IN ('InicioSesion','CierreSesion','BloqueoAcceso')""";
+
+    /// Lo mismo para consultas de EF: solo los eventos de cambios de datos.
+    public static IQueryable<EventoAuditoria> SoloCambios(this IQueryable<EventoAuditoria> eventos) =>
+        eventos.Where(e => e.Accion != AccionAuditoria.InicioSesion
+            && e.Accion != AccionAuditoria.CierreSesion && e.Accion != AccionAuditoria.BloqueoAcceso);
+
     /// Lee cuántos intentos fallidos tiene el usuario.
     public static async Task<int> IntentosFallidosAsync(Escenario escenario, Guid id)
     {

@@ -15,11 +15,12 @@ public interface IGestorIdentidad
     // Solo para el procedimiento de operador; el acceso usa VerificarCredencialesAsync para no revelar si el usuario existe.
     Task<DatosUsuario?> ObtenerPorNombreAsync(string nombreUsuario, CancellationToken cancelacion = default);
 
-    // Null ante cualquier fallo sin distinguirlo (S-02); cuenta los fallos para el bloqueo y serializa los intentos de un usuario (S-03).
-    Task<DatosUsuario?> VerificarCredencialesAsync(string nombreUsuario, string contrasena, CancellationToken cancelacion = default);
+    // Usuario nulo ante cualquier fallo sin distinguirlo (S-02); cuenta los fallos para el bloqueo y serializa los intentos de un usuario (S-03).
+    // Indica si este intento fue el que inició el bloqueo, para registrarlo una sola vez: con el bloqueo vigente no cuenta ni vuelve a informar.
+    Task<ResultadoDeVerificacion> VerificarCredencialesAsync(string nombreUsuario, string contrasena, CancellationToken cancelacion = default);
 
-    // Un intento fallido también cuenta para el bloqueo. Como la anterior, debe ejecutarse dentro de IUnidadDeTrabajo.
-    Task<bool> VerificarContrasenaActualAsync(Guid idUsuario, string contrasena, CancellationToken cancelacion = default);
+    // Un intento fallido también cuenta para el bloqueo y puede iniciarlo. Como la anterior, debe ejecutarse dentro de IUnidadDeTrabajo.
+    Task<ResultadoDeContrasenaActual> VerificarContrasenaActualAsync(Guid idUsuario, string contrasena, CancellationToken cancelacion = default);
 
     // Nombre completo y correo son opcionales aquí (el comando de arranque crea al primer superusuario sin ellos); CU02 los exige antes de llamar. Llegan ya validados.
     Task<ResultadoCreacionDeUsuario> CrearAsync(

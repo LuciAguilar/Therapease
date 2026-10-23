@@ -63,32 +63,55 @@ internal class GestorIdentidadFalso : IGestorIdentidad
     public Task<DatosUsuario?> ObtenerPorNombreAsync(string nombreUsuario, CancellationToken cancelacion = default) =>
         Task.FromResult(Usuarios.Values.FirstOrDefault(u => string.Equals(u.NombreUsuario, nombreUsuario, StringComparison.OrdinalIgnoreCase)));
 
-    public virtual async Task<DatosUsuario?> VerificarCredencialesAsync(string nombreUsuario, string contrasena, CancellationToken cancelacion = default)
+    // Como el gestor real, simula el límite de Identity: al llegar a él la cuenta queda bloqueada y el contador vuelve a cero. Sin límite, solo cuenta.
+    public int? LimiteDeFallos { get; set; }
+
+    // Un intento a la vez, como el bloqueo de fila de la base (S-03): permite probar intentos simultáneos.
+    private readonly object _candadoDeIntentos = new();
+
+    public virtual Task<ResultadoDeVerificacion> VerificarCredencialesAsync(string nombreUsuario, string contrasena, CancellationToken cancelacion = default)
     {
-        var usuario = await ObtenerPorNombreAsync(nombreUsuario, cancelacion);
-        if (usuario is null || !usuario.Activo || Bloqueados.Contains(usuario.IdUsuario))
+        lock (_candadoDeIntentos)
         {
-            return null;
-        }
+            var usuario = Usuarios.Values.FirstOrDefault(u => string.Equals(u.NombreUsuario, nombreUsuario, StringComparison.OrdinalIgnoreCase));
+            if (usuario is null || !usuario.Activo || Bloqueados.Contains(usuario.IdUsuario))
+            {
+                return Task.FromResult(new ResultadoDeVerificacion(null));
+            }
 
-        if (Contrasenas[usuario.IdUsuario] != contrasena)
-        {
-            IntentosFallidos[usuario.IdUsuario] = IntentosFallidos.GetValueOrDefault(usuario.IdUsuario) + 1;
-            return null;
+            return Task.FromResult(Contrasenas[usuario.IdUsuario] == contrasena
+                ? new ResultadoDeVerificacion(usuario)
+                : new ResultadoDeVerificacion(null, RegistrarFallo(usuario.IdUsuario) ? usuario.IdUsuario : null));
         }
-
-        return usuario;
     }
 
-    public Task<bool> VerificarContrasenaActualAsync(Guid idUsuario, string contrasena, CancellationToken cancelacion = default)
+    public Task<ResultadoDeContrasenaActual> VerificarContrasenaActualAsync(Guid idUsuario, string contrasena, CancellationToken cancelacion = default)
     {
-        if (Contrasenas.GetValueOrDefault(idUsuario) == contrasena)
+        lock (_candadoDeIntentos)
         {
-            return Task.FromResult(true);
+            if (Bloqueados.Contains(idUsuario))
+            {
+                return Task.FromResult(new ResultadoDeContrasenaActual(Correcta: false));
+            }
+
+            return Task.FromResult(Contrasenas.GetValueOrDefault(idUsuario) == contrasena
+                ? new ResultadoDeContrasenaActual(Correcta: true)
+                : new ResultadoDeContrasenaActual(Correcta: false, BloqueoNuevo: RegistrarFallo(idUsuario)));
+        }
+    }
+
+    private bool RegistrarFallo(Guid idUsuario)
+    {
+        var intentos = IntentosFallidos.GetValueOrDefault(idUsuario) + 1;
+        if (LimiteDeFallos is { } limite && intentos >= limite)
+        {
+            Bloqueados.Add(idUsuario);
+            IntentosFallidos[idUsuario] = 0;
+            return true;
         }
 
-        IntentosFallidos[idUsuario] = IntentosFallidos.GetValueOrDefault(idUsuario) + 1;
-        return Task.FromResult(false);
+        IntentosFallidos[idUsuario] = intentos;
+        return false;
     }
 
     public Task<ResultadoCreacionDeUsuario> CrearAsync(
