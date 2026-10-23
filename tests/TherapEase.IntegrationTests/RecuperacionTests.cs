@@ -125,8 +125,8 @@ public class RecuperacionTests(PostgreSqlRevision postgres, ITestOutputHelper sa
             foreach (var sql in new[] { "UPDATE \"EventoAuditoria\" SET \"Hecho\"='No permitido'", "DELETE FROM \"EventoAuditoria\"", "CREATE TABLE public.no_permitida(id int)" })
                 Assert.Equal("42501", (await Assert.ThrowsAsync<PostgresException>(() => PostgreSqlRevision.Sql(nuevo.App, sql))).SqlState);
             var nuevoEvento = Guid.NewGuid();
-            await PostgreSqlRevision.Sql(nuevo.App, $"INSERT INTO \"EventoAuditoria\" SELECT '{nuevoEvento}',\"FechaEvento\",\"IdUsuarioActor\",\"TipoRegistro\",\"IdRegistro\",\"Accion\",\"CamposAfectados\",\"Hecho\" FROM \"EventoAuditoria\" LIMIT 1");
-            Assert.Equal(2L, await PostgreSqlRevision.Valor<long>(nuevo.App, "SELECT count(*) FROM \"EventoAuditoria\""));
+            await PostgreSqlRevision.Sql(nuevo.App, $"INSERT INTO \"EventoAuditoria\" SELECT '{nuevoEvento}',\"FechaEvento\",\"IdUsuarioActor\",\"TipoRegistro\",\"IdRegistro\",\"Accion\",\"CamposAfectados\",\"Hecho\" FROM \"EventoAuditoria\" WHERE \"Accion\"='Alta' LIMIT 1");
+            Assert.Equal(2L, await PostgreSqlRevision.Valor<long>(nuevo.App, $"SELECT count(*) FROM \"EventoAuditoria\" e WHERE {ServidorIdentidadRevision.SoloCambiosSql}"));
             Assert.Equal(3L, await PostgreSqlRevision.Valor<long>(nuevo.Migrador, "SELECT count(*) FROM \"__EFMigrationsHistory\""));
             Assert.Equal("42501", (await Assert.ThrowsAsync<PostgresException>(() => PostgreSqlRevision.Valor<long>(nuevo.App, "SELECT count(*) FROM \"__EFMigrationsHistory\""))).SqlState);
             var version = await destino.Contenedor.ExecAsync(["pg_dump", "--version"]);

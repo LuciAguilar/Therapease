@@ -222,6 +222,30 @@ public class ServicioUsuariosTests
         Assert.Equal(AccionAuditoria.ReinicioContrasena, Assert.Single(_repositorioAuditoria.Eventos).Accion);
     }
 
+    // Cambiar el rol, restablecer y desactivar cierran las sesiones de la cuenta; ese cierre queda en el evento de la operación que lo causa.
+    [Fact]
+    public async Task CierresForzados_QuedanSoloEnElEventoDeLaOperacionQueLosCausa()
+    {
+        var porRol = _gestor.Agregar("usuaria1", NombresDeRol.Usuaria);
+        var porContrasena = _gestor.Agregar("usuaria2", NombresDeRol.Usuaria);
+        var porDesactivacion = _gestor.Agregar("usuaria3", NombresDeRol.Usuaria);
+
+        await _servicio.CambiarRolAsync(porRol.IdUsuario, NombresDeRol.Superusuario);
+        await _servicio.RestablecerContrasenaAsync(porContrasena.IdUsuario);
+        await _servicio.DesactivarUsuarioAsync(porDesactivacion.IdUsuario);
+
+        Assert.Equal(
+            [AccionAuditoria.Actualizacion, AccionAuditoria.ReinicioContrasena, AccionAuditoria.Desactivacion],
+            _repositorioAuditoria.Eventos.Select(e => e.Accion));
+        Assert.Equal(
+            [porRol.IdUsuario, porContrasena.IdUsuario, porDesactivacion.IdUsuario],
+            _repositorioAuditoria.Eventos.Select(e => e.IdRegistro));
+        Assert.DoesNotContain(
+            _repositorioAuditoria.Eventos,
+            e => e.Accion is AccionAuditoria.InicioSesion or AccionAuditoria.CierreSesion or AccionAuditoria.BloqueoAcceso);
+        Assert.Equal(3, _unidad.Confirmaciones);
+    }
+
     [Fact]
     public async Task RestablecerContrasena_DeUnUsuarioInexistenteODesactivado_Rechaza()
     {

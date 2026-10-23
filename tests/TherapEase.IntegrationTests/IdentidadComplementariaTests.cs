@@ -92,7 +92,7 @@ public class IdentidadComplementariaTests(PostgreSqlRevision postgres) : IClassF
 
 
         // Assert: no quedó ninguna escritura
-        Assert.Equal(0L, await PostgreSqlRevision.Valor<long>(escenario.App, "SELECT count(*) FROM \"EventoAuditoria\""));
+        Assert.Equal(0L, await PostgreSqlRevision.Valor<long>(escenario.App, $"SELECT count(*) FROM \"EventoAuditoria\" e WHERE {ServidorIdentidadRevision.SoloCambiosSql}"));
         Assert.Equal(1L, await PostgreSqlRevision.Valor<long>(escenario.App, "SELECT count(*) FROM \"AspNetUsers\""));
     }
 
@@ -182,6 +182,6 @@ public class IdentidadComplementariaTests(PostgreSqlRevision postgres) : IClassF
         var acceso = await solicitud.Obtener<IServicioAcceso>().IniciarSesionAsync("operador-ficticio", segundaClave);
         Assert.True(acceso.Exito);
         Assert.True(acceso.Datos!.DebeCambiarContrasena);
-        Assert.Equal(2L, await PostgreSqlRevision.Valor<long>(escenario.App, "SELECT count(*) FROM \"EventoAuditoria\""));
+        Assert.Equal(2L, await PostgreSqlRevision.Valor<long>(escenario.App, $"SELECT count(*) FROM \"EventoAuditoria\" e WHERE {ServidorIdentidadRevision.SoloCambiosSql}"));
     }
 }

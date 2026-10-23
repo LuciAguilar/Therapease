@@ -16,13 +16,14 @@ public class ServicioContrasenaTests
     private readonly EmisorDeSesionFalso _emisor = new();
     private readonly UnidadDeTrabajoFalsa _unidad = new();
     private readonly RepositorioAuditoriaFalso _repositorioAuditoria = new();
+    private readonly RegistroTecnicoFalso _registro = new();
     private readonly UsuarioActualFalso _actual = new();
     private readonly ServicioContrasena _servicio;
 
     public ServicioContrasenaTests()
     {
         var auditoria = new ServicioAuditoria(_repositorioAuditoria, new AutorizacionFalsa(), new RelojFijo(new DateTimeOffset(2026, 10, 5, 15, 0, 0, TimeSpan.Zero)));
-        _servicio = new ServicioContrasena(_gestor, _emisor, _unidad, auditoria, _actual);
+        _servicio = new ServicioContrasena(_gestor, _emisor, _unidad, auditoria, _registro, _actual);
     }
 
     [Fact]
@@ -138,6 +139,133 @@ public class ServicioContrasenaTests
 
         Assert.Equal(1, _unidad.Reversiones);
         Assert.Empty(_emisor.Refrescadas);
+    }
+
+    // ──── Bloqueo nacido al cambiar la contraseña propia ────
+
+    [Fact]
+    public async Task CambioOrdinario_ElQuintoFalloDeLaActualInicia_ElBloqueoYRegistraUnSoloEvento()
+    {
+        var usuario = _gestor.Agregar("usuaria1", NombresDeRol.Usuaria, ContrasenaActual);
+        _actual.IdUsuario = usuario.IdUsuario;
+        _gestor.LimiteDeFallos = 5;
+
+        for (var i = 1; i <= 4; i++)
+        {
+            await _servicio.CambiarContrasenaPropiaAsync("contrasena-equivocada-999", ContrasenaNueva);
+            Assert.Empty(_repositorioAuditoria.Eventos);
+        }
+
+        var quinto = await _servicio.CambiarContrasenaPropiaAsync("contrasena-equivocada-999", ContrasenaNueva);
+
+        Assert.False(quinto.Exito);
+        Assert.Equal(MensajesDeIdentidad.CambioDeContrasenaNoRealizado, quinto.Mensaje);
+        var evento = Assert.Single(_repositorioAuditoria.Eventos);
+        Assert.Equal(AccionAuditoria.BloqueoAcceso, evento.Accion);
+        Assert.Equal(TipoRegistroAuditoria.Usuario, evento.TipoRegistro);
+        Assert.Equal(usuario.IdUsuario, evento.IdUsuarioActor);
+        Assert.Equal(usuario.IdUsuario, evento.IdRegistro);
+        Assert.Empty(evento.CamposAfectados);
+        Assert.Equal("Se bloqueó el acceso por cinco intentos fallidos.", evento.Hecho);
+        Assert.Empty(_gestor.ContrasenasEstablecidas);
+        Assert.Empty(_emisor.Refrescadas);
+    }
+
+    [Fact]
+    public async Task CambioOrdinario_ConElBloqueoVigente_NoVuelveARegistrarloNiConLaActualCorrecta()
+    {
+        var usuario = _gestor.Agregar("usuaria1", NombresDeRol.Usuaria, ContrasenaActual);
+        _actual.IdUsuario = usuario.IdUsuario;
+        _gestor.LimiteDeFallos = 2;
+        await _servicio.CambiarContrasenaPropiaAsync("contrasena-equivocada-999", ContrasenaNueva);
+        await _servicio.CambiarContrasenaPropiaAsync("contrasena-equivocada-999", ContrasenaNueva);
+
+        var siguientes = new[]
+        {
+            await _servicio.CambiarContrasenaPropiaAsync("contrasena-equivocada-999", ContrasenaNueva),
+            await _servicio.CambiarContrasenaPropiaAsync(ContrasenaActual, ContrasenaNueva)
+        };
+
+        Assert.All(siguientes, r => Assert.Equal(MensajesDeIdentidad.CambioDeContrasenaNoRealizado, r.Mensaje));
+        Assert.Equal(AccionAuditoria.BloqueoAcceso, Assert.Single(_repositorioAuditoria.Eventos).Accion);
+        Assert.Empty(_gestor.ContrasenasEstablecidas);
+    }
+
+    [Fact]
+    public async Task CambioOrdinario_ElBloqueoSeConfirmaAntesDeRegistrarSuEvento()
+    {
+        var usuario = _gestor.Agregar("usuaria1", NombresDeRol.Usuaria, ContrasenaActual);
+        _actual.IdUsuario = usuario.IdUsuario;
+        _gestor.LimiteDeFallos = 1;
+
+        await _servicio.CambiarContrasenaPropiaAsync("contrasena-equivocada-999", ContrasenaNueva);
+
+        // Una transacción para contar el fallo y otra, después, para el evento.
+        Assert.Equal(2, _unidad.Confirmaciones);
+        Assert.Contains(usuario.IdUsuario, _gestor.Bloqueados);
+    }
+
+    [Fact]
+    public async Task CambioOrdinario_SiFallaElEventoDeBloqueo_ElBloqueoSigueYSoloQuedaElAvisoTecnico()
+    {
+        var usuario = _gestor.Agregar("usuaria1", NombresDeRol.Usuaria, ContrasenaActual);
+        _actual.IdUsuario = usuario.IdUsuario;
+        _gestor.LimiteDeFallos = 1;
+        _repositorioAuditoria.ExcepcionAlAgregar = new InvalidOperationException("fallo simulado");
+
+        var respuesta = await _servicio.CambiarContrasenaPropiaAsync("contrasena-equivocada-999", ContrasenaNueva);
+
+        Assert.False(respuesta.Exito);
+        Assert.Equal(MensajesDeIdentidad.CambioDeContrasenaNoRealizado, respuesta.Mensaje);
+        Assert.Contains(usuario.IdUsuario, _gestor.Bloqueados);
+        Assert.Equal(1, _registro.AvisosDeBloqueo);
+        Assert.Equal(0, _registro.AvisosDeSalida);
+        Assert.Empty(_repositorioAuditoria.Eventos);
+    }
+
+    [Fact]
+    public async Task CambioOrdinario_ConIntentosSimultaneosQueSuperanElLimite_RegistraUnSoloBloqueo()
+    {
+        var usuario = _gestor.Agregar("usuaria1", NombresDeRol.Usuaria, ContrasenaActual);
+        _actual.IdUsuario = usuario.IdUsuario;
+        _gestor.LimiteDeFallos = 5;
+
+        await Task.WhenAll(Enumerable.Range(0, 14)
+            .Select(_ => Task.Run(() => _servicio.CambiarContrasenaPropiaAsync("contrasena-equivocada-999", ContrasenaNueva))));
+
+        Assert.Equal(AccionAuditoria.BloqueoAcceso, Assert.Single(_repositorioAuditoria.Eventos).Accion);
+        Assert.Equal(0, _registro.Total);
+    }
+
+    [Fact]
+    public async Task CambioConTemporal_NoCuentaFallosNiRegistraBloqueo()
+    {
+        var usuario = _gestor.Agregar("usuaria1", NombresDeRol.Usuaria, "temporal-asignada-789", debeCambiar: true);
+        _actual.IdUsuario = usuario.IdUsuario;
+        _gestor.LimiteDeFallos = 1;
+
+        await _servicio.CambiarContrasenaPropiaAsync(null, "corta");
+
+        Assert.Empty(_gestor.IntentosFallidos);
+        Assert.Empty(_gestor.Bloqueados);
+        Assert.Empty(_repositorioAuditoria.Eventos);
+    }
+
+    [Fact]
+    public async Task EventoDelBloqueo_NoContieneContrasenasNiElNombreDeUsuario()
+    {
+        var usuario = _gestor.Agregar("usuaria_canario", NombresDeRol.Usuaria, ContrasenaActual);
+        _actual.IdUsuario = usuario.IdUsuario;
+        _gestor.LimiteDeFallos = 1;
+
+        await _servicio.CambiarContrasenaPropiaAsync("contrasena-equivocada-999", ContrasenaNueva);
+
+        var evento = Assert.Single(_repositorioAuditoria.Eventos);
+        var texto = $"{evento.Hecho}|{string.Join(',', evento.CamposAfectados)}";
+        Assert.DoesNotContain(ContrasenaActual, texto);
+        Assert.DoesNotContain(ContrasenaNueva, texto);
+        Assert.DoesNotContain("contrasena-equivocada-999", texto);
+        Assert.DoesNotContain("usuaria_canario", texto);
     }
 
     [Fact]

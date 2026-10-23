@@ -25,6 +25,9 @@ internal sealed class UserManagerFalso : UserManager<Usuario>
 
     public bool ContrasenaCorrecta { get; set; } = true;
 
+    // Simula que el fallo registrado llegó al límite de Identity: la cuenta queda bloqueada en ese mismo paso.
+    public bool BloqueaAlFallar { get; set; }
+
     public static IdentityResult Falla(string codigo = "FalloSimulado") =>
         IdentityResult.Failed(new IdentityError { Code = codigo, Description = "Descripción con datos privados que no debe salir en el mensaje." });
 
@@ -56,7 +59,16 @@ internal sealed class UserManagerFalso : UserManager<Usuario>
 
     public override Task<IdentityResult> AddPasswordAsync(Usuario user, string password) => Registrar(nameof(AddPasswordAsync));
 
-    public override Task<IdentityResult> AccessFailedAsync(Usuario user) => Registrar(nameof(AccessFailedAsync));
+    public override async Task<IdentityResult> AccessFailedAsync(Usuario user)
+    {
+        var resultado = await Registrar(nameof(AccessFailedAsync));
+        if (BloqueaAlFallar && resultado.Succeeded)
+        {
+            Bloqueado = true;
+        }
+
+        return resultado;
+    }
 
     public override Task<IdentityResult> ResetAccessFailedCountAsync(Usuario user) => Registrar(nameof(ResetAccessFailedCountAsync));
 

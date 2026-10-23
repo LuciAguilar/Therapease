@@ -85,7 +85,7 @@ public class AuditoriaServidorTests(PostgreSqlRevision postgres) : IClassFixture
 
         // Assert
         await using var lectura = escenario.Contexto();
-        var evento = Assert.Single(await lectura.EventosAuditoria.AsNoTracking().ToListAsync());
+        var evento = Assert.Single(await lectura.EventosAuditoria.AsNoTracking().SoloCambios().ToListAsync());
         Assert.NotEqual(Guid.Empty, evento.IdEvento);
         Assert.Equal(propia ? objetivo : actor, evento.IdUsuarioActor);
         Assert.Equal(objetivo, evento.IdRegistro);

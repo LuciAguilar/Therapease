@@ -139,7 +139,7 @@ bash scripts/ci/revisar-archivos-sensibles.sh     # .env, credenciales o claves 
 
 El flujo también comprueba que el modelo y las migraciones coinciden (`dotnet ef migrations has-pending-model-changes --project src/Infrastructure --startup-project src/Web`, con una `ConnectionStrings__Migraciones` ficticia: no se conecta a ninguna base) y que la imagen del `Dockerfile` no corre como root y define su comprobación de salud.
 
-La aplicación escucha en `http://localhost:5052` y expone `/salud`, que solo comprueba que el proceso está encendido: puede responder 200 aunque PostgreSQL no esté disponible, así que no demuestra que el acceso a datos funcione. IntegrationTests contiene los bloques de QA de B00 §4.1–§4.8 (PR #4, fusionado); sus resultados están en [B00 §4](docs/planning/TherapEase-etapa09-B00.md#4-evidencia-registrada-y-límites). E2ETests sigue sin pruebas; espera los recorridos con las páginas de Dulce.
+La aplicación escucha en `http://localhost:5052` con el perfil `http` y en `https://localhost:7028` con el perfil `https` (HTTP redirige a HTTPS); para probar formularios y sesiones se usa el `https` (ver «Servidor local para conectar las páginas» más abajo). Expone `/salud`, que solo comprueba que el proceso está encendido: puede responder 200 aunque PostgreSQL no esté disponible, así que no demuestra que el acceso a datos funcione. IntegrationTests contiene los bloques de QA de B00 §4.1–§4.8 (PR #4, fusionado); sus resultados están en [B00 §4](docs/planning/TherapEase-etapa09-B00.md#4-evidencia-registrada-y-límites). E2ETests sigue sin pruebas; espera los recorridos con las páginas de Dulce.
 
 Imagen Docker (requiere Docker Desktop; salud y usuario sin privilegios se declaran en el `Dockerfile`):
 
@@ -160,6 +160,16 @@ $env:ConnectionStrings__TherapEase = "Host=localhost;Port=55432;Database=therape
 ```
 
 Las migraciones las aplica solo `therapease_migrador`; la aplicación se conecta con `therapease_app`, que no puede cambiar el esquema, borrar pacientes o citas, ni modificar `EventoAuditoria`. Una migración nueva se crea con `dotnet ef migrations add <Nombre> --project src/Infrastructure --startup-project src/Web --output-dir Migraciones`; si crea una tabla, debe incluir sus `GRANT` explícitos para `therapease_app`, y se revisa su SQL (`dotnet ef migrations script`) antes del PR.
+
+**Servidor local para conectar las páginas.** Con las dos variables de arriba en la **misma terminal** (la aplicación no carga `.env`; se pierden al cerrarla y conviene retirarlas al terminar con `Remove-Item Env:ConnectionStrings__TherapEase, Env:ConnectionStrings__Migraciones`):
+
+```powershell
+dotnet run --project src/Web -- --crear-superusuario super-ficticio   # una vez; la temporal sale solo por esta consola
+dotnet dev-certs https --trust                                        # una vez por equipo: confiar en el certificado local
+dotnet run --project src/Web --launch-profile https                   # abre el navegador en https://localhost:7028
+```
+
+Cuando exista la página de acceso, se entra por `https://localhost:7028/Acceso` con el usuario ficticio y la temporal; la primera entrada solo permite cambiar la contraseña (CU11). La cookie de sesión es `Secure` y la de antifalsificación es `Secure` y `SameSite=Strict`, así que el formulario real se prueba por HTTPS; en HTTP algunos navegadores no guardan esas cookies. La protección antifalsificación de Razor Pages viene activa y **no se desactiva** (`[IgnoreAntiforgeryToken]` o `asp-antiforgery="false"`) para avanzar: el diseño que la desactivaba para trabajar sin base de datos debe corregirse al conectar la página. El comando de arranque imprime, además de la contraseña temporal (al final), mensajes informativos de Entity Framework con las sentencias SQL y sin valores; no son un error. `/salud` solo comprueba el proceso, no la base. Datos ficticios y base local: no se toca la nube. Comprobado el 22-oct con un contenedor desechable, ver el [plan de pruebas §0.8](docs/testing/TherapEase-09-plan-de-pruebas.md#08-avance-de-miguel-en-b01-eventos-de-acceso-salida-y-bloqueo--22-oct-2026); confiar en el certificado (`--trust`) lo hace cada persona, no se hizo en esa comprobación.
 
 **Restauración en un servidor nuevo.** Primero crea la base vacía y ejecuta `scripts/db/crear-roles.sql` como administrador del destino, con contraseñas locales: `pg_dump` no copia los roles globales de PostgreSQL. Después restaura con `therapease_migrador`, sin aplicar antes migraciones en esa base vacía. Testcontainers prepara ambos roles en cada contenedor nuevo. Esto documenta la recuperación local; no configura age ni respaldos diarios.
 
@@ -206,11 +216,19 @@ Excepción aprobada por Lucía el 08-oct: Web puede usar enumeraciones y contene
 
 Los setters de las entidades son `internal`: solo las clases de `Reglas` del propio dominio las modifican, así ninguna otra capa salta una regla. Los ámbitos de un paciente se exponen como colección de solo lectura. El coordinador de CU04 va en `TherapEase.Application.Coordinadores`, fuera de Pacientes y Citas. Citas puede usar el contrato público de Pacientes; Pacientes no usa Citas; Identidad usa Auditoría y Auditoría no usa Identidad.
 
+## Avance de B01: eventos de acceso, salida y bloqueo — 22-oct-2026
+
+Rama `b00/correcciones-pr4`, usada como rama de trabajo por indicación de Miguel (incluye el PR #5, ya fusionado, y `origin/main` `7a73e0a`, en el commit `231b2a2`). Código probado en el commit `e3f227cb79a1450d9cc8d1b88f4f09cc50680062`; el enlace del PR y el resultado del CI se anotan en su descripción. 422 unitarias y 319 de integración correctas en local, no CI, con `xUnit.MaxParallelThreads=2`; los resultados, los límites y la lista de ajustes a pruebas de Lucía están en el [plan de pruebas §0.8](docs/testing/TherapEase-09-plan-de-pruebas.md#08-avance-de-miguel-en-b01-eventos-de-acceso-salida-y-bloqueo--22-oct-2026).
+
+- **Servidor:** `InicioSesion` se guarda junto con la verificación de la entrada (si falla, no se abre sesión y llega el error general); `CierreSesion` y `BloqueoAcceso` se guardan después de proteger, en otra transacción, y si su evento falla la sesión queda cerrada o la cuenta bloqueada y solo queda un aviso técnico fijo (`IRegistroTecnico`, con el registro de .NET y sin paquetes nuevos). Un evento por bloqueo, también con intentos simultáneos y cuando nace en CU11. Los cierres por desactivar, cambiar el rol o restablecer siguen en el evento de esa operación. No se guardan el nombre escrito, la IP ni el navegador.
+- **Para Dulce:** el [contrato](docs/planning/TherapEase-etapa09-B01-contrato-para-paginas.md) se actualizó (§2.6 y las firmas, que no cambian) y [la propuesta](docs/planning/TherapEase-etapa09-B01-propuesta.md) recoge las cuatro precisiones aprobadas el 18-oct. Las instrucciones de PostgreSQL local se ejecutaron de punta a punta, ver «Servidor local para conectar las páginas» en §10.
+- **Pendiente:** revisión de otra persona, CI y aprobación de Lucía; páginas y navegador siguen con Dulce y Lucía.
+
 ## Avance de B01 en la rama de Miguel — 17-oct-2026
 
 Rama `b01/acceso-y-usuarios`, código probado `c3f2b63de2fce7e5f265119ba292f6c2017d93c5`: 386 unitarias y 240 de integración correctas (esta última en la segunda ejecución, con 35 pruebas de Lucía que después se retiraron de este PR; la primera tuvo 10 fallos por tiempo de espera agotado, atribuidos a la carga de la máquina). Ejecución local, no CI; [PR #7](https://github.com/LuciAguilar/Therapease/pull/7). Comandos, entorno y huellas en el [plan de pruebas §0.7](docs/testing/TherapEase-09-plan-de-pruebas.md#07-avance-de-miguel-en-b01--17-oct-2026).
 
-- **Servidor:** permisos escritos uno por uno, lista y ficha de usuarios, nombre completo y correo con su migración, edición por el Superusuario y consulta de datos propios. Faltan los eventos de acceso, salida y bloqueo: aprobados el 17-oct, esperan que se anote su excepción en AGENTS §2.3.
+- **Servidor:** permisos escritos uno por uno, lista y ficha de usuarios, nombre completo y correo con su migración, edición por el Superusuario y consulta de datos propios. Los eventos de acceso, salida y bloqueo, aprobados el 17-oct, se programaron el 22-oct (ver arriba).
 - **Para Dulce:** [contrato de las funciones para las páginas](docs/planning/TherapEase-etapa09-B01-contrato-para-paginas.md).
 - **CI:** `.github/workflows/comprobaciones.yml` y `scripts/ci/`. Comprobado en local y en GitHub (PR #7): la ejecución 2, del 18-oct, terminó correcta en sus cuatro trabajos; la 1 tuvo 7 fallos de integración que ya se corrigieron. Va en el mismo PR que lo anterior; los eventos de acceso irán en otro. Cómo ejecutar sus comprobaciones en local, en §10.
 - **Decisiones:** [propuesta de Miguel](docs/planning/TherapEase-etapa09-B01-propuesta.md), con las decisiones de Lucía del 17-oct y el estado de cada punto.

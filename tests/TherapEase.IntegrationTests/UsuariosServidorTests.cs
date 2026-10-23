@@ -88,7 +88,7 @@ public class UsuariosServidorTests(PostgreSqlRevision postgres) : IClassFixture<
         Assert.True(await ContrasenaFuncionaAsync(proveedor, datos.Usuario.IdUsuario, datos.ContrasenaTemporal));
         Assert.Equal(rol, Assert.Single(await usuarios.GetRolesAsync(guardado)));
         Assert.Equal(1L, await PostgreSqlRevision.Valor<long>(escenario.App,
-            """SELECT count(*) FROM "EventoAuditoria" e"""));
+            $"""SELECT count(*) FROM "EventoAuditoria" e WHERE {ServidorIdentidadRevision.SoloCambiosSql}"""));
     }
 
     /// Un nombre ya usado no se puede repetir, aunque ese usuario esté desactivado
