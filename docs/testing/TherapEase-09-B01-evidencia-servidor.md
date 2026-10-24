@@ -1,10 +1,10 @@
 # TherapEase — B01 · Pruebas del servidor
 
-**Repetición final: 19-oct-2026. Entrega 1 aprobada por Lucía; revisión humana y CI del PR conjunto pendientes.**
+**Estado al 20-oct-2026:** entrega aprobada por Lucía, revisada por Miguel y fusionada en PR #8 (`7a73e0a`); CI correcta. Las pruebas finales siguen fechadas el 19-oct; no se ejecutaron de nuevo por actualizar el informe.
 
 Se comprueban los servicios existentes de usuarios, acceso y contraseñas con PostgreSQL desechable, sin páginas. La ejecución final reúne **44 casos propios y 42 existentes: 86 correctos, 0 fallidos y 0 omitidos**. Se usaron los nombres finales y se conservaron intactos los comentarios corregidos por Claude, incluido `// Act + Assert` en el bloque que ejecuta cambios y comprueba sus respuestas.
 
-✅ significa comprobación local ejecutada para el alcance indicado; Lucía aprobó esta entrega y autorizó su commit local el 18-oct. No equivale a CI, revisión humana ni cierre de B01. Sin push ni PR por esta autorización.
+✅ significa comprobación local ejecutada para el alcance indicado; Lucía aprobó esta entrega y autorizó su commit local el 18-oct. La revisión humana y CI de PR #8 están completas; no equivale al cierre de B01.
 
 ## 1. Versión y entorno
 
@@ -60,11 +60,17 @@ La ejecución registrada usó `--no-restore` porque las dependencias ya estaban 
 
 | Estado | Pendiente | Responsable / dependencia |
 | --- | --- | --- |
-| ✅ / ⏳ | Aprobar la entrega y revisar sus pruebas. | ✅ Lucía aprobó Entrega 1 con 86 correctas y su commit local. ⏳ Miguel revisará las pruebas en el PR conjunto; publicar necesita autorización aparte. |
-| ✅ / ⏳ | Comprobaciones automáticas en GitHub. | ✅ CI de Miguel revisada en PR #7. ⏳ Ejecutar el QA de Lucía en su futuro PR, tras auditoría y autorización. |
-| ✅ / ⏳ | Adaptación al PR #7 fusionado. | ✅ Rama actualizada y 86 pruebas correctas. ✅ Correcciones de auditoría resueltas y aprobación de Lucía. ⏳ Revisión humana del QA. |
-| ⏳ | Ampliaciones propias de permisos, sesiones y contraseñas que no cubra lo existente. | Siguientes entregas de QA según el checklist de Lucía; no se dan por completas por esta entrega de servidor. |
+| ✅ | Aprobar la entrega y revisar sus pruebas. | ✅ Lucía aprobó Entrega 1 con 86 correctas y su commit local. ✅ Miguel aprobó `95c9425`; Lucía fusionó PR #8 el 20-oct. |
+| ✅ | Comprobaciones automáticas en GitHub. | ✅ CI de Miguel revisada en PR #7. ✅ Los cuatro trabajos de CI de PR #8 terminaron correctamente. |
+| ✅ | Adaptación al PR #7 fusionado. | ✅ Rama actualizada y 86 pruebas correctas. ✅ Correcciones de auditoría resueltas y aprobación de Lucía. ✅ Revisión humana de Miguel completada en PR #8. |
+| ✅ / ⏳ | QA de permisos, sesiones y contraseñas. | ✅ Cuatro entregas revisadas e incorporadas en PR #8. ⏳ Páginas/navegador y nuevos eventos no quedan cubiertos por estas pruebas. |
 | ⏳ | Formularios, antifalsificación, temporales en respuestas web y recorrido de Q03 autenticado en navegador. | Páginas y PageModel de Dulce; pruebas posteriores de Lucía. |
 | ⏳ | CSS con sesión y tiempos de espera del primer arranque observados en PR #6. | Seguimiento conservado; estas pruebas no vuelven a comprobar esos casos HTTP. |
 
 Esta muestra de concurrencia cubre los escenarios indicados; no demuestra cualquier volumen o combinación posible. No hay pruebas de navegador, carga Q12, revisión nueva de paquetes ni despliegue. Temporal de 24 horas sigue exigida antes de datos reales, sin implementarse aquí. **B01 y B00/LCA/R04 continúan abiertos.**
+
+## 6. Revisión de Miguel y observaciones — 20-oct-2026
+
+✅ [PR #8](https://github.com/LuciAguilar/Therapease/pull/8) revisado y aprobado por Miguel (`GalloNav`) sobre `95c9425`, y fusionado por Lucía el 20-oct-2026, 17:29 de Hermosillo, mediante **Create a merge commit**, en `7a73e0a2282155273cd7d29dd9fea1c7e30635fd`. Los cinco commits se conservan. [CI del PR](https://github.com/LuciAguilar/Therapease/actions/runs/39512430706): cuatro trabajos correctos.
+
+⏳ Mejora no bloqueante: `Migracion_Revierte_Y_Reaplica_Sin_Perder_Usuario` usa `20261003202126_IdentidadYAcceso` como destino. Revisar la referencia si cambia la migración; código sin cambios.

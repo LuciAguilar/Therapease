@@ -1,6 +1,6 @@
 # TherapEase — B01 · Pruebas de permisos
 
-**18-oct-2026 · Entrega 2 APROBADA con ajuste menor por Lucía; commit local autorizado, sin push.**
+**Estado al 20-oct-2026:** entrega aprobada por Lucía, revisada por Miguel y fusionada en PR #8 (`7a73e0a`); CI correcta. Las pruebas finales siguen fechadas el 19-oct; no se ejecutaron de nuevo por actualizar el informe.
 
 Se comprueba quién puede leer o modificar usuarios con servicios reales y PostgreSQL desechable. Son **34 casos nuevos**; se repitieron 16 de integración y 44 unitarias existentes. Solo datos ficticios, sin páginas nuevas ni cambios de producción.
 
@@ -45,8 +45,10 @@ La ejecución registrada usó además `--no-restore` y una ubicación separada p
 ## 4. Qué falta
 
 - ✅ Auditoría y aprobación de Lucía recibidas. Se ajustaron tres encabezados de 95 a 94 caracteres; solo comentarios. Las 50 de integración y 44 unitarias se repitieron el 19-oct junto con las otras entregas. Commit local autorizado.
-- Revisión humana de Miguel en el PR conjunto y CI de ese futuro PR.
+- ✅ Miguel aprobó `95c9425`; [PR #8](https://github.com/LuciAguilar/Therapease/pull/8) fusionado y [CI](https://github.com/LuciAguilar/Therapease/actions/runs/39512430706) correcta.
 - Formularios, todas las rutas, campos adicionales, navegación y navegador: esperan PageModel/páginas de Dulce. No se completan S-11/S-12 por estas pruebas de servicios.
-- Las cuatro entregas tienen aprobación local; su revisión humana y las pruebas de páginas/navegador siguen pendientes. B01/B00/LCA/R04 siguen abiertos; sin datos reales, nube ni gastos.
+- Las cuatro entregas tienen aprobación de Lucía, revisión humana de Miguel y CI correcta. Las pruebas de páginas/navegador siguen pendientes. B01/B00/LCA/R04 siguen abiertos; sin datos reales, nube ni gastos.
 
-La regla de publicación se decide aparte. Estas pruebas no autorizan push ni force-with-lease.
+La publicación autorizada ya se realizó en PR #8. Su excepción de push forzado está consumida; no autoriza otro push.
+
+✅ Publicación y revisión: [PR #8](https://github.com/LuciAguilar/Therapease/pull/8), fusión `7a73e0a`; [CI correcta](https://github.com/LuciAguilar/Therapease/actions/runs/39512430706).

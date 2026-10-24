@@ -1,14 +1,30 @@
 # TherapEase — Plan de pruebas por caso de uso
 
-**QA de las cuatro entregas aprobado por Lucía y repetido el 19-oct-2026:** Servidor 86; Permisos 50 de integración y 44 unitarias; Sesiones 24; Contraseñas 62 de integración y 16 unitarias. Sin fallidas ni omitidas. Son los mismos casos; las ejecuciones se solapan y no se suman como pruebas distintas. Contraseñas incluye 28 casos nuevos. Evidencia final y filtros en el manifest de la repetición y los cuatro informes. Commit local autorizado, sin push; revisión humana de Miguel, CI y páginas/navegador pendientes. No cierra B01/B00/LCA/R04. Los párrafos fechados siguientes conservan la historia de cada entrega.
+**Estado al 24-oct-2026:** ✅ Lucía aprueba el código del PR #9 (`cb7da59`) tras la auditoría de Claude. ⏳ Miguel completa título/CI, referencias a decisiones y estados de documentos; falta fusión. Registro técnico confirmado el 21-oct en AGENTS §2.3. Publicación de esta documentación autorizada; páginas y navegador pendientes.
 
+| Estado | Ejecución y autor | Resultado |
+| --- | --- | --- |
+| ✅ | Codex, revisión local del 24-oct sobre PR #9 | 422 unitarias y 319 de integración, sin fallidas ni omitidas. Diez casos propios adicionales correctos, ejecutados aparte. |
+| ✅ | Claude, según el veredicto recibido | Compilación sin advertencias ni errores; 422 unitarias y 329 de integración, incluidos los diez casos propios. Cinco repeticiones de eventos y concurrencia, 15/15 cada una. Cambios incorrectos intencionales hicieron fallar las pruebas esperadas; código restaurado. |
+| ✅ | CI del PR #9 | [39905673597](https://github.com/LuciAguilar/Therapease/actions/runs/39905673597): cuatro trabajos correctos. |
+| ⏳ | Diez casos propios de Lucía | Auditados; se incorporan después de fusionar PR #9, con revisión humana de Miguel o Dulce. |
 
-**Sesiones aprobado por Lucía el 19-oct-2026:** 24 correctas en la ejecución del 18-oct, 8 nuevas y 16 repetidas; dos comentarios aclarados. Commit local autorizado sin push. Evidencia y límites en `TherapEase-09-B01-evidencia-sesiones.md`; revisión humana y navegador pendientes. Contraseñas conserva su entrega.
+Los resultados completos quedan locales: los TRX contienen rutas y datos del equipo. La cifra histórica de 16 unitarias de contraseñas del 19-oct se conserva; la selección tendrá 23 al incorporar PR #9. No se presenta esa ampliación como una nueva ejecución de la entrega original.
 
+**Estado actual, 20-oct-2026.** ✅ [PR #8](https://github.com/LuciAguilar/Therapease/pull/8) revisado y aprobado por Miguel (`GalloNav`) sobre `95c9425`, y fusionado por Lucía el 20-oct-2026, 17:29 de Hermosillo, mediante **Create a merge commit**, en `7a73e0a2282155273cd7d29dd9fea1c7e30635fd`. Los cinco commits se conservan. [CI del PR](https://github.com/LuciAguilar/Therapease/actions/runs/39512430706): cuatro trabajos correctos.
 
-**Entrega 2 —Permisos— aprobada con ajuste menor por Lucía, 18-oct:** 50 de integración (34 nuevas y 16 existentes) y 44 unitarias existentes correctas, sin fallidas/omitidas. Solo se acortaron encabezados a 94 caracteres; no se repitieron las pruebas por este cambio de comentario. Commit local autorizado, sin push; revisión humana en el PR conjunto pendiente. No completa las páginas ni todas las rutas de S-11/S-12. Evidencia y alcance en el informe de Permisos.
+| Estado | QA de Lucía incorporado | Resultado local final del 19-oct |
+| --- | --- | --- |
+| ✅ | Servidor | 86 de integración correctas. |
+| ✅ | Permisos | 50 de integración y 44 unitarias existentes correctas. |
+| ✅ | Sesiones | 24 de integración correctas. |
+| ✅ | Contraseñas | 62 de integración y 16 unitarias existentes correctas. |
 
-**Entrega 1 de QA —Servidor— aprobada por Lucía el 18-oct-2026:** 86 correctas, 0 fallidas y 0 omitidas, Release, base `922a4e3` con QA local. Correcciones de auditoría resueltas; incluye el caso de cambiar solo correo con auditoría únicamente `Correo`. Evidencia `servidor-correo.trx` y `manifest-final.json`; detalle en el informe de Servidor. Commit local autorizado, sin push. Revisión humana de Miguel en el futuro PR conjunto y QA de Contraseñas pendiente. No cierra B01/B00/LCA/R04.
+Sin fallidas ni omitidas en esas ejecuciones. Los grupos de integración se solapan: 166 casos distintos seleccionados, 114 nuevos en PR #8. No sumar los grupos como si fueran pruebas distintas. Las fechas, filtros y límites siguen en los cuatro informes; no hay una ejecución local nueva por editar este plan.
+
+⏳ Observación no bloqueante: la prueba de reversión/reaplicación usa el nombre fijo `20261003202126_IdentidadYAcceso`; revisar esa referencia si cambia la migración. Código intacto. ⏳ Siguen pendientes los eventos de acceso/salida/bloqueo, las páginas y PageModel de Dulce, y las pruebas de navegador. La temporal de 24 horas se exige antes de datos reales. B01/B00/LCA/R04 siguen abiertos; solo datos ficticios, sin nube ni gastos.
+
+Los registros fechados siguientes conservan sus resultados y límites históricos.
 
 **Actualización aprobada, 18-oct-2026:** ✅ Propuesta de Miguel aprobada el 17-oct; PR #7 revisado, aprobado por Lucía y fusionado en `922a4e32705c50fa7b559bd95ad19f86800bcba2`. CI revisada sobre `a2047ec`, ejecución 39152597181: cuatro trabajos correctos, 386 unitarias y 205 de integración; las 30 de arquitectura ya están en esas 205. Estos son resultados de la revisión del PR, no una ejecución nueva por editar el plan. ⏳ QA propio de Lucía y páginas/navegador conservan sus revisiones y pruebas pendientes. El seguimiento por persona está en B01 §2.
 
@@ -82,6 +98,8 @@ Evidencia detallada: [Identity](TherapEase-09-B00-evidencia-identidad.md), [recu
 El seguimiento 0.1 conserva las ejecuciones del 08–10-oct como historia. Los fallos de arquitectura/Q03 allí citados ya no son el resultado vigente. No se marcan completas las pruebas de páginas u operaciones aún inexistentes.
 
 ## 0.7. Avance de Miguel en B01 — 17-oct-2026
+
+Registro de esa entrega y sus resultados históricos. El estado actual de QA, revisión y fusión está al principio de este plan; los pendientes de decisión de entonces no sustituyen las decisiones posteriores de AGENTS.
 
 Rama `b01/acceso-y-usuarios`: parte de `main` `ffb2494`, incluye los documentos del equipo. Las pruebas de servidor B01 de Lucía se retiraron de este PR por decisión suya (18-oct): ella las adaptará y las entregará en un PR propio; no se cuentan como evidencia aprobada. ✅ identifica ejecución local con evidencia para el alcance indicado; no equivale a revisión humana, aprobación ni CI. Las casillas de §1, §3 y §4 conservan su estado hasta cerrar esas revisiones. No se crearon identificadores nuevos: Lucía asigna los de los casos que siguen.
 
@@ -481,7 +499,7 @@ Referencia: OWASP Top 10:2025, ASVS 5.0 aplicable y 07B. «Todas las rutas» = l
 | Resuelto el 11-oct: baja provisional de pacientes para Usuaria y Superusuario; otros permisos no se amplían | CU04, Q01; pruebas de autorización del permiso nuevo | Lucía aprobó; Miguel implementa y prueba en PR #5. Dulce valida la política operativa con la usuaria. |
 | Resuelto el 12-oct: temporales, orden 7 puntos 1–4; A para B00 ficticio, B de 24 h antes de datos reales | CU02, CU11, Q08/Q19 | Lucía aprobó; entrega/interfaz y prueba final pendientes; B no se implementa ahora |
 | Resuelto el 12-oct: Q03 por navegador autenticado, orden 8 opción A; script B no incluido | L-Q03-03–04, S-22–S-24 | Lucía aprobó; acceso/cierre de sesión de Dulce y prueba final pendientes |
-| Resuelto el 17-oct: lista y ficha de usuarios, nombre completo y correo, permisos explícitos y eventos de acceso, salida y bloqueo ([propuesta](../planning/TherapEase-etapa09-B01-propuesta.md)) | CU02, CU11, L-CU02-07, S-12, S-24 | Lucía aprobó; Miguel implementó todo salvo los eventos (§0.7). Lucía añade las pruebas de base de datos y asigna identificadores; Dulce usa el [contrato](../planning/TherapEase-etapa09-B01-contrato-para-paginas.md). |
+| Resuelto el 17-oct: lista y ficha de usuarios, nombre completo y correo, permisos explícitos y eventos de acceso, salida y bloqueo ([propuesta](../planning/TherapEase-etapa09-B01-propuesta.md)) | CU02, CU11, L-CU02-07, S-12, S-24 | Lucía aprobó; Miguel implementó todo salvo los eventos (§0.7). Lucía incorporó sus pruebas de base de datos en PR #8, revisadas por Miguel; Dulce usa el [contrato](../planning/TherapEase-etapa09-B01-contrato-para-paginas.md). |
 
 ## Ajuste de cobertura por entrevista del 14-oct-2026
 
