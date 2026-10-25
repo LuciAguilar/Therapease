@@ -242,7 +242,7 @@ Integración: xUnit + Testcontainers, con el esquema creado por **las migracione
 | A-03 | ✅ | Insertar por SQL directo dos citas activas solapadas → **la base** las rechaza (no solo el código). | Q06, 05C |
 | A-04 | ✅ | La imagen Docker arranca, responde la comprobación de salud y corre sin privilegios. | 05E |
 | A-05 | ✅ | Respaldo cifrado, huella SHA-256 correcta y restauración en PostgreSQL desechable con los mismos datos. | Q10, 05E |
-| A-06 | ⏳ | Lucía registra la decisión de visibilidad del repositorio antes de crearlo y mide minutos de CI por PR, indicando visibilidad, tipo de runner y duración por trabajo. El flujo preparado por Miguel deja en el resumen de cada trabajo el runner, la visibilidad, la duración, el commit y el enlace (§0.7); dos mediciones en GitHub, el 17 y el 18-oct, en §0.7 (2 min 55 s y 2 min 51 s en total, `ubuntu-24.04`, repositorio público). | R01, 07C, ajuste B00 del 01-oct |
+| A-06 | ✅ | Visibilidad pública confirmada; nueve ejecuciones de PR y tres push a main, con corte del 25-oct-2026 a las 09:12 de Hermosillo. Runner estándar `ubuntu-24.04`; ventanas y duración por trabajo registradas: 2.852 s (47 min 32 s; 47,53 min), 48 trabajos registrados, 47 ejecutados y uno omitido; 0 minutos facturables aplicables. [Registro CI aprobado v2](TherapEase-09-B01-registro-CI.md), auditado por Claude y publicación autorizada por Lucía el 25-oct. No acredita pruebas omitidas ni cierre de B01/B00/LCA/R04. | R01, 07C, ajuste B00 del 01-oct |
 | A-07 | ✅ | Con PostgreSQL/Testcontainers y el usuario real de la aplicación: `INSERT` en `EventoAuditoria` permitido; `UPDATE`, `DELETE` y cambio de esquema denegados. | Q03, 07B; S-22–S-23 |
 
 ### CU01 — Acceder y cerrar sesión (B01) ★
