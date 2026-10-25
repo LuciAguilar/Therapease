@@ -14,11 +14,11 @@ Este documento cumple dos entregas que pide el [plan B01](TherapEase-etapa09-B01
 | ✅ | Administrar usuarios | `IServicioUsuarios` | Crear, cambiar rol, desactivar y restablecer. Exige el permiso `AdministrarUsuarios`. Cambio y evento se guardan juntos. El último Superusuario está protegido por el servicio y por la base (disparador `TE002`). | Elegir un usuario de una lista y ver su ficha (§3.1). Nombre y correo (§3.3). Páginas. |
 | ✅ | Cambiar la contraseña propia | `IServicioContrasena` | Ordinario: exige la actual y un fallo cuenta para el bloqueo. Con temporal: pide solo la nueva. Cierra las demás sesiones y renueva la actual. | Formulario (Dulce). |
 | ✅ | Primer Superusuario | `IServicioArranqueDeIdentidad` y comandos `--crear-superusuario` / `--restablecer-superusuario` | La temporal sale solo por la consola. | Nada para B01. |
-| ✅ | Permisos | `IAutorizacion`, `MatrizDePermisos` | Tres permisos: `AdministrarUsuarios`, `ConsultarAuditoria`, `DarDeBajaPacientes`. Se comprueban en cada solicitud contra la base. | Dejar de conceder permisos automáticamente al Superusuario (§3.4). |
+| ✅ | Permisos | `IAutorizacion`, `MatrizDePermisos` | Tres permisos: `AdministrarUsuarios`, `ConsultarAuditoria`, `DarDeBajaPacientes`. Se comprueban en cada solicitud contra la base. | Nada: los permisos explícitos por rol, con su prueba de completitud (§3.4), se entregaron en el PR #7. |
 | ✅ | Sesión y cookie | `ConfiguracionDeSeguridad` | 30 minutos con renovación; `HttpOnly`, `Secure`, `SameSite=Lax`; sello revisado en cada solicitud; claves en PostgreSQL. | Nada. |
 | ✅ / ⏳ | Auditoría y consulta Q03 | `IServicioAuditoria`, `/api/auditoria/eventos` | Registra cada cambio de usuario y contraseña, sin valores. | Hechos de acceso, salida y bloqueo (§3.2): programados el 22-oct y código aprobado por Lucía el 24-oct, ver §7. |
 | ✅ | Cabeceras y error 500 fijo | `CabecerasDeSeguridad`, `ManejadorDeErroresInesperados` | Incorporados en el PR #5. | Probar con las páginas. |
-| Correcto en GitHub | Comprobaciones automáticas (CI) | `.github/workflows` | En `main` no existe ningún flujo; la carpeta solo tiene `.gitkeep`. La rama de Miguel ya trae uno (§6). | Se ejecutó dos veces en el PR #7 y la segunda terminó correcta (§6). |
+| ✅ | Comprobaciones automáticas (CI) | `.github/workflows/comprobaciones.yml` y `scripts/ci/` | `main` ya tiene el flujo, desde el PR #7 (`922a4e3`): cuatro trabajos que compilan, ejecutan las pruebas y revisan paquetes, fijaciones, secretos, migraciones e imagen. | Nada para B01; Lucía mide los minutos (A-06). Se ejecutó dos veces en el PR #7 y la segunda terminó correcta (§6). |
 
 ### 1.2. Pruebas disponibles
 
@@ -30,18 +30,18 @@ Este documento cumple dos entregas que pide el [plan B01](TherapEase-etapa09-B01
 
 Sin esos 35, esta rama lista los 205 casos de integración de `main`. Después de cada cambio se guardan nueva fecha, versión y resultados; no se copian conteos anteriores.
 
-### 1.3. Lo que falta completar, en orden
+### 1.3. Lo que faltaba completar, en orden, y cómo va
 
-| # | Qué falta | Dónde se decide o se explica |
+| # | Qué faltaba | Dónde se decide o se explica, y cómo va |
 | --- | --- | --- |
-| 1 | Consulta para elegir un usuario y ver su ficha (CU02) | §3.1 |
-| 2 | Eventos de acceso, salida y bloqueo | §3.2 |
-| 3 | Nombre completo y correo | §3.3 |
-| 4 | Permisos del Superusuario escritos uno por uno | §3.4 |
+| 1 | Consulta para elegir un usuario y ver su ficha (CU02) | §3.1. ✅ Entregada en el PR #7. |
+| 2 | Eventos de acceso, salida y bloqueo | §3.2. ✅ Código aprobado por Lucía el 24-oct en el PR #9; ⏳ fusión. |
+| 3 | Nombre completo y correo | §3.3. ✅ Entregados en el PR #7. |
+| 4 | Permisos del Superusuario escritos uno por uno | §3.4. ✅ Entregados en el PR #7. |
 | 5 | **Protección de intentos con nombres desconocidos.** No está en §3.2, pero [CU01 A1](../requirements/TherapEase-etapa08-casos-historias.md) la deja a Miguel. Hoy un nombre desconocido no tiene contador: solo se iguala el tiempo de respuesta. | §4. **Decisión de Lucía:** fuera de B01; pendiente antes de datos reales. |
-| 6 | Comprobaciones automáticas (CI) | Empieza sin esperar decisiones. |
-| 7 | Contrato de cada función para Dulce | Documento aparte, después de §3. |
-| 8 | Cinco comentarios del código dicen «pendiente de decisión» aunque ya está decidido (contraseña de 12 caracteres, sesión de 30 minutos, restablecer sin levantar bloqueo, comandos de operador). No cambian el comportamiento. | Se corrigen en un cambio pequeño. |
+| 6 | Comprobaciones automáticas (CI) | Empezó sin esperar decisiones. ✅ Entregadas en el PR #7; `main` ya tiene el flujo. |
+| 7 | Contrato de cada función para Dulce | Documento aparte, después de §3. ✅ Entregado en el PR #7 y actualizado en el PR #9. |
+| 8 | Cinco comentarios del código decían «pendiente de decisión» aunque ya estaba decidido (contraseña de 12 caracteres, sesión de 30 minutos, restablecer sin levantar bloqueo, comandos de operador). No cambian el comportamiento. | ✅ Corregidos en el PR #7. |
 
 ## 2. Cómo leer la propuesta
 
