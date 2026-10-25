@@ -195,9 +195,10 @@ public class GestorIdentidadTests
     [Fact]
     public async Task VerificarCredencialesAsync_ConContrasenaCorrecta_DevuelveElUsuarioYReiniciaLosIntentos()
     {
-        var datos = await _gestor.VerificarCredencialesAsync("operador-ficticio", "contrasena-correcta");
+        var resultado = await _gestor.VerificarCredencialesAsync("operador-ficticio", "contrasena-correcta");
 
-        Assert.Equal(new DatosUsuario(_usuario.Id, "operador-ficticio", "Usuaria", true, false), datos);
+        Assert.Equal(new DatosUsuario(_usuario.Id, "operador-ficticio", "Usuaria", true, false), resultado.Usuario);
+        Assert.Null(resultado.IdUsuarioBloqueado);
         Assert.Equal(["ResetAccessFailedCountAsync"], _usuarios.Llamadas);
     }
 
@@ -206,9 +207,50 @@ public class GestorIdentidadTests
     {
         _usuarios.ContrasenaCorrecta = false;
 
-        var datos = await _gestor.VerificarCredencialesAsync("operador-ficticio", "contrasena-incorrecta");
+        var resultado = await _gestor.VerificarCredencialesAsync("operador-ficticio", "contrasena-incorrecta");
 
-        Assert.Null(datos);
+        Assert.Null(resultado.Usuario);
+        Assert.Equal(["AccessFailedAsync"], _usuarios.Llamadas);
+    }
+
+    [Fact]
+    public async Task VerificarCredencialesAsync_ConUnFalloQueNoLlegaAlLimite_NoInformaDeBloqueo()
+    {
+        _usuarios.ContrasenaCorrecta = false;
+
+        var resultado = await _gestor.VerificarCredencialesAsync("operador-ficticio", "contrasena-incorrecta");
+
+        Assert.Null(resultado.IdUsuarioBloqueado);
+    }
+
+    [Fact]
+    public async Task VerificarCredencialesAsync_ConElFalloQueIniciaElBloqueo_InformaDeLaCuentaBloqueada()
+    {
+        _usuarios.ContrasenaCorrecta = false;
+        _usuarios.BloqueaAlFallar = true;
+
+        var resultado = await _gestor.VerificarCredencialesAsync("operador-ficticio", "contrasena-incorrecta");
+
+        Assert.Null(resultado.Usuario);
+        Assert.Equal(_usuario.Id, resultado.IdUsuarioBloqueado);
+        Assert.Equal(["AccessFailedAsync"], _usuarios.Llamadas);
+    }
+
+    [Fact]
+    public async Task VerificarCredencialesAsync_DespuesDelFalloQueBloquea_LosIntentosSiguientesNoVuelvenAInformar()
+    {
+        _usuarios.ContrasenaCorrecta = false;
+        _usuarios.BloqueaAlFallar = true;
+        var primero = await _gestor.VerificarCredencialesAsync("operador-ficticio", "contrasena-incorrecta");
+
+        var segundo = await _gestor.VerificarCredencialesAsync("operador-ficticio", "contrasena-incorrecta");
+        _usuarios.ContrasenaCorrecta = true;
+        var tercero = await _gestor.VerificarCredencialesAsync("operador-ficticio", "contrasena-correcta");
+
+        Assert.NotNull(primero.IdUsuarioBloqueado);
+        Assert.Null(segundo.IdUsuarioBloqueado);
+        Assert.Null(tercero.IdUsuarioBloqueado);
+        Assert.Null(tercero.Usuario);
         Assert.Equal(["AccessFailedAsync"], _usuarios.Llamadas);
     }
 
@@ -240,20 +282,22 @@ public class GestorIdentidadTests
     {
         _gestor.UsuarioBloqueado = null;
 
-        var datos = await _gestor.VerificarCredencialesAsync("nadie", "cualquiera");
+        var resultado = await _gestor.VerificarCredencialesAsync("nadie", "cualquiera");
 
-        Assert.Null(datos);
+        Assert.Null(resultado.Usuario);
+        Assert.Null(resultado.IdUsuarioBloqueado);
         Assert.Empty(_usuarios.Llamadas);
     }
 
     [Fact]
-    public async Task VerificarCredencialesAsync_ConBloqueoVigente_NoEvaluaLaContrasena()
+    public async Task VerificarCredencialesAsync_ConBloqueoVigente_NoEvaluaLaContrasenaNiInformaDeBloqueo()
     {
         _usuarios.Bloqueado = true;
 
-        var datos = await _gestor.VerificarCredencialesAsync("operador-ficticio", "contrasena-correcta");
+        var resultado = await _gestor.VerificarCredencialesAsync("operador-ficticio", "contrasena-correcta");
 
-        Assert.Null(datos);
+        Assert.Null(resultado.Usuario);
+        Assert.Null(resultado.IdUsuarioBloqueado);
         Assert.Empty(_usuarios.Llamadas);
     }
 
@@ -262,9 +306,10 @@ public class GestorIdentidadTests
     {
         _usuario.Activo = false;
 
-        var datos = await _gestor.VerificarCredencialesAsync("operador-ficticio", "contrasena-correcta");
+        var resultado = await _gestor.VerificarCredencialesAsync("operador-ficticio", "contrasena-correcta");
 
-        Assert.Null(datos);
+        Assert.Null(resultado.Usuario);
+        Assert.Null(resultado.IdUsuarioBloqueado);
         Assert.Empty(_usuarios.Llamadas);
     }
 
@@ -273,7 +318,10 @@ public class GestorIdentidadTests
     [Fact]
     public async Task VerificarContrasenaActualAsync_ConContrasenaCorrecta_DevuelveVerdadero()
     {
-        Assert.True(await _gestor.VerificarContrasenaActualAsync(_usuario.Id, "contrasena-correcta"));
+        var resultado = await _gestor.VerificarContrasenaActualAsync(_usuario.Id, "contrasena-correcta");
+
+        Assert.True(resultado.Correcta);
+        Assert.False(resultado.BloqueoNuevo);
         Assert.Equal(["ResetAccessFailedCountAsync"], _usuarios.Llamadas);
     }
 
@@ -282,8 +330,35 @@ public class GestorIdentidadTests
     {
         _usuarios.ContrasenaCorrecta = false;
 
-        Assert.False(await _gestor.VerificarContrasenaActualAsync(_usuario.Id, "incorrecta"));
+        var resultado = await _gestor.VerificarContrasenaActualAsync(_usuario.Id, "incorrecta");
+
+        Assert.False(resultado.Correcta);
+        Assert.False(resultado.BloqueoNuevo);
         Assert.Equal(["AccessFailedAsync"], _usuarios.Llamadas);
+    }
+
+    [Fact]
+    public async Task VerificarContrasenaActualAsync_ConElFalloQueIniciaElBloqueo_InformaDeBloqueoNuevo()
+    {
+        _usuarios.ContrasenaCorrecta = false;
+        _usuarios.BloqueaAlFallar = true;
+
+        var resultado = await _gestor.VerificarContrasenaActualAsync(_usuario.Id, "incorrecta");
+
+        Assert.False(resultado.Correcta);
+        Assert.True(resultado.BloqueoNuevo);
+    }
+
+    [Fact]
+    public async Task VerificarContrasenaActualAsync_ConBloqueoVigente_NoEvaluaNiInformaDeBloqueoNuevo()
+    {
+        _usuarios.Bloqueado = true;
+
+        var resultado = await _gestor.VerificarContrasenaActualAsync(_usuario.Id, "contrasena-correcta");
+
+        Assert.False(resultado.Correcta);
+        Assert.False(resultado.BloqueoNuevo);
+        Assert.Empty(_usuarios.Llamadas);
     }
 
     [Fact]

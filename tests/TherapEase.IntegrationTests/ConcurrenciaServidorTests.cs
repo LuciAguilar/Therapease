@@ -72,7 +72,7 @@ public class ConcurrenciaServidorTests(PostgreSqlRevision postgres) : IClassFixt
             WHERE u."Activo" AND r."Name"='Superusuario'
             """));
         Assert.Equal(1L, await PostgreSqlRevision.Valor<long>(escenario.App,
-            """SELECT count(*) FROM "EventoAuditoria" e"""));
+            $"""SELECT count(*) FROM "EventoAuditoria" e WHERE {ServidorIdentidadRevision.SoloCambiosSql}"""));
         var rechazado = resultados[0] ? primero : segundo;
         var guardado = await UsuarioGuardadoAsync(escenario, rechazado);
         Assert.True(anteriores[rechazado] == guardado, "El usuario rechazado no quedó como antes.");
@@ -81,7 +81,7 @@ public class ConcurrenciaServidorTests(PostgreSqlRevision postgres) : IClassFixt
             WHERE ur."UserId"='{rechazado}'
             """));
         await using var lectura = escenario.Contexto();
-        var evento = await lectura.EventosAuditoria.AsNoTracking().SingleAsync();
+        var evento = await lectura.EventosAuditoria.AsNoTracking().SoloCambios().SingleAsync();
         Assert.Equal(resultados[0] ? primero : segundo, evento.IdUsuarioActor);
         Assert.Equal(resultados[0] ? segundo : primero, evento.IdRegistro);
     }

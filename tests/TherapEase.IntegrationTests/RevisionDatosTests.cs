@@ -281,7 +281,7 @@ public class RevisionDatosTests : IClassFixture<PostgreSqlRevision>
             using var proveedor=e.Servicios(); using var scope=proveedor.CreateScope();
             var c=scope.ServiceProvider.GetRequiredService<ContextoDeDatos>();
             await using var t=await c.Database.BeginTransactionAsync();
-            Assert.Null(await scope.ServiceProvider.GetRequiredService<IGestorIdentidad>().VerificarCredencialesAsync("usuario-ficticio","Incorrecta-Ficticia"));
+            Assert.Null((await scope.ServiceProvider.GetRequiredService<IGestorIdentidad>().VerificarCredencialesAsync("usuario-ficticio","Incorrecta-Ficticia")).Usuario);
             await t.CommitAsync();
         }
 
@@ -293,7 +293,7 @@ public class RevisionDatosTests : IClassFixture<PostgreSqlRevision>
 
         using var p=e.Servicios(); using var s=p.CreateScope(); var contexto=s.ServiceProvider.GetRequiredService<ContextoDeDatos>();
         await using var tx=await contexto.Database.BeginTransactionAsync();
-        Assert.Null(await s.ServiceProvider.GetRequiredService<IGestorIdentidad>().VerificarCredencialesAsync("usuario-ficticio","Ficticio-Password-Revision"));
+        Assert.Null((await s.ServiceProvider.GetRequiredService<IGestorIdentidad>().VerificarCredencialesAsync("usuario-ficticio","Ficticio-Password-Revision")).Usuario);
         await tx.CommitAsync();
 
         // Assert: la cuenta quedó bloqueada
