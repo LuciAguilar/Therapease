@@ -67,8 +67,8 @@ Miguel se encarga del **servidor**: código que comprueba usuarios, contraseñas
 | ✅ | Permisos explícitos | Tres permisos enumerados por rol, prueba que exige decidir cada permiso nuevo y denegación de valores desconocidos. PR #7. |
 | ✅ | Entregar funciones a Dulce | [Contrato para páginas](TherapEase-etapa09-B01-contrato-para-paginas.md): parámetros, respuestas y errores. PageModel siguen con Dulce. |
 | ✅ | Unitarias y comprobaciones de GitHub | Unitarias propias y cuatro trabajos de CI revisados en PR #7. Nuevos cambios siguen llevando sus unitarias. |
-| Programado; falta revisión y CI | Eventos de acceso, salida y bloqueo | Programados el 22-oct en la rama de trabajo, commit `e3f227c`: `InicioSesion` junto con la verificación, `CierreSesion` y `BloqueoAcceso` en otra transacción tras proteger, y `IRegistroTecnico`. 36 unitarias nuevas. Cierre forzado queda en el evento de la operación que lo causa. Resultados y ajustes a pruebas de Lucía en el [plan de pruebas §0.8](../testing/TherapEase-09-plan-de-pruebas.md#08-avance-de-miguel-en-b01-eventos-de-acceso-salida-y-bloqueo--22-oct-2026). |
-| Hecho en el mismo PR | Alinear sus documentos | Propuesta y contrato reflejan el 22-oct las cuatro precisiones del 18-oct y las decisiones de los eventos. |
+| ✅ / ⏳ | Eventos de acceso, salida y bloqueo | ✅ Código ejecutado el 22-oct (commit `e3f227c`; 36 unitarias nuevas; CI de GitHub correcto) y aprobado por Lucía el 24-oct tras la auditoría de Claude: `InicioSesion` junto con la verificación, `CierreSesion` y `BloqueoAcceso` en otra transacción tras proteger, y `IRegistroTecnico`. Cierre forzado queda en el evento de la operación que lo causa. ⏳ Fusión del [PR #9](https://github.com/LuciAguilar/Therapease/pull/9), con squash aprobado por Lucía. Resultados y ajustes a pruebas de Lucía en el [plan de pruebas §0.8](../testing/TherapEase-09-plan-de-pruebas.md#08-avance-de-miguel-en-b01-eventos-de-acceso-salida-y-bloqueo--22-oct-2026). |
+| ✅ / ⏳ | Alinear sus documentos | ✅ Propuesta y contrato reflejan las cuatro precisiones del 18-oct y las decisiones de los eventos. ⏳ Ajustes de la revisión del 24-oct aplicados el 25-oct; falta su revisión. |
 | ⏳ | Integrar las páginas y corregir fallos propios | Mantener acceso, salida, bloqueo, usuarios y contraseñas conforme a las reglas; apoyar a Dulce cuando conecte sus páginas. Reutilizar B00. |
 | ⏳ | Revisar el QA de Lucía | Revisar su PR de servidor, permisos, sesiones y contraseñas cuando esté listo. Lucía conserva la aprobación final. |
 
@@ -116,11 +116,11 @@ Lucía aprobó la propuesta de Miguel el 17-oct. El PR #7 entregó lista/ficha, 
 | Estado | Asunto | Decisión y siguiente paso |
 | --- | --- | --- |
 | ✅ | Elegir usuario en CU02 | Lista de hasta 100, búsqueda por nombre de usuario o completo, incluye inactivos; correo solo en ficha individual para Superusuario autorizado. |
-| ✅ / ⏳ | Acceso, salida y bloqueo | Alcance aprobado el 17-oct y programado el 22-oct, pendiente de revisión y CI. `InicioSesion`, `CierreSesion`, `BloqueoAcceso`; sin IP ni nombre escrito. Cierre forzado en el evento que lo causa. Registro técnico `IRegistroTecnico` aprobado y programado. |
+| ✅ / ⏳ | Acceso, salida y bloqueo | ✅ Alcance aprobado el 17-oct, programado el 22-oct y código aprobado por Lucía el 24-oct; CI correcto. `InicioSesion`, `CierreSesion`, `BloqueoAcceso`; sin IP ni nombre escrito. Cierre forzado en el evento que lo causa. Registro técnico `IRegistroTecnico` aprobado el 21-oct. ⏳ Fusión del PR #9 y pruebas con las páginas. |
 | ✅ | Nombre completo y correo | Nombre obligatorio al crear desde CU02, de 2 a 150 caracteres; correo opcional. Solo Superusuario edita; cada persona consulta los suyos. Editar no cierra sesiones. Sin recuperación por correo. |
 | ✅ | Permisos del Superusuario | `AdministrarUsuarios`, `ConsultarAuditoria` y `DarDeBajaPacientes`, escritos uno por uno; ningún permiso nuevo por esta entrega. |
 
-**Cuatro precisiones confirmadas el 18-oct, AGENTS §3:** ficha con correo solo para Superusuario activo, con sesión válida y sin temporal; dominio sin puntos iniciales, finales o repetidos; evento solo con nombres de campos cambiados y ninguno si no hubo cambios; datos propios con temporal únicamente como apoyo a CU11. Miguel las reflejó en sus documentos el 22-oct, en el PR de eventos.
+**Cuatro precisiones confirmadas el 18-oct, AGENTS §3:** ficha con correo solo para Superusuario activo, con sesión válida y sin temporal; dominio sin puntos iniciales, finales o repetidos; evento solo con nombres de campos cambiados y ninguno si no hubo cambios; datos propios con temporal únicamente como apoyo a CU11. Miguel las reflejó en sus documentos en el PR #9 (22-oct) y aplicó los ajustes de la revisión del 24-oct el 25-oct.
 
 
 Dulce concreta campos, mensajes y destino después de entrar o cambiar contraseña, con Miguel y Lucía. B01 debe poder probarse sin esperar pacientes o agenda. Montos, «solo particular» y cancelación automática al dar de baja pacientes siguen fuera de B01 y sin autorizar.
@@ -146,7 +146,7 @@ Los nombres de código ayudan a Miguel y Dulce a localizar funciones existentes.
 
 | Función | Código existente | Qué falta conectar o completar |
 | --- | --- | --- |
-| Entrar y salir | `IServicioAcceso`: `IniciarSesionAsync`, `CerrarSesionAsync`. | Dulce lo llama desde sus páginas, según el [contrato](TherapEase-etapa09-B01-contrato-para-paginas.md). Los eventos `InicioSesion`, `CierreSesion` y `BloqueoAcceso` los guardan estas mismas funciones, sin cambiar sus firmas (excepción en AGENTS §2.3); programados el 22-oct, pendientes de revisión y CI. |
+| Entrar y salir | `IServicioAcceso`: `IniciarSesionAsync`, `CerrarSesionAsync`. | Dulce lo llama desde sus páginas, según el [contrato](TherapEase-etapa09-B01-contrato-para-paginas.md). Los eventos `InicioSesion`, `CierreSesion` y `BloqueoAcceso` los guardan estas mismas funciones, sin cambiar sus firmas (excepción en AGENTS §2.3); programados el 22-oct y con el código aprobado por Lucía el 24-oct; falta fusionar el PR #9 y conectarlos con las páginas. |
 | Crear, cambiar rol, desactivar y restablecer | `IServicioUsuarios`. | Acciones reutilizadas. ✅ Lista, ficha, nombre/correo y edición de datos aprobados el 17-oct y programados (`ListarUsuariosAsync`, `ObtenerUsuarioAsync`, `ActualizarDatosDeCuentaAsync`; datos propios en `IServicioCuentaPropia`). Entregar la temporal de forma segura (§8). |
 | Cambiar contraseña propia | `IServicioContrasena.CambiarContrasenaPropiaAsync`. | Conectar formulario y comprobar temporal y sesiones anteriores. |
 | Preparar identidad y comprobar permisos | `IServicioArranqueDeIdentidad`, `IGestorIdentidad`, `IAutorizacion`, `ContrasenaTemporalEntregada`. | Reutilizar código de apoyo a través de Application. No mostrar ni registrar datos internos o contraseñas fuera de la respuesta autorizada. |
@@ -221,7 +221,7 @@ B01 no desarrolla pacientes, citas, pagos, bajas ni directorio. Desactivar una c
 | ✅ Entregado en PR #7 | Miguel | Inventario, propuesta aprobada, usuarios, nombre/correo, permisos explícitos, funciones documentadas y CI. | Lo pendiente se sigue en §2; no rehacer lo entregado. |
 | Ahora: preparación | Dulce | Concretar pantallas, campos, mensajes y navegación; coordinar uso del servidor y README. | No declarar diseño como login funcional. Datos nuevos requieren detalle aprobado. |
 | Ahora: QA propio | Lucía | Propuesta y CI revisadas. Adaptar y probar servidor; continuar permisos, sesiones y contraseñas según su checklist. | Auditoría y aprobación antes de cada commit. |
-| ✅ Programado el 22-oct, falta revisión y CI | Miguel | Eventos de acceso, salida y bloqueo con sus unitarias y documentos alineados con las cuatro precisiones. | Revisión de otra persona y aprobación de Lucía. Un mecanismo o evento nuevo requiere su decisión. |
+| ✅ / ⏳ | Miguel | ✅ Eventos de acceso, salida y bloqueo con sus unitarias, código aprobado por Lucía el 24-oct y CI correcto. ⏳ Ajustes documentales de la revisión y fusión del PR #9. | Aprobación de Lucía de los ajustes documentales. Un mecanismo o evento nuevo requiere su decisión. |
 | Servidor disponible, sin páginas | Lucía | Probar cuentas, permisos, bloqueo, contraseñas, sesiones, cambios simultáneos y guardado con base. | Servidor solo no demuestra formulario protegido. |
 | Funciones acordadas | Dulce | PageModel y unitarias; conectar acceso, salida, usuarios y cambio propio; formularios, mensajes y navegación. | No necesita esperar pacientes o agenda para terminar B01. |
 | Código que recibe formularios disponible | Lucía | Enviar solicitudes reales; comprobar permisos, datos, protección y respuestas perdidas. | No requiere automatizar navegador todavía, pero sí acciones de página de Dulce. |
@@ -273,7 +273,7 @@ Fecha/zona horaria, SHA completo y cambios locales, entorno, comando, pruebas co
 | Consultar Q03 | Superusuario activo, sin temporal, entra en navegador y abre consulta en esa ventana. URL `/api/auditoria/eventos`; `desde`/`hasta` son fechas/horas con zona, `tipoRegistro` admite solo nombres completos y `limite` va de 1 a 500. |
 | Quitar permiso o salir con Q03 abierto | La siguiente consulta se deniega. Probar Usuaria, temporal, sesión vencida, desactivación y rol retirado. Sin pantalla ni script que evite iniciar sesión. |
 
-Temporales y opción A de Q03 fueron aprobados el 12-oct. Falta completar su uso en páginas y probarlo. Los nuevos eventos de acceso, salida y bloqueo quedaron aprobados el 17-oct (el cierre forzado se queda dentro del evento que lo causa); la excepción está anotada en AGENTS §2.3. Se programaron el 22-oct, con el registro técnico `IRegistroTecnico`; falta su revisión, el CI y probarlos con las páginas.
+Temporales y opción A de Q03 fueron aprobados el 12-oct. Falta completar su uso en páginas y probarlo. Los nuevos eventos de acceso, salida y bloqueo quedaron aprobados el 17-oct (el cierre forzado se queda dentro del evento que lo causa); la excepción está anotada en AGENTS §2.3. Se programaron el 22-oct, con el registro técnico `IRegistroTecnico` aprobado el 21-oct; Lucía aprobó el código el 24-oct y el CI de GitHub terminó correcto. Falta fusionar el PR #9 y probarlos con las páginas.
 
 ## 9. Cuándo se cierra B01 y qué queda fuera
 
