@@ -17,6 +17,7 @@ public class ServicioContrasena : IServicioContrasena
     private readonly IEmisorDeSesion _emisor;
     private readonly IUnidadDeTrabajo _unidad;
     private readonly IServicioAuditoria _auditoria;
+    private readonly IRegistroTecnico _registroTecnico;
     private readonly IUsuarioActual _usuarioActual;
 
     public ServicioContrasena(
@@ -24,12 +25,14 @@ public class ServicioContrasena : IServicioContrasena
         IEmisorDeSesion emisor,
         IUnidadDeTrabajo unidad,
         IServicioAuditoria auditoria,
+        IRegistroTecnico registroTecnico,
         IUsuarioActual usuarioActual)
     {
         _gestor = gestor;
         _emisor = emisor;
         _unidad = unidad;
         _auditoria = auditoria;
+        _registroTecnico = registroTecnico;
         _usuarioActual = usuarioActual;
     }
 
@@ -50,14 +53,20 @@ public class ServicioContrasena : IServicioContrasena
         // En el cambio ordinario se exige la actual; un intento fallido cuenta para el bloqueo (CU11 A1).
         if (!usuario.DebeCambiarContrasena)
         {
-            var actualCorrecta = false;
+            var actual = new ResultadoDeContrasenaActual(Correcta: false);
             if (!string.IsNullOrEmpty(contrasenaActual))
             {
                 await _unidad.EjecutarAsync(
-                    async ct => actualCorrecta = await _gestor.VerificarContrasenaActualAsync(idUsuario, contrasenaActual, ct), cancelacion);
+                    async ct => actual = await _gestor.VerificarContrasenaActualAsync(idUsuario, contrasenaActual, ct), cancelacion);
             }
 
-            if (!actualCorrecta)
+            // Si este intento inició el bloqueo, queda su evento, también aquí (AGENTS §2.3); no cambia la respuesta de la persona.
+            if (actual.BloqueoNuevo)
+            {
+                await EventosDeAcceso.RegistrarBloqueoAsync(_unidad, _auditoria, _registroTecnico, idUsuario, cancelacion);
+            }
+
+            if (!actual.Correcta)
             {
                 return RespuestaServicio<DatosUsuario>.Fallida(MensajesDeIdentidad.CambioDeContrasenaNoRealizado);
             }

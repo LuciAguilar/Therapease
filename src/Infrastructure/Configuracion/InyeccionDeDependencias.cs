@@ -12,6 +12,7 @@ using TherapEase.Application.Pacientes.Interfaces.Repositorios;
 using TherapEase.Infrastructure.Auditoria.Repositorios;
 using TherapEase.Infrastructure.Citas.Repositorios;
 using TherapEase.Infrastructure.Compartido.Repositorios;
+using TherapEase.Infrastructure.Compartido.Servicios;
 using TherapEase.Infrastructure.Data;
 using TherapEase.Infrastructure.Identidad.Entidades;
 using TherapEase.Infrastructure.Identidad.Repositorios;
@@ -70,6 +71,7 @@ public static class InyeccionDeDependencias
         servicios.AddScoped<IGestorIdentidad, GestorIdentidad>();
         servicios.AddScoped<IEmisorDeSesion, EmisorDeSesion>();
         servicios.AddScoped<IUsuarioActual, UsuarioActualHttp>();
+        servicios.AddSingleton<IRegistroTecnico, RegistroTecnico>();
         return servicios;
     }
 }

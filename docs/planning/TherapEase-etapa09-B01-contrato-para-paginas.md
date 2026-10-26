@@ -1,8 +1,8 @@
 # TherapEase — B01 · Contrato de las funciones del servidor para las páginas
 
-**Borrador del 17-oct-2026.** Autor: Miguel. Para: Dulce. Revisa: Lucía. Rama `b01/acceso-y-usuarios`, código de referencia en el commit `d18cf29` ([PR #7](https://github.com/LuciAguilar/Therapease/pull/7); llegará a `main` con ese PR).
+**Actualizado el 25-oct-2026** (versión inicial del 17-oct). Autor: Miguel. Para: Dulce. Revisa: Lucía. El código de las funciones de CU02, nombre y correo está en `main` desde el [PR #7](https://github.com/LuciAguilar/Therapease/pull/7) (squash `922a4e3`). Los eventos de entrada, salida y bloqueo (§2.6) están en el [PR #9](https://github.com/LuciAguilar/Therapease/pull/9): su código, revisado en `cb7da59`, fue aprobado por Lucía el 24-oct y su CI terminó correcto; llegan a `main` cuando se fusione ese PR.
 
-Este documento cumple la entrega «explicar qué recibe y devuelve cada función, sus errores y la entrega de temporales» del [plan B01](TherapEase-etapa09-B01.md) (§2). Dice **cómo llamar a cada función desde un PageModel**, qué responde y qué debe hacer la página con cada resultado. Las páginas, los formularios, los mensajes en pantalla y la navegación son de Dulce; aquí solo se fija lo que el servidor garantiza y lo que la página no debe romper. **No contiene páginas ni código de interfaz.** ✅ indica algo que ya está en el código y con pruebas; ⏳ indica algo pendiente de decisión de Lucía.
+Este documento cumple la entrega «explicar qué recibe y devuelve cada función, sus errores y la entrega de temporales» del [plan B01](TherapEase-etapa09-B01.md) (§2). Dice **cómo llamar a cada función desde un PageModel**, qué responde y qué debe hacer la página con cada resultado. Las páginas, los formularios, los mensajes en pantalla y la navegación son de Dulce; aquí solo se fija lo que el servidor garantiza y lo que la página no debe romper. **No contiene páginas ni código de interfaz.** ✅ indica algo que ya está en el código y con pruebas; ⏳ indica algo pendiente de decisión de Lucía. Las cuatro precisiones de Miguel del 17-oct quedaron aprobadas por Lucía el 18-oct (§7), y los eventos de acceso se programaron según lo aprobado el 17-oct y el 21-oct.
 
 ## 1. Reglas para todas las páginas
 
@@ -30,6 +30,7 @@ Este documento cumple la entrega «explicar qué recibe y devuelve cada función
 Un fallo inesperado (base de datos, Identity, registro de auditoría) **no vuelve como `Exito = false`**: sube como excepción y, fuera del entorno de desarrollo, el servidor responde la página de error fija: «Ocurrió un error. Si estabas guardando algo, revisa si se guardó antes de repetirlo.» (En desarrollo se ve la página de excepciones del propio .NET; no es lo que verá la usuaria.)
 
 - No capturar excepciones para mostrar su texto ni para reintentar.
+- **Dos excepciones a esa regla, solo para eventos de auditoría** (AGENTS §2.3): si no se puede guardar el evento de **salida** o el de **bloqueo**, la protección ya quedó aplicada (sesión cerrada, cuenta bloqueada) y la llamada **no** lanza excepción; el servidor deja un aviso técnico fijo (§2.6). Si no se puede guardar el de **entrada**, la excepción sí sube y no se abre la sesión (§2.1).
 - **Nunca reintentar automáticamente** una operación que cambia datos (crear, cambiar rol, desactivar, restablecer, cambiar contraseña). Si se pierde la respuesta, la persona comprueba qué quedó guardado antes de repetir (§3 y plan B01 §8).
 
 ### 1.4. Autorización por página (políticas existentes)
@@ -66,13 +67,14 @@ Las páginas privadas reciben `Cache-Control: no-store` automáticamente. **La p
 | | |
 | --- | --- |
 | **Campos del formulario** | `Entrada.NombreUsuario` y `Entrada.Contrasena` (los del diseño; no cambiarlos). |
-| **Qué hace el servidor** | Quita los espacios exteriores del nombre, verifica la cuenta, cuenta los fallos y, **solo si todo es correcto y ya se guardó**, abre la sesión (la cookie la emite el servidor dentro de esta llamada). |
+| **Qué hace el servidor** | Quita los espacios exteriores del nombre, verifica la cuenta, cuenta los fallos y, **solo si todo es correcto y ya se guardó**, abre la sesión (la cookie la emite el servidor dentro de esta llamada). Una entrada correcta guarda su evento `InicioSesion` **en la misma transacción** que la verificación (§2.6). |
 | **Si hay éxito** | `Datos.DebeCambiarContrasena = true` → llevar a la página de CU11 (con temporal pendiente no se puede entrar a nada más). Si es `false` → destino normal. |
 | **Si falla** | `Mensaje = MensajesDeIdentidad.CredencialesInvalidas` («Usuario o contraseña incorrectos.»). Es **el mismo texto** para nombre desconocido, contraseña incorrecta, cuenta desactivada, cuenta bloqueada y campos vacíos. |
+| **Si no se puede guardar el evento de entrada** | **No se abre la sesión** y la llamada **lanza una excepción**: la persona ve el error 500 fijo de §1.3, **no** «Usuario o contraseña incorrectos». Presentarlo como contraseña incorrecta ocultaría una falla de la base y haría creer que escribió mal la clave. La página no captura esa excepción. |
 
 La página:
 
-- **No distingue** esos casos ni muestra que la cuenta está bloqueada, cuántos intentos quedan ni si el nombre existe. Cinco fallos seguidos bloquean 15 minutos; mientras dure, ni la contraseña correcta entra, y el mensaje es el mismo.
+- **No distingue** esos casos ni muestra que la cuenta está bloqueada, cuántos intentos quedan ni si el nombre existe. Cinco fallos seguidos bloquean 15 minutos; mientras dure, ni la contraseña correcta entra, y el mensaje es el mismo. **El quinto fallo, el que inicia el bloqueo, responde igual que los anteriores**: su evento `BloqueoAcceso` (§2.6) se guarda aparte y no cambia lo que ve la persona.
 - Puede volver a mostrar el nombre escrito, nunca la contraseña.
 - **`returnUrl`:** cuando el servidor redirige a `/Acceso` agrega `ReturnUrl`. Solo se acepta si es una dirección local (`Url.IsLocalUrl`); si no, se usa el destino por defecto. Nunca redirigir a un sitio externo.
 - Si la persona ya tiene sesión y abre `/Acceso`, es decisión de Dulce a dónde llevarla.
@@ -83,6 +85,7 @@ La página:
 
 - Se llama desde un **POST** (la página de salir lleva la política de §1.4, para que también pueda salir quien tiene la temporal pendiente). Quita la cookie y renueva el sello de seguridad: **todas las sesiones de esa cuenta** (también las de otros navegadores) dejan de valer en su siguiente solicitud.
 - Es idempotente: sin sesión, o repetida, no falla.
+- **Primero cierra y después registra.** El sello se renueva y la cookie se retira antes de guardar el evento `CierreSesion`, que va en otra transacción (§2.6). **Si el evento no se puede guardar, la sesión queda cerrada igual**, la llamada termina sin error y el servidor deja un aviso técnico fijo, sin datos privados. Una falla de auditoría no puede impedir salir ni dejar la sesión abierta. Sin sesión o con la sesión ya vencida no hay cuenta a la que atribuir el evento: solo se retira la cookie.
 - Después, redirigir a `/Acceso`. Con «atrás» no debe verse nada privado (las páginas privadas llevan `no-store`).
 
 ### 2.3. Cambiar la contraseña propia — CU11
@@ -94,7 +97,7 @@ La página:
 | **Ordinaria** (`DebeCambiarContrasena = false`) | Contraseña actual, nueva y confirmación de la nueva. | `contrasenaActual` y `contrasenaNueva`. |
 | **Con temporal pendiente** | **Solo** la nueva y su confirmación (no se vuelve a pedir la temporal). | `contrasenaActual = null` y `contrasenaNueva`. |
 
-- Cómo saber en qué situación está: ✅ la reclamación `Reclamaciones.DebeCambiarContrasena` de la sesión (`"true"` = pendiente; si falta, también se trata como pendiente), o ⏳ la consulta de datos propios (§2.4). El servidor **decide con el estado real de la cuenta**, no con lo que mande la página: si la cuenta no tiene temporal pendiente y la actual falta o es incorrecta, no cambia nada.
+- Cómo saber en qué situación está: ✅ la reclamación `Reclamaciones.DebeCambiarContrasena` de la sesión (`"true"` = pendiente; si falta, también se trata como pendiente), o ✅ la consulta de datos propios (§2.4). El servidor **decide con el estado real de la cuenta**, no con lo que mande la página: si la cuenta no tiene temporal pendiente y la actual falta o es incorrecta, no cambia nada.
 - **La confirmación de la nueva la valida la página**; el servidor no la recibe.
 - Regla de la nueva contraseña: **mínimo 12 caracteres, sin exigir mayúsculas, números ni símbolos**. El servidor no fija un máximo.
 - Solo cambia la contraseña **de la sesión actual**. No hay forma de pasar un identificador.
@@ -102,18 +105,17 @@ La página:
 | Resultado | `Mensaje` | Qué hace la página |
 | --- | --- | --- |
 | ✅ Éxito | «Contraseña actualizada.» (`Datos.DebeCambiarContrasena = false`) | Llevar al destino normal. El servidor **ya reemitió la cookie de esta sesión**; las demás sesiones de la cuenta dejaron de valer. |
-| Actual vacía o incorrecta, cuenta inactiva, sin sesión | `CambioDeContrasenaNoRealizado` | Mostrar el mensaje sin decir qué campo falló. **Cada actual incorrecta cuenta para el bloqueo** (el mismo contador del acceso: cinco fallos, 15 minutos). |
+| Actual vacía o incorrecta, cuenta inactiva, sin sesión | `CambioDeContrasenaNoRealizado` | Mostrar el mensaje sin decir qué campo falló. **Cada actual incorrecta cuenta para el bloqueo** (el mismo contador del acceso: cinco fallos, 15 minutos). **El quinto fallo inicia el bloqueo y deja su evento `BloqueoAcceso`** (§2.6); la respuesta es la misma de siempre y la sesión abierta no se cierra. |
 | Nueva de menos de 12 caracteres | `ContrasenaNuevaNoCumpleReglas` | Mostrarlo junto al campo de la nueva. Nada se cambió; la contraseña anterior sigue valiendo. |
 
-### 2.4. Datos propios — ⏳
+### 2.4. Datos propios
 
 `IServicioCuentaPropia.ObtenerMisDatosAsync()` → `RespuestaServicio<FichaDeUsuario>`
 
 - **No recibe identificador:** toma la cuenta de la sesión. Sirve para mostrar el nombre completo y el correo de quien está dentro, y para saber si tiene una temporal pendiente.
-- Funciona **también con la contraseña temporal pendiente** (la página de CU11 puede mostrar el nombre).
-- Cada persona ve **solo** sus datos y **no los cambia** desde aquí; los cambia el Superusuario (§2.9).
+- Funciona **también con la contraseña temporal pendiente**, **solo como apoyo al cambio de contraseña (CU11)**: la página de CU11 puede mostrar el nombre. Decisión de Lucía, 18-oct (precisión 4). **No habilita otras páginas, funciones operativas ni datos ajenos:** con temporal pendiente sigue sin poder usarse nada más.
+- Cada persona ve **solo** sus datos y **no los cambia** desde aquí; los cambia el Superusuario (§2.5.4).
 - Falla con `SinPermiso` si no hay sesión o la cuenta está desactivada: llevar a `/Acceso`.
-- ⏳ Lucía debe confirmar que se permita con temporal pendiente (la regla dice «con temporal solo se accede a CU11»).
 
 ### 2.5. Administrar usuarios — CU02
 
@@ -139,6 +141,7 @@ La página:
 `ObtenerUsuarioAsync(Guid idUsuario)` → `RespuestaServicio<FichaDeUsuario>`
 
 - Devuelve los datos de la cuenta **y su correo**. No devuelve contraseña, hash, sello ni contadores.
+- **El correo solo lo ve el Superusuario activo, con sesión válida, autorizado y sin temporal pendiente** (decisión de Lucía, 18-oct, precisión 1). Cualquier otra sesión recibe `SinPermiso` y ningún dato. Cada persona consulta su propio correo con §2.4.
 - Errores: `SinPermiso`; `UsuarioNoEncontrado` («No se encontró el usuario.»).
 - El identificador (`Guid`) sale de la fila de la lista; la página lo lleva en una ruta o campo oculto, y **el servidor lo vuelve a comprobar** con la autorización.
 
@@ -153,7 +156,7 @@ La página:
 | `nombreUsuario` | Se recortan los espacios; hasta `LimitesDeIdentidad.LongitudMaximaNombreUsuario` (50) caracteres. Solo letras, dígitos y `-` `.` `_` `@` `+` (regla de Identity). No distingue mayúsculas para detectar duplicados. |
 | `rol` | Uno de `NombresDeRol.Usuaria` o `NombresDeRol.Superusuario`. No se crean roles nuevos. |
 | `nombreCompleto` | Obligatorio, 2 a 150 caracteres (`LimitesDeCuenta`), recortado. Sin caracteres de control ni de formato (saltos de línea, tabuladores, inversión de sentido, espacio de ancho cero). |
-| `correo` | Opcional (`null` o vacío = sin correo). Hasta 254 caracteres; se guarda en minúsculas. Una sola `@`, texto antes y después, al menos un punto en el dominio, sin punto al inicio, al final ni repetido del dominio, sin espacios. **No se exige que sea único** y **no sirve para entrar, recuperar contraseñas ni recibir mensajes.** |
+| `correo` | Opcional (`null` o vacío = sin correo). Hasta 254 caracteres; se guarda en minúsculas. Una sola `@`, texto antes y después, al menos un punto en el dominio, **sin punto al inicio, al final ni repetido en el dominio** (decisión de Lucía, 18-oct, precisión 2: se rechazan «erika@.com», «erika@ficticio.» y «erika@ficticio..mx»), sin espacios. **No se exige que sea único** y **no sirve para entrar, recuperar contraseñas ni recibir mensajes.** |
 
 | Resultado | `Mensaje` |
 | --- | --- |
@@ -172,7 +175,7 @@ Si varias cosas están mal, el servidor informa **la primera** en este orden: no
 - **Reemplaza** el nombre completo y el correo: el formulario se llena con la ficha actual y manda los dos valores. `correo` vacío o `null` **quita** el correo.
 - El nombre completo es obligatorio también aquí (mismas reglas que al crear). Una cuenta creada sin nombre —como la del primer Superusuario— se completa con esta función.
 - **No cierra sesiones** de la persona editada. Se puede corregir una cuenta desactivada y la propia.
-- Si nada cambió, no se escribe nada ni se registra evento. Si cambió algo, el evento dice solo **qué campos** cambiaron, nunca sus valores.
+- **Auditoría solo de lo que cambió de verdad** (decisión de Lucía, 18-oct, precisión 3): si nada cambió, no se escribe nada ni se registra evento. Si cambió algo, el evento lleva únicamente los **nombres de los campos** que cambiaron (`NombreCompleto`, `Correo` o ambos), nunca sus valores.
 
 | Resultado | `Mensaje` |
 | --- | --- |
@@ -203,6 +206,21 @@ Si varias cosas están mal, el servidor informa **la primera** en este orden: no
 - Éxito: «Contraseña restablecida. Entrega la contraseña temporal por un canal seguro.» `Datos` trae la contraseña (§3).
 - Errores: `SinPermiso`; `UsuarioNoEncontrado` (también si la cuenta está desactivada).
 - **Antes de ejecutarlo**, la página debe recordar el procedimiento aprobado (B01 §8): verificar a la persona **en persona o con una llamada a un número que ya se conocía**, por un canal distinto al de entrega; nunca solo por mensaje. Conviene un paso de confirmación, porque repetir el envío genera **otra** contraseña y deja inservible la anterior.
+
+### 2.6. Eventos de acceso que el servidor guarda en la auditoría
+
+Los guardan `IniciarSesionAsync`, `CerrarSesionAsync` y `CambiarContrasenaPropiaAsync` por sí solos. **Las páginas no llaman a nada para esto y las firmas no cambian.** Se consultan con la consulta técnica Q03 (opción A de AGENTS §2.3), sin pantalla nueva.
+
+| Hecho | Cuándo | Acción | Actor y registro | Texto del hecho | Cómo se guarda |
+| --- | --- | --- | --- | --- | --- |
+| Entró | Credenciales correctas, antes de abrir la sesión | `InicioSesion` | La cuenta | «Inició sesión.» | Misma transacción que la verificación. Si falla, no se abre sesión (§2.1). |
+| Salió | Cierre voluntario con sesión | `CierreSesion` | La cuenta | «Cerró sesión.» | Otra transacción, después de cerrar. Si falla, la sesión queda cerrada igual (§2.2). |
+| Acceso bloqueado | El quinto fallo seguido inicia el bloqueo, al entrar o al escribir mal la contraseña actual en CU11 | `BloqueoAcceso` | La cuenta bloqueada | «Se bloqueó el acceso por cinco intentos fallidos.» | Otra transacción, después de guardar el bloqueo. Si falla, el bloqueo sigue (§2.1, §2.3). |
+
+- **Un evento por bloqueo.** Los intentos fallidos que llegan con el bloqueo ya vigente, también los simultáneos, no generan otro.
+- **Los cierres forzados no tienen evento aparte.** Desactivar, cambiar el rol, restablecer la contraseña y cambiar la contraseña propia cierran sesiones, y ese cierre queda dentro del evento de la operación que lo causa (§2.5.5 a §2.5.7 y §2.3).
+- **No se registra** cada intento fallido, ni el **nombre escrito** (puede contener una contraseña tecleada por error o texto malicioso), ni la IP ni el navegador. Los campos afectados quedan vacíos y no se guarda ningún valor.
+- **Si falla el evento de salida o de bloqueo**, el servidor escribe un aviso técnico de texto fijo en su registro, sin nombres, contraseñas ni datos de la solicitud. La página no lo ve ni lo maneja.
 
 ## 3. Entrega de contraseñas temporales (crear y restablecer)
 
@@ -270,8 +288,8 @@ Los límites del navegador (`maxlength`, `required`) **ayudan a la persona**, pe
 
 | Estado | Qué | Efecto en las páginas |
 | --- | --- | --- |
-| ⏳ | Eventos de inicio de sesión, salida y bloqueo (decisión de Lucía, 17-oct; espera que se anote la excepción en AGENTS §2.3). | **Las llamadas no cambian.** Lucía aprobó que, si el evento de **entrar** no se puede guardar, no se abra la sesión; Miguel propone que la persona vea el **error 500 fijo** y no «contraseña incorrecta» (⏳ pendiente de que Lucía lo confirme). Salir siempre cierra la sesión, aunque falle su evento. |
-| ⏳ | Precisiones de Miguel sobre la ficha (§2.5.2) y los datos propios con temporal pendiente (§2.4). | Ya están en el código; si Lucía cambia algo, se avisa. Lo demás (lista, nombre y correo, permisos) está aprobado. |
+| ✅ / ⏳ | Eventos de inicio de sesión, salida y bloqueo (§2.6), aprobados por Lucía el 17-oct; la excepción de salida y bloqueo está en AGENTS §2.3 desde el 18-oct. | **Las llamadas no cambian.** Si el evento de **entrar** no se puede guardar, no se abre la sesión y la persona ve el **error 500 fijo**, no «contraseña incorrecta» (aprobado por Lucía el 21-oct, junto con `IRegistroTecnico`). Salir siempre cierra la sesión, aunque falle su evento. ✅ Código ejecutado y aprobado por Lucía el 24-oct, con el CI correcto. ⏳ Llega a `main` con la fusión del PR #9. |
+| ✅ | Precisiones de Miguel sobre la ficha con correo (§2.5.2), el dominio del correo (§2.5.3), la auditoría de la edición (§2.5.4) y los datos propios con temporal pendiente (§2.4). | Aprobadas por Lucía el 18-oct y ya en el código. Con ellas, lista, nombre y correo y permisos están aprobados. |
 | ⏳ | Temporal de 24 horas y segundo código de verificación (TOTP). | **Obligatorios antes de datos reales**; no se implementan en B01. |
 | — | Reactivar cuentas, recuperar contraseña por correo, cambiar el nombre de usuario. | Fuera de B01. Las páginas no deben ofrecerlos. |
 
@@ -281,7 +299,8 @@ Los límites del navegador (`maxlength`, `required`) **ayudan a la persona**, pe
 - [ ] Ningún formulario desactiva la antifalsificación; los modelos de entrada tienen solo los campos previstos.
 - [ ] `/Acceso` y `/Acceso/Denegado` son `[AllowAnonymous]`; `/Acceso` lleva `no-store`; `returnUrl` solo acepta rutas locales.
 - [ ] CU11 usa la política `CambiarContrasenaPropia`; CU02 usa `AdministrarUsuarios`.
-- [ ] Mismo mensaje para todos los fallos de entrada; ninguna contraseña vuelve a pintarse.
+- [ ] Mismo mensaje para todos los fallos de entrada, también el que inicia el bloqueo; ninguna contraseña vuelve a pintarse.
+- [ ] Nada captura la excepción de `IniciarSesionAsync`: si no se puede guardar el evento de entrada, el error 500 fijo es la respuesta prevista.
 - [ ] La contraseña temporal se muestra solo en la respuesta del POST: ni URL, ni `TempData`, ni registros.
 - [ ] Salir es POST; nada reintenta solo un cambio.
 - [ ] Todo texto del servidor se muestra como texto (sin `Html.Raw`).

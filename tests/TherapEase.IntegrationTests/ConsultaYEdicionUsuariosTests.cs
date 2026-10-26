@@ -56,7 +56,7 @@ public class ConsultaYEdicionUsuariosTests(PostgreSqlRevision postgres) : IClass
         Assert.Empty(guionBajo.Datos!);
         Assert.Empty(manipulada.Datos!);
         await using var lectura = escenario.Contexto();
-        Assert.Empty(await lectura.EventosAuditoria.ToListAsync());
+        Assert.Empty(await lectura.EventosAuditoria.SoloCambios().ToListAsync());
     }
 
     /// El alta guarda el nombre y el correo.
@@ -84,7 +84,7 @@ public class ConsultaYEdicionUsuariosTests(PostgreSqlRevision postgres) : IClass
         Assert.True(usuario.Email == "marcador@ficticio.mx");
         Assert.True(usuario.DebeCambiarContrasena);
         Assert.True(await ContrasenaFuncionaAsync(servicios, usuario.Id, entrega.ContrasenaTemporal));
-        var evento = Assert.Single(await lectura.EventosAuditoria.ToListAsync());
+        var evento = Assert.Single(await lectura.EventosAuditoria.SoloCambios().ToListAsync());
         Assert.Equal(new[] { "NombreUsuario", "Rol", "DebeCambiarContrasena", "NombreCompleto", "Correo" },
             evento.CamposAfectados);
         Assert.DoesNotContain("Nombre Marcador Ficticio", evento.Hecho);
@@ -167,7 +167,7 @@ public class ConsultaYEdicionUsuariosTests(PostgreSqlRevision postgres) : IClass
         var usuario = await contexto.Users.AsNoTracking().SingleAsync(u => u.Id == objetivo);
         Assert.True(usuario.NombreCompleto == "Nombre Corregido Ficticio" && usuario.Email == "nuevo@ficticio.mx");
         Assert.True(usuario.SecurityStamp == sello, "La edición cambió el sello de seguridad.");
-        var evento = Assert.Single(await contexto.EventosAuditoria.ToListAsync());
+        var evento = Assert.Single(await contexto.EventosAuditoria.SoloCambios().ToListAsync());
         Assert.Equal(new[] { "NombreCompleto", "Correo" }, evento.CamposAfectados);
         Assert.True(await CookieSigueSirviendoAsync(servicios, primera));
         Assert.True(await CookieSigueSirviendoAsync(servicios, segunda));
@@ -206,7 +206,7 @@ public class ConsultaYEdicionUsuariosTests(PostgreSqlRevision postgres) : IClass
         Assert.Equal(nombreAnterior, usuario.NombreCompleto);
         Assert.Equal("solo-correo@ficticio.mx", usuario.Email);
         Assert.Equal(selloAnterior, usuario.SecurityStamp);
-        var evento = Assert.Single(await contexto.EventosAuditoria.ToListAsync());
+        var evento = Assert.Single(await contexto.EventosAuditoria.SoloCambios().ToListAsync());
         Assert.Equal(objetivo, evento.IdRegistro);
         Assert.Equal(new[] { "Correo" }, evento.CamposAfectados);
     }
