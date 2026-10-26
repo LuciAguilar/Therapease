@@ -1,6 +1,6 @@
 # TherapEase — Guía de arranque del equipo en 09
 
-**Estado vigente — 25-oct-2026:** B01 sigue abierto. PR #7, #8 y #9 revisados y fusionados; eventos de acceso incorporados en `6526607`. El QA de usuarios, permisos, sesiones y contraseñas llegó en #8; los diez casos propios de eventos se preparan en el mismo #10, todavía borrador. Páginas y navegador pendientes. B02 tiene el alcance y límites de [AGENTS §3](AGENTS.md#3-límites-vigentes); B00/LCA/R04 siguen abiertos. Solo datos ficticios, sin nube ni gastos.
+**Estado vigente — 25-oct-2026:** B01 sigue abierto. PR #7, #8 y #9 revisados y fusionados; eventos de acceso incorporados en `6526607`. El QA de usuarios, permisos, sesiones y contraseñas llegó en #8; los diez casos propios de eventos se incluyen en el mismo #10, con revisión humana y fusión pendientes. Páginas y navegador pendientes. B02 tiene el alcance y límites de [AGENTS §3](AGENTS.md#3-límites-vigentes); B00/LCA/R04 siguen abiertos. Solo datos ficticios, sin nube ni gastos.
 
 > **Actualización del 14-oct-2026:** ✅ entrevista recibida; [respuestas, cambios y autorizaciones pendientes](docs/requirements/TherapEase-09-entrevista-requisitos.md). ⏳ Montos, solo particular y cancelación automática cambian la base y requieren decisión de Lucía antes de código. Nombre completo/correo de Usuario y conformidad general a pantallas ya recibidos; falta detalle y pruebas. B00/LCA/R04 abiertos; esta preparación no autoriza Construcción.
 
@@ -222,7 +222,7 @@ Rama `b00/correcciones-pr4`, usada como rama de trabajo por indicación de Migue
 
 - **Servidor:** `InicioSesion` se guarda junto con la verificación de la entrada (si falla, no se abre sesión y llega el error general); `CierreSesion` y `BloqueoAcceso` se guardan después de proteger, en otra transacción, y si su evento falla la sesión queda cerrada o la cuenta bloqueada y solo queda un aviso técnico fijo (`IRegistroTecnico`, con el registro de .NET y sin paquetes nuevos). Un evento por bloqueo, también con intentos simultáneos y cuando nace en CU11. Los cierres por desactivar, cambiar el rol o restablecer siguen en el evento de esa operación. No se guardan el nombre escrito, la IP ni el navegador.
 - **Para Dulce:** el [contrato](docs/planning/TherapEase-etapa09-B01-contrato-para-paginas.md) se actualizó (§2.6 y las firmas, que no cambian) y [la propuesta](docs/planning/TherapEase-etapa09-B01-propuesta.md) recoge las cuatro precisiones aprobadas el 18-oct. Las instrucciones de PostgreSQL local se ejecutaron de punta a punta, ver «Servidor local para conectar las páginas» en §10.
-- **Actualización del 25-oct:** documentos revisados, auditoría v3 aprobada y PR #9 fusionado por Lucía en `6526607`. Los diez casos propios de eventos se preparan en #10; páginas y navegador siguen pendientes con Dulce y Lucía.
+- **Actualización del 25-oct:** documentos revisados, auditoría v3 aprobada y PR #9 fusionado por Lucía en `6526607`. Los diez casos propios de eventos se incluyen en #10, auditados y con publicación autorizada; su revisión humana sigue pendiente; páginas y navegador siguen pendientes con Dulce y Lucía.
 
 ## Avance de B01 en la rama de Miguel — 17-oct-2026
 

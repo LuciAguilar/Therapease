@@ -6,7 +6,7 @@
 
 Claude informó sobre `28f52df`: compilación sin advertencias; doce casos de horas correctos con una entrada de control a las 17:30 UTC; sin esa entrada, 422 unitarias y 319 de integración con dos hilos. Son resultados de su auditoría, no nuevas ejecuciones de Codex. No pidió correcciones obligatorias.
 
-PR #10 se conserva como borrador para incorporar las diez pruebas propias de eventos. Lucía aprobó combinar las reglas actuales de main, el avance de su QA, los pasos de HTTPS de Miguel y la redacción sencilla del plan. Preparación local, sin commit ni push hasta auditoría y su aprobación. Revisión humana de Miguel o Dulce antes de fusionar #10 con Create a merge commit. La mejora de separar identificadores en `HttpsLocalRevision` sigue opcional y sin aplicar.
+PR #10 incorpora las diez pruebas propias de eventos, con revisión humana y fusión pendientes. Lucía aprobó combinar las reglas actuales de main, el avance de su QA, los pasos de HTTPS de Miguel y la redacción sencilla del plan. La combinación fue auditada y Lucía aprobó la precisión de texto y autorizó su publicación el 25-oct. Revisión humana de Miguel o Dulce antes de fusionar #10 con Create a merge commit. La mejora de separar identificadores en `HttpsLocalRevision` sigue opcional y sin aplicar.
 
 Para Miguel: PR #9 ya está fusionado. Leer AGENTS §3 y la descripción del PR #9 en `28f52df`. No quedan correcciones obligatorias de esta revisión. Se propone retirar `b00/correcciones-pr4` y usar una rama nueva desde main para la propuesta B02; mientras conserve la anterior, hacer `git pull` antes de modificarla porque contiene un commit de Lucía. El QA de #10 sigue local, aún no disponible para su revisión.
 

@@ -1,6 +1,6 @@
 # TherapEase — 09/B01 · Acceso e identidad segura
 
-**Actualizado el 25-oct-2026:** PR #8 y #9 revisados y fusionados. El servidor de eventos ya está en main (`6526607`). Los diez casos propios de Lucía se preparan localmente para #10; faltan su auditoría y revisión humana. Páginas y navegador siguen pendientes.
+**Actualizado el 25-oct-2026:** PR #8 y #9 revisados y fusionados. El servidor de eventos ya está en main (`6526607`). Los diez casos propios de Lucía se incluyen en #10: auditoría resuelta y publicación autorizada; faltan revisión humana y fusión. Páginas y navegador siguen pendientes.
 
 B01 es la puerta de entrada de TherapEase: cada persona entra con su usuario y contraseña, usa solo lo que le toca y sale de forma segura. También incluye administrar cuentas, cambiar y restablecer contraseñas, bloquear intentos fallidos y dejar registro de todo (HU01–HU03 y HU15; CU01, CU02 y CU11).
 
@@ -13,6 +13,7 @@ Miguel hace el servidor, Dulce las páginas y Lucía comprueba que todo funcione
 | ✅ | Usuarios, nombre y correo, permisos y comprobaciones automáticas (CI) | Miguel | PR #7, fusionado el 18-oct |
 | ✅ | Pruebas de servidor, permisos, sesiones y contraseñas | Lucía; revisó Miguel | [PR #8](https://github.com/LuciAguilar/Therapease/pull/8), fusionado el 20-oct |
 | ✅ | Registrar entradas, salidas y bloqueos | Miguel | PR #9 revisado y fusionado el 25-oct en `6526607` |
+| ✅ / ⏳ | Diez pruebas propias de eventos | Lucía; revisa Miguel o Dulce | ✅ Incorporadas y auditadas en el mismo PR #10; Lucía aprobó la precisión y publicación. ⏳ Revisión humana y fusión |
 | ⏳ | Páginas, formularios y PageModel | Dulce | Sin entregar; hoy solo hay diseño |
 | ⏳ | Probar formularios, navegador y la consulta de auditoría Q03 | Lucía | Cuando lleguen las páginas |
 | ⏳ | Cerrar B01 | Todos; aprueba Lucía | Al final, con todo probado y revisado |
@@ -39,7 +40,7 @@ Un **PR** es una solicitud para revisar cambios y el **SHA** es el código que i
 | Rama principal `main` | ✅ `6526607fbd59ffda966093d65f04467da1a959ad`, PR #9 fusionado el 25-oct; incluye el [merge de PR #8](https://github.com/LuciAguilar/Therapease/pull/8). | Incluye el QA revisado de Servidor, Permisos, Sesiones y Contraseñas. |
 | PR #5 de Miguel | ✅ Revisado por Lucía y fusionado. Último SHA del PR: `bce94091ba614e16f4cce3435697d8c58c2a31ff`; incorporado a `main` como `40785d2`. [PR #5](https://github.com/LuciAguilar/Therapease/pull/5). | Reutilizar sus funciones y pruebas. Fusión: 13-oct, 20:49 de Hermosillo; 14-oct, 03:49 UTC. |
 | PR #6 de pruebas de Lucía | ✅ [Miguel aprobó](https://github.com/LuciAguilar/Therapease/pull/6#pullrequestreview-5528518803) `0db344a06a03edb054e3e94759f38a4c6f7e340c`; Lucía fusionó mediante squash el 15-oct, 08:06 de Hermosillo. [PR #6](https://github.com/LuciAguilar/Therapease/pull/6). | Incorporado a `main` en `ffb2494ad9da026f24a57826c45f6f530afb467b`. Código probado anterior `0aa32f2b4f387f02ded7b1100a74e869a0ad40d7`; no son pruebas nuevas. |
-| Rama global de Lucía | `revision/etapa09` incorpora main `6526607` con la combinación documental aprobada. | Conflictos de documentos resueltos como aprobó Lucía; cambios locales conservados. La entrega de QA se guarda por separado. |
+| Rama global de Lucía | `revision/etapa09` incorpora main `6526607` mediante `160aa72345e0f923993d3adcef1c1fa26cdb1d05`; entrega de eventos en el mismo PR #10. | Conflictos resueltos, auditoría realizada y publicación autorizada por Lucía el 25-oct. El SHA de QA y sus comprobaciones se identifican en los commits y la CI del PR #10. |
 | Páginas y comprobaciones automáticas | ✅ CI de PR #7 y PR #8 correctas. ⏳ Páginas funcionales y navegador. | La CI no demuestra login desde una página. |
 | Diseño de Dulce | ✅ Se inspeccionó solo en lectura `frontend/diseno`, SHA `0dfd3a5419f24c5825b5362f9c3ef8374720ec6f`. ⏳ Sin PR asociado ni revisión de entrega acreditada. | Es diseño, todavía sin inicio de sesión funcional. Observaciones en §4.2. |
 | B00, LCA y R04 | ⏳ Continúan abiertos. | B01 no cierra sus pendientes de pruebas, revisión o datos reales. |
@@ -237,15 +238,15 @@ B01 no incluye pacientes, citas, pagos, bajas ni directorio. Desactivar una cuen
 | --- | --- | --- | --- |
 | ✅ | Miguel | Inventario, propuesta aprobada, usuarios, nombre/correo, permisos explícitos, funciones documentadas y CI. | Lo pendiente se sigue en §2; no rehacer lo entregado. |
 | ⏳ | Dulce | Concretar pantallas, campos, mensajes y navegación; coordinar uso del servidor y README. | No declarar diseño como login funcional. Datos nuevos requieren detalle aprobado. |
-| ✅ | Lucía; Miguel revisó | ✅ Cuatro entregas y refactorización incorporadas en PR #8. | Eventos probados el 24-oct; diez casos propios esperan incorporación y revisión humana. Páginas y navegador con Dulce. |
+| ✅ | Lucía; Miguel revisó | ✅ Cuatro entregas y refactorización incorporadas en PR #8. | Eventos probados el 24-oct; diez casos propios incorporados en #10, con revisión humana pendiente. Páginas y navegador con Dulce. |
 | ✅ | Miguel | PR #9: eventos y documentos revisados y fusionados. | Lucía aprobó y fusionó el 25-oct en `6526607`. El apoyo a Dulce continúa cuando conecte las páginas. |
-| ✅ | Lucía | ✅ Casos de usuarios, permisos, bloqueo, contraseñas, sesiones, concurrencia y auditoría de los cuatro informes, revisados en PR #8. | Eventos comprobados; diez casos propios se incorporan después de fusionar PR #9. Recorridos web pendientes. |
+| ✅ | Lucía | ✅ Casos de usuarios, permisos, bloqueo, contraseñas, sesiones, concurrencia y auditoría de los cuatro informes, revisados en PR #8. | Eventos comprobados; diez casos propios incorporados en #10, con revisión humana pendiente. Recorridos web pendientes. |
 | ⏳ | Dulce | PageModel y unitarias; conectar acceso, salida, usuarios y cambio propio; formularios, mensajes y navegación. | No necesita esperar pacientes o agenda para terminar B01. |
 | ⏳ | Lucía | Enviar solicitudes reales; comprobar permisos, datos, protección y respuestas perdidas. | No requiere automatizar navegador todavía, pero sí acciones de página de Dulce. |
 | ⏳ | Lucía | Probar entrada/salida, dos sesiones, bloqueo, temporal, cambio propio, roles y Q03 en navegador. | Miguel o Dulce revisa sus pruebas. |
 | ⏳ | Equipo; Lucía aprueba | Corregir fallos, revisar pruebas y comprobar resultados automáticos/manuales. | Cierre B00/LCA separado. |
 
-Miguel completa los ajustes documentales del PR #9; Lucía publica las reglas aprobadas. Después se incorporan sus diez pruebas propias. Dulce continúa las páginas y el navegador queda para su integración.
+PR #9 ya está fusionado. Las diez pruebas propias de Lucía se incluyen en #10, con auditoría resuelta y publicación autorizada; falta su revisión humana. Dulce continúa las páginas y el navegador queda para su integración.
 
 ## 7. Qué pruebas y evidencia se necesitan
 
@@ -296,7 +297,7 @@ Fecha y zona horaria, SHA completo y cambios locales, entorno, comando, cuántas
 | Consultar Q03 | Superusuario activo, sin temporal, entra en navegador y abre consulta en esa ventana. URL `/api/auditoria/eventos`; `desde`/`hasta` son fechas/horas con zona, `tipoRegistro` admite solo nombres completos y `limite` va de 1 a 500. |
 | Quitar permiso o salir con Q03 abierto | La siguiente consulta se deniega. Probar Usuaria, temporal, sesión vencida, desactivación y rol retirado. Sin pantalla ni script que evite iniciar sesión. |
 
-Temporales y consulta Q03 están aprobados desde el 12-oct; falta usarlos en las páginas y probarlos. Eventos y registro técnico revisados y fusionados en PR #9 el 25-oct. El QA propio de eventos de Lucía sigue en preparación para #10.
+Temporales y consulta Q03 están aprobados desde el 12-oct; falta usarlos en las páginas y probarlos. Eventos y registro técnico revisados y fusionados en PR #9 el 25-oct. El QA propio de eventos de Lucía está en #10, con revisión humana y fusión pendientes.
 
 ## 9. Cuándo se cierra B01 y qué queda fuera
 
