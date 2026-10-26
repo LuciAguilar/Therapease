@@ -1,6 +1,6 @@
 # TherapEase — B01 · Pruebas de contraseñas
 
-**19-oct-2026 · Entrega 4 aprobada por Lucía con ajuste menor aplicado; commit local autorizado, sin push.**
+**Estado al 20-oct-2026:** entrega aprobada por Lucía, revisada por Miguel y fusionada en PR #8 (`7a73e0a`); CI correcta. Las pruebas finales siguen fechadas el 19-oct; no se ejecutaron de nuevo por actualizar el informe.
 
 Se comprueba el cambio propio y el restablecimiento con servicios reales y PostgreSQL desechable. Solo datos ficticios. No se modificó producción, paquetes, tablas o reglas de acceso.
 
@@ -44,6 +44,8 @@ Para repetir los 62 y las 16 unitarias, usar los filtros del manifest. La ejecuc
 
 ## 4. Pendientes
 
-Auditoría resuelta y aprobación de Lucía recibida. Se hizo explícita la comprobación de la sesión ya abierta: el bloqueo impide volver a entrar, pero no la cierra. Las cuatro entregas se repitieron con los mismos casos; revisión humana de Miguel y CI del PR conjunto pendientes.
+Auditoría resuelta y aprobación de Lucía recibida. Se hizo explícita la comprobación de la sesión ya abierta: el bloqueo impide volver a entrar, pero no la cierra. Las cuatro entregas se repitieron con los mismos casos; revisión humana de Miguel y CI del PR #8 completas, con fusión el 20-oct.
 
 Páginas, PageModel y navegador siguen con su trabajo pendiente. No se acredita mostrar la temporal una sola vez, impedir su recuperación con recargar/atrás o la cabecera no-store en formularios. La verificación de identidad y el canal de entrega siguen siendo el procedimiento aprobado. La caducidad adicional de 24 horas se exige antes de datos reales; no se implementa ni se prueba aquí. B01/B00/LCA/R04 siguen abiertos; sin nube ni gastos.
+
+✅ Publicación y revisión: [PR #8](https://github.com/LuciAguilar/Therapease/pull/8), fusión `7a73e0a`; [CI correcta](https://github.com/LuciAguilar/Therapease/actions/runs/39512430706).

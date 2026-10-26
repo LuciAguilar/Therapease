@@ -1,5 +1,9 @@
 # TherapEase — Avance de Metodologías de Desarrollo Ágil
 
+**Actualización del 24-oct-2026:** ✅ código del PR #9 (`cb7da59`) revisado, auditado y aprobado por Lucía. ⏳ Ajustes documentales de Miguel y fusión; AGENTS aprobado se publica antes o junto con esa fusión. Diez casos propios de Lucía se incorporan después con revisión de Miguel o Dulce. Páginas, navegador, B01/B00/LCA/R04 abiertos; B02 no iniciado.
+
+**Avance al 20-oct-2026:** ✅ [PR #8](https://github.com/LuciAguilar/Therapease/pull/8) revisado y aprobado por Miguel (`GalloNav`) sobre `95c9425`, y fusionado por Lucía el 20-oct-2026, 17:29 de Hermosillo, mediante **Create a merge commit**, en `7a73e0a2282155273cd7d29dd9fea1c7e30635fd`. Los cinco commits se conservan. [CI del PR](https://github.com/LuciAguilar/Therapease/actions/runs/39512430706): cuatro trabajos correctos. ⏳ Siguen pendientes los eventos de acceso/salida/bloqueo, las páginas y PageModel de Dulce, y las pruebas de navegador. La temporal de 24 horas se exige antes de datos reales. B01/B00/LCA/R04 siguen abiertos; solo datos ficticios, sin nube ni gastos.
+
 **Publicación documental, 17-oct-2026:** B01 está abierto y PR #6 ya está fusionado. Este resumen conserva la evidencia aprobada de B00 y las tareas previstas; la ampliación de pruebas B01 espera auditoría y aprobación y no se incorpora como avance cerrado.
 
 > **Entrevista recibida y revisada el 14-oct-2026:** ✅ respuestas de la psicóloga registradas en [respuestas y ajustes](../requirements/TherapEase-09-entrevista-requisitos.md). ⏳ Montos, simplificación a solo particular y cancelación automática requieren decisión de alcance/mecanismo de Lucía; no están implementados por esta actualización. B00/LCA/R04 abiertos, preparación documental sin Construcción ni pruebas nuevas. Los resultados y aprobaciones anteriores se conservan como historia.
@@ -11,8 +15,8 @@
 | Integrante | Rol en Scrum | Trabajo y avance actual |
 | --- | --- | --- |
 | **Lucía** | **Scrum Master** | Facilita el proceso y seguimiento; responsable de arquitectura, documentación, seguridad, QA y pruebas de integración. Revisa cambios y conserva la aprobación final del proyecto. |
-| **Dulce Hernandez** | **Product Owner** — gestión del producto | Contacto directo con la psicóloga: requisitos, prioridades y seguimiento. Responsable del frontend y sus pruebas unitarias; frontend todavía sin avance, según actualización del equipo. |
-| **Miguel Leyva** | **Developer** | Implementa backend y sus pruebas unitarias; atiende correcciones y revisa el trabajo de Lucía. Backend inicial incorporado y correcciones en revisión. |
+| **Dulce Hernandez** | **Product Owner** — gestión del producto | Contacto directo con la psicóloga: requisitos, prioridades y seguimiento. Responsable del frontend y sus pruebas unitarias; diseño de acceso inspeccionado; funcionalidad de páginas y navegador pendientes. |
+| **Miguel Leyva** | **Developer** | Implementa backend y sus pruebas unitarias; atiende correcciones y revisa el trabajo de Lucía. Backend de usuarios incorporado en PR #7 y QA de Lucía revisado en PR #8; eventos aprobados en PR #9, pendiente de ajustes documentales y fusión. |
 
 > **Nombre del rol:** en Scrum usamos *Product Owner* para Dulce, aunque su labor incluya gestión del producto. Los tres contribuyen a la calidad; Lucía y Dulce también actúan como Developers al trabajar en el incremento. Priorizar el producto corresponde a Dulce; facilitar Scrum corresponde a Lucía.
 
@@ -42,7 +46,7 @@
 | Ciclo de dos semanas | Objetivo propuesto | Resultado esperado y condición |
 | --- | --- | --- |
 | Próximo ciclo: trabajo actual B00 | Completar la validación técnica prioritaria. | Miguel corrige backend; Lucía verifica seguridad e integración; Dulce prepara el frontend mínimo de acceso necesario. Registrar pendientes; cerrar LCA solo con evidencia y decisión expresa de Lucía. |
-| Siguiente: B01 | Construcción abierta el 14-oct: backend, seguridad, CI y QA de servidor sin esperar páginas. | B00/LCA/R04 siguen abiertos; integrar páginas de Dulce cuando lleguen. No exige cerrar antes B00/LCA; PR #6 revisado y fusionado el 15-oct, espera cumplida; propuestas de detalle aún pendientes. Actualizar la copia local antes de continuar B01. |
+| En curso: B01 | ✅ Usuarios, nombre/correo, permisos explícitos y CI de Miguel, PR #7 aprobado y fusionado el 18-oct. | ✅ QA de Servidor, Permisos, Sesiones y Contraseñas revisado y fusionado en PR #8. ✅ Código de eventos aprobado en PR #9; ⏳ ajustes documentales, fusión, páginas de Dulce y navegador. B00/LCA/R04 abiertos. |
 | Posterior: B02 | Registrar y buscar pacientes ficticios. | Recorrido integrado y probado; respuestas de campos/prioridades recibidas; detalle de formatos y cambios de alcance por concretar/aprobar. |
 | Posterior: B03–B04, según capacidad | Agendar y registrar estado pagado/pendiente. | Recorrido acceso → paciente → cita → pago probado. Dividir entre ciclos si no cabe. |
 
@@ -69,7 +73,8 @@
 | Etapas 01–08 | Cerradas documentalmente; requisitos, arquitectura, historias, casos de uso y backlog disponibles. |
 | Backend inicial — PR #1 | Fusionado; no equivale a producto completo. |
 | Pruebas de Lucía — PR #4 | Revisadas por Miguel y fusionadas. |
-| Correcciones de Miguel — PR #5 | En revisión según el registro disponible; no se declara fusionado. |
+| Correcciones de Miguel — PR #5 | Revisadas y fusionadas el 13-oct; main `40785d2`. |
+| QA de Lucía — PR #8 | Miguel aprobó `95c9425`; Lucía fusionó el 20-oct en `7a73e0a` mediante merge commit. CI del PR correcta. |
 | Frontend y validación completa | Pendientes. B00/LCA siguen abiertos; solo datos ficticios. |
 
 ## 6. Qué entregar al profesor

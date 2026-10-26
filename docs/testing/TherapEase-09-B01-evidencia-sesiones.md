@@ -1,6 +1,6 @@
 # TherapEase — B01 · Pruebas de sesiones
 
-**Repetición final: 19-oct-2026. Aprobada por Lucía; commit local autorizado, sin push.**
+**Estado al 20-oct-2026:** entrega aprobada por Lucía, revisada por Miguel y fusionada en PR #8 (`7a73e0a`); CI correcta. Las pruebas finales siguen fechadas el 19-oct; no se ejecutaron de nuevo por actualizar el informe.
 
 Se comprueba cuándo vence una sesión, cómo se renueva y cuándo debe dejar de servir. Solo datos ficticios; Identity y PostgreSQL reales, con HTTPS local en los casos indicados. No se cambió producción ni se añadieron paquetes.
 
@@ -42,4 +42,6 @@ Para repetir las 24, usar la propiedad `filtro` del manifest de la ejecución en
 
 ## 4. Pendientes
 
-Auditoría de Sesiones resuelta y aprobación de Lucía recibida el 19-oct. Las 24 se repitieron el 19-oct con los mismos casos y las ayudas finales. Revisión humana de Miguel y CI en el PR conjunto. El navegador y las páginas/PageModel de Dulce siguen pendientes: HTTP y clientes de prueba no demuestran su recorrido real, cerrar el navegador o volver atrás. B01/B00/LCA/R04 continúan abiertos; sin nube ni gastos. Contraseñas conserva su entrega.
+Auditoría de Sesiones resuelta y aprobación de Lucía recibida el 19-oct. Las 24 se repitieron el 19-oct con los mismos casos y las ayudas finales. Miguel aprobó PR #8, su CI terminó correctamente y Lucía lo fusionó. El navegador y las páginas/PageModel de Dulce siguen pendientes: HTTP y clientes de prueba no demuestran su recorrido real, cerrar el navegador o volver atrás. B01/B00/LCA/R04 continúan abiertos; sin nube ni gastos. Contraseñas conserva su entrega.
+
+✅ Publicación y revisión: [PR #8](https://github.com/LuciAguilar/Therapease/pull/8), fusión `7a73e0a`; [CI correcta](https://github.com/LuciAguilar/Therapease/actions/runs/39512430706).
