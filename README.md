@@ -1,86 +1,38 @@
-# TherapEase — Guía de arranque del equipo en 09
+# TherapEase
 
-**Estado vigente — 25-oct-2026:** B01 sigue abierto. PR #7, #8 y #9 revisados y fusionados; eventos de acceso incorporados en `6526607`. El QA de usuarios, permisos, sesiones y contraseñas llegó en #8; los diez casos propios de eventos se incluyen en el mismo #10, con revisión humana y fusión pendientes. Páginas y navegador pendientes. B02 tiene el alcance y límites de [AGENTS §3](AGENTS.md#3-límites-vigentes); B00/LCA/R04 siguen abiertos. Solo datos ficticios, sin nube ni gastos.
+## 1. Qué es y estado de hoy
 
-> **Actualización del 14-oct-2026:** ✅ entrevista recibida; [respuestas, cambios y autorizaciones pendientes](docs/requirements/TherapEase-09-entrevista-requisitos.md). ⏳ Montos, solo particular y cancelación automática cambian la base y requieren decisión de Lucía antes de código. Nombre completo/correo de Usuario y conformidad general a pantallas ya recibidos; falta detalle y pruebas. B00/LCA/R04 abiertos; esta preparación no autoriza Construcción.
+TherapEase es una aplicación web para la gestión administrativa de un consultorio psicológico.
 
-**Actualización documental: 10-oct-2026.** La base de esta guía, AGENTS, ADR-01…06 y el plan B00 fueron aprobados el 01-oct. Esta actualización separa ajustes para el equipo de las notas personales y alinea el estado parcial de B00. Los cambios de documentación inicial pueden comunicarse a Lucía; no se acredita una revisión no recibida.
+**Estado de hoy — 26-oct-2026:** PR #10 fusionado en `a7c0c52`; [CI de esa fusión correcta](https://github.com/LuciAguilar/Therapease/actions/runs/40395259207).
 
-**T1 aprobado y publicado:** Lucía aprobó los 22 archivos de documentación, reglas y carpetas base el 01-oct-2026 y realizó el primer push a [LuciAguilar/Therapease](https://github.com/LuciAguilar/Therapease), repositorio público. La validación ejecutable de B00 y la decisión de cierre de LCA siguen pendientes.
+- B01 espera las páginas, formularios y navegador; B00/LCA/R04 siguen abiertos.
+- B02 espera una sola propuesta de Miguel; Lucía decide el detalle antes de programar.
+- Solo datos ficticios, sin nube ni gastos; montos, «solo particular» y cancelación automática fuera.
 
-## 1. Estado y alcance
+## 2. Quién hace qué ahora
 
-- **Autorizado:** iniciar 09 por B00, implementar lo necesario para validar el stack y registrar evidencia. Lucía aprobó el plan corregido, ADR-06, la fidelidad de ADR-01…05 corregidos y la consulta Q03 sin pantalla. Eligió repositorio público y autorizó instalar .NET 10.
-- **Avance parcial incorporado:** PR #1 corregido, revisado por Lucía y fusionado en main con `41123f2d2c115a05ff1df944457195a7f671cc17`. Incluye solución/proyectos, backend inicial, migraciones e identidad. Hay resultados parciales, resumidos en B00; la validación completa sigue pendiente. B01–B08 no quedan autorizados por esta fusión.
-- **Producto:** primer recorrido previsto: acceso → paciente → cita → pago pagado/pendiente, sin montos ni cobros. B00–B04 al 04-dic-2026 es un corte propuesto que Dulce debe validar con la usuaria. B05–B06 dependen de prioridad y capacidad; el directorio B07 queda para después del primer avance de diciembre; B08 recoge evidencia realmente obtenida.
-- **Cambio vigente:** no hay pantalla de auditoría. Q03 registra eventos en base y permite consulta técnica autorizada de solo lectura. **Decisión de Dulce del 08-oct:** registrar y **buscar pacientes desde Pacientes** permanece en el primer avance de diciembre. El directorio sale de CU03 y pasa a una pantalla aparte posterior (B07), con la lista completa de vigentes por defecto y filtro autorizado de bajas; sus campos visibles siguen pendientes.
-- **Datos:** solo ficticios. R04 sigue abierto. Expediente, notas, reportes, capturista, correo e integraciones están diferidos. TOTP es obligatorio antes de datos reales, con revisión del impacto en ADR-05.
-- **Forma de trabajo:** solo Lucía elabora con Codex y audita con Claude. Miguel y Dulce eligen herramientas, asistentes y organización de sus revisiones; la documentación les sirve de contexto y soporte. Las reglas compartidas de revisión entre personas y aprobación están en [AGENTS.md](AGENTS.md).
+| Persona | Trabajo actual |
+| --- | --- |
+| Lucía | Decide las propuestas y dirige QA; otra persona revisa sus pruebas. |
+| Miguel | Propone campos/tutor, permisos, búsqueda/homónimos, reenvío y ámbitos en una rama nueva desde main. |
+| Dulce | Confirma producto con la usuaria y prepara páginas, PageModel y sus unitarias. |
 
-## 2. Mapa de documentos del repositorio
+## 3. Documentos clave
 
-| Documento | Ruta en el repo | Para qué sirve |
-| --- | --- | --- |
-| Reglas compartidas | [AGENTS.md](AGENTS.md) | Seguridad, datos, pruebas, revisión y límites obligatorios para todos. |
-| Entrada del equipo | [README.md](README.md) | Guía, responsabilidades y preparación del entorno; conserva también los comandos técnicos. |
-| Requisitos arquitectónicos | [docs/requirements/TherapEase-requisitos-arquitectonicos.md](docs/requirements/TherapEase-requisitos-arquitectonicos.md) | Q01–Q20 y criterios medibles. |
-| Historias y casos de uso | [docs/requirements/TherapEase-etapa08-casos-historias.md](docs/requirements/TherapEase-etapa08-casos-historias.md) | Permisos, aceptación y caminos básicos/alternos. |
-| Modelos e interfaces | [docs/requirements/TherapEase-etapa08-modelos-interfaces.md](docs/requirements/TherapEase-etapa08-modelos-interfaces.md) | Entidades, relaciones y propuestas de pantallas/campos. |
-| Backlog y trazabilidad | [docs/planning/TherapEase-etapa08-backlog-trazabilidad.md](docs/planning/TherapEase-etapa08-backlog-trazabilidad.md) | B00–B08 y relación con Q/R/ADR. |
-| Plan y estado B00 | [docs/planning/TherapEase-etapa09-B00.md](docs/planning/TherapEase-etapa09-B00.md) | Resultados, pendientes, siguientes pasos y puerta LCA. |
-| Plan B01 | [Acceso e identidad segura](docs/planning/TherapEase-etapa09-B01.md) | Trabajo de cada persona, decisiones aprobadas, propuestas y orden de entrega. |
-| Respuestas y ajustes | [Entrevista de requisitos](docs/requirements/TherapEase-09-entrevista-requisitos.md) | Preferencias recibidas, decisiones que faltan y alcance pendiente. |
-| Avance y organización | [Avance Scrum](docs/planning/TherapEase-avance-Scrum.md) | Bloques y organización del trabajo; no acredita Sprints ni avances de QA no aprobados. |
-| Plan de pruebas | [docs/testing/TherapEase-09-plan-de-pruebas.md](docs/testing/TherapEase-09-plan-de-pruebas.md) | Casos por persona y caso de uso. |
-| Ajustes del PR #1 | [docs/reviews/TherapEase-09-B00-revision-PR01.md](docs/reviews/TherapEase-09-B00-revision-PR01.md) | Correcciones concretas y mejoras propuestas para Miguel/Dulce. |
-| ADR-01…05 | [docs/architecture/adr/ADR-01-a-05-provisionales.md](docs/architecture/adr/ADR-01-a-05-provisionales.md) | Decisiones arquitectónicas y sus límites. |
-| ADR-06 | [docs/architecture/adr/ADR-06-monorepo.md](docs/architecture/adr/ADR-06-monorepo.md) | Monorepo y validación de dependencias. |
-| StarUML | [docs/diagrams/TherapEase-08C-StarUML.mdj](docs/diagrams/TherapEase-08C-StarUML.mdj) | Dominio y casos de uso editables; antecedente de 08, anterior al cambio de pantalla. |
+| Documento | Para qué sirve |
+| --- | --- |
+| [AGENTS](AGENTS.md) | Reglas obligatorias, alcance y límites vigentes. |
+| [Plan B01](docs/planning/TherapEase-etapa09-B01.md) | Acceso, identidad y páginas pendientes. |
+| [Plan B02](docs/planning/TherapEase-etapa09-B02.md) | Plan aprobado; propuesta y decisión de detalle pendientes. |
+| [Contrato para páginas](docs/planning/TherapEase-etapa09-B01-contrato-para-paginas.md) | Entradas, resultados y errores para los PageModel de Dulce. |
+| [Plan de pruebas](docs/testing/TherapEase-09-plan-de-pruebas.md) | Casos, responsables y evidencia; enlaza B00. |
+| [08B](docs/requirements/TherapEase-etapa08-casos-historias.md) | Historias, criterios y casos de uso. |
+| [08D](docs/planning/TherapEase-etapa08-backlog-trazabilidad.md) | Backlog y trazabilidad; enlaza modelos y requisitos. |
+| [Entrevista](docs/requirements/TherapEase-09-entrevista-requisitos.md) | Respuestas recibidas y confirmaciones pendientes. |
+| [ADR](docs/architecture/adr/) | Decisiones de arquitectura y sus límites. |
 
-Las adendas de 09 y las decisiones incorporadas a AGENTS rigen el trabajo vigente. Las propuestas de producto marcadas como pendientes siguen pendientes hasta recibir una respuesta; los diagramas de 08 no validan por sí solos el frontend de 09.
-
-## 3. Qué hace cada persona primero
-
-| Persona | Trabajo actual B01 y pendientes B00 | Entrega y siguiente paso |
-| --- | --- | --- |
-| **Lucía** | Auditar sus pruebas con Claude y resolver observaciones; aprobar las propuestas nuevas de Miguel y conservar QA pendiente B00. | Miguel o Dulce revisa sus pruebas. Después de auditoría y aprobaciones, actualizar documentos de avance y autorizar el commit/publicación de QA. |
-| **Miguel** | Completar acceso, usuarios, sesiones y contraseñas, y el CI, en la rama `b01/acceso-y-usuarios`. Ya están programados la lista y ficha de usuarios, nombre y correo y los permisos explícitos (aprobados el 17-oct); los eventos y sus documentos quedaron incorporados en PR #9, fusionado el 25-oct en `6526607`. Queda apoyar la integración de páginas y revisar el QA de Lucía cuando se solicite. Ver el [avance de B01](#avance-de-b01-en-la-rama-de-miguel--17-oct-2026). | Unitarias propias y evidencia por cambio. Un PR con lista, nombre/correo, permisos y CI, y otro con los eventos de acceso. Coordinar con Dulce mediante el [contrato para páginas](docs/planning/TherapEase-etapa09-B01-contrato-para-paginas.md). |
-| **Dulce** | PageModel, Razor, formularios y navegación del acceso, usuarios y cambio propio; unitarias del código que escriba. Concretar mensajes/campos pendientes con la usuaria y el equipo. | Integrar las funciones del servidor con protección de formularios y HTTPS local. No necesita esperar pacientes/citas/pagos para B01. |
-
-**PageModel asignado:** Lucía confirmó el 04-oct-2026 que lo escribe Dulce. Unitarias en el mismo PR, revisión distinta y aprobación de Lucía, conforme a [AGENTS.md](AGENTS.md).
-
-Orden de lectura compartido: esta guía → B00 → 08D. Después Miguel: ADR → requisitos → 08B/08C → pruebas §1 y B00. Dulce: 08B/08C → pruebas §2 → requisitos aplicables. Lucía: requisitos → plan de pruebas §§3–5 → B00. Cada tarea debe citar su B/HU/CU/Q y criterio de aceptación.
-
-## 4. Stack y estructura
-
-Ver [AGENTS.md — Stack y estructura](AGENTS.md).
-
-## 5. Reglas por cambio
-
-Ver [AGENTS.md — Reglas por cambio](AGENTS.md).
-
-## 6. Pendientes que no deben resolverse por suposición
-
-| Pendiente | Quién lo resuelve | Qué trabajo depende de ello |
-| --- | --- | --- |
-| Prioridad/corte B00–B04, campos del directorio y paciente, contacto de tutor, ámbitos, duplicados, valor inicial del pago y corrección tras cancelar/baja | Dulce con la usuaria | Pantallas y reglas afectadas. Las propuestas de 08C no son respuestas recibidas. |
-| Baja de paciente con citas activas; retirar un ámbito con citas y recuperación posterior | Dulce con la usuaria; Miguel implementa; Lucía prueba | Política funcional antes de implementarla. B00 valida los invariantes aprobados sin adjudicar una regla pendiente. |
-| Resuelto el 04-oct: primer superusuario por comando local y restablecimiento sin levantar bloqueo | Lucía aprobó; Miguel implementa; Lucía prueba | Condiciones en [AGENTS.md](AGENTS.md); sin contraseña fija ni correo supuesto. |
-| Resuelto el 04-oct: PageModel a cargo de Dulce | Lucía confirmó; Dulce implementa y escribe unitarias | Revisión distinta y aprobación de Lucía. |
-| Respaldo: decisión de Lucía del 10-oct registrada | Implementación pendiente de autorización | Opción A, age, validación diaria antes de cifrar y simulacro mensual; reglas vigentes en AGENTS §2.8 y nota posterior ADR-05. No crear repo, conectar Neon ni configurar flujo. |
-| Revisión de documentación inicial | Miguel o Dulce comunica observaciones con su propio método; Lucía confirma cambios | Pendiente y no bloqueante; guía, AGENTS y ADR corregidos ya aprobados por Lucía. |
-| Revisión de código/pruebas, resultados B00 y decisión LCA | Autor distinto del revisor en cada PR; aprobación final de Lucía | Miguel/Dulce revisa pruebas de Lucía. Construcción B01 está abierta por decisión posterior; el cierre B00/LCA sigue esperando evidencia y decisión de Lucía. |
-| Acceso, procedencia, conservación y eliminación de datos reales; TOTP | Lucía con la usuaria y responsables técnicos | R04 sigue abierto: no utilizar datos reales. |
-
-GitHub permite descargar artefactos a personas autenticadas con lectura del repositorio; en uno público ese acceso no restringe el respaldo al equipo. El cifrado no convierte el artefacto en privado. [Fuente oficial: descarga de artefactos](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/download-workflow-artifacts). La nota posterior ADR-05 del 10-oct registra la decisión aprobada de cifrado, custodia y validación; su implementación no está autorizada. No se ha creado el repo de respaldo ni configurado el flujo.
-
-## 7. Cómo dejar trabajo revisable sin depender de una llamada
-
-En cada PR: B/HU/CU/Q afectados, qué se implementó, criterios cubiertos, comandos y resultados, pendientes y persona revisora. Adjuntar evidencia ficticia y sin secretos. Miguel documenta cómo arrancar, migrar y reproducir; Dulce deja respuestas de producto y capturas ficticias; Los documentos de avance incorporan los cambios y resultados de la entrega después de cerrar la auditoría y las aprobaciones; antes se conserva la evidencia local pendiente. La menor disponibilidad de Lucía permite preparar trabajo revisable, no fusionar cambios críticos sin su revisión ni dar por aprobada LCA.
-
-## 8. Instalar antes de empezar
-
-Abrir PowerShell y comprobar las herramientas. .NET SDK y Docker son necesarios para correr y probar localmente; Git obtiene el código, el editor permite modificarlo y StarUML abre el diagrama editable.
+## 4. Instalar
 
 | Herramienta | Comando de comprobación | Resultado esperado |
 | --- | --- | --- |
@@ -90,105 +42,38 @@ Abrir PowerShell y comprobar las herramientas. .NET SDK y Docker son necesarios 
 | VS Code (editor comprobado) | `code --version` | Versión del editor. Si se elige otro, comprobar su versión con su comando. |
 | StarUML | `winget list --id MKLabs.StarUML --exact --source winget` | Instalación detectada; abrir el `.mdj` con StarUML. |
 
-Fuentes: [instalar .NET en Windows](https://learn.microsoft.com/en-us/dotnet/core/install/windows), [Docker Desktop para Windows](https://docs.docker.com/desktop/setup/install/windows-install/), [Git](https://git-scm.com/downloads), [VS Code](https://code.visualstudio.com/download) y [StarUML](https://staruml.io/download/).
+## 5. Construir, probar y ejecutar
 
-El PR #1 fusionado ya incluye solución, `.csproj`, migraciones y aplicación mínima; no acredita todavía B00 completo. Los comandos técnicos de Miguel se conservan en [§10 — Construir, probar y ejecutar](#10-construir-probar-y-ejecutar). No instalar PostgreSQL de producción para B00: Testcontainers crea bases desechables con Docker. Las dependencias ya declaradas en los proyectos no se sustituyen instalando SDK o creando carpetas.
+SDK de `global.json`; Visual Studio 18 o superior o VS Code/terminal. Desde la raíz, en PowerShell; sustituir `<clave>` por contraseñas locales y mantener las variables en la misma terminal. La aplicación no carga `.env`.
 
-`.env.example` contiene solo ejemplos ficticios. Copiar a `.env` únicamente para configuración local y nunca publicarlo; ASP.NET Core no carga ese archivo automáticamente. La configuración del servidor y las conexiones locales se documentan en §10.
-
-**Render y Neon:** no se necesitan para B00. No crear cuentas ni aceptar condiciones hasta que Lucía autorice el despliegue. B00 utiliza PostgreSQL desechable mediante Testcontainers y Docker; las conexiones a servicios de nube y el respaldo diario siguen pendientes de su autorización.
-
-## 9. Estado y entrega de B00
-
-PR #1, #3, #4 y #5 fusionados. Base de esta entrega: main `40785d2`. Secret Protection y Push protection verificadas por captura el 12-oct; main exigió una revisión con permisos de escritura el 13-oct, según el bloqueo comunicado por Lucía y su posterior APPROVED/fusión. No se inspeccionaron otras reglas de main ni se ensayó un push con secreto.
-
-PR #5, `bce9409`: build Release sin errores/advertencias; 258 unitarias y 182 integración correctas. Corrige los hallazgos anteriores, permisos, Identity, cabeceras y 500 seguro. Ejecuciones locales, no CI.
-
-| Quién | Qué debe consultar y atender |
-| --- | --- |
-| Miguel | PR #6 revisado y fusionado. Continuar en la rama `b01/acceso-y-usuarios`; estado en el [avance de B01](#avance-de-b01-en-la-rama-de-miguel--17-oct-2026). No reasignar PageModel de Dulce. |
-| Dulce | [Informe PR01 §8](docs/reviews/TherapEase-09-B00-revision-PR01.md#8-mensajes-de-guardado--dulce-pagemodel-10-oct-2026): mensajes Q08; acceso mínimo/PageModel y unitarias; validar producto con la usuaria. Procedimientos aprobados en [AGENTS](AGENTS.md) §2.2–§2.3. |
-| Equipo | [B00 §7](docs/planning/TherapEase-etapa09-B00.md#7-plan-de-validación-autorizado) y [plan de pruebas](docs/testing/TherapEase-09-plan-de-pruebas.md): responsables, evidencia y pendientes. Reglas obligatorias en AGENTS. |
-
-**[PR #6 — QA incorporado](https://github.com/LuciAguilar/Therapease/pull/6):** Miguel aprobó `0db344a`; Lucía fusionó mediante squash el 15-oct en `ffb2494ad9da026f24a57826c45f6f530afb467b`. Código probado final `0aa32f2`: 258 unitarias y 205 integración correctas; comandos y huellas en B00 §4.11. No son pruebas nuevas de esta actualización. B00/LCA/R04 siguen abiertos.
-
-
-**Corrección del PR #6, 14-oct:** Pkcs y Xml de pruebas fijados en 10.0.13; auditoría NuGet sin paquetes vulnerables reportados. Repetición: 258 unitarias y 205 integración correctas. Encabezados ampliados; B00 §4.11 conserva comandos y huellas. Miguel revisó estas correcciones y Lucía fusionó PR #6 el 15-oct. Mantener seguimiento de tiempos de espera y CSS con sesión; páginas y navegador pendientes.
-
-**Avance autorizado el 13-oct:** Lucía autoriza Construcción/B01 con Miguel en otro chat mientras termina el QA de B00. B00/LCA conservan pendientes; R04 abierto, solo datos ficticios. El QA nuevo ya fue revisado por Miguel y fusionado por Lucía el 15-oct. Páginas/navegador, producto, respaldo real y nube mantienen sus límites.
-
-**ADR-05:** age, clave pública y custodia privada según AGENTS §2.8. Las pruebas actuales usan cifrado exclusivo de QA; no implementan el respaldo real.
-
-## 10. Construir, probar y ejecutar
-
-Requiere el SDK indicado en `global.json` (.NET 10). Visual Studio solo abre estos proyectos desde la versión 2026 (18.0 o superior); Visual Studio 2022 no carga ese SDK y muestra «The SDK 'Microsoft.NET.Sdk' specified could not be found». VS Code y la terminal funcionan con el SDK instalado. Desde la raíz del repositorio:
-
-```bash
-dotnet build TherapEase.sln
-dotnet test TherapEase.sln
-dotnet run --project src/Web
-```
-
-Comprobaciones del CI en local (desde la raíz, con Git Bash; el `bash` de WSL sin distribución instalada no sirve). La primera necesita un `dotnet restore` previo:
-
-```bash
-bash scripts/ci/revisar-paquetes-vulnerables.sh   # falla ante una vulnerabilidad alta o crítica en paquetes NuGet
-bash scripts/ci/revisar-fijaciones.sh             # acciones por SHA, imagen base por digest, permisos del flujo
-bash scripts/ci/revisar-archivos-sensibles.sh     # .env, credenciales o claves privadas versionados
-```
-
-El flujo también comprueba que el modelo y las migraciones coinciden (`dotnet ef migrations has-pending-model-changes --project src/Infrastructure --startup-project src/Web`, con una `ConnectionStrings__Migraciones` ficticia: no se conecta a ninguna base) y que la imagen del `Dockerfile` no corre como root y define su comprobación de salud.
-
-La aplicación escucha en `http://localhost:5052` con el perfil `http` y en `https://localhost:7028` con el perfil `https` (HTTP redirige a HTTPS); para probar formularios y sesiones se usa el `https` (ver «Servidor local para conectar las páginas» más abajo). Expone `/salud`, que solo comprueba que el proceso está encendido: puede responder 200 aunque PostgreSQL no esté disponible, así que no demuestra que el acceso a datos funcione. IntegrationTests contiene los bloques de QA de B00 §4.1–§4.8 (PR #4, fusionado); sus resultados están en [B00 §4](docs/planning/TherapEase-etapa09-B00.md#4-evidencia-registrada-y-límites). E2ETests sigue sin pruebas; espera los recorridos con las páginas de Dulce.
-
-Imagen Docker (requiere Docker Desktop; salud y usuario sin privilegios se declaran en el `Dockerfile`):
-
-```bash
-docker build -t therapease:local .
-docker run --rm -p 8080:8080 therapease:local
-```
-
-**Base de datos local y migraciones** (PostgreSQL desechable con datos ficticios; el puerto 55432 evita chocar con un PostgreSQL ya instalado). Sustituye `<clave>` por contraseñas locales que no subas a Git:
-
+Arranque predeterminado: `dotnet run --project src/Web`. Imagen: `docker build -t therapease:local .` construye; `docker run --rm -p 8080:8080 therapease:local` ejecuta.
 ```powershell
-docker run -d --name therapease-pg -e POSTGRES_PASSWORD=<clave> -e POSTGRES_DB=therapease_ficticia -p 55432:5432 postgres:17
-Get-Content scripts/db/crear-roles.sql -Raw | docker exec -i therapease-pg psql -U postgres -v ON_ERROR_STOP=1 -v base=therapease_ficticia -v clave_migrador=<clave> -v clave_app=<clave> -f -
-$env:ConnectionStrings__Migraciones = "Host=localhost;Port=55432;Database=therapease_ficticia;Username=therapease_migrador;Password=<clave>"
-dotnet tool restore
-dotnet ef database update --project src/Infrastructure --startup-project src/Web
-$env:ConnectionStrings__TherapEase = "Host=localhost;Port=55432;Database=therapease_ficticia;Username=therapease_app;Password=<clave>"
+dotnet build TherapEase.sln   # compilar
+dotnet test TherapEase.sln    # probar; Docker debe estar disponible
+docker run -d --name therapease-pg -e POSTGRES_PASSWORD=<clave> -e POSTGRES_DB=therapease_ficticia -p 55432:5432 postgres:17 # base local ficticia
+Get-Content scripts/db/crear-roles.sql -Raw | docker exec -i therapease-pg psql -U postgres -v ON_ERROR_STOP=1 -v base=therapease_ficticia -v clave_migrador=<clave> -v clave_app=<clave> -f - # crear los roles
+$env:ConnectionStrings__Migraciones = "Host=localhost;Port=55432;Database=therapease_ficticia;Username=therapease_migrador;Password=<clave>" # conexión de migración
+dotnet tool restore # restaurar herramientas
+dotnet ef database update --project src/Infrastructure --startup-project src/Web # aplicar migraciones
+$env:ConnectionStrings__TherapEase = "Host=localhost;Port=55432;Database=therapease_ficticia;Username=therapease_app;Password=<clave>" # conexión de la aplicación
+dotnet run --project src/Web -- --crear-superusuario <nombre-de-usuario> # una vez; temporal solo en esta consola
+dotnet run --project src/Web -- --restablecer-superusuario <nombre-de-usuario> # recuperación por operador, solo si hace falta
+dotnet dev-certs https --trust # confiar en el certificado local
+dotnet run --project src/Web --launch-profile https # https://localhost:7028; usar HTTPS para formularios
+```
+En Git Bash, después de `dotnet restore`:
+```bash
+bash scripts/ci/revisar-paquetes-vulnerables.sh # revisar paquetes
+bash scripts/ci/revisar-fijaciones.sh # revisar fijaciones y permisos
+bash scripts/ci/revisar-archivos-sensibles.sh # revisar archivos sensibles
 ```
 
-Las migraciones las aplica solo `therapease_migrador`; la aplicación se conecta con `therapease_app`, que no puede cambiar el esquema, borrar pacientes o citas, ni modificar `EventoAuditoria`. Una migración nueva se crea con `dotnet ef migrations add <Nombre> --project src/Infrastructure --startup-project src/Web --output-dir Migraciones`; si crea una tabla, debe incluir sus `GRANT` explícitos para `therapease_app`, y se revisa su SQL (`dotnet ef migrations script`) antes del PR.
+- Modelo/migraciones: `dotnet ef migrations has-pending-model-changes --project src/Infrastructure --startup-project src/Web`, con `ConnectionStrings__Migraciones` ficticia; no conecta a una base.
+- Nueva migración: `dotnet ef migrations add <Nombre> --project src/Infrastructure --startup-project src/Web --output-dir Migraciones`; revisar SQL con `dotnet ef migrations script`. Al terminar: `Remove-Item Env:ConnectionStrings__TherapEase, Env:ConnectionStrings__Migraciones`.
+- Auditoría: superusuario activo sin temporal, en la misma ventana autenticada: `GET /api/auditoria/eventos?desde=<instante-con-zona>&hasta=<instante-con-zona>`; opcionales `tipoRegistro` (Paciente/Cita/Usuario, nombres completos), `idRegistro`, `limite` (1–500; 100 por defecto). Sin zona, números/listas en tipoRegistro o filtros inválidos: 400; sin sesión: 401; sin permiso: 403. El recorrido espera páginas.
+- Reglas y `/salud`: identidad, cabeceras, citas y auditoría en [AGENTS §2](AGENTS.md#2-reglas-que-deben-acompañar-cada-cambio-05e-y-07a07c). `/salud` mide el proceso, no PostgreSQL; el detalle operativo está en [B00](docs/planning/TherapEase-etapa09-B00.md) y [B01](docs/planning/TherapEase-etapa09-B01.md).
 
-**Servidor local para conectar las páginas.** Con las dos variables de arriba en la **misma terminal** (la aplicación no carga `.env`; se pierden al cerrarla y conviene retirarlas al terminar con `Remove-Item Env:ConnectionStrings__TherapEase, Env:ConnectionStrings__Migraciones`):
-
-```powershell
-dotnet run --project src/Web -- --crear-superusuario super-ficticio   # una vez; la temporal sale solo por esta consola
-dotnet dev-certs https --trust                                        # una vez por equipo: confiar en el certificado local
-dotnet run --project src/Web --launch-profile https                   # abre el navegador en https://localhost:7028
-```
-
-Cuando exista la página de acceso, se entra por `https://localhost:7028/Acceso` con el usuario ficticio y la temporal; la primera entrada solo permite cambiar la contraseña (CU11). La cookie de sesión es `Secure` y la de antifalsificación es `Secure` y `SameSite=Strict`, así que el formulario real se prueba por HTTPS; en HTTP algunos navegadores no guardan esas cookies. La protección antifalsificación de Razor Pages viene activa y **no se desactiva** (`[IgnoreAntiforgeryToken]` o `asp-antiforgery="false"`) para avanzar: el diseño que la desactivaba para trabajar sin base de datos debe corregirse al conectar la página. El comando de arranque imprime, además de la contraseña temporal (al final), mensajes informativos de Entity Framework con las sentencias SQL y sin valores; no son un error. `/salud` solo comprueba el proceso, no la base. Datos ficticios y base local: no se toca la nube. Comprobado el 22-oct con un contenedor desechable, ver el [plan de pruebas §0.8](docs/testing/TherapEase-09-plan-de-pruebas.md#08-avance-de-miguel-en-b01-eventos-de-acceso-salida-y-bloqueo--22-oct-2026); confiar en el certificado (`--trust`) lo hace cada persona, no se hizo en esa comprobación.
-
-**Restauración en un servidor nuevo.** Primero crea la base vacía y ejecuta `scripts/db/crear-roles.sql` como administrador del destino, con contraseñas locales: `pg_dump` no copia los roles globales de PostgreSQL. Después restaura con `therapease_migrador`, sin aplicar antes migraciones en esa base vacía. Testcontainers prepara ambos roles en cada contenedor nuevo. Esto documenta la recuperación local; no configura age ni respaldos diarios.
-
-**Reglas de citas implementadas.** Activa = agendada y vigente; solo las activas bloquean horarios. La base impone por sí misma que dos citas activas no se crucen y que nunca exista una cita activa de un paciente de baja (restricción de exclusión y triggers de `EsquemaInicial`); esa protección se conserva. Cancelar no es baja y conserva el pago. Ninguna cita se cancela ni se recupera automáticamente. **Provisional, pendiente de validar con la usuaria (Dulce):** (1) la política para las citas existentes al dar de baja a un paciente: hoy la baja se rechaza mientras haya citas activas, y la alternativa sería cancelarlas primero; (2) el pago inicial «Pendiente»; (3) las citas seguidas sin hueco, que hoy se permiten porque el intervalo es `[inicio, fin)`. Lo provisional es la política de atención a las citas existentes, no el bloqueo de la base.
-
-**Identidad y acceso.** Los usuarios y roles los administra ASP.NET Core Identity; los roles `Usuaria` y `Superusuario` los siembra la migración. Con la aplicación configurada (`ConnectionStrings__TherapEase`), el primer superusuario se crea con un comando que se ejecuta solo en la máquina del operador: entrega una contraseña temporal únicamente por su consola, una sola vez, sin escribirla en los registros del servidor, sin correo y sin contraseña fija en el código. Condiciones decididas por Lucía: la contraseña tiene mínimo 12 caracteres y no exige combinaciones de letras, números o símbolos, y la sesión caduca tras 30 minutos sin actividad. Cada cuenta tiene nombre completo (obligatorio al crear desde CU02, de 2 a 150 caracteres; el primer superusuario lo recibe vacío y el Superusuario lo completa después) y un correo opcional que no sirve para entrar ni para recuperar contraseñas (aprobado el 17-oct). Documentarlas no acredita que sus mecanismos estén completamente probados: la evidencia de QA en servidor está en B00 §4.1; los recorridos de navegador siguen pendientes.
-
-```powershell
-dotnet run --project src/Web -- --crear-superusuario <nombre-de-usuario>
-dotnet run --project src/Web -- --restablecer-superusuario <nombre-de-usuario>
-```
-
-El segundo comando es la recuperación cuando ningún superusuario puede entrar; como todo restablecimiento de contraseña, conserva el bloqueo vigente en lugar de levantarlo (cinco fallos bloquean como máximo 15 minutos). La cookie de sesión es `HttpOnly`, `Secure` y `SameSite=Lax`; cada solicitud revalida el sello y el estado del usuario contra la base, y todo lo que no declare otra política exige sesión válida. Si Identity rechaza una operación (rol, sello, contraseña, contador de intentos), la operación se detiene y no se confirma. Permisos: administrar usuarios y consultar la auditoría son solo del Superusuario; dar de baja pacientes es de Usuaria y Superusuario, decisión provisional de Lucía del 11-oct que Dulce valida con la usuaria. La matriz de permisos es explícita por rol y una prueba falla si se añade un permiso sin decidirlo. La autorización se resuelve en el servidor con `IAutorizacion` y exige sesión válida, cuenta activa y sin contraseña temporal pendiente.
-
-**Cabeceras de seguridad y errores.** Toda respuesta lleva `X-Content-Type-Options: nosniff`, `Content-Security-Policy: frame-ancestors 'none'`, `X-Frame-Options: DENY` y `Referrer-Policy: no-referrer`. El contenido que exige sesión lleva además `Cache-Control: no-store`; no se impone a los archivos estáticos. `/salud` ya impide caché por el framework y `/Error` por ResponseCache. Las demás restricciones de CSP se completan con las páginas y la duración de HSTS se decide al desplegar. Fuera de Development, una excepción no controlada recibe un 500 con cuerpo fijo (JSON en `/api`, HTML mínimo en las páginas) que no consulta Identity ni la base y no incluye datos de la excepción, de la solicitud ni del usuario.
-
-**Consulta técnica de auditoría (Q03, sin pantalla).** Solo lectura, solo superusuario activo con sesión vigente: `GET /api/auditoria/eventos?desde=<instante>&hasta=<instante>` con opcionales `tipoRegistro` (`Paciente`, `Cita`, `Usuario`; solo nombres completos, sin distinguir mayúsculas: números y listas con comas devuelven `400`), `idRegistro` y `limite` (1 a 500, 100 por defecto). Los instantes llevan zona, por ejemplo `2026-10-01T00:00:00Z`; sin zona se rechazan. Responde `401` sin sesión, `403` sin permiso y `400` ante un filtro inválido. Devuelve en JSON el actor, el momento, el registro y los campos afectados, la acción y el hecho, nunca valores. Opción A aprobada el 12-oct: el Superusuario activo sin temporal inicia sesión en el navegador y abre la URL en la misma ventana, con su cookie y permisos. No se incluye el script B. El recorrido final espera las páginas de acceso/salida de Dulce y su prueba de navegador; Dulce escribe PageModel y unitarias.
-
-**Dependencias permitidas según [AGENTS](AGENTS.md) §1.** Las 30 pruebas automáticas de límites pasan sobre el commit revisado del PR #5; el recorrido sobre páginas funcionales sigue pendiente. Estado de B00: [B00 §4](docs/planning/TherapEase-etapa09-B00.md#4-evidencia-registrada-y-límites).
+## 6. Cómo está organizado el código
 
 | Proyecto | Puede referenciar |
 | --- | --- |
@@ -196,10 +81,6 @@ El segundo comando es la recuperación cuando ningún superusuario puede entrar;
 | `TherapEase.Application` | Domain |
 | `TherapEase.Infrastructure` | Application, Domain |
 | `TherapEase.Web` | Application; Domain solo para enumeraciones y contenedores de constantes sin lógica; Infrastructure solo para componer dependencias en el arranque |
-
-Excepción aprobada por Lucía el 08-oct: Web puede usar enumeraciones y contenedores de constantes de Domain; entidades, reglas y servicios de Domain pasan siempre por Application. [AGENTS](AGENTS.md) sigue siendo la fuente de las reglas.
-
-**Estructura de carpetas.** Cada capa se organiza primero por módulo (Identidad, Pacientes, Citas, Auditoria y lo común en `Compartido`), porque `AGENTS.md` y ADR-03 piden módulos por capacidad; el espacio de nombres sigue el patrón `TherapEase.<Capa>.<Módulo>`, por ejemplo `TherapEase.Application.Pacientes`. Dentro de cada módulo, el código se separa por tipo y el espacio de nombres sigue la carpeta:
 
 | Capa | Carpeta dentro del módulo | Qué contiene |
 | --- | --- | --- |
@@ -214,27 +95,10 @@ Excepción aprobada por Lucía el 08-oct: Web puede usar enumeraciones y contene
 | Infrastructure | `Data`, `Migraciones`, `Configuracion` | Contexto de EF, migraciones y registro de dependencias (no pertenecen a un módulo). |
 | Web | `Pages`, `Endpoints`, `Seguridad`, `Comandos`, `Configuracion`, `Salud` | Pantallas, rutas técnicas, cookie y políticas, comandos de operador, composición y sonda de salud. |
 
-Los setters de las entidades son `internal`: solo las clases de `Reglas` del propio dominio las modifican, así ninguna otra capa salta una regla. Los ámbitos de un paciente se exponen como colección de solo lectura. El coordinador de CU04 va en `TherapEase.Application.Coordinadores`, fuera de Pacientes y Citas. Citas puede usar el contrato público de Pacientes; Pacientes no usa Citas; Identidad usa Auditoría y Auditoría no usa Identidad.
+## 7. Antes de abrir un PR
 
-## Avance de B01: eventos de acceso, salida y bloqueo — 22-oct-2026
-
-Rama `b00/correcciones-pr4`, usada como rama de trabajo por indicación de Miguel (incluye el PR #5, ya fusionado, y `origin/main` `7a73e0a`, en el commit `231b2a2`). [PR #9](https://github.com/LuciAguilar/Therapease/pull/9): código probado en el commit `e3f227cb79a1450d9cc8d1b88f4f09cc50680062`, revisado en `cb7da59`; [CI de GitHub](https://github.com/LuciAguilar/Therapease/actions/runs/39905673597) correcto en sus cuatro trabajos y código aprobado por Lucía el 24-oct. 422 unitarias y 319 de integración correctas en local, no CI, con `xUnit.MaxParallelThreads=2`; los resultados, los límites y la lista de ajustes a pruebas de Lucía están en el [plan de pruebas §0.8](docs/testing/TherapEase-09-plan-de-pruebas.md#08-avance-de-miguel-en-b01-eventos-de-acceso-salida-y-bloqueo--22-oct-2026).
-
-- **Servidor:** `InicioSesion` se guarda junto con la verificación de la entrada (si falla, no se abre sesión y llega el error general); `CierreSesion` y `BloqueoAcceso` se guardan después de proteger, en otra transacción, y si su evento falla la sesión queda cerrada o la cuenta bloqueada y solo queda un aviso técnico fijo (`IRegistroTecnico`, con el registro de .NET y sin paquetes nuevos). Un evento por bloqueo, también con intentos simultáneos y cuando nace en CU11. Los cierres por desactivar, cambiar el rol o restablecer siguen en el evento de esa operación. No se guardan el nombre escrito, la IP ni el navegador.
-- **Para Dulce:** el [contrato](docs/planning/TherapEase-etapa09-B01-contrato-para-paginas.md) se actualizó (§2.6 y las firmas, que no cambian) y [la propuesta](docs/planning/TherapEase-etapa09-B01-propuesta.md) recoge las cuatro precisiones aprobadas el 18-oct. Las instrucciones de PostgreSQL local se ejecutaron de punta a punta, ver «Servidor local para conectar las páginas» en §10.
-- **Actualización del 25-oct:** documentos revisados, auditoría v3 aprobada y PR #9 fusionado por Lucía en `6526607`. Los diez casos propios de eventos se incluyen en #10, auditados y con publicación autorizada; su revisión humana sigue pendiente; páginas y navegador siguen pendientes con Dulce y Lucía.
-
-## Avance de B01 en la rama de Miguel — 17-oct-2026
-
-Rama `b01/acceso-y-usuarios`, código probado `c3f2b63de2fce7e5f265119ba292f6c2017d93c5`: 386 unitarias y 240 de integración correctas (esta última en la segunda ejecución, con 35 pruebas de Lucía que después se retiraron de este PR; la primera tuvo 10 fallos por tiempo de espera agotado, atribuidos a la carga de la máquina). Ejecución local, no CI; [PR #7](https://github.com/LuciAguilar/Therapease/pull/7). Comandos, entorno y huellas en el [plan de pruebas §0.7](docs/testing/TherapEase-09-plan-de-pruebas.md#07-avance-de-miguel-en-b01--17-oct-2026).
-
-- **Servidor:** permisos escritos uno por uno, lista y ficha de usuarios, nombre completo y correo con su migración, edición por el Superusuario y consulta de datos propios. Los eventos de acceso, salida y bloqueo quedaron revisados y fusionados en PR #9 el 25-oct (`6526607`). AGENTS §2.3 recoge el registro técnico aprobado el 21-oct.
-- **Para Dulce:** [contrato de las funciones para las páginas](docs/planning/TherapEase-etapa09-B01-contrato-para-paginas.md).
-- **CI:** `.github/workflows/comprobaciones.yml` y `scripts/ci/`. Comprobado en local y en GitHub (PR #7): la ejecución 2, del 18-oct, terminó correcta en sus cuatro trabajos; la 1 tuvo 7 fallos de integración que ya se corrigieron. Va en el mismo PR que lo anterior; los eventos de acceso irán en otro. Cómo ejecutar sus comprobaciones en local, en §10.
-- **Decisiones:** [propuesta de Miguel](docs/planning/TherapEase-etapa09-B01-propuesta.md), con las decisiones de Lucía del 17-oct y el estado de cada punto.
-
-## Preparación de B01 y respuestas recibidas
-
-[Plan B01](docs/planning/TherapEase-etapa09-B01.md): trabajo de Miguel/CI y QA autorizado que puede avanzar sin páginas; PageModel y formularios de Dulce; navegador cuando estén disponibles. La entrevista acepta el recorrido de diciembre y registra campos, tutor, homónimos/lista, contiguas, pago inicial/correcciones y prioridades futuras. Los comandos técnicos y resultados históricos anteriores se conservan; no describen montos o cancelación automática implementados. Revisar el registro de entrevista antes de retomar pendientes de producto. No publicar fuentes originales ni checklist personal.
-
-**Horario aclarado por Lucía, 14-oct:** ✅ 9:00–15:00, sesiones de 1 h; desde 15:00 puede haber sesiones de 30 min, hasta 19:00. ⏳ Último inicio o término a 19:00, días y cruce de las 15:00 por concretar. Referencia America/Hermosillo; no acredita implementación ni pruebas.
+- Indicar B/HU/CU/Q, criterios cubiertos, cambios y pendientes.
+- Incluir las unitarias propias y evidencia de las comprobaciones aplicables.
+- Mantener CI correcta; no acreditar pruebas omitidas o no ejecutadas.
+- Revisar SQL, impacto y reversión si hay migraciones; no incluir secretos ni datos reales.
+- Obtener revisión de otra persona y aprobación final de Lucía; seguir [AGENTS](AGENTS.md).

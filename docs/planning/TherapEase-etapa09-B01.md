@@ -1,6 +1,6 @@
 # TherapEase — 09/B01 · Acceso e identidad segura
 
-**Actualizado el 25-oct-2026:** PR #8 y #9 revisados y fusionados. El servidor de eventos ya está en main (`6526607`). Los diez casos propios de Lucía se incluyen en #10: auditoría resuelta y publicación autorizada; faltan revisión humana y fusión. Páginas y navegador siguen pendientes.
+**Actualizado el 26-oct-2026:** PR #8, #9 y #10 revisados y fusionados. Miguel (`GalloNav`) aprobó los diez casos propios de eventos sobre `3a44332`; Lucía fusionó #10 con Create a merge commit en `a7c0c52`. Páginas y navegador siguen pendientes; B01 continúa abierto. B02 espera la propuesta única de Miguel.
 
 B01 es la puerta de entrada de TherapEase: cada persona entra con su usuario y contraseña, usa solo lo que le toca y sale de forma segura. También incluye administrar cuentas, cambiar y restablecer contraseñas, bloquear intentos fallidos y dejar registro de todo (HU01–HU03 y HU15; CU01, CU02 y CU11).
 
@@ -13,7 +13,7 @@ Miguel hace el servidor, Dulce las páginas y Lucía comprueba que todo funcione
 | ✅ | Usuarios, nombre y correo, permisos y comprobaciones automáticas (CI) | Miguel | PR #7, fusionado el 18-oct |
 | ✅ | Pruebas de servidor, permisos, sesiones y contraseñas | Lucía; revisó Miguel | [PR #8](https://github.com/LuciAguilar/Therapease/pull/8), fusionado el 20-oct |
 | ✅ | Registrar entradas, salidas y bloqueos | Miguel | PR #9 revisado y fusionado el 25-oct en `6526607` |
-| ✅ / ⏳ | Diez pruebas propias de eventos | Lucía; revisa Miguel o Dulce | ✅ Incorporadas y auditadas en el mismo PR #10; Lucía aprobó la precisión y publicación. ⏳ Revisión humana y fusión |
+| ✅ | Diez pruebas propias de eventos | Lucía; revisó Miguel | Revisadas sobre `3a44332` y fusionadas por Lucía en PR #10, `a7c0c52`, el 26-oct. CI 40393607611: cuatro trabajos correctos. |
 | ⏳ | Páginas, formularios y PageModel | Dulce | Sin entregar; hoy solo hay diseño |
 | ⏳ | Probar formularios, navegador y la consulta de auditoría Q03 | Lucía | Cuando lleguen las páginas |
 | ⏳ | Cerrar B01 | Todos; aprueba Lucía | Al final, con todo probado y revisado |
@@ -40,7 +40,7 @@ Un **PR** es una solicitud para revisar cambios y el **SHA** es el código que i
 | Rama principal `main` | ✅ `6526607fbd59ffda966093d65f04467da1a959ad`, PR #9 fusionado el 25-oct; incluye el [merge de PR #8](https://github.com/LuciAguilar/Therapease/pull/8). | Incluye el QA revisado de Servidor, Permisos, Sesiones y Contraseñas. |
 | PR #5 de Miguel | ✅ Revisado por Lucía y fusionado. Último SHA del PR: `bce94091ba614e16f4cce3435697d8c58c2a31ff`; incorporado a `main` como `40785d2`. [PR #5](https://github.com/LuciAguilar/Therapease/pull/5). | Reutilizar sus funciones y pruebas. Fusión: 13-oct, 20:49 de Hermosillo; 14-oct, 03:49 UTC. |
 | PR #6 de pruebas de Lucía | ✅ [Miguel aprobó](https://github.com/LuciAguilar/Therapease/pull/6#pullrequestreview-5528518803) `0db344a06a03edb054e3e94759f38a4c6f7e340c`; Lucía fusionó mediante squash el 15-oct, 08:06 de Hermosillo. [PR #6](https://github.com/LuciAguilar/Therapease/pull/6). | Incorporado a `main` en `ffb2494ad9da026f24a57826c45f6f530afb467b`. Código probado anterior `0aa32f2b4f387f02ded7b1100a74e869a0ad40d7`; no son pruebas nuevas. |
-| Rama global de Lucía | `revision/etapa09` incorpora main `6526607` mediante `160aa72345e0f923993d3adcef1c1fa26cdb1d05`; entrega de eventos en el mismo PR #10. | Conflictos resueltos, auditoría realizada y publicación autorizada por Lucía el 25-oct. El SHA de QA y sus comprobaciones se identifican en los commits y la CI del PR #10. |
+| Rama global de Lucía | `revision/etapa09` conserva su historial y quedó actualizada desde main `a7c0c52` tras fusionar #10. | Actualización sin crear otro commit; modelo/PDF locales conservados. El QA revisado es `3a44332`; no se acreditan pruebas nuevas por actualizar documentos. |
 | Páginas y comprobaciones automáticas | ✅ CI de PR #7 y PR #8 correctas. ⏳ Páginas funcionales y navegador. | La CI no demuestra login desde una página. |
 | Diseño de Dulce | ✅ Se inspeccionó solo en lectura `frontend/diseno`, SHA `0dfd3a5419f24c5825b5362f9c3ef8374720ec6f`. ⏳ Sin PR asociado ni revisión de entrega acreditada. | Es diseño, todavía sin inicio de sesión funcional. Observaciones en §4.2. |
 | B00, LCA y R04 | ⏳ Continúan abiertos. | B01 no cierra sus pendientes de pruebas, revisión o datos reales. |
@@ -195,7 +195,7 @@ Fuentes: [página de acceso](https://github.com/LuciAguilar/Therapease/blob/0dfd
 
 #### PostgreSQL local para usar el acceso y proteger los formularios
 
-**Pasos ejecutados el 22-oct** en un contenedor desechable, con claves generadas al vuelo y sin tocar la nube: contenedor y roles, migraciones, `--crear-superusuario` con un nombre ficticio y arranque de la aplicación (resultados en el [plan de pruebas §0.8](../testing/TherapEase-09-plan-de-pruebas.md#08-avance-de-miguel-en-b01-eventos-de-acceso-salida-y-bloqueo--22-oct-2026)). No se probó entrar con una página real, que no existe todavía, ni se confió en el certificado de desarrollo. Comandos en [README técnico §10 — Construir, probar y ejecutar](../../README.md#10-construir-probar-y-ejecutar).
+**Pasos ejecutados el 22-oct** en un contenedor desechable, con claves generadas al vuelo y sin tocar la nube: contenedor y roles, migraciones, `--crear-superusuario` con un nombre ficticio y arranque de la aplicación (resultados en el [plan de pruebas §0.8](../testing/TherapEase-09-plan-de-pruebas.md#08-avance-de-miguel-en-b01-eventos-de-acceso-salida-y-bloqueo--22-oct-2026)). No se probó entrar con una página real, que no existe todavía, ni se confió en el certificado de desarrollo. Comandos en [README técnico §5 — Construir, probar y ejecutar](../../README.md#5-construir-probar-y-ejecutar).
 
 1. Seguir el README desde la copia propia: versión de .NET indicada en `global.json`, Docker y datos ficticios. Crear PostgreSQL y sus usuarios solo si es instalación nueva. Preparar las tablas con el usuario migrador y ejecutar con el usuario app; son cuentas de la base de datos con permisos distintos. La aplicación no carga `.env` automáticamente.
 2. En base ficticia nueva, crear el primer Superusuario con `--crear-superusuario`. Nombre ficticio y temporal solo en consola; obliga al cambio CU11. Si ya existe cuenta de prueba, usarla.
@@ -238,15 +238,15 @@ B01 no incluye pacientes, citas, pagos, bajas ni directorio. Desactivar una cuen
 | --- | --- | --- | --- |
 | ✅ | Miguel | Inventario, propuesta aprobada, usuarios, nombre/correo, permisos explícitos, funciones documentadas y CI. | Lo pendiente se sigue en §2; no rehacer lo entregado. |
 | ⏳ | Dulce | Concretar pantallas, campos, mensajes y navegación; coordinar uso del servidor y README. | No declarar diseño como login funcional. Datos nuevos requieren detalle aprobado. |
-| ✅ | Lucía; Miguel revisó | ✅ Cuatro entregas y refactorización incorporadas en PR #8. | Eventos probados el 24-oct; diez casos propios incorporados en #10, con revisión humana pendiente. Páginas y navegador con Dulce. |
+| ✅ | Lucía; Miguel revisó | ✅ Cuatro entregas y refactorización incorporadas en PR #8. | Eventos probados el 24-oct; diez casos propios revisados por Miguel y fusionados en #10 el 26-oct (`a7c0c52`). Páginas y navegador con Dulce. |
 | ✅ | Miguel | PR #9: eventos y documentos revisados y fusionados. | Lucía aprobó y fusionó el 25-oct en `6526607`. El apoyo a Dulce continúa cuando conecte las páginas. |
-| ✅ | Lucía | ✅ Casos de usuarios, permisos, bloqueo, contraseñas, sesiones, concurrencia y auditoría de los cuatro informes, revisados en PR #8. | Eventos comprobados; diez casos propios incorporados en #10, con revisión humana pendiente. Recorridos web pendientes. |
+| ✅ | Lucía | ✅ Casos de usuarios, permisos, bloqueo, contraseñas, sesiones, concurrencia y auditoría de los cuatro informes, revisados en PR #8. | Eventos comprobados; diez casos propios revisados por Miguel y fusionados en #10 el 26-oct (`a7c0c52`). Recorridos web pendientes. |
 | ⏳ | Dulce | PageModel y unitarias; conectar acceso, salida, usuarios y cambio propio; formularios, mensajes y navegación. | No necesita esperar pacientes o agenda para terminar B01. |
 | ⏳ | Lucía | Enviar solicitudes reales; comprobar permisos, datos, protección y respuestas perdidas. | No requiere automatizar navegador todavía, pero sí acciones de página de Dulce. |
 | ⏳ | Lucía | Probar entrada/salida, dos sesiones, bloqueo, temporal, cambio propio, roles y Q03 en navegador. | Miguel o Dulce revisa sus pruebas. |
 | ⏳ | Equipo; Lucía aprueba | Corregir fallos, revisar pruebas y comprobar resultados automáticos/manuales. | Cierre B00/LCA separado. |
 
-PR #9 ya está fusionado. Las diez pruebas propias de Lucía se incluyen en #10, con auditoría resuelta y publicación autorizada; falta su revisión humana. Dulce continúa las páginas y el navegador queda para su integración.
+PR #9 y #10 ya están fusionados. Miguel revisó las diez pruebas propias de Lucía sobre `3a44332`; Lucía fusionó #10 el 26-oct con Create a merge commit en `a7c0c52`. Dulce continúa las páginas y el navegador queda para su integración. B02 espera la propuesta de Miguel.
 
 ## 7. Qué pruebas y evidencia se necesitan
 
@@ -297,7 +297,7 @@ Fecha y zona horaria, SHA completo y cambios locales, entorno, comando, cuántas
 | Consultar Q03 | Superusuario activo, sin temporal, entra en navegador y abre consulta en esa ventana. URL `/api/auditoria/eventos`; `desde`/`hasta` son fechas/horas con zona, `tipoRegistro` admite solo nombres completos y `limite` va de 1 a 500. |
 | Quitar permiso o salir con Q03 abierto | La siguiente consulta se deniega. Probar Usuaria, temporal, sesión vencida, desactivación y rol retirado. Sin pantalla ni script que evite iniciar sesión. |
 
-Temporales y consulta Q03 están aprobados desde el 12-oct; falta usarlos en las páginas y probarlos. Eventos y registro técnico revisados y fusionados en PR #9 el 25-oct. El QA propio de eventos de Lucía está en #10, con revisión humana y fusión pendientes.
+Temporales y consulta Q03 están aprobados desde el 12-oct; falta usarlos en las páginas y probarlos. Eventos y registro técnico revisados y fusionados en PR #9 el 25-oct. El QA propio de eventos de Lucía fue revisado por Miguel y fusionado en #10 el 26-oct (`a7c0c52`).
 
 ## 9. Cuándo se cierra B01 y qué queda fuera
 
@@ -305,13 +305,13 @@ Temporales y consulta Q03 están aprobados desde el 12-oct; falta usarlos en las
 | --- | --- | --- |
 | ⏳ | Funciones y errores de §5 satisfechos. | Resultados actuales de servidor, páginas y navegador. Servidor solo no cierra B01. |
 | ⏳ | Seguridad y registros completos para B01. | Permisos, contraseñas, sesiones, formularios y errores; sin problemas de seguridad que impidan usar el bloque. |
-| ⏳ | Comprobaciones automáticas correctas y evidencia identificable. | ✅ PR #7 y QA de PR #8 revisados, con CI correcta. ✅ CI del PR #9 correcta; ⏳ páginas e integración final. |
-| ⏳ | Otra persona revisa y Lucía aprueba al final. | ✅ Miguel revisó el QA de PR #8 y Lucía lo fusionó. ✅ PR #9 revisado y fusionado. ⏳ Revisión humana del QA de eventos de Lucía, páginas y cierre completo. |
+| ⏳ | Comprobaciones automáticas correctas y evidencia identificable. | ✅ PR #7 y QA de PR #8 revisados, con CI correcta. ✅ CI de #9 y #10 correcta; ⏳ páginas e integración final. |
+| ⏳ | Otra persona revisa y Lucía aprueba al final. | ✅ Miguel revisó el QA de PR #8 y Lucía lo fusionó. ✅ PR #9 revisado y fusionado. ✅ Miguel revisó el QA de eventos y Lucía fusionó #10. ⏳ Páginas y cierre completo. |
 | ⏳ | Pendientes anteriores registrados sin darlos por resueltos aquí. | B00/LCA se deciden aparte; R04 abierto. |
 
 | Límite o trabajo posterior | Qué se conserva |
 | --- | --- |
-| Rama y publicación | `revision/etapa09` se conserva. QA publicado y fusionado en PR #8, con merge commit. La autorización única de push forzado está consumida; publicación documental aprobada el 24-oct, con documentos actuales en cada push autorizado. El checklist de Lucía sigue solo local. |
+| Rama y publicación | `revision/etapa09` se conserva. QA publicado y fusionado en PR #8 y #10, con merge commit; rama global actualizada a `a7c0c52`. Los documentos de avance se mantienen al día con las entregas aprobadas. La autorización única de push forzado está consumida; publicación documental aprobada el 24-oct, con documentos actuales en cada push autorizado. El checklist de Lucía sigue solo local. |
 | Otros bloques | Pacientes/citas/pago en B02–B04; directorio separado en B07. Montos, solo particular y baja automática sin autorizar. |
 | Datos reales | Solo ficticios con R04 abierto. Antes de reales: temporal 24 h, TOTP y recuperación, más controles/decisiones aplicables. B01 no los acredita. |
 | Nube y respaldo real | Sin Render, Neon, repo de respaldos, despliegue ni gastos. Se conserva ADR-05/AGENTS §2.8 para autorización posterior; no se implementa aquí. |
@@ -323,3 +323,43 @@ Temporales y consulta Q03 están aprobados desde el 12-oct; falta usarlos en las
 ⏳ Dulce concreta campos, mensajes y logotipo; Lucía aprueba lo que falte decidir. El correo no sirve para recuperar contraseñas, y el visto bueno a las pantallas no significa que ya funcionen.
 
 Las respuestas completas de la entrevista (14-oct) están en [respuestas y ajustes](../requirements/TherapEase-09-entrevista-requisitos.md).
+
+## 10. Antecedentes y detalle de integración conservados de la guía
+
+Se conserva aquí el detalle retirado del README al simplificarlo. Son antecedentes con sus versiones y resultados originales, no pruebas nuevas. El estado vigente está al inicio de este plan; AGENTS y la entrevista prevalecen sobre pendientes históricos.
+
+### Avance de B01: eventos de acceso, salida y bloqueo — 22-oct-2026
+
+Rama `b00/correcciones-pr4`, usada como rama de trabajo por indicación de Miguel (incluye el PR #5, ya fusionado, y `origin/main` `7a73e0a`, en el commit `231b2a2`). [PR #9](https://github.com/LuciAguilar/Therapease/pull/9): código probado en el commit `e3f227cb79a1450d9cc8d1b88f4f09cc50680062`, revisado en `cb7da59`; [CI de GitHub](https://github.com/LuciAguilar/Therapease/actions/runs/39905673597) correcto en sus cuatro trabajos y código aprobado por Lucía el 24-oct. 422 unitarias y 319 de integración correctas en local, no CI, con `xUnit.MaxParallelThreads=2`; los resultados, los límites y la lista de ajustes a pruebas de Lucía están en el [plan de pruebas §0.8](../testing/TherapEase-09-plan-de-pruebas.md#08-avance-de-miguel-en-b01-eventos-de-acceso-salida-y-bloqueo--22-oct-2026).
+
+- **Servidor:** `InicioSesion` se guarda junto con la verificación de la entrada (si falla, no se abre sesión y llega el error general); `CierreSesion` y `BloqueoAcceso` se guardan después de proteger, en otra transacción, y si su evento falla la sesión queda cerrada o la cuenta bloqueada y solo queda un aviso técnico fijo (`IRegistroTecnico`, con el registro de .NET y sin paquetes nuevos). Un evento por bloqueo, también con intentos simultáneos y cuando nace en CU11. Los cierres por desactivar, cambiar el rol o restablecer siguen en el evento de esa operación. No se guardan el nombre escrito, la IP ni el navegador.
+- **Para Dulce:** el [contrato](TherapEase-etapa09-B01-contrato-para-paginas.md) se actualizó (§2.6 y las firmas, que no cambian) y [la propuesta](TherapEase-etapa09-B01-propuesta.md) recoge las cuatro precisiones aprobadas el 18-oct. Las instrucciones de PostgreSQL local se ejecutaron de punta a punta, ver [README sección 5](../../README.md#5-construir-probar-y-ejecutar).
+- **Actualización del 25-oct:** documentos revisados, auditoría v3 aprobada y PR #9 fusionado por Lucía en `6526607`. Los diez casos propios de eventos fueron revisados por Miguel y fusionados por Lucía en #10 el 26-oct (`a7c0c52`); páginas y navegador siguen pendientes con Dulce y Lucía.
+
+### Avance de B01 en la rama de Miguel — 17-oct-2026
+
+Rama `b01/acceso-y-usuarios`, código probado `c3f2b63de2fce7e5f265119ba292f6c2017d93c5`: 386 unitarias y 240 de integración correctas (esta última en la segunda ejecución, con 35 pruebas de Lucía que después se retiraron de este PR; la primera tuvo 10 fallos por tiempo de espera agotado, atribuidos a la carga de la máquina). Ejecución local, no CI; [PR #7](https://github.com/LuciAguilar/Therapease/pull/7). Comandos, entorno y huellas en el [plan de pruebas §0.7](../testing/TherapEase-09-plan-de-pruebas.md#07-avance-de-miguel-en-b01--17-oct-2026).
+
+- **Servidor:** permisos escritos uno por uno, lista y ficha de usuarios, nombre completo y correo con su migración, edición por el Superusuario y consulta de datos propios. Los eventos de acceso, salida y bloqueo quedaron revisados y fusionados en PR #9 el 25-oct (`6526607`). AGENTS §2.3 recoge el registro técnico aprobado el 21-oct.
+- **Para Dulce:** [contrato de las funciones para las páginas](TherapEase-etapa09-B01-contrato-para-paginas.md).
+- **CI:** `.github/workflows/comprobaciones.yml` y `scripts/ci/`. Comprobado en local y en GitHub (PR #7): la ejecución 2, del 18-oct, terminó correcta en sus cuatro trabajos; la 1 tuvo 7 fallos de integración que ya se corrigieron. Va en el mismo PR que lo anterior; los eventos de acceso irán en otro. Cómo ejecutar sus comprobaciones en local, en README §5.
+- **Decisiones:** [propuesta de Miguel](TherapEase-etapa09-B01-propuesta.md), con las decisiones de Lucía del 17-oct y el estado de cada punto.
+
+### Preparación de B01 y respuestas recibidas
+
+[Plan B01](TherapEase-etapa09-B01.md): trabajo de Miguel/CI y QA autorizado que puede avanzar sin páginas; PageModel y formularios de Dulce; navegador cuando estén disponibles. La entrevista acepta el recorrido de diciembre y registra campos, tutor, homónimos/lista, contiguas, pago inicial/correcciones y prioridades futuras. Los comandos técnicos y resultados históricos anteriores se conservan; no describen montos o cancelación automática implementados. Revisar el registro de entrevista antes de retomar pendientes de producto. No publicar fuentes originales ni checklist personal.
+
+**Horario aclarado por Lucía, 14-oct:** ✅ 9:00–15:00, sesiones de 1 h; desde 15:00 puede haber sesiones de 30 min, hasta 19:00. ⏳ Último inicio o término a 19:00, días y cruce de las 15:00 por concretar. Referencia America/Hermosillo; no acredita implementación ni pruebas.
+
+### Detalles para conectar y mantener el servidor
+
+Cuando exista la página de acceso, se entra por `https://localhost:7028/Acceso` con el usuario ficticio y la temporal; la primera entrada solo permite cambiar la contraseña (CU11). La cookie de sesión es `Secure` y la de antifalsificación es `Secure` y `SameSite=Strict`, así que el formulario real se prueba por HTTPS; en HTTP algunos navegadores no guardan esas cookies. La protección antifalsificación de Razor Pages viene activa y **no se desactiva** (`[IgnoreAntiforgeryToken]` o `asp-antiforgery="false"`) para avanzar: el diseño que la desactivaba para trabajar sin base de datos debe corregirse al conectar la página. El comando de arranque imprime, además de la contraseña temporal (al final), mensajes informativos de Entity Framework con las sentencias SQL y sin valores; no son un error. `/salud` solo comprueba el proceso, no la base. Datos ficticios y base local: no se toca la nube. Comprobado el 22-oct con un contenedor desechable, ver el [plan de pruebas §0.8](../testing/TherapEase-09-plan-de-pruebas.md#08-avance-de-miguel-en-b01-eventos-de-acceso-salida-y-bloqueo--22-oct-2026); confiar en el certificado (`--trust`) lo hace cada persona, no se hizo en esa comprobación.
+
+**Identidad y acceso.** Los usuarios y roles los administra ASP.NET Core Identity; los roles `Usuaria` y `Superusuario` los siembra la migración. Con la aplicación configurada (`ConnectionStrings__TherapEase`), el primer superusuario se crea con un comando que se ejecuta solo en la máquina del operador: entrega una contraseña temporal únicamente por su consola, una sola vez, sin escribirla en los registros del servidor, sin correo y sin contraseña fija en el código. Condiciones decididas por Lucía: la contraseña tiene mínimo 12 caracteres y no exige combinaciones de letras, números o símbolos, y la sesión caduca tras 30 minutos sin actividad. Cada cuenta tiene nombre completo (obligatorio al crear desde CU02, de 2 a 150 caracteres; el primer superusuario lo recibe vacío y el Superusuario lo completa después) y un correo opcional que no sirve para entrar ni para recuperar contraseñas (aprobado el 17-oct). Documentarlas no acredita que sus mecanismos estén completamente probados: la evidencia de QA en servidor está en B00 §4.1; los recorridos de navegador siguen pendientes.
+
+**Estructura de carpetas.** Cada capa se organiza primero por módulo (Identidad, Pacientes, Citas, Auditoria y lo común en `Compartido`), porque `AGENTS.md` y ADR-03 piden módulos por capacidad; el espacio de nombres sigue el patrón `TherapEase.<Capa>.<Módulo>`, por ejemplo `TherapEase.Application.Pacientes`. Dentro de cada módulo, el código se separa por tipo y el espacio de nombres sigue la carpeta; ver la tabla en [README sección 6](../../README.md#6-cómo-está-organizado-el-código).
+
+
+Los setters de las entidades son `internal`: solo las clases de `Reglas` del propio dominio las modifican, así ninguna otra capa salta una regla. Los ámbitos de un paciente se exponen como colección de solo lectura. El coordinador de CU04 va en `TherapEase.Application.Coordinadores`, fuera de Pacientes y Citas. Citas puede usar el contrato público de Pacientes; Pacientes no usa Citas; Identidad usa Auditoría y Auditoría no usa Identidad.
+
+El perfil `http` usa http://localhost:5052; el perfil `https`, https://localhost:7028 y redirección desde HTTP. Las variables de conexión se mantienen en la misma terminal. Los comandos actualizados están en README §5.

@@ -525,3 +525,20 @@ No crear un PR por cada mejora. GitHub Settings y el correo local se verifican/c
 > **Cierre:** publicar documentos, fusionar un PR parcial y cerrar LCA son decisiones distintas. Conservar los pendientes visibles y actualizar este documento cuando exista nueva evidencia o decisión.
 
 **Horario aclarado por Lucía, 14-oct:** ✅ 9:00–15:00, sesiones de 1 h; desde 15:00 puede haber sesiones de 30 min, hasta 19:00. ⏳ Último inicio o término a 19:00, días y cruce de las 15:00 por concretar. Referencia America/Hermosillo; no acredita implementación ni pruebas.
+
+## 10. Antecedentes de preparación conservados de la guía
+
+El README se reduce a instrucciones de uso. Los resultados de PR #1–#6 ya están en §1 y §4; las respuestas de producto están en la entrevista y las reglas de seguridad en AGENTS. Se conservan aquí los detalles operativos retirados que no estaban completos en este plan. No se ejecutó ninguna prueba por este traslado.
+
+- T1: Lucía aprobó los 22 archivos de documentación, reglas y carpetas base y publicó el repositorio público el 01-oct-2026. La base documental y ADR se aprobaron ese día; las actualizaciones posteriores no acreditan cierre de B00/LCA.
+- Entorno: SDK de global.json, Visual Studio 18 o superior o VS Code/terminal; Git Bash para los scripts de CI. No instalar PostgreSQL de producción para B00: Testcontainers crea bases desechables con Docker.
+- Configuración: .env.example solo contiene ejemplos ficticios. Copiarlo no hace que ASP.NET Core cargue .env; se necesitan las variables del README. Render/Neon y el respaldo real esperan autorización de Lucía.
+- Detalle de caché ya documentado: /salud impide caché por el framework y /Error por ResponseCache. /salud comprueba el proceso, no la disponibilidad de PostgreSQL. Las reglas generales de cabeceras y errores están en AGENTS.
+
+**Restauración en un servidor nuevo.** Primero crea la base vacía y ejecuta `scripts/db/crear-roles.sql` como administrador del destino, con contraseñas locales: `pg_dump` no copia los roles globales de PostgreSQL. Después restaura con `therapease_migrador`, sin aplicar antes migraciones en esa base vacía. Testcontainers prepara ambos roles en cada contenedor nuevo. Esto documenta la recuperación local; no configura age ni respaldos diarios.
+
+GitHub permite descargar artefactos a personas autenticadas con lectura del repositorio; en uno público ese acceso no restringe el respaldo al equipo. El cifrado no convierte el artefacto en privado. [Fuente oficial: descarga de artefactos](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/download-workflow-artifacts). La nota posterior ADR-05 del 10-oct registra la decisión aprobada de cifrado, custodia y validación; su implementación no está autorizada. No se ha creado el repo de respaldo ni configurado el flujo.
+
+Fuentes: [instalar .NET en Windows](https://learn.microsoft.com/en-us/dotnet/core/install/windows), [Docker Desktop para Windows](https://docs.docker.com/desktop/setup/install/windows-install/), [Git](https://git-scm.com/downloads), [VS Code](https://code.visualstudio.com/download) y [StarUML](https://staruml.io/download/).
+
+Los scripts de CI usan Git Bash; el bash de WSL requiere una distribución instalada. Esto es preparación del entorno, no ejecución de las comprobaciones.

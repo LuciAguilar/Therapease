@@ -1,5 +1,6 @@
 # TherapEase — B01 · Duración y minutos de CI
 
+**Comprobación puntual posterior — 26-oct-2026:** #10 fue revisado y fusionado en `a7c0c52`. La última [CI del SHA revisado `3a44332`, 40393607611](https://github.com/LuciAguilar/Therapease/actions/runs/40393607611), terminó con cuatro trabajos correctos: 40, 36, 44 y 179 segundos; suma **299 s (4 min 59 s; 4,98 min)**. Datos de tiempos/estados obtenidos por API, sin volver a ejecutar pruebas ni leer sus logs en esta comprobación. Es un corte puntual complementario: no sustituye ni se suma al acumulado auditado del 25-oct, porque aquí no se inventarían las ejecuciones intermedias. No es una lectura de facturación. El corte aprobado que aparece a continuación conserva su fecha y resultados. La [CI de main 40395259207](https://github.com/LuciAguilar/Therapease/actions/runs/40395259207), del push de `a7c0c52`, también terminó correcta; su estado no modifica la suma puntual anterior.
 **25-oct-2026 · APROBADO v2 por Claude; publicación autorizada por Lucía.** Corte de la medición: **09:12 de Hermosillo del 25-oct**. Incluye nueve ejecuciones de PR y tres push a main, desde el 17-oct. No se lanzaron pruebas ni se cambió el flujo para medirlas. Este registro y A-06 ✅ del [plan de pruebas](TherapEase-09-plan-de-pruebas.md) se publican juntos.
 
 ## 1. Qué significan los tiempos
@@ -81,4 +82,4 @@ El orden vigente es:
 4. Miguel o Dulce revisa las pruebas; Lucía da la aprobación final.
 5. Fusionar **#10 con Create a merge commit**.
 
-Hoy #10 solo contiene documentos y sigue como borrador: Miguel no necesita revisarlos. Sus diez casos aún no están publicados y esperan el backend del #9. AGENTS ya llegó a main en `05fc3c7`; #10 no debe fusionarse primero. Las páginas y el navegador siguen pendientes de Dulce. B01/B00/LCA/R04 permanecen abiertos; B02 se rige por la autorización de Lucía del 25-oct en AGENTS §3.
+En el corte del 25-oct descrito en este apartado, #10 solo contenía documentos y seguía como borrador; sus diez casos esperaban el backend de #9. Ese orden se completó: Miguel revisó `3a44332` y Lucía fusionó #10 el 26-oct en `a7c0c52`. AGENTS ya llegó a main en `05fc3c7`; #10 no debe fusionarse primero. Las páginas y el navegador siguen pendientes de Dulce. B01/B00/LCA/R04 permanecen abiertos; B02 se rige por la autorización de Lucía del 25-oct en AGENTS §3.

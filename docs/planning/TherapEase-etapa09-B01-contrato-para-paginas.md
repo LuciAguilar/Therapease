@@ -306,4 +306,4 @@ Los límites del navegador (`maxlength`, `required`) **ayudan a la persona**, pe
 - [ ] Todo texto del servidor se muestra como texto (sin `Html.Raw`).
 - [ ] Unitarias propias en el mismo PR (AGENTS §2.6). Las pruebas con servidor, navegador y seguridad son de Lucía.
 
-Para ejecutar el servidor local con PostgreSQL y probar los formularios, ver [B01 §4.2](TherapEase-etapa09-B01.md#42-cómo-se-conectarán-el-servidor-y-las-páginas) y el [README técnico §10](../../README.md#10-construir-probar-y-ejecutar).
+Para ejecutar el servidor local con PostgreSQL y probar los formularios, ver [B01 §4.2](TherapEase-etapa09-B01.md#42-cómo-se-conectarán-el-servidor-y-las-páginas) y el [README técnico §5](../../README.md#5-construir-probar-y-ejecutar).
