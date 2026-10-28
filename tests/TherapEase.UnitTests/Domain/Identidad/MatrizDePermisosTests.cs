@@ -55,6 +55,12 @@ public class MatrizDePermisosTests
     [InlineData(NombresDeRol.Usuaria, Permiso.AdministrarUsuarios, false)]
     [InlineData(NombresDeRol.Usuaria, Permiso.ConsultarAuditoria, false)]
     [InlineData(NombresDeRol.Usuaria, Permiso.DarDeBajaPacientes, true)]
+    [InlineData(NombresDeRol.Superusuario, Permiso.RegistrarPacientes, true)]
+    [InlineData(NombresDeRol.Superusuario, Permiso.ConsultarPacientes, true)]
+    [InlineData(NombresDeRol.Superusuario, Permiso.ActualizarPacientes, true)]
+    [InlineData(NombresDeRol.Usuaria, Permiso.RegistrarPacientes, true)]
+    [InlineData(NombresDeRol.Usuaria, Permiso.ConsultarPacientes, true)]
+    [InlineData(NombresDeRol.Usuaria, Permiso.ActualizarPacientes, true)]
     public void RolTienePermiso_CoincideConLaTablaAprobada(string rol, Permiso permiso, bool esperado)
     {
         Assert.Equal(esperado, MatrizDePermisos.RolTienePermiso(rol, permiso));
@@ -62,17 +68,31 @@ public class MatrizDePermisosTests
     }
 
     [Fact]
-    public void PermisosDelSuperusuario_SonLosTresDecididosPorEscrito()
+    public void PermisosDelSuperusuario_SonLosSeisDecididosPorEscrito()
     {
         Assert.Equal(
-            [Permiso.AdministrarUsuarios, Permiso.ConsultarAuditoria, Permiso.DarDeBajaPacientes],
+            [
+                Permiso.AdministrarUsuarios, Permiso.ConsultarAuditoria, Permiso.DarDeBajaPacientes,
+                Permiso.RegistrarPacientes, Permiso.ConsultarPacientes, Permiso.ActualizarPacientes
+            ],
             MatrizDePermisos.PermisosDelRol(NombresDeRol.Superusuario));
     }
 
     [Fact]
-    public void PermisosDeLaUsuaria_SonSoloLaBajaDePacientes()
+    public void PermisosDeLaUsuaria_SonLaBajaYLasTresOperacionesDePacientes_SinAdministrarUsuariosNiAuditoria()
     {
-        Assert.Equal([Permiso.DarDeBajaPacientes], MatrizDePermisos.PermisosDelRol(NombresDeRol.Usuaria));
+        Assert.Equal(
+            [Permiso.DarDeBajaPacientes, Permiso.RegistrarPacientes, Permiso.ConsultarPacientes, Permiso.ActualizarPacientes],
+            MatrizDePermisos.PermisosDelRol(NombresDeRol.Usuaria));
+    }
+
+    // Cada operación de pacientes tiene su propio permiso: conceder uno no concede los otros.
+    [Fact]
+    public void LasOperacionesDePacientes_TienenPermisosSeparadosYDistintosDeLaBaja()
+    {
+        var permisos = new[] { Permiso.RegistrarPacientes, Permiso.ConsultarPacientes, Permiso.ActualizarPacientes, Permiso.DarDeBajaPacientes };
+
+        Assert.Equal(permisos.Length, permisos.Distinct().Count());
     }
 
     [Theory]

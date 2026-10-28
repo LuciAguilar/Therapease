@@ -59,7 +59,7 @@ public class CoordinadorDeBajaDePacienteTests
 
     private Paciente AgregarPaciente()
     {
-        var paciente = ReglasDePaciente.Registrar(Guid.NewGuid(), "Paciente ficticio", null, [AmbitoAtencion.Escolar], _idActor, Ahora);
+        var paciente = ReglasDePaciente.Registrar(Guid.NewGuid(), new DatosDePaciente("Paciente ficticio", new DateOnly(1990, 1, 15)), [AmbitoAtencion.Escolar], _idActor, Ahora);
         _pacientes.Pacientes[paciente.IdPaciente] = paciente;
         return paciente;
     }

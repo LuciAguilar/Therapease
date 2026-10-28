@@ -119,7 +119,7 @@ Antes de cada entrega se conserva la rama global y se ejecutan `git fetch` y `gi
 
 Cada evidencia identifica fecha, SHA, comando, entorno, casos correctos/fallidos/omitidos y quién revisó. Sin nombres reales, contactos, contraseñas ni rutas personales en informes públicos. Los resultados locales y la nota de aprendizaje de Lucía se conservan aparte.
 
-**Estado de esta entrega:** propuesta ajustada y nota ADR-04 aprobadas para implementar, con veredicto de Claude APROBADO v1 y ajustes de texto que no requieren otra auditoría. El plan inicial fue aprobado antes por Lucía tras sus correcciones. Ninguna prueba funcional nueva de B02 ejecutada ni acreditada; el diseño privado de QA conserva su revisión y las pruebas esperan los servicios.
+**Estado de esta entrega (27-oct-2026):** propuesta ajustada y nota ADR-04 aprobadas para implementar, con veredicto de Claude APROBADO v1 y ajustes de texto que no requieren otra auditoría. Miguel implementó el servidor en la rama `b02/fichas-de-pacientes`, con unitarias propias y verificaciones con PostgreSQL desechable; sin commit, PR ni CI todavía. Los resultados de esas ejecuciones están en la [evidencia de servicios](../testing/TherapEase-09-B02-evidencia-servicios.md) y no sustituyen la revisión humana distinta, la CI, el QA de Lucía ni las páginas. El diseño privado de QA conserva su revisión.
 
 ## 8. Reglas para integrar y entregar
 
@@ -128,7 +128,7 @@ Cada evidencia identifica fecha, SHA, comando, entorno, casos correctos/fallidos
 | ✅ | Páginas mediante Application | Los PageModel no llegan directo a la base ni usan entidades/reglas de Domain; siguen asignados a Dulce. Web conserva únicamente la excepción de enumeraciones/constantes y la composición autorizada en AGENTS. |
 | ✅ | Permisos en servidor | Tabla explícita por operación y rol, incluido Superusuario; pruebas de concesiones y rechazos. |
 | ✅ | Datos ficticios | Sin nube, servicios externos nuevos ni gastos por esta apertura. |
-| ✅ | Contrato para las páginas | Contrato aprobado en la propuesta ajustada; Miguel lo implementa y mantiene, Dulce lo conecta y prueba. |
+| ✅ | Contrato para las páginas | Contrato aprobado en la propuesta ajustada; Miguel lo implementó y lo documenta para las páginas en el [contrato B02](TherapEase-etapa09-B02-contrato-para-paginas.md); Dulce lo conecta y prueba. |
 | ⏳ | Cambio de datos aprobado | Si requiere migración, explicar qué cambia, cómo probarla y cómo revertirla. No crear tablas/campos por suposición. |
 | ⏳ | Documentos actuales | Actualizar los afectados tras auditoría y aprobación. Documentación aprobada se publica directamente en main, con autorización explícita de Lucía; código/pruebas conservan PR y revisión por otra persona. El QA conserva su PR y la revisión humana correspondiente; cada publicación requiere el OK explícito de Lucía. |
 
