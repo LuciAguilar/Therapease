@@ -1,6 +1,6 @@
 # TherapEase — B02 · Evidencia del servidor de pacientes (verificación de Miguel)
 
-**27-oct-2026 · rama `b02/fichas-de-pacientes`, sobre main `a7c0c52` más la fusión que incorporó la propuesta aprobada; cambios sin commit, PR ni CI.** El SHA de la entrega y su CI se añaden aquí cuando existan. Este documento reúne lo que Miguel ejecutó localmente con datos ficticios. **No es la aprobación de Lucía, no sustituye la revisión humana distinta ni su QA, y no incluye páginas ni navegador.**
+**27-oct-2026 · rama `b02/fichas-de-pacientes`, sobre main `a7c0c52` más la fusión que incorporó la propuesta aprobada; commit inicial `c9fc7ff`, todavía sin push, PR ni CI.** El SHA final de la entrega y su CI se añaden aquí cuando existan; los resultados de la sección 2 son del código de ese commit. Este documento reúne lo que Miguel ejecutó localmente con datos ficticios. **No es la aprobación de Lucía, no sustituye la revisión humana distinta ni su QA, y no incluye páginas ni navegador.**
 
 ## 1. Qué se implementó y con qué se comprueba
 
@@ -27,7 +27,7 @@
 | ✅ | Unitarias | 624 correctas, 0 fallidas, 0 omitidas (antes de B02: 422). |
 | ✅ | Integración completa con dos hilos | 367 correctas, 0 fallidas, 0 omitidas, 2 min 27 s (antes de B02: 329; 38 casos nuevos). |
 | ✅ | Comprobación de que la prueba de migración no es vacía | Se quitó a propósito el recorte del espacio de no separación en el SQL: la prueba falló con la muestra afectada; se restauró la migración. |
-| ⏳ | CI de GitHub | Pendiente del push de Miguel. |
+| ⏳ | CI de GitHub | Pendiente del push y del PR de Miguel. |
 | ⏳ | QA de Lucía, páginas de Dulce y navegador | Pendientes. |
 
 En una primera ejecución completa fallaron 4 casos de pruebas existentes de Lucía, por cambios esperados del propio B02: la lista de permisos explícitos de Usuaria y Superusuario (2 casos) y el conteo de migraciones aplicadas (2 casos, de 3 a 4). Se actualizaron (sección 5) y la ejecución final es la de la tabla.
