@@ -85,7 +85,7 @@ Referencias primarias: [pg_dump 17](https://www.postgresql.org/docs/17/app-pgdum
 | --- | --- |
 | ✅ | Recuperación: 13 casos correctos en la selección de 36 del 13-oct. Además del HTTP 200, se comprueban evento/registro, tipo, acción y hecho restaurados. |
 | ✅ | ServidorRevision captura el timeout de cada intento de salud y sigue consultando dentro de su ventana de 40 s; conserva limpieza si falla. No se provocó aquí un arranque lento artificial. |
-| ✅ | README §10 documenta crear base vacía y ejecutar scripts/db/crear-roles.sql antes de restaurar en un servidor nuevo; pg_dump no copia roles globales. Testcontainers los prepara para QA. |
+| ✅ | [B00 sección 10](../planning/TherapEase-etapa09-B00.md#10-antecedentes-de-preparación-conservados-de-la-guía) documenta crear base vacía y ejecutar scripts/db/crear-roles.sql antes de restaurar en un servidor nuevo; pg_dump no copia roles globales. Testcontainers los prepara para QA. |
 | ⏳ | Miguel o Dulce revisa esta ampliación; no queda cubierta por la revisión de PR #4. Páginas, navegador, volumen real, age y respaldo diario siguen pendientes. |
 
 Pruebas comentadas según el skill del proyecto. Lucía autoriza avance B01 el 13-oct con pendientes B00/LCA visibles; no declara cierre de LCA ni autoriza datos reales/nube.

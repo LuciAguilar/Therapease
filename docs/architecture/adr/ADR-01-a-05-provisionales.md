@@ -58,6 +58,12 @@
 
 **Límite aprobado en 04D v0.3:** la baja lógica atiende **Q20**, no resuelve R04. La demostración usa datos ficticios (Q05). Una cita cancelada conserva su registro y estado de pago; cancelarla y darla de baja son operaciones distintas. 08B/08C precisaron que solo una cita agendada y vigente cuenta para cruces y que recuperar una agendada exige paciente vigente y nueva comprobación de cruce. Todo ello requiere prueba ejecutable en 09.
 
+**Nota posterior B02 — propuesta aprobada por Lucía el 26-oct-2026; auditoría de Claude APROBADO v1 con ajustes de texto, sin otra auditoría. Miguel implementa y avisa si encuentra un problema técnico.** Solo registros ficticios. Lucía aprobó reconocer el doble envío de alta por el identificador fijo generado al abrir el formulario. El servidor valida sesión/permisos y, para reconocer un alta confirmada, el actor y los datos normalizados; una repetición reconocida no crea otra ficha, evento o versión. El identificador no es secreto ni concede acceso. La lista de parecidos requiere consultar, también durante el alta.
+
+La clave primaria de Paciente impide dos filas con el mismo identificador. La propuesta concreta reconocer solo esa colisión, revertir la transacción fallida y releer lo persistido con un contexto válido antes de responder; un fallo de auditoría u otra restricción nunca significa «ya registrado». Se mantienen cambio/evento atómicos. Reenviar manualmente el mismo identificador no crea otra ficha; no hay reintento automático. Identificadores distintos pueden registrar homónimos: no se promete unicidad por nombre/nacimiento ni una deduplicación general.
+
+En edición, Lucía eligió mantener conflicto ante versión antigua, incluso con datos iguales. Solo la versión vigente permite «sin cambios», sin escritura/evento/incremento. Que la ficha exista no confirma una edición cuya respuesta se perdió: se revisan datos/versión con permiso de consultar y se mantiene la incertidumbre si no se puede atribuir el resultado. No se agrega un registro o servicio de solicitudes nuevo. Este mecanismo se comprobará con PostgreSQL real, solicitudes simultáneas, cortes antes/después de confirmar, actores/datos distintos y fallo del evento; **no se acredita implementación ni prueba ejecutada**. No resuelve R04 ni autoriza datos reales, B06/B07, nube o gastos.
+
 ## ADR-05 — Seguridad y recuperación
 
 - **Contexto 04D v0.3:** Q01, Q02, Q04, Q10–Q11, Q14, **Q17**, Q19 y R03.

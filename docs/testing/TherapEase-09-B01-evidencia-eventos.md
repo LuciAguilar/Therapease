@@ -1,6 +1,6 @@
 # TherapEase — B01 · Pruebas de eventos de acceso
 
-**25-oct-2026 · Entrega de QA en el PR #10.** Auditoría realizada; precisión de texto aplicada y aprobada por Lucía, quien autorizó los dos commits y su publicación. Revisión humana de Miguel o Dulce y fusión pendientes. Este resultado no cierra B01.
+**Actualizado el 26-oct-2026 · QA revisado y fusionado en PR #10.** Auditoría y precisión de texto aprobadas; Miguel (`GalloNav`) aprobó `3a44332` y Lucía fusionó con Create a merge commit en `a7c0c52`, a las 13:23:52 de Hermosillo. Última CI de ese SHA: 40393607611, cuatro trabajos correctos. Este resultado no cierra B01; faltan páginas y navegador.
 
 ## 1. Qué se comprueba
 
@@ -44,4 +44,4 @@ dotnet test tests/TherapEase.IntegrationTests -c Release --no-build --no-restore
 
 ## 4. Para terminar esta entrega
 
-Claude auditó la combinación y pidió la precisión de texto ya aplicada. Lucía aprobó la corrección y autorizó la publicación en el mismo PR #10. Allí se comprueba la nueva CI y Miguel o Dulce revisa las pruebas. Lucía conserva la aprobación final y fusiona con **Create a merge commit**. Páginas, formularios, navegador y cierre completo de B01 siguen pendientes.
+Claude auditó la combinación y pidió la precisión de texto ya aplicada. Lucía aprobó y autorizó la publicación; Miguel revisó `3a44332` y dejó Approve. Lucía fusionó el mismo PR #10 el 26-oct mediante **Create a merge commit** en `a7c0c52`. CI 40393607611 correcta en cuatro trabajos. Las ejecuciones de la sección 3 conservan su fecha/versión; no son pruebas nuevas por esta actualización. Páginas, formularios, navegador y cierre completo de B01 siguen pendientes.
