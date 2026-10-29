@@ -29,13 +29,13 @@
 | ✅ | Integración completa con dos hilos, con las correcciones | 375 correctas, 0 fallidas, 0 omitidas, 2 min 41 s (en `1eab29c`: 367; antes de B02: 329). |
 | ✅ | Concurrencia y migración repetidas tres veces | 18 correctas en cada una: `ConcurrenciaServidorTests`, las carreras de alta y edición de `PacientesServidorTests` y `MigracionDeDatosDePacienteTests`. |
 | ✅ | Comprobaciones de que las pruebas no son vacías | Con una mutación a la vez, falló la prueba esperada y se restauró el código: recorte del espacio de no separación en la migración; quitar `ChangeTracker.Clear()` (fallaron las dos pruebas de alcance); volver a la minúscula solo A–Z (fallaron 14 pruebas de clave y de búsqueda). |
-| ⏳ | CI de las correcciones del 28-oct | Pendiente del commit y del push de Miguel. |
+| ✅ | CI de las correcciones del 28-oct, PR #11 sobre `a78016a` | [Ejecución 40827839680](https://github.com/LuciAguilar/Therapease/actions/runs/40827839680): cuatro trabajos correctos (37 s, 46 s, 27 s y 2 min 11 s); ventana de 2 min 53 s y suma de trabajos de 4 min 1 s. Los registros de cada trabajo piden iniciar sesión, así que el número de casos de la CI no se consultó aquí. |
 | ⏳ | QA de Lucía, páginas de Dulce y navegador | Pendientes. |
 
 Dos incidencias de las ejecuciones, para que no se confundan con fallos del producto:
 
 - En una primera ejecución completa, antes de la CI, fallaron 4 casos de pruebas existentes de Lucía por cambios esperados del propio B02 (lista de permisos explícitos, 2 casos; conteo de migraciones de 3 a 4, 2 casos). Se actualizaron (sección 5).
-- Con las correcciones, una de las ejecuciones completas dio **un fallo en `Busqueda_NoDistingueAcentosNiMayusculasConPostgreSqlReal` («maria munoz»)** y no se capturó su mensaje. No se reprodujo: pasó 5 de 5 veces aislada y dos ejecuciones completas posteriores dieron 375/375. Esa ejecución fue más lenta (3 min 20 s frente a 2 min 41 s); la causa probable es carga del equipo, no confirmada. Conviene mirar si se repite en la CI.
+- Con las correcciones, una de las ejecuciones completas dio **un fallo en `Busqueda_NoDistingueAcentosNiMayusculasConPostgreSqlReal` («maria munoz»)** y no se capturó su mensaje. No se reprodujo: pasó 5 de 5 veces aislada y dos ejecuciones completas posteriores dieron 375/375. Esa ejecución fue más lenta (3 min 20 s frente a 2 min 41 s); la causa probable es carga del equipo, no confirmada. En la CI de `a78016a` no se repitió.
 - Una prueba de regresión mía falló dos de tres veces porque comparaba una lista en orden fijo con GUID aleatorios; era un error de la aserción, corregido y repetido cinco veces.
 
 ```powershell
