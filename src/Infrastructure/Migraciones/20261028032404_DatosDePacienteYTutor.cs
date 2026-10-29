@@ -21,9 +21,11 @@ namespace TherapEase.Infrastructure.Migraciones
     //   columna anterior y no se trunca (un correo cortado sería otro dato): se usa el teléfono, o nulo. Si había correo y teléfono, se pierde el teléfono. Se
     //   pierden también nacimiento, escuela, grupo, tutor y nombre normalizado al retirar sus columnas; ninguna se puede reconstruir desde Contacto.
     //
-    // Correspondencia en SQL frente a Domain: la clave de nombre usa normalize(..., NFD), regexp_replace y translate de PostgreSQL; la validación de correo y
-    // teléfono replica ReglasDeNombreYCorreo y ReglasDeTelefono con los caracteres de formato del plano básico de Unicode. Las pruebas de integración comparan ambas
-    // con las mismas muestras. No usa el reloj ni la configuración regional del servidor para decidir mayúsculas de la clave; el correo sí usa lower() de PostgreSQL.
+    // Correspondencia en SQL frente a Domain: la clave de nombre usa normalize(..., NFD), regexp_replace, lower(... COLLATE "und-x-icu") y translate de PostgreSQL; la
+    // validación de correo y teléfono replica ReglasDeNombreYCorreo y ReglasDeTelefono con los caracteres de formato del plano básico de Unicode. Las pruebas de
+    // integración comparan ambas con las mismas muestras (Ø, Ж, İ y Σ incluidas). Las minúsculas usan la colación ICU raíz y no la configuración regional del servidor,
+    // pero exigen un PostgreSQL compilado con ICU (el de las pruebas lo es). Divergencia conocida del correo, que Domain baja con ToLowerInvariant y aquí se baja con
+    // ICU: una İ o una Σ final dentro de un correo anterior; no afecta a los datos de prueba y la clave de nombre sí las iguala.
     /// <inheritdoc />
     public partial class DatosDePacienteYTutor : Migration
     {
@@ -34,10 +36,10 @@ namespace TherapEase.Infrastructure.Migraciones
         private const string Prohibidos =
             "[[:cntrl:]\\u00ad\\u0600-\\u0605\\u061c\\u06dd\\u070f\\u0890\\u0891\\u08e2\\u180e\\u200b-\\u200f\\u2028-\\u202e\\u2060-\\u2064\\u2066-\\u206f\\ufeff\\ufff9-\\ufffb]";
 
-        // Clave de nombre: forma D, sin marcas combinantes U+0300-U+036F, A-Z a minúscula y espacios colapsados y recortados.
+        // Clave de nombre: forma D, sin marcas combinantes U+0300-U+036F, minúscula ICU ya sin las marcas, sigma final igual a sigma y espacios colapsados y recortados.
         private const string ClaveDeNombre =
             "btrim(regexp_replace(" +
-                "translate(regexp_replace(normalize(\"Nombre\", NFD), '[\\u0300-\\u036f]', '', 'g'), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), " +
+                "translate(lower(regexp_replace(normalize(\"Nombre\", NFD), '[\\u0300-\\u036f]', '', 'g') COLLATE \"und-x-icu\"), U&'\\03C2', U&'\\03C3'), " +
                 "'[ \\t\\n\\r\\v\\f]+', ' ', 'g'), ' ')";
 
         /// <inheritdoc />
@@ -139,7 +141,7 @@ namespace TherapEase.Infrastructure.Migraciones
                     "SELECT \"IdPaciente\", regexp_replace(\"Contacto\", '^" + Espacios + "+|" + Espacios + "+$', '', 'g') AS t " +
                     "FROM \"Paciente\" WHERE \"Contacto\" IS NOT NULL), " +
                 "conv AS (" +
-                    "SELECT \"IdPaciente\", t, lower(t) AS c, split_part(lower(t), '@', 2) AS d, regexp_replace(t, '[^0-9]', '', 'g') AS digitos FROM base) " +
+                    "SELECT \"IdPaciente\", t, lower(t COLLATE \"und-x-icu\") AS c, split_part(lower(t COLLATE \"und-x-icu\"), '@', 2) AS d, regexp_replace(t, '[^0-9]', '', 'g') AS digitos FROM base) " +
                 "UPDATE \"Paciente\" p SET " +
                     "\"Correo\" = CASE WHEN length(conv.c) BETWEEN 1 AND 254 " +
                         "AND conv.c !~ '" + Espacios + "' AND conv.c !~ '" + Prohibidos + "' " +

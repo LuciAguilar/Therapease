@@ -363,6 +363,17 @@ public class ServicioPacientesTests
     }
 
     [Fact]
+    public async Task Registrar_ConUnNombreIgualSalvoMayusculasFueraDeAZ_DevuelveLaCoincidencia()
+    {
+        var existente = Existente("\u00D8scar");
+
+        var respuesta = await _servicio.RegistrarAsync(Guid.NewGuid(), Adulto("\u00F8SCAR"));
+
+        Assert.Equal(EstadoDeAlta.CoincidenciasPorConfirmar, respuesta.Datos!.Estado);
+        Assert.Equal(existente.IdPaciente, Assert.Single(respuesta.Datos.Coincidencias!).IdPaciente);
+    }
+
+    [Fact]
     public async Task Registrar_ConfirmandoQueEsOtraPersona_GuardaAunConCoincidencias()
     {
         Existente("María Muñoz");
@@ -566,6 +577,20 @@ public class ServicioPacientesTests
         Assert.True(respuesta.Exito);
         Assert.Equal(maria.IdPaciente, Assert.Single(respuesta.Datos!.Pacientes).IdPaciente);
         Assert.False(respuesta.Datos.HayMas);
+    }
+
+    [Theory]
+    [InlineData("\u00D8scar", "\u00F8scar")]
+    [InlineData("\u0416\u0443\u043A", "\u0436\u0443\u043A")]
+    [InlineData("\u0130stanbul", "istanbul")]
+    [InlineData("\u039F\u0394\u03A5\u03A3\u03A3\u0395\u03A5\u03A3", "\u03BF\u03B4\u03C5\u03C3\u03C3\u03B5\u03C5\u03C2")]
+    public async Task Buscar_EncuentraUnNombreConMayusculasFueraDeAZEscribiendoSuMinuscula(string nombre, string texto)
+    {
+        var ficha = Existente(nombre);
+
+        var respuesta = await _servicio.BuscarAsync(texto);
+
+        Assert.Equal(ficha.IdPaciente, Assert.Single(respuesta.Datos!.Pacientes).IdPaciente);
     }
 
     [Fact]

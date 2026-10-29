@@ -321,6 +321,57 @@ public class PacientesServidorTests(PostgreSqlRevision postgres) : IClassFixture
     }
 
     [Fact]
+    public async Task Alta_TrasUnaCarreraDelMismoIdentificador_LaSiguienteAltaDelMismoAlcanceSeGuarda()
+    {
+        var id = Guid.NewGuid();
+        var adelantada = new AdelantadaAlGuardar();
+        using var e = await PrepararAsync(configurar: servicios => servicios.ConfigureDbContext<ContextoDeDatos>(o => o.AddInterceptors(adelantada)));
+        adelantada.Armar(async () =>
+        {
+            var competidora = await e.Servicio(s => s.RegistrarAsync(id, Adulto()));
+            Assert.Equal(EstadoDeAlta.Registrado, competidora.Datos!.Estado);
+        });
+        var siguiente = Guid.NewGuid();
+
+        // Las dos llamadas comparten el alcance, como las de una misma solicitud: el intento fallido no debe quedar pendiente en el contexto.
+        var (primera, segunda) = await e.EnAlcance(async p =>
+        {
+            var servicio = p.GetRequiredService<IServicioPacientes>();
+            var uno = await servicio.RegistrarAsync(id, Adulto());
+            var dos = await servicio.RegistrarAsync(siguiente, Adulto("Otra Persona Distinta"));
+            return (uno, dos);
+        });
+
+        Assert.Equal(EstadoDeAlta.YaRegistrado, primera.Datos!.Estado);
+        Assert.True(segunda.Exito, segunda.Mensaje);
+        Assert.Equal(EstadoDeAlta.Registrado, segunda.Datos!.Estado);
+        Assert.Equal(new[] { id, siguiente }.Order(), (await e.PacientesAsync()).Select(p => p.IdPaciente).Order());
+        Assert.Equal(2, (await e.EventosDePacientesAsync()).Count);
+    }
+
+    [Fact]
+    public async Task Alta_TrasFallarLaAuditoria_LaSiguienteOperacionDelMismoAlcanceNoRepiteElCambioFallido()
+    {
+        using var e = await PrepararAsync();
+        await SimularFalloDeAuditoriaAsync(e.Escenario);
+        var segundo = Guid.NewGuid();
+
+        var segunda = await e.EnAlcance(async p =>
+        {
+            var servicio = p.GetRequiredService<IServicioPacientes>();
+            await Assert.ThrowsAsync<DbUpdateException>(() => servicio.RegistrarAsync(Guid.NewGuid(), Adulto("Primera Ficha Fallida")));
+            await PostgreSqlRevision.Sql(e.Escenario.Migrador,
+                "DROP TRIGGER rechazar_evento_de_revision ON \"EventoAuditoria\"; DROP FUNCTION rechazar_evento_de_revision();");
+            return await servicio.RegistrarAsync(segundo, Adulto("Segunda Ficha Valida"));
+        });
+
+        Assert.True(segunda.Exito, segunda.Mensaje);
+        var guardadas = await e.PacientesAsync();
+        Assert.Equal(segundo, Assert.Single(guardadas).IdPaciente);
+        Assert.Equal(segundo, Assert.Single(await e.EventosDePacientesAsync()).IdRegistro);
+    }
+
+    [Fact]
     public async Task Alta_ConParecidos_NoGuardaHastaConfirmarYLuegoConservaAmbasFichas()
     {
         using var e = await PrepararAsync();
@@ -540,6 +591,24 @@ public class PacientesServidorTests(PostgreSqlRevision postgres) : IClassFixture
         var respuesta = await e.Servicio(s => s.BuscarAsync(texto));
 
         Assert.Equal(maria, Assert.Single(respuesta.Datos!.Pacientes).IdPaciente);
+    }
+
+    [Theory]
+    [InlineData("\u00D8scar", "\u00F8scar")]
+    [InlineData("\u00D8SCAR", "\u00F8scar")]
+    [InlineData("\u0416\u0443\u043A", "\u0436\u0443\u043A")]
+    [InlineData("\u0130stanbul", "istanbul")]
+    [InlineData("\u039F\u0394\u03A5\u03A3\u03A3\u0395\u03A5\u03A3", "\u03BF\u03B4\u03C5\u03C3\u03C3\u03B5\u03C5\u03C2")]
+    [InlineData("\u03A3\u039F\u03A6\u038A\u0391", "\u03C3\u03BF\u03C6\u03B9\u03B1")]
+    public async Task Busqueda_EncuentraNombresConMayusculasFueraDeAZEscribiendoSuMinuscula(string nombre, string texto)
+    {
+        using var e = await PrepararAsync();
+        var id = await RegistrarAsync(e, Adulto(nombre));
+        await RegistrarAsync(e, Adulto("Luis P\u00E9rez"));
+
+        var respuesta = await e.Servicio(s => s.BuscarAsync(texto));
+
+        Assert.Equal(id, Assert.Single(respuesta.Datos!.Pacientes).IdPaciente);
     }
 
     [Fact]

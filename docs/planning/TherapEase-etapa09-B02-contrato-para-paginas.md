@@ -1,6 +1,6 @@
 # TherapEase — B02 · Contrato de las funciones del servidor para las páginas de pacientes
 
-**Versión inicial del 27-oct-2026.** Autor: Miguel. Para: Dulce. Revisa: Lucía. El código está en la rama `b02/fichas-de-pacientes`, en el commit inicial `c9fc7ff`, todavía sin push, PR ni CI; este documento se actualiza con el SHA final y los resultados de la CI cuando existan. Concreta la sección 3.6 de la [propuesta ajustada](TherapEase-etapa09-B02-propuesta.md), aprobada por Lucía el 26-oct-2026, y sigue el formato del [contrato de B01](TherapEase-etapa09-B01-contrato-para-paginas.md): lo que no se repite aquí (cómo se llama al servidor, `RespuestaServicio<T>`, error 500 fijo, formularios, caché) se aplica igual.
+**Versión inicial del 27-oct-2026; actualizada el 28-oct-2026.** Autor: Miguel. Para: Dulce. Revisa: Lucía. El código está en la rama `b02/fichas-de-pacientes` y en el [PR #11](https://github.com/LuciAguilar/Therapease/pull/11). La [CI de `1eab29c`](https://github.com/LuciAguilar/Therapease/actions/runs/40639773900) terminó correcta; las tres correcciones de Lucía del 28-oct están en el commit siguiente y esperan su propia CI; detalle en la [evidencia](../testing/TherapEase-09-B02-evidencia-servicios.md). Concreta la sección 3.6 de la [propuesta ajustada](TherapEase-etapa09-B02-propuesta.md), aprobada por Lucía el 26-oct-2026, y sigue el formato del [contrato de B01](TherapEase-etapa09-B01-contrato-para-paginas.md): lo que no se repite aquí (cómo se llama al servidor, `RespuestaServicio<T>`, error 500 fijo, formularios, caché) se aplica igual.
 
 Explica cómo llamar desde un PageModel a las cuatro funciones de pacientes, qué responden y qué debe hacer la página con cada resultado. Las páginas, los formularios, los textos en pantalla y la navegación son de Dulce. **No contiene páginas ni código de interfaz.** Solo datos ficticios; los valores de los campos son provisionales hasta que Dulce confirme los detalles de producto (sección 6).
 
@@ -63,7 +63,7 @@ Requiere `RegistrarPacientes` **y** `ConsultarPacientes`, porque comprueba si ya
 Requiere `ConsultarPacientes`. Solo fichas **vigentes**.
 
 - Texto de 2 a 100 caracteres, hasta 6 palabras y sin caracteres de control. Si no cumple: `Exito = false` con `MensajesDePacientes.BusquedaInvalida`.
-- No distingue acentos ni mayúsculas (`maria` encuentra `María`; `munoz` encuentra `Muñoz`) y exige que aparezcan **todas** las palabras. `%`, `_` y `\` se buscan como texto literal.
+- No distingue acentos ni mayúsculas de ninguna escritura: `maria` encuentra `María`, `munoz` encuentra `Muñoz`, `øscar` encuentra `Øscar`, `жук` encuentra `Жук`, `istanbul` encuentra `İstanbul`, y la sigma final es igual a la sigma. Exige que aparezcan **todas** las palabras. `%`, `_` y `\` se buscan como texto literal.
 - Orden estable por nombre normalizado y, para empates, por identificador. Devuelve como máximo 50; si hay más, `HayMas = true`: pedir que se afine el texto, no afirmar que la lista esté completa.
 - `nacimientoExacto` filtra por esa fecha.
 - Cada fila trae el nacimiento **solo si otra ficha vigente tiene el mismo nombre**, para distinguirlas; en las demás es nulo. `NacimientoDesconocido` indica una ficha anterior sin fecha.
@@ -115,7 +115,7 @@ Requiere `ActualizarPacientes`. `versionEsperada` es la `Version` de la ficha **
 
 ## 5. Fallos inesperados
 
-Una falla de la base o de la auditoría **no vuelve como `Exito = false`**: sube como excepción y el servidor responde el error 500 fijo de B01 §1.3. La página no la captura, no la presenta como error de validación y no reintenta sola. Cambio y evento se guardan juntos o no se guarda ninguno: tras un 500 en una alta, reenviar el mismo número (sección 3.1) es seguro.
+Una falla de la base o de la auditoría **no vuelve como `Exito = false`**: sube como excepción y el servidor responde el error 500 fijo de B01 §1.3. La página no la captura, no la presenta como error de validación y no reintenta sola. Cambio y evento se guardan juntos o no se guarda ninguno: tras un 500 en una alta, reenviar el mismo número (sección 3.1) es seguro. Si un guardado falla, la unidad de trabajo descarta lo que dejó pendiente en el contexto, de modo que la siguiente operación de la misma solicitud no repite el cambio fallido.
 
 ## 6. Pendiente de Dulce
 

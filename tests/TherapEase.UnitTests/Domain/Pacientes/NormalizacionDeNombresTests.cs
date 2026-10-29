@@ -31,18 +31,37 @@ public class NormalizacionDeNombresTests
         Assert.Equal("maria munoz", NormalizacionDeNombres.Normalizar(descompuesta));
     }
 
-    [Fact]
-    public void Normalizar_SoloPasaAMinusculaLasLetrasAZ_LasDemasSeComparanTalCual()
+    [Theory]
+    [InlineData("\u00D8scar", "\u00F8scar")]
+    [InlineData("\u00D8SCAR", "\u00F8scar")]
+    [InlineData("\u0152uvre", "\u0153uvre")]
+    [InlineData("\u0416\u0443\u043A", "\u0436\u0443\u043A")]
+    [InlineData("\u0416\u0423\u041A", "\u0436\u0443\u043A")]
+    [InlineData("\u0130stanbul", "istanbul")]
+    [InlineData("\u0130STANBUL", "istanbul")]
+    [InlineData("I\u0307stanbul", "istanbul")]
+    [InlineData("\u03A3\u039F\u03A6\u038A\u0391", "\u03C3\u03BF\u03C6\u03B9\u03B1")]
+    [InlineData("\u039F\u0394\u03A5\u03A3\u03A3\u0395\u03A5\u03A3", "\u03BF\u03B4\u03C5\u03C3\u03C3\u03B5\u03C5\u03C3")]
+    [InlineData("\u03BF\u03B4\u03C5\u03C3\u03C3\u03B5\u03C5\u03C2", "\u03BF\u03B4\u03C5\u03C3\u03C3\u03B5\u03C5\u03C3")]
+    public void Normalizar_PasaAMinusculaLasLetrasDeCualquierEscrituraYNoSoloLasDeAZ(string entrada, string esperada)
     {
-        // Independiente de la cultura del equipo: la I sin punto turca y la Ñ mayúscula no dependen de la configuración regional.
+        // Ø, Œ, Ж, la İ turca y la sigma de Σ: la clave de «Øscar» es la misma que la de «øscar», y lo mismo con el resto.
+        Assert.Equal(esperada, NormalizacionDeNombres.Normalizar(entrada));
+    }
+
+    [Fact]
+    public void Normalizar_NoDependeDeLaCulturaDelEquipo()
+    {
         var anterior = Thread.CurrentThread.CurrentCulture;
         try
         {
             Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("tr-TR");
 
+            // Con la cultura turca, ToLower daría «ısık»; la clave usa la minúscula invariante.
             Assert.Equal("isik", NormalizacionDeNombres.Normalizar("ISIK"));
-            Assert.Equal("ß", NormalizacionDeNombres.Normalizar("ß"));
-            Assert.Equal("Ж", NormalizacionDeNombres.Normalizar("Ж"));
+            Assert.Equal("istanbul", NormalizacionDeNombres.Normalizar("\u0130stanbul"));
+            Assert.Equal("\u00DF", NormalizacionDeNombres.Normalizar("\u00DF"));
+            Assert.Equal("\u0436", NormalizacionDeNombres.Normalizar("\u0416"));
         }
         finally
         {
@@ -56,8 +75,8 @@ public class NormalizacionDeNombresTests
         var conMarcas = new StringBuilder("e");
         conMarcas.Append((char)0x0300).Append((char)0x036F).Append((char)0x0370);
 
-        // U+0370 (GREEK CAPITAL LETTER HETA) queda fuera del rango de marcas y se conserva.
-        Assert.Equal("e" + (char)0x0370, NormalizacionDeNombres.Normalizar(conMarcas.ToString()));
+        // U+0370 (GREEK CAPITAL LETTER HETA) queda fuera del rango de marcas: se conserva y solo pasa a su minúscula, U+0371.
+        Assert.Equal("e" + (char)0x0371, NormalizacionDeNombres.Normalizar(conMarcas.ToString()));
     }
 
     [Theory]

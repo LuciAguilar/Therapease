@@ -4,7 +4,7 @@
 
 TherapEase es una aplicación web para la gestión administrativa de un consultorio psicológico.
 
-**Estado de hoy — 27-oct-2026:** main `a7c0c52` (PR #10 fusionado; [CI de esa fusión correcta](https://github.com/LuciAguilar/Therapease/actions/runs/40395259207)). Miguel implementa B02 en la rama `b02/fichas-de-pacientes`, todavía sin PR.
+**Estado de hoy — 28-oct-2026:** main `a7c0c52` (PR #10 fusionado; [CI de esa fusión correcta](https://github.com/LuciAguilar/Therapease/actions/runs/40395259207)). Miguel implementa B02 en el [PR #11](https://github.com/LuciAguilar/Therapease/pull/11) (rama `b02/fichas-de-pacientes`).
 
 - B01 espera las páginas, formularios y navegador; B00/LCA/R04 siguen abiertos.
 - B02: propuesta y diez decisiones aprobadas por Lucía el 26-oct; servidor en implementación y [contrato para páginas](docs/planning/TherapEase-etapa09-B02-contrato-para-paginas.md) preparado para Dulce.

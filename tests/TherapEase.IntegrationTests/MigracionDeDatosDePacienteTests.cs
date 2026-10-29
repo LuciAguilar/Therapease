@@ -35,6 +35,7 @@ public class MigracionDeDatosDePacienteTests(PostgreSqlRevision postgres) : ICla
         "\tpersona@ficticio.test\n",
         "\u00A0persona@ficticio.test\u00A0",
         "MARÍA@Ficticio.TEST",
+        "\u00D8SCAR@Ficticio.TEST",
         "sin@dominio",
         "@ficticio.test",
         "persona@",
@@ -95,6 +96,13 @@ public class MigracionDeDatosDePacienteTests(PostgreSqlRevision postgres) : ICla
         "Renée Çelik",
         "\u0301abc",
         "😀 Ana",
+        "\u00D8scar",
+        "\u00D8SCAR",
+        "\u0152UVRE",
+        "\u039F\u0394\u03A5\u03A3\u03A3\u0395\u03A5\u03A3",
+        "\u03BF\u03B4\u03C5\u03C3\u03C3\u03B5\u03C5\u03C2",
+        "\u03A3\u039F\u03A6\u038A\u0391",
+        "I\u0307STANBUL",
         new string('Z', 200)
     ];
 
@@ -294,6 +302,7 @@ public class MigracionDeDatosDePacienteTests(PostgreSqlRevision postgres) : ICla
         Assert.Equal(("persona@ficticio.test", null), De("Persona@Ficticio.TEST"));
         Assert.Equal(("persona@ficticio.test", null), De("  persona@ficticio.test  "));
         Assert.Equal(("persona@ficticio.test", null), De("\u00A0persona@ficticio.test\u00A0"));
+        Assert.Equal(("\u00F8scar@ficticio.test", null), De("\u00D8SCAR@Ficticio.TEST"));
         Assert.Equal((null, "+526441234567"), De(" +52 (644) 123-4567 "));
         Assert.Equal((null, "6441234567"), De("644-123-4567"));
         Assert.Equal((null, null), De("sin@dominio"));
