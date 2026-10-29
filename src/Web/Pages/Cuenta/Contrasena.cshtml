@@ -1,0 +1,62 @@
+@page "/Cuenta/Contrasena"
+@model ContrasenaModel
+@{
+    ViewData["Title"] = "Cambiar contraseña";
+    Layout = "_LayoutAcceso";
+}
+
+<main class="acceso acceso--una-columna">
+    <section class="acceso-panel">
+        <div class="acceso-panel__contenido">
+            <div class="acceso-panel__encabezado">
+                <h1 class="acceso-panel__titulo">Cambia tu contraseña</h1>
+                <p class="acceso-panel__texto">
+                    @(Model.EsTemporal
+                        ? "Tu contraseña es temporal. Crea una nueva para continuar."
+                        : "Escribe tu contraseña actual y la nueva.")
+                </p>
+            </div>
+
+            <form method="post" class="formulario-acceso">
+                @if (Model.MensajeError is not null)
+                {
+                    <div class="alerta-error" role="alert">@Model.MensajeError</div>
+                }
+                @if (Model.MensajeExito is not null)
+                {
+                    <div class="alerta-exito" role="status">@Model.MensajeExito</div>
+                }
+
+                @if (!Model.EsTemporal)
+                {
+                    <div class="campo">
+                        <label class="campo__etiqueta" for="Entrada_ContrasenaActual">Contraseña actual</label>
+                        <div class="campo__control">
+                            @* Copia aquí el <svg class="campo__icono"> del candado de tu Index.cshtml *@
+                            <input class="campo__entrada" id="Entrada_ContrasenaActual" name="Entrada.ContrasenaActual"
+                                   type="password" autocomplete="current-password" />
+                        </div>
+                    </div>
+                }
+
+                <div class="campo">
+                    <label class="campo__etiqueta" for="Entrada_ContrasenaNueva">Contraseña nueva</label>
+                    <div class="campo__control">
+                        <input class="campo__entrada" id="Entrada_ContrasenaNueva" name="Entrada.ContrasenaNueva"
+                               type="password" autocomplete="new-password" />
+                    </div>
+                </div>
+
+                <div class="campo">
+                    <label class="campo__etiqueta" for="Entrada_Confirmacion">Confirmar contraseña nueva</label>
+                    <div class="campo__control">
+                        <input class="campo__entrada" id="Entrada_Confirmacion" name="Entrada.Confirmacion"
+                               type="password" autocomplete="new-password" />
+                    </div>
+                </div>
+
+                <button type="submit" class="boton boton--primario boton--completo">Cambiar contraseña</button>
+            </form>
+        </div>
+    </section>
+</main>

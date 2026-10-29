@@ -1,4 +1,5 @@
 @page "/Acceso"
+@model TherapEase.Web.Pages.Login.IndexModel
 @attribute [Microsoft.AspNetCore.Authorization.AllowAnonymous]
 @{
     ViewData["Title"] = "Acceso";
@@ -67,7 +68,7 @@
                 <p class="acceso-panel__texto">Accede a tu espacio de trabajo para comenzar.</p>
             </div>
             <!-- Evita que DataProtection intente usar la base de datos -->
-            <form method="post" asp-antiforgery="false" class="formulario-acceso">
+            <form method="post" class="formulario-acceso">
 
                 <!-- Quita "hidden" para ver el error -->
                 <div class="alerta-error" role="alert" hidden>
