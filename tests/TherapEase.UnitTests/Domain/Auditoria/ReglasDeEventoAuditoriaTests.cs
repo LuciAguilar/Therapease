@@ -33,6 +33,29 @@ public class ReglasDeEventoAuditoriaTests
         Assert.Equal(["Estado"], evento.CamposAfectados);
     }
 
+    // La acción se guarda como texto en una columna de 20 caracteres sin restricción de valores: una acción nueva no requiere migración mientras quepa.
+    [Fact]
+    public void Acciones_CabenEnLaColumnaDeLaBase()
+    {
+        Assert.All(Enum.GetNames<AccionAuditoria>(), nombre => Assert.InRange(nombre.Length, 1, 20));
+    }
+
+    [Theory]
+    [InlineData(AccionAuditoria.InicioSesion, "Inició sesión.")]
+    [InlineData(AccionAuditoria.CierreSesion, "Cerró sesión.")]
+    [InlineData(AccionAuditoria.BloqueoAcceso, "Se bloqueó el acceso por cinco intentos fallidos.")]
+    public void Registrar_ConUnaAccionDeAcceso_AceptaCamposVaciosYLaCuentaComoActorYRegistro(AccionAuditoria accion, string hecho)
+    {
+        var evento = ReglasDeEventoAuditoria.Registrar(
+            Guid.NewGuid(), Ahora, Actor, TipoRegistroAuditoria.Usuario, Actor, accion, [], hecho);
+
+        Assert.Equal(accion, evento.Accion);
+        Assert.Equal(Actor, evento.IdUsuarioActor);
+        Assert.Equal(Actor, evento.IdRegistro);
+        Assert.Empty(evento.CamposAfectados);
+        Assert.Equal(hecho, evento.Hecho);
+    }
+
     [Theory]
     [InlineData("canario@ficticio.test")]
     [InlineData("Canario#Prueba1")]

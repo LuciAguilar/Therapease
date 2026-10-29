@@ -21,7 +21,12 @@ internal sealed class RepositorioAuditoriaFalso : IRepositorioAuditoria
             throw ExcepcionAlAgregar;
         }
 
-        Eventos.Add(evento);
+        // Con candado: algunas pruebas registran eventos desde varios intentos simultáneos.
+        lock (Eventos)
+        {
+            Eventos.Add(evento);
+        }
+
         return Task.CompletedTask;
     }
 

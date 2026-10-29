@@ -10,5 +10,8 @@ public enum AccionAuditoria
     Cancelacion,
     Desactivacion,
     CambioContrasena,
-    ReinicioContrasena
+    ReinicioContrasena,
+    InicioSesion,
+    CierreSesion,
+    BloqueoAcceso
 }

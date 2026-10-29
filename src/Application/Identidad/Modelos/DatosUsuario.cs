@@ -5,5 +5,6 @@ public sealed record DatosUsuario(
     string NombreUsuario, 
     string Rol, 
     bool Activo, 
-    bool DebeCambiarContrasena
+    bool DebeCambiarContrasena,
+    string NombreCompleto = ""
     );

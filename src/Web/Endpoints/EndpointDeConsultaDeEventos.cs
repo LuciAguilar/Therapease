@@ -36,7 +36,7 @@ public static partial class EndpointDeConsultaDeEventos
         TipoRegistroAuditoria? tipo = null;
         if (!string.IsNullOrEmpty(tipoRegistro))
         {
-            if (!Enum.TryParse<TipoRegistroAuditoria>(tipoRegistro, ignoreCase: true, out var tipoValido) || !Enum.IsDefined(tipoValido))
+            if (!TryParsearTipoDeRegistro(tipoRegistro, out var tipoValido))
             {
                 return Results.BadRequest(new { error = "El tipo de registro no es válido." });
             }
@@ -55,6 +55,19 @@ public static partial class EndpointDeConsultaDeEventos
         return respuesta.Mensaje == MensajesDeAuditoria.SinPermiso
             ? Results.StatusCode(StatusCodes.Status403Forbidden)
             : Results.BadRequest(new { error = respuesta.Mensaje });
+    }
+
+    // Solo nombres completos: Enum.TryParse también acepta números y listas con comas ("Paciente,Cita") y las convierte en otro valor.
+    public static bool TryParsearTipoDeRegistro(string valor, out TipoRegistroAuditoria tipo)
+    {
+        tipo = default;
+        if (!Enum.GetNames<TipoRegistroAuditoria>().Contains(valor, StringComparer.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        tipo = Enum.Parse<TipoRegistroAuditoria>(valor, ignoreCase: true);
+        return true;
     }
 
     // Los instantes deben llevar zona (Q09): sin esta comprobación DateTimeOffset asumiría la zona del servidor.

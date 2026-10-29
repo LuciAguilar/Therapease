@@ -1,23 +1,24 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
-using TherapEase.Domain.Identidad.Constantes;
-using TherapEase.Domain.Identidad.Reglas;
+using TherapEase.Application.Compartido.Interfaces.Servicios;
 using TherapEase.Web.Seguridad.Requisitos;
 
 namespace TherapEase.Web.Seguridad.Manejadores;
 
+// Se registra por solicitud porque IAutorizacion depende del usuario de esa solicitud y no debe compartirse entre ellas.
 public sealed class ManejadorDeRequisitoDePermiso : AuthorizationHandler<RequisitoDePermiso>
 {
-    protected override Task HandleRequirementAsync(AuthorizationHandlerContext contexto, RequisitoDePermiso requisito)
-    {
-        var sinContrasenaTemporal = contexto.User.FindFirst(Reclamaciones.DebeCambiarContrasena)?.Value == "false";
-        var tienePermiso = contexto.User.FindAll(ClaimTypes.Role).Any(r => MatrizDePermisos.RolTienePermiso(r.Value, requisito.Permiso));
+    private readonly IAutorizacion _autorizacion;
 
-        if (sinContrasenaTemporal && tienePermiso)
+    public ManejadorDeRequisitoDePermiso(IAutorizacion autorizacion)
+    {
+        _autorizacion = autorizacion;
+    }
+
+    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext contexto, RequisitoDePermiso requisito)
+    {
+        if (await _autorizacion.TienePermisoAsync(requisito.Permiso))
         {
             contexto.Succeed(requisito);
         }
-
-        return Task.CompletedTask;
     }
 }

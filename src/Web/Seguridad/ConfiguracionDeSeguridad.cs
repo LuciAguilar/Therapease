@@ -13,7 +13,7 @@ public static class ConfiguracionDeSeguridad
 {
     public const string PrefijoDeRutasTecnicas = "/api";
 
-    // Duración por inactividad: propuesta de Miguel, pendiente de decisión de Lucía (07B no fija un valor en el repositorio).
+    // Duración por inactividad: 30 minutos, decisión de Lucía del 04-oct-2026 (AGENTS §2.2).
     public static readonly TimeSpan DuracionDeSesion = TimeSpan.FromMinutes(30);
 
     // Requiere AgregarIdentidad: configura la cookie de sesión que ese registro crea.
@@ -43,7 +43,7 @@ public static class ConfiguracionDeSeguridad
             opciones.Cookie.SameSite = SameSiteMode.Strict;
         });
 
-        servicios.AddSingleton<IAuthorizationHandler, ManejadorDeRequisitoDePermiso>();
+        servicios.AddScoped<IAuthorizationHandler, ManejadorDeRequisitoDePermiso>();
         servicios.AddAuthorizationBuilder()
             .SetFallbackPolicy(PoliticaDeAccesoOperativo())
             .AddPolicy(PoliticasDeAutorizacion.AccesoOperativo, PoliticaDeAccesoOperativo())

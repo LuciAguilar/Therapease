@@ -67,7 +67,7 @@ public class RevisionDatosTests : IClassFixture<PostgreSqlRevision>
     // ──── BASE Y AUDITORÍA ───────────────────────────────────────────────────────────────────
 
 
-    /// Las dos migraciones reales se aplican y la aplicación se conecta con su propio usuario,
+    /// Las tres migraciones reales se aplican y la aplicación se conecta con su propio usuario,
     /// que no es administrador de PostgreSQL.
     [Fact]
     public async Task Migraciones_Reales_Con_Usuario_Separado()
@@ -79,7 +79,7 @@ public class RevisionDatosTests : IClassFixture<PostgreSqlRevision>
 
         // Assert
 
-        Assert.Equal(2L, await PostgreSqlRevision.Valor<long>(e.Migrador, "SELECT count(*) FROM \"__EFMigrationsHistory\""));
+        Assert.Equal(3L, await PostgreSqlRevision.Valor<long>(e.Migrador, "SELECT count(*) FROM \"__EFMigrationsHistory\""));
         Assert.Equal("therapease_app", await PostgreSqlRevision.Valor<string>(e.App, "SELECT current_user"));
         Assert.False(await PostgreSqlRevision.Valor<bool>(e.App, "SELECT rolsuper FROM pg_roles WHERE rolname=current_user"));
     }
@@ -281,7 +281,7 @@ public class RevisionDatosTests : IClassFixture<PostgreSqlRevision>
             using var proveedor=e.Servicios(); using var scope=proveedor.CreateScope();
             var c=scope.ServiceProvider.GetRequiredService<ContextoDeDatos>();
             await using var t=await c.Database.BeginTransactionAsync();
-            Assert.Null(await scope.ServiceProvider.GetRequiredService<IGestorIdentidad>().VerificarCredencialesAsync("usuario-ficticio","Incorrecta-Ficticia"));
+            Assert.Null((await scope.ServiceProvider.GetRequiredService<IGestorIdentidad>().VerificarCredencialesAsync("usuario-ficticio","Incorrecta-Ficticia")).Usuario);
             await t.CommitAsync();
         }
 
@@ -293,7 +293,7 @@ public class RevisionDatosTests : IClassFixture<PostgreSqlRevision>
 
         using var p=e.Servicios(); using var s=p.CreateScope(); var contexto=s.ServiceProvider.GetRequiredService<ContextoDeDatos>();
         await using var tx=await contexto.Database.BeginTransactionAsync();
-        Assert.Null(await s.ServiceProvider.GetRequiredService<IGestorIdentidad>().VerificarCredencialesAsync("usuario-ficticio","Ficticio-Password-Revision"));
+        Assert.Null((await s.ServiceProvider.GetRequiredService<IGestorIdentidad>().VerificarCredencialesAsync("usuario-ficticio","Ficticio-Password-Revision")).Usuario);
         await tx.CommitAsync();
 
         // Assert: la cuenta quedó bloqueada
@@ -394,7 +394,7 @@ public class RevisionDatosTests : IClassFixture<PostgreSqlRevision>
         // Act + Assert: el alta falla
 
         using(var s=proveedor.CreateScope())
-            await Assert.ThrowsAsync<DbUpdateException>(()=>s.ServiceProvider.GetRequiredService<IServicioUsuarios>().CrearUsuarioAsync("nuevo-ficticio","Usuaria"));
+            await Assert.ThrowsAsync<DbUpdateException>(()=>s.ServiceProvider.GetRequiredService<IServicioUsuarios>().CrearUsuarioAsync("nuevo-ficticio","Usuaria","Nombre Ficticio"));
 
         // Assert: no quedó el usuario ni su evento
 

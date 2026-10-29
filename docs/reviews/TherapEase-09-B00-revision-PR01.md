@@ -1,5 +1,7 @@
 # TherapEase — B00 · Ajustes del PR #1
 
+> **Continuidad documental del 14-oct-2026:** ✅ respuestas de producto recibidas en [registro de entrevista](../requirements/TherapEase-09-entrevista-requisitos.md). Este informe conserva revisión/evidencia histórica: montos, solo particular y cancelación automática no se atribuyen al código probado B00. ⏳ Detalle/aprobación/implementación de cambios; B00/LCA/R04 abiertos y esta preparación no autoriza Construcción.
+
 > **Ampliaciones:** arquitectura en §6 (08-oct), filtro Q03 en §7 y mensajes de PageModel en §8 (10-oct, pruebas auditadas; correcciones por implementar). Mejora de mensaje ante fallo de Identity en §9. Correcciones históricas de §2 ya fusionadas.
 
 **Fecha de revisión:** 04-oct-2026. **Estado:** correcciones obligatorias documentales comprobadas en `b60eba42edeb2fa8cdbea08ad1a4e51b041c21b0`, incluida la descripción. Lucía revisó/aprobó y fusionó PR #1 en main (`41123f2d2c115a05ff1df944457195a7f671cc17`). Las políticas de producto y mejoras opcionales siguen abiertas.

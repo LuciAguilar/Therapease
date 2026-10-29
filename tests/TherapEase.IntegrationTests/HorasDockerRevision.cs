@@ -34,6 +34,10 @@ public sealed class HorasDockerRevision : IAsyncLifetime
     public Guid Registro { get; } = Guid.NewGuid();
     public Guid EventoIncluido { get; } = Guid.NewGuid();
 
+    // El usuario no comparte identificador con el paciente de los eventos: iniciar sesión guarda un evento InicioSesion cuyo registro es el usuario,
+    // y si la hora real cayera dentro de la ventana consultada (2026-10-25, de 17:00 a 18:00 UTC) se contaría junto al evento incluido.
+    private readonly Guid _usuario = Guid.NewGuid();
+
     /// Construye la imagen actual, carga datos de ejemplo y la pone en marcha.
     public async Task InitializeAsync()
     {
@@ -60,8 +64,11 @@ public sealed class HorasDockerRevision : IAsyncLifetime
 
             // Un puerto asignado explícitamente se conserva cuando Docker reinicia el contenedor.
 
+            // En Linux (por ejemplo, el runner de GitHub) host.docker.internal no existe por sí solo: se mapea a la puerta de enlace del anfitrión.
+            // Docker Desktop ya lo resuelve; la opción no le cambia nada.
             var arranque = await DockerAsync("run", "--detach", "--name", _nombre,
                 "--label", "therapease.revision=b00-horas-docker", "--publish", $"127.0.0.1:{numero}:8080",
+                "--add-host", "host.docker.internal:host-gateway",
                 "--env", "ConnectionStrings__TherapEase=" + conexion, "--env", "TZ=Europe/Madrid", Imagen);
             ExigirExito(arranque, "arranque del contenedor");
             _contenedorCreado = true;
@@ -84,7 +91,7 @@ public sealed class HorasDockerRevision : IAsyncLifetime
         using (var alcance = proveedor.CreateScope())
         {
             var resultado = await alcance.ServiceProvider.GetRequiredService<IGestorIdentidad>()
-                .CrearAsync(Registro, "horas-ficticias", "Superusuario", "ficticiacontrasenahoras", false);
+                .CrearAsync(_usuario, "horas-ficticias", "Superusuario", "ficticiacontrasenahoras", false);
             if (resultado != ResultadoCreacionDeUsuario.Creado) throw new InvalidOperationException("No se creó el usuario ficticio.");
         }
         using (var solicitud = new SolicitudIdentidad(proveedor))
@@ -104,7 +111,7 @@ public sealed class HorasDockerRevision : IAsyncLifetime
                 """, conexion);
             comando.Parameters.AddWithValue("id", id);
             comando.Parameters.AddWithValue("fecha", DateTimeOffset.Parse(instante).ToUniversalTime());
-            comando.Parameters.AddWithValue("actor", Registro);
+            comando.Parameters.AddWithValue("actor", _usuario);
             comando.Parameters.AddWithValue("registro", Registro);
             await comando.ExecuteNonQueryAsync();
         }

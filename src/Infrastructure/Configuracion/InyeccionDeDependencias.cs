@@ -12,6 +12,7 @@ using TherapEase.Application.Pacientes.Interfaces.Repositorios;
 using TherapEase.Infrastructure.Auditoria.Repositorios;
 using TherapEase.Infrastructure.Citas.Repositorios;
 using TherapEase.Infrastructure.Compartido.Repositorios;
+using TherapEase.Infrastructure.Compartido.Servicios;
 using TherapEase.Infrastructure.Data;
 using TherapEase.Infrastructure.Identidad.Entidades;
 using TherapEase.Infrastructure.Identidad.Repositorios;
@@ -40,7 +41,7 @@ public static class InyeccionDeDependencias
 
         servicios.AddIdentity<Usuario, Rol>(opciones =>
             {
-                // Propuesta de Miguel, pendiente de decisión de Lucía (L-CU11-02): solo longitud, sin reglas de composición.
+                // Mínimo de 12 caracteres, sin reglas de composición: decisión de Lucía del 04-oct-2026 (AGENTS §2.2, L-CU11-02).
                 opciones.Password.RequiredLength = 12;
                 opciones.Password.RequireDigit = false;
                 opciones.Password.RequireLowercase = false;
@@ -70,6 +71,7 @@ public static class InyeccionDeDependencias
         servicios.AddScoped<IGestorIdentidad, GestorIdentidad>();
         servicios.AddScoped<IEmisorDeSesion, EmisorDeSesion>();
         servicios.AddScoped<IUsuarioActual, UsuarioActualHttp>();
+        servicios.AddSingleton<IRegistroTecnico, RegistroTecnico>();
         return servicios;
     }
 }

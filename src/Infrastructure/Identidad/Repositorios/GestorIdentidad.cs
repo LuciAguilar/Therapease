@@ -30,13 +30,52 @@ public class GestorIdentidad : IGestorIdentidad
         return usuario is null ? null : await ADatosAsync(usuario);
     }
 
+    public async Task<IReadOnlyList<DatosUsuario>> ListarAsync(string? busqueda, int maximo, CancellationToken cancelacion = default)
+    {
+        var consulta = _contexto.Users.AsNoTracking();
+        if (!string.IsNullOrEmpty(busqueda))
+        {
+            // Contains con parámetro (no LIKE): % y _ escritos por la persona se buscan como texto.
+            // El nombre de usuario se compara normalizado; el nombre completo, en mayúsculas en ambos lados.
+            var normalizado = _usuarios.NormalizeName(busqueda)!;
+            var mayusculas = busqueda.ToUpperInvariant();
+            consulta = consulta.Where(u => u.NormalizedUserName!.Contains(normalizado) || u.NombreCompleto.ToUpper().Contains(mayusculas));
+        }
+
+        // Solo se proyectan las columnas de DatosUsuario: el hash, el sello y los contadores de fallos nunca salen de la base.
+        var filas = await consulta
+            .OrderBy(u => u.NormalizedUserName)
+            .Take(maximo)
+            .Select(u => new
+            {
+                u.Id,
+                u.UserName,
+                u.Activo,
+                u.DebeCambiarContrasena,
+                u.NombreCompleto,
+                Rol = _contexto.UserRoles
+                    .Where(ur => ur.UserId == u.Id)
+                    .Join(_contexto.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => r.Name)
+                    .FirstOrDefault()
+            })
+            .ToListAsync(cancelacion);
+
+        return filas.Select(f => new DatosUsuario(f.Id, f.UserName!, f.Rol ?? string.Empty, f.Activo, f.DebeCambiarContrasena, f.NombreCompleto)).ToList();
+    }
+
+    public async Task<FichaDeUsuario?> ObtenerFichaAsync(Guid idUsuario, CancellationToken cancelacion = default)
+    {
+        var usuario = await _usuarios.FindByIdAsync(idUsuario.ToString());
+        return usuario is null ? null : new FichaDeUsuario(await ADatosAsync(usuario), usuario.Email);
+    }
+
     public async Task<DatosUsuario?> ObtenerPorNombreAsync(string nombreUsuario, CancellationToken cancelacion = default)
     {
         var usuario = await _usuarios.FindByNameAsync(nombreUsuario);
         return usuario is null ? null : await ADatosAsync(usuario);
     }
 
-    public async Task<DatosUsuario?> VerificarCredencialesAsync(string nombreUsuario, string contrasena, CancellationToken cancelacion = default)
+    public async Task<ResultadoDeVerificacion> VerificarCredencialesAsync(string nombreUsuario, string contrasena, CancellationToken cancelacion = default)
     {
         var normalizado = _usuarios.NormalizeName(nombreUsuario);
         var usuario = await BloquearUsuarioAsync(normalizado, cancelacion);
@@ -44,51 +83,52 @@ public class GestorIdentidad : IGestorIdentidad
         if (usuario is null)
         {
             _hasher.VerifyHashedPassword(new Usuario(), HashFicticio, contrasena);
-            return null;
+            return new ResultadoDeVerificacion(null);
         }
 
         // Con el bloqueo vigente no se evalúa la contraseña: una correcta tampoco abre sesión (CU01 A2).
         if (!usuario.Activo || await _usuarios.IsLockedOutAsync(usuario))
         {
             _hasher.VerifyHashedPassword(new Usuario(), HashFicticio, contrasena);
-            return null;
+            return new ResultadoDeVerificacion(null);
         }
 
         if (!await _usuarios.CheckPasswordAsync(usuario, contrasena))
         {
-            await _usuarios.AccessFailedAsync(usuario);
-            return null;
+            return new ResultadoDeVerificacion(null, await RegistrarFalloAsync(usuario) ? usuario.Id : null);
         }
 
-        await _usuarios.ResetAccessFailedCountAsync(usuario);
-        return await ADatosAsync(usuario);
+        Exigir(await _usuarios.ResetAccessFailedCountAsync(usuario), "reiniciar los intentos fallidos");
+        return new ResultadoDeVerificacion(await ADatosAsync(usuario));
     }
 
-    public async Task<bool> VerificarContrasenaActualAsync(Guid idUsuario, string contrasena, CancellationToken cancelacion = default)
+    public async Task<ResultadoDeContrasenaActual> VerificarContrasenaActualAsync(Guid idUsuario, string contrasena, CancellationToken cancelacion = default)
     {
         var usuario = await BloquearUsuarioAsync(idUsuario, cancelacion);
         if (usuario is not { Activo: true } || await _usuarios.IsLockedOutAsync(usuario))
         {
-            return false;
+            return new ResultadoDeContrasenaActual(Correcta: false);
         }
 
         if (!await _usuarios.CheckPasswordAsync(usuario, contrasena))
         {
-            await _usuarios.AccessFailedAsync(usuario);
-            return false;
+            return new ResultadoDeContrasenaActual(Correcta: false, BloqueoNuevo: await RegistrarFalloAsync(usuario));
         }
 
-        await _usuarios.ResetAccessFailedCountAsync(usuario);
-        return true;
+        Exigir(await _usuarios.ResetAccessFailedCountAsync(usuario), "reiniciar los intentos fallidos");
+        return new ResultadoDeContrasenaActual(Correcta: true);
     }
 
     public async Task<ResultadoCreacionDeUsuario> CrearAsync(
-        Guid idUsuario, string nombreUsuario, string rol, string contrasena, bool debeCambiarContrasena, CancellationToken cancelacion = default)
+        Guid idUsuario, string nombreUsuario, string rol, string contrasena, bool debeCambiarContrasena,
+        string? nombreCompleto = null, string? correo = null, CancellationToken cancelacion = default)
     {
         var usuario = new Usuario
         {
             Id = idUsuario,
             UserName = nombreUsuario,
+            NombreCompleto = nombreCompleto ?? string.Empty,
+            Email = correo,
             Activo = true,
             DebeCambiarContrasena = debeCambiarContrasena,
             LockoutEnabled = true
@@ -102,25 +142,46 @@ public class GestorIdentidad : IGestorIdentidad
                 : ResultadoCreacionDeUsuario.DatosInvalidos;
         }
 
-        await _usuarios.AddToRoleAsync(usuario, rol);
+        Exigir(await _usuarios.AddToRoleAsync(usuario, rol), "asignar el rol");
         return ResultadoCreacionDeUsuario.Creado;
+    }
+
+    public async Task<CamposActualizados> ActualizarDatosAsync(
+        Guid idUsuario, string nombreCompleto, string? correo, CancellationToken cancelacion = default)
+    {
+        var usuario = await ObtenerEntidadAsync(idUsuario);
+        var cambios = new CamposActualizados(
+            NombreCompleto: !string.Equals(usuario.NombreCompleto, nombreCompleto, StringComparison.Ordinal),
+            Correo: !string.Equals(usuario.Email, correo, StringComparison.Ordinal));
+        if (!cambios.Hubo)
+        {
+            return cambios;
+        }
+
+        usuario.NombreCompleto = nombreCompleto;
+        usuario.Email = correo;
+
+        // Se asignan las propiedades y se guarda con UpdateAsync, que no toca el sello de seguridad.
+        // SetEmailAsync no sirve aquí: renueva el sello y cerraría las sesiones de la persona, y el correo no interviene en el acceso.
+        Exigir(await _usuarios.UpdateAsync(usuario), "actualizar los datos de la cuenta");
+        return cambios;
     }
 
     public async Task CambiarRolAsync(Guid idUsuario, string nuevoRol, CancellationToken cancelacion = default)
     {
         var usuario = await ObtenerEntidadAsync(idUsuario);
         var actuales = await _usuarios.GetRolesAsync(usuario);
-        await _usuarios.RemoveFromRolesAsync(usuario, actuales);
-        await _usuarios.AddToRoleAsync(usuario, nuevoRol);
-        await _usuarios.UpdateSecurityStampAsync(usuario);
+        Exigir(await _usuarios.RemoveFromRolesAsync(usuario, actuales), "retirar los roles actuales");
+        Exigir(await _usuarios.AddToRoleAsync(usuario, nuevoRol), "asignar el rol");
+        Exigir(await _usuarios.UpdateSecurityStampAsync(usuario), "renovar el sello de seguridad");
     }
 
     public async Task DesactivarAsync(Guid idUsuario, CancellationToken cancelacion = default)
     {
         var usuario = await ObtenerEntidadAsync(idUsuario);
         usuario.Activo = false;
-        await _usuarios.UpdateAsync(usuario);
-        await _usuarios.UpdateSecurityStampAsync(usuario);
+        Exigir(await _usuarios.UpdateAsync(usuario), "desactivar el usuario");
+        Exigir(await _usuarios.UpdateSecurityStampAsync(usuario), "renovar el sello de seguridad");
     }
 
     public async Task<ResultadoDeContrasena> EstablecerContrasenaAsync(
@@ -138,15 +199,11 @@ public class GestorIdentidad : IGestorIdentidad
         }
 
         // Quitar y agregar la contraseña renueva el sello de seguridad: las demás sesiones dejan de valer.
-        await _usuarios.RemovePasswordAsync(usuario);
-        var resultado = await _usuarios.AddPasswordAsync(usuario, contrasena);
-        if (!resultado.Succeeded)
-        {
-            throw new InvalidOperationException("No se pudo establecer la contraseña.");
-        }
+        Exigir(await _usuarios.RemovePasswordAsync(usuario), "retirar la contraseña actual");
+        Exigir(await _usuarios.AddPasswordAsync(usuario, contrasena), "establecer la contraseña");
 
         usuario.DebeCambiarContrasena = debeCambiarContrasena;
-        await _usuarios.UpdateAsync(usuario);
+        Exigir(await _usuarios.UpdateAsync(usuario), "marcar el cambio de contraseña pendiente");
         return ResultadoDeContrasena.Establecida;
     }
 
@@ -163,8 +220,26 @@ public class GestorIdentidad : IGestorIdentidad
         var usuario = await _usuarios.FindByIdAsync(idUsuario.ToString());
         if (usuario is not null)
         {
-            await _usuarios.UpdateSecurityStampAsync(usuario);
+            Exigir(await _usuarios.UpdateSecurityStampAsync(usuario), "renovar el sello de seguridad");
         }
+    }
+
+    // Una operación de Identity rechazada no se confirma: se detiene aquí y IUnidadDeTrabajo revierte lo anterior. Solo se citan los códigos de error, nunca datos de la cuenta.
+    private static void Exigir(IdentityResult resultado, string operacion)
+    {
+        if (!resultado.Succeeded)
+        {
+            throw new InvalidOperationException(
+                $"Identity rechazó la operación «{operacion}» ({string.Join(", ", resultado.Errors.Select(e => e.Code))}).");
+        }
+    }
+
+    // Cuenta el fallo y dice si con él empezó el bloqueo. Quien llama ya comprobó que no estaba bloqueada, y al llegar al límite Identity fija el vencimiento
+    // en este mismo paso, así que un bloqueo vigente después del fallo es uno nuevo: de ese modo se informa una sola vez por bloqueo.
+    private async Task<bool> RegistrarFalloAsync(Usuario usuario)
+    {
+        Exigir(await _usuarios.AccessFailedAsync(usuario), "registrar un intento fallido");
+        return await _usuarios.IsLockedOutAsync(usuario);
     }
 
     private async Task<Usuario> ObtenerEntidadAsync(Guid idUsuario) =>
@@ -172,12 +247,13 @@ public class GestorIdentidad : IGestorIdentidad
         ?? throw new InvalidOperationException("El usuario no existe.");
 
     // Un intento a la vez por usuario (S-03): el bloqueo de fila dura hasta el commit de IUnidadDeTrabajo; sin LINQ encima, para que FOR UPDATE no quede en una subconsulta.
-    private async Task<Usuario?> BloquearUsuarioAsync(string nombreNormalizado, CancellationToken cancelacion) =>
+    // Los dos son virtuales solo para sustituir la base en las unitarias.
+    protected virtual async Task<Usuario?> BloquearUsuarioAsync(string nombreNormalizado, CancellationToken cancelacion) =>
         (await _contexto.Users
             .FromSqlInterpolated($"""SELECT * FROM "AspNetUsers" WHERE "NormalizedUserName" = {nombreNormalizado} FOR UPDATE""")
             .ToListAsync(cancelacion)).SingleOrDefault();
 
-    private async Task<Usuario?> BloquearUsuarioAsync(Guid idUsuario, CancellationToken cancelacion) =>
+    protected virtual async Task<Usuario?> BloquearUsuarioAsync(Guid idUsuario, CancellationToken cancelacion) =>
         (await _contexto.Users
             .FromSqlInterpolated($"""SELECT * FROM "AspNetUsers" WHERE "Id" = {idUsuario} FOR UPDATE""")
             .ToListAsync(cancelacion)).SingleOrDefault();
@@ -185,6 +261,7 @@ public class GestorIdentidad : IGestorIdentidad
     private async Task<DatosUsuario> ADatosAsync(Usuario usuario)
     {
         var roles = await _usuarios.GetRolesAsync(usuario);
-        return new DatosUsuario(usuario.Id, usuario.UserName!, roles.FirstOrDefault() ?? string.Empty, usuario.Activo, usuario.DebeCambiarContrasena);
+        return new DatosUsuario(
+            usuario.Id, usuario.UserName!, roles.FirstOrDefault() ?? string.Empty, usuario.Activo, usuario.DebeCambiarContrasena, usuario.NombreCompleto);
     }
 }

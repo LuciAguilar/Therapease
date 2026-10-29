@@ -242,7 +242,7 @@ public class IdentidadServidorTests(PostgreSqlRevision postgres) : IClassFixture
         Assert.True((await autorizacion.AuthorizeAsync(solicitud.Contexto.User, PoliticasDeAutorizacion.CambiarContrasenaPropia)).Succeeded);
         Assert.False((await autorizacion.AuthorizeAsync(solicitud.Contexto.User, PoliticasDeAutorizacion.AccesoOperativo)).Succeeded);
         Assert.False((await autorizacion.AuthorizeAsync(solicitud.Contexto.User, PoliticasDeAutorizacion.AdministrarUsuarios)).Succeeded);
-        Assert.False((await solicitud.Obtener<IServicioUsuarios>().CrearUsuarioAsync("no-permitida", "Usuaria")).Exito);
+        Assert.False((await solicitud.Obtener<IServicioUsuarios>().CrearUsuarioAsync("no-permitida", "Usuaria", "Nombre Ficticio")).Exito);
 
         // Act: cambiar la contraseña
 
@@ -319,7 +319,7 @@ public class IdentidadServidorTests(PostgreSqlRevision postgres) : IClassFixture
         // Assert
 
         Assert.Equal(sello, await PostgreSqlRevision.Valor<string>(escenario.App, "SELECT \"SecurityStamp\" FROM \"AspNetUsers\""));
-        Assert.Equal(0L, await PostgreSqlRevision.Valor<long>(escenario.App, "SELECT count(*) FROM \"EventoAuditoria\""));
+        Assert.Equal(0L, await PostgreSqlRevision.Valor<long>(escenario.App, $"SELECT count(*) FROM \"EventoAuditoria\" e WHERE {ServidorIdentidadRevision.SoloCambiosSql}"));
         Assert.True(await AutenticarAsync(proveedor, cookie));
         await EntrarAsync(proveedor);
     }
@@ -505,7 +505,7 @@ public class IdentidadServidorTests(PostgreSqlRevision postgres) : IClassFixture
         // Assert: sigue un superusuario y no hay auditoría
 
         Assert.Equal(1, await solicitud.Obtener<IGestorIdentidad>().ContarSuperusuariosActivosAsync());
-        Assert.Equal(0L, await PostgreSqlRevision.Valor<long>(escenario.App, "SELECT count(*) FROM \"EventoAuditoria\""));
+        Assert.Equal(0L, await PostgreSqlRevision.Valor<long>(escenario.App, $"SELECT count(*) FROM \"EventoAuditoria\" e WHERE {ServidorIdentidadRevision.SoloCambiosSql}"));
     }
 
 
@@ -667,7 +667,7 @@ public class IdentidadServidorTests(PostgreSqlRevision postgres) : IClassFixture
         // Assert: el usuario quedó igual y su sesión sigue válida
 
         Assert.Equal(anterior, await PostgreSqlRevision.Valor<string>(escenario.App, $"SELECT row_to_json(u)::text FROM \"AspNetUsers\" u WHERE \"Id\"='{id}'"));
-        Assert.Equal(0L, await PostgreSqlRevision.Valor<long>(escenario.App, "SELECT count(*) FROM \"EventoAuditoria\""));
+        Assert.Equal(0L, await PostgreSqlRevision.Valor<long>(escenario.App, $"SELECT count(*) FROM \"EventoAuditoria\" e WHERE {ServidorIdentidadRevision.SoloCambiosSql}"));
         Assert.True(await AutenticarAsync(proveedor, usuarioCookie));
     }
 
@@ -692,7 +692,7 @@ public class IdentidadServidorTests(PostgreSqlRevision postgres) : IClassFixture
         using (var solicitud = new SolicitudIdentidad(proveedor, actorCookie))
         {
             Assert.True(await solicitud.AutenticarAsync());
-            var respuesta = await solicitud.Obtener<IServicioUsuarios>().CrearUsuarioAsync("datoRastreable-nombre-ficticio", "Usuaria");
+            var respuesta = await solicitud.Obtener<IServicioUsuarios>().CrearUsuarioAsync("datoRastreable-nombre-ficticio", "Usuaria", "Nombre Ficticio");
             Assert.True(respuesta.Exito);
             creada = respuesta.Datos!;
         }
@@ -706,7 +706,7 @@ public class IdentidadServidorTests(PostgreSqlRevision postgres) : IClassFixture
         // Assert: ningún valor sensible aparece en auditoría ni registros
 
         var auditoria = await PostgreSqlRevision.Valor<string>(escenario.App, "SELECT json_agg(e)::text FROM \"EventoAuditoria\" e");
-        Assert.Equal(2L, await PostgreSqlRevision.Valor<long>(escenario.App, "SELECT count(*) FROM \"EventoAuditoria\""));
+        Assert.Equal(2L, await PostgreSqlRevision.Valor<long>(escenario.App, $"SELECT count(*) FROM \"EventoAuditoria\" e WHERE {ServidorIdentidadRevision.SoloCambiosSql}"));
         var hash = await PostgreSqlRevision.Valor<string>(escenario.App, $"SELECT \"PasswordHash\" FROM \"AspNetUsers\" WHERE \"Id\"='{creada.Usuario.IdUsuario}'");
         foreach (var datoRastreable in new[] { Contrasena, Nueva, creada.ContrasenaTemporal, hash, cookie.Split('=', 2)[1], escenario.App })
         {

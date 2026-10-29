@@ -107,7 +107,7 @@ public sealed class InterrupcionesIdentidadRevision : IDisposable
         if (operacion is "crear" or "restablecer")
         {
             var respuesta = operacion == "crear"
-                ? await servicio.CrearUsuarioAsync(NombreObjetivo, "Usuaria", cancelacion)
+                ? await servicio.CrearUsuarioAsync(NombreObjetivo, "Usuaria", "Nombre Ficticio", cancelacion: cancelacion)
                 : await servicio.RestablecerContrasenaAsync(_objetivo, cancelacion);
             var temporalVerificada = false;
             if (respuesta.Exito && respuesta.Datos is { } datos)
@@ -165,7 +165,7 @@ public sealed class InterrupcionesIdentidadRevision : IDisposable
                 huellaUsuario = Huella(lector.GetString(3));
             }
         }
-        var eventos = await PostgreSqlRevision.Valor<long>(Escenario.App, "SELECT count(*) FROM \"EventoAuditoria\"");
+        var eventos = await PostgreSqlRevision.Valor<long>(Escenario.App, $"SELECT count(*) FROM \"EventoAuditoria\" e WHERE {ServidorIdentidadRevision.SoloCambiosSql}");
         return new(Huella(string.Join('\n', partes)), eventos, cantidad, activo, temporal, rol, huellaUsuario);
     }
 
