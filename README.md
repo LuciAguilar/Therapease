@@ -4,10 +4,10 @@
 
 TherapEase es una aplicación web para la gestión administrativa de un consultorio psicológico.
 
-**Estado de hoy — 26-oct-2026:** PR #10 fusionado en `a7c0c52`; [CI de esa fusión correcta](https://github.com/LuciAguilar/Therapease/actions/runs/40395259207).
+**Estado de hoy — 28-oct-2026:** main `a7c0c52` (PR #10 fusionado; [CI de esa fusión correcta](https://github.com/LuciAguilar/Therapease/actions/runs/40395259207)). Miguel implementa B02 en el [PR #11](https://github.com/LuciAguilar/Therapease/pull/11) (rama `b02/fichas-de-pacientes`).
 
 - B01 espera las páginas, formularios y navegador; B00/LCA/R04 siguen abiertos.
-- B02 espera una sola propuesta de Miguel; Lucía decide el detalle antes de programar.
+- B02: propuesta y diez decisiones aprobadas por Lucía el 26-oct; servidor en implementación y [contrato para páginas](docs/planning/TherapEase-etapa09-B02-contrato-para-paginas.md) preparado para Dulce.
 - Solo datos ficticios, sin nube ni gastos; montos, «solo particular» y cancelación automática fuera.
 
 ## 2. Quién hace qué ahora
@@ -15,7 +15,7 @@ TherapEase es una aplicación web para la gestión administrativa de un consulto
 | Persona | Trabajo actual |
 | --- | --- |
 | Lucía | Decide las propuestas y dirige QA; otra persona revisa sus pruebas. |
-| Miguel | Propone campos/tutor, permisos, búsqueda/homónimos, reenvío y ámbitos en una rama nueva desde main. |
+| Miguel | Implementa el servidor de B02 (campos/tutor, permisos, búsqueda/homónimos, reenvío y ámbitos) en su rama desde main y avisa a Lucía de cualquier problema técnico. |
 | Dulce | Confirma producto con la usuaria y prepara páginas, PageModel y sus unitarias. |
 
 ## 3. Documentos clave
@@ -24,8 +24,9 @@ TherapEase es una aplicación web para la gestión administrativa de un consulto
 | --- | --- |
 | [AGENTS](AGENTS.md) | Reglas obligatorias, alcance y límites vigentes. |
 | [Plan B01](docs/planning/TherapEase-etapa09-B01.md) | Acceso, identidad y páginas pendientes. |
-| [Plan B02](docs/planning/TherapEase-etapa09-B02.md) | Plan aprobado; propuesta y decisión de detalle pendientes. |
-| [Contrato para páginas](docs/planning/TherapEase-etapa09-B01-contrato-para-paginas.md) | Entradas, resultados y errores para los PageModel de Dulce. |
+| [Plan B02](docs/planning/TherapEase-etapa09-B02.md) | Plan aprobado; [propuesta ajustada](docs/planning/TherapEase-etapa09-B02-propuesta.md) aprobada el 26-oct. |
+| [Contrato para páginas, B01](docs/planning/TherapEase-etapa09-B01-contrato-para-paginas.md) | Entradas, resultados y errores de acceso y usuarios para los PageModel de Dulce. |
+| [Contrato para páginas, B02](docs/planning/TherapEase-etapa09-B02-contrato-para-paginas.md) | Entradas, resultados y errores de pacientes para los PageModel de Dulce. |
 | [Plan de pruebas](docs/testing/TherapEase-09-plan-de-pruebas.md) | Casos, responsables y evidencia; enlaza B00. |
 | [08B](docs/requirements/TherapEase-etapa08-casos-historias.md) | Historias, criterios y casos de uso. |
 | [08D](docs/planning/TherapEase-etapa08-backlog-trazabilidad.md) | Backlog y trazabilidad; enlaza modelos y requisitos. |

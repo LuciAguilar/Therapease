@@ -29,9 +29,19 @@ public class UnidadDeTrabajo : IUnidadDeTrabajo
             await _contexto.SaveChangesAsync(cancelacion);
             await transaccion.CommitAsync(cancelacion);
         }
-        catch (Exception excepcion) when (TraductorDeErroresDeBase.Traducir(excepcion) is not null)
+        catch (Exception excepcion)
         {
-            throw TraductorDeErroresDeBase.Traducir(excepcion)!;
+            // La transacción se revierte al liberarla, pero el contexto conserva lo que el guardado fallido dejó pendiente (una ficha nueva, un cambio, un evento).
+            // Sin descartarlo, la siguiente operación del mismo alcance volvería a intentar ese cambio y fallaría con él. Se descarta cualquiera sea la causa.
+            _contexto.ChangeTracker.Clear();
+
+            var traducida = TraductorDeErroresDeBase.Traducir(excepcion);
+            if (traducida is null)
+            {
+                throw;
+            }
+
+            throw traducida;
         }
     }
 }

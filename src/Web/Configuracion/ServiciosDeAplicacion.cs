@@ -5,6 +5,8 @@ using TherapEase.Application.Coordinadores.Interfaces.Servicios;
 using TherapEase.Application.Coordinadores.Servicios;
 using TherapEase.Application.Identidad.Interfaces.Servicios;
 using TherapEase.Application.Identidad.Servicios;
+using TherapEase.Application.Pacientes.Interfaces.Servicios;
+using TherapEase.Application.Pacientes.Servicios;
 
 namespace TherapEase.Web.Configuracion;
 
@@ -21,6 +23,7 @@ public static class ServiciosDeAplicacion
         servicios.AddScoped<IServicioCuentaPropia, ServicioCuentaPropia>();
         servicios.AddScoped<IServicioContrasena, ServicioContrasena>();
         servicios.AddScoped<IServicioArranqueDeIdentidad, ServicioArranqueDeIdentidad>();
+        servicios.AddScoped<IServicioPacientes, ServicioPacientes>();
         servicios.AddScoped<ICoordinadorDeBajaDePaciente, CoordinadorDeBajaDePaciente>();
         return servicios;
     }

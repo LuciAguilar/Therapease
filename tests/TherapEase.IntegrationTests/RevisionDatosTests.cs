@@ -49,7 +49,7 @@ public class RevisionDatosTests : IClassFixture<PostgreSqlRevision>
     private static async Task<Guid> Paciente(Escenario e)
     {
         await using var contexto = e.Contexto();
-        var p = ReglasDePaciente.Registrar(Guid.NewGuid(), "Paciente Ficticio", null, [AmbitoAtencion.Independiente], Actor, Ahora);
+        var p = ReglasDePaciente.Registrar(Guid.NewGuid(), PacientesDePrueba.Adulto("Paciente Ficticio"), [AmbitoAtencion.Independiente], Actor, Ahora);
         contexto.Pacientes.Add(p);
         await contexto.SaveChangesAsync();
         return p.IdPaciente;
@@ -79,7 +79,7 @@ public class RevisionDatosTests : IClassFixture<PostgreSqlRevision>
 
         // Assert
 
-        Assert.Equal(3L, await PostgreSqlRevision.Valor<long>(e.Migrador, "SELECT count(*) FROM \"__EFMigrationsHistory\""));
+        Assert.Equal(4L, await PostgreSqlRevision.Valor<long>(e.Migrador, "SELECT count(*) FROM \"__EFMigrationsHistory\""));
         Assert.Equal("therapease_app", await PostgreSqlRevision.Valor<string>(e.App, "SELECT current_user"));
         Assert.False(await PostgreSqlRevision.Valor<bool>(e.App, "SELECT rolsuper FROM pg_roles WHERE rolname=current_user"));
     }
@@ -170,9 +170,9 @@ public class RevisionDatosTests : IClassFixture<PostgreSqlRevision>
 
         var e = await _postgres.Crear(); var id = await Paciente(e);
         await using var a = e.Contexto(); await using var b = e.Contexto();
-        var pa = await a.Pacientes.SingleAsync(p => p.IdPaciente == id); var pb = await b.Pacientes.SingleAsync(p => p.IdPaciente == id);
-        ReglasDePaciente.Actualizar(pa,"Primera edicion ficticia",null,1,Actor,Ahora); await a.SaveChangesAsync();
-        ReglasDePaciente.Actualizar(pb,"Segunda edicion ficticia",null,1,Actor,Ahora);
+        var pa = await a.Pacientes.Include(p => p.Ambitos).SingleAsync(p => p.IdPaciente == id); var pb = await b.Pacientes.Include(p => p.Ambitos).SingleAsync(p => p.IdPaciente == id);
+        ReglasDePaciente.Actualizar(pa, PacientesDePrueba.Adulto("Primera edicion ficticia"), [AmbitoAtencion.Independiente], 1, Actor, Ahora); await a.SaveChangesAsync();
+        ReglasDePaciente.Actualizar(pb, PacientesDePrueba.Adulto("Segunda edicion ficticia"), [AmbitoAtencion.Independiente], 1, Actor, Ahora);
 
         // Act + Assert: la segunda se rechaza
 

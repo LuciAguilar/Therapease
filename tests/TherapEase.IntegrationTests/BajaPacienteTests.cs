@@ -291,7 +291,7 @@ public sealed class BajaPacienteTests(PostgreSqlRevision postgres) : IClassFixtu
             }
             var paciente = Guid.NewGuid();
             await using var datos = e.Contexto();
-            datos.Pacientes.Add(ReglasDePaciente.Registrar(paciente, "Paciente ficticio de revisión", "Contacto ficticio",
+            datos.Pacientes.Add(ReglasDePaciente.Registrar(paciente, PacientesDePrueba.Adulto("Paciente ficticio de revisión"),
                 [AmbitoAtencion.Independiente], actor, DateTimeOffset.UtcNow));
             await datos.SaveChangesAsync();
             return new Preparacion(e, proveedor, cookie, actor, paciente);
