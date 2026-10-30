@@ -82,7 +82,12 @@ public class ServicioPacientes : IServicioPacientes
                 candidato.NombreNormalizado, LimitesDeBusquedaDePacientes.MaximoDeCoincidencias + 1, cancelacion);
             if (parecidos.Count > 0)
             {
-                return CoincidenciasPorConfirmar(parecidos);
+                // Entre la primera lectura y esta búsqueda, el mismo envío (doble clic o reintento) pudo guardarse y entonces su propia ficha aparece como parecida.
+                // Antes de devolver parecidos se vuelve a buscar por el número de la ficha: si ya existe, es un reenvío y se responde como tal.
+                var guardada = await _pacientes.ObtenerParaComparacionAsync(idSolicitud, cancelacion);
+                return guardada is not null
+                    ? ResponderAlReenvio(guardada, candidato, idActor)
+                    : CoincidenciasPorConfirmar(parecidos);
             }
         }
 

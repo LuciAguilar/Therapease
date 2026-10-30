@@ -85,6 +85,25 @@ public class PacientesServidorTests(PostgreSqlRevision postgres) : IClassFixture
         }
     }
 
+    // Ejecuta una acción, una sola vez, justo antes de la consulta de fichas parecidas de un alta: fuerza el momento en que otro envío igual ya se guardó.
+    private sealed class AntesDeBuscarParecidos : DbCommandInterceptor
+    {
+        private Func<Task>? _accion;
+
+        public void Armar(Func<Task> accion) => Volatile.Write(ref _accion, accion);
+
+        public override async ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(
+            DbCommand comando, CommandEventData datos, InterceptionResult<DbDataReader> resultado, CancellationToken cancelacion = default)
+        {
+            if (comando.CommandText.Contains("\"NombreNormalizado\" = @", StringComparison.Ordinal) && Interlocked.Exchange(ref _accion, null) is { } accion)
+            {
+                await accion();
+            }
+
+            return resultado;
+        }
+    }
+
     private sealed class Entorno(Escenario escenario, ServiceProvider proveedor, UsuarioActualMutable actual, RegistroDeComandos comandos) : IDisposable
     {
         public Escenario Escenario { get; } = escenario;
@@ -283,6 +302,29 @@ public class PacientesServidorTests(PostgreSqlRevision postgres) : IClassFixture
         Assert.False(respuesta.Exito);
         Assert.Equal(MensajesDePacientes.SolicitudYaUsada, respuesta.Mensaje);
         Assert.Equal("Otra Persona", Assert.Single(await e.PacientesAsync()).Nombre);
+        Assert.Single(await e.EventosDePacientesAsync());
+    }
+
+    [Fact]
+    public async Task Alta_SiElMismoEnvioSeGuardaJustoAntesDeBuscarParecidos_SeResponde_YaRegistradoYNoComoParecido()
+    {
+        var id = Guid.NewGuid();
+        var antes = new AntesDeBuscarParecidos();
+        using var e = await PrepararAsync(configurar: servicios => servicios.ConfigureDbContext<ContextoDeDatos>(o => o.AddInterceptors(antes)));
+        antes.Armar(async () =>
+        {
+            var otro = await e.Servicio(s => s.RegistrarAsync(id, Adulto()));
+            Assert.Equal(EstadoDeAlta.Registrado, otro.Datos!.Estado);
+        });
+
+        // Este envío no encontró la ficha al empezar; cuando busca parecidos, el otro ya la guardó y su propia ficha aparecería como parecida.
+        var respuesta = await e.Servicio(s => s.RegistrarAsync(id, Adulto()));
+
+        Assert.True(respuesta.Exito, respuesta.Mensaje);
+        Assert.Equal(EstadoDeAlta.YaRegistrado, respuesta.Datos!.Estado);
+        Assert.Equal(id, respuesta.Datos.IdPaciente);
+        Assert.Null(respuesta.Datos.Coincidencias);
+        Assert.Single(await e.PacientesAsync());
         Assert.Single(await e.EventosDePacientesAsync());
     }
 

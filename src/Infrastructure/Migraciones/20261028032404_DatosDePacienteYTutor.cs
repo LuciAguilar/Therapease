@@ -23,9 +23,9 @@ namespace TherapEase.Infrastructure.Migraciones
     //
     // Correspondencia en SQL frente a Domain: la clave de nombre usa normalize(..., NFD), regexp_replace, lower(... COLLATE "und-x-icu") y translate de PostgreSQL; la
     // validación de correo y teléfono replica ReglasDeNombreYCorreo y ReglasDeTelefono con los caracteres de formato del plano básico de Unicode. Las pruebas de
-    // integración comparan ambas con las mismas muestras (Ø, Ж, İ y Σ incluidas). Las minúsculas usan la colación ICU raíz y no la configuración regional del servidor,
-    // pero exigen un PostgreSQL compilado con ICU (el de las pruebas lo es). Divergencia conocida del correo, que Domain baja con ToLowerInvariant y aquí se baja con
-    // ICU: una İ o una Σ final dentro de un correo anterior; no afecta a los datos de prueba y la clave de nombre sí las iguala.
+    // integración comparan ambas con las mismas muestras (Ø, Ж, İ y Σ incluidas). La minúscula de la clave de nombre usa la colación ICU raíz y no la configuración
+    // regional del servidor, pero exige un PostgreSQL compilado con ICU (el de las pruebas lo es). La del correo usa la colación integrada pg_c_utf8, de PostgreSQL 17
+    // en adelante, que baja letra por letra como ToLowerInvariant: ICU escribiría ς en una Σ final y una i con punto aparte en la İ, y Domain guarda σ e İ.
     /// <inheritdoc />
     public partial class DatosDePacienteYTutor : Migration
     {
@@ -35,6 +35,11 @@ namespace TherapEase.Infrastructure.Migraciones
         // Control (Cc) y formato (Cf) del plano básico, más los separadores de línea y de párrafo (Zl, Zp): lo que ReglasDeNombreYCorreo.EsCaracterInvisible rechaza.
         private const string Prohibidos =
             "[[:cntrl:]\\u00ad\\u0600-\\u0605\\u061c\\u06dd\\u070f\\u0890\\u0891\\u08e2\\u180e\\u200b-\\u200f\\u2028-\\u202e\\u2060-\\u2064\\u2066-\\u206f\\ufeff\\ufff9-\\ufffb]";
+
+        // Minúscula de un correo anterior (la columna t), igual que ToLowerInvariant en todo Unicode: pg_c_utf8 no mira el contexto (ς solo la escribe ICU) y la İ se aparta
+        // antes de bajar, porque ToLowerInvariant la deja como está. Se parte en cada İ, se baja cada parte en su orden y se vuelve a unir con la İ.
+        private const string MinusculaDeCorreo =
+            "array_to_string(ARRAY(SELECT lower(parte COLLATE \"pg_c_utf8\") FROM unnest(string_to_array(t, U&'\\0130')) WITH ORDINALITY AS u(parte, n) ORDER BY n), U&'\\0130')";
 
         // Clave de nombre: forma D, sin marcas combinantes U+0300-U+036F, minúscula ICU ya sin las marcas, sigma final igual a sigma y espacios colapsados y recortados.
         private const string ClaveDeNombre =
@@ -140,8 +145,9 @@ namespace TherapEase.Infrastructure.Migraciones
                 "WITH base AS (" +
                     "SELECT \"IdPaciente\", regexp_replace(\"Contacto\", '^" + Espacios + "+|" + Espacios + "+$', '', 'g') AS t " +
                     "FROM \"Paciente\" WHERE \"Contacto\" IS NOT NULL), " +
+                "minus AS (SELECT \"IdPaciente\", t, " + MinusculaDeCorreo + " AS c FROM base), " +
                 "conv AS (" +
-                    "SELECT \"IdPaciente\", t, lower(t COLLATE \"und-x-icu\") AS c, split_part(lower(t COLLATE \"und-x-icu\"), '@', 2) AS d, regexp_replace(t, '[^0-9]', '', 'g') AS digitos FROM base) " +
+                    "SELECT \"IdPaciente\", t, c, split_part(c, '@', 2) AS d, regexp_replace(t, '[^0-9]', '', 'g') AS digitos FROM minus) " +
                 "UPDATE \"Paciente\" p SET " +
                     "\"Correo\" = CASE WHEN length(conv.c) BETWEEN 1 AND 254 " +
                         "AND conv.c !~ '" + Espacios + "' AND conv.c !~ '" + Prohibidos + "' " +

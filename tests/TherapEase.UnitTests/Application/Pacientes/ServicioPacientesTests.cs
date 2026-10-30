@@ -373,6 +373,60 @@ public class ServicioPacientesTests
         Assert.Equal(existente.IdPaciente, Assert.Single(respuesta.Datos.Coincidencias!).IdPaciente);
     }
 
+    private Paciente GuardarComoOtroEnvio(Guid id, string nombre = "Paciente Ficticio", Guid? creador = null)
+    {
+        var ficha = ReglasDePaciente.Registrar(
+            id, new DatosDePaciente(nombre, NacimientoAdulto, Correo: "canario@ficticio.test"), [AmbitoAtencion.Escolar], creador ?? _idActor, Ahora);
+        _pacientes.Pacientes[id] = ficha;
+        return ficha;
+    }
+
+    [Fact]
+    public async Task Registrar_SiElMismoEnvioSeGuardaEntreLaLecturaYLaBusquedaDeParecidos_RespondeComoReenvioYNoComoParecido()
+    {
+        var id = Guid.NewGuid();
+        // El doble clic: otro envío con el mismo número y los mismos datos termina de guardarse justo antes de que este busque parecidos y su ficha aparece en la lista.
+        _pacientes.AlBuscarParecidos = () => GuardarComoOtroEnvio(id);
+
+        var respuesta = await _servicio.RegistrarAsync(id, Adulto());
+
+        Assert.True(respuesta.Exito);
+        Assert.Equal(EstadoDeAlta.YaRegistrado, respuesta.Datos!.Estado);
+        Assert.Equal(id, respuesta.Datos.IdPaciente);
+        Assert.Null(respuesta.Datos.Coincidencias);
+        Assert.Equal(MensajesDePacientes.PacienteYaRegistrado, respuesta.Mensaje);
+        Assert.Equal(2, _pacientes.LecturasParaComparacion);
+        Assert.Equal(0, _unidad.Confirmaciones);
+        Assert.Empty(_repositorioAuditoria.Eventos);
+        Assert.Single(_pacientes.Pacientes);
+    }
+
+    [Fact]
+    public async Task Registrar_SiElReenvioAparecioConOtrosDatos_NoSeReconoceNiMuestraLaFicha()
+    {
+        var id = Guid.NewGuid();
+        _pacientes.AlBuscarParecidos = () => GuardarComoOtroEnvio(id, "Paciente Ficticio", OtroUsuario);
+
+        var respuesta = await _servicio.RegistrarAsync(id, Adulto());
+
+        Assert.False(respuesta.Exito);
+        Assert.Equal(MensajesDePacientes.SolicitudYaUsada, respuesta.Mensaje);
+        Assert.Null(respuesta.Datos);
+    }
+
+    [Fact]
+    public async Task Registrar_ElReenvioNoOcultaOtrasFichasParecidasLegitimas_PeroSiLasMuestraSiNoHayReenvio()
+    {
+        // Control: una ficha de otra persona con el mismo nombre que aparece en ese momento, con otro número, sigue siendo un parecido por confirmar.
+        _pacientes.AlBuscarParecidos = () => GuardarComoOtroEnvio(Guid.NewGuid());
+
+        var respuesta = await _servicio.RegistrarAsync(Guid.NewGuid(), Adulto());
+
+        Assert.False(respuesta.Exito);
+        Assert.Equal(EstadoDeAlta.CoincidenciasPorConfirmar, respuesta.Datos!.Estado);
+        Assert.Single(respuesta.Datos.Coincidencias!);
+    }
+
     [Fact]
     public async Task Registrar_ConfirmandoQueEsOtraPersona_GuardaAunConCoincidencias()
     {

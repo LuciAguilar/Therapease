@@ -68,6 +68,17 @@ public class ReglasDeNombreYCorreoTests
         Assert.False(ReglasDeDatosDeCuenta.EsCorreoValido(entrada, out _));
     }
 
+    [Theory]
+    [InlineData("\u039F\u03A3@Ficticio.TEST", "\u03BF\u03C3@ficticio.test")]
+    [InlineData("\u0130@Ficticio.TEST", "\u0130@ficticio.test")]
+    [InlineData("\u00D8SCAR@Ficticio.TEST", "\u00F8scar@ficticio.test")]
+    public void Correo_SeBajaConToLowerInvariant_LaSigmaFinalNoSeEscribeComoFinalYLaIConPuntoSeConserva(string entrada, string esperado)
+    {
+        // Es lo que guarda Domain y lo que la migración debe producir al convertir un contacto anterior.
+        Assert.True(ReglasDeNombreYCorreo.EsCorreoValido(entrada, LimitesDePaciente.LongitudMaximaCorreo, out var correo));
+        Assert.Equal(esperado, correo);
+    }
+
     [Fact]
     public void Pacientes_RechazaCorreosConCaracteresInvisiblesComoCuentas()
     {

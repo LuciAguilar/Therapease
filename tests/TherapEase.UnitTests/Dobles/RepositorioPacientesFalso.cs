@@ -13,6 +13,9 @@ internal sealed class RepositorioPacientesFalso : IRepositorioPacientes
     // Para simular una carrera: se ejecuta justo antes de guardar el alta y puede insertar a la competidora o lanzar la excepción de la base.
     public Action<Paciente>? AlAgregar { get; set; }
 
+    // Para forzar el momento entre la primera lectura de un alta y la búsqueda de parecidos: se ejecuta una sola vez, justo antes de buscar.
+    public Action? AlBuscarParecidos { get; set; }
+
     public int LecturasParaEscribir { get; private set; }
 
     public int LecturasParaComparacion { get; private set; }
@@ -99,6 +102,9 @@ internal sealed class RepositorioPacientesFalso : IRepositorioPacientes
         string nombreNormalizado, int limite, CancellationToken cancelacion = default)
     {
         BusquedasDeParecidos++;
+        var gancho = AlBuscarParecidos;
+        AlBuscarParecidos = null;
+        gancho?.Invoke();
         IReadOnlyList<ParecidoDePaciente> parecidos = Pacientes.Values
             .Where(p => p.Condicion == CondicionRegistro.Vigente && p.NombreNormalizado == nombreNormalizado)
             .OrderBy(p => p.NombreNormalizado, StringComparer.Ordinal)

@@ -53,7 +53,7 @@ Requiere `RegistrarPacientes` **y** `ConsultarPacientes`, porque comprueba si ya
 
 - **No decidir la navegación solo por `Exito`:** con `CoincidenciasPorConfirmar` es falso y trae contenido. Comparar `Datos?.Estado`.
 - Rechazos posibles: `SinPermiso`, `SolicitudInvalida` (datos nulos o número vacío), `SolicitudYaUsada` (el número ya pertenece a otra ficha con otros datos o de otra persona; abrir de nuevo el formulario con un número nuevo; **no se revela la otra ficha**) y los mensajes fijos de validación de `MensajesDeDatosDePaciente`: nombre, nacimiento obligatorio o inválido (futuro o anterior a 1900), teléfono, correo, escuela, grupo, tutor obligatorio para menores de 18, tutor incompleto o inválido, y ámbitos (uno o dos, sin repetir). Ningún mensaje repite el valor escrito.
-- Los parecidos son fichas **vigentes** con el mismo nombre al comparar sin acentos ni mayúsculas. Las bajas no cuentan.
+- Los parecidos son fichas **vigentes** con el mismo nombre al comparar sin acentos ni mayúsculas. Las bajas no cuentan. Si entre la primera lectura y la búsqueda de parecidos se guarda la ficha de este mismo envío (un doble clic), se responde `YaRegistrado` y no se muestra como parecida.
 - La lista de parecidos y el reenvío exitoso no cambian por reintentar: reenviar el mismo número con los mismos datos es seguro. Si se pierde la respuesta, **volver a enviar el mismo número** y leer el resultado (`Registrado` o `YaRegistrado`); no abrir un número nuevo, porque eso crearía una segunda ficha.
 
 ### 3.2. Buscar — CU03

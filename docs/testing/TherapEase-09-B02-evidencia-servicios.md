@@ -11,9 +11,9 @@
 | ✅ | Clave de nombre normalizada: acentos, formas Unicode, minúsculas de cualquier escritura (Ø, Ж, İ, Σ), espacios e independencia de la cultura | `NormalizacionDeNombresTests` | 29 |
 | ✅ | Teléfono: formatos aceptados y rechazados, y lo que se guarda | `ReglasDeTelefonoTests` | 25 |
 | ✅ | Edad, mayoría de edad, 29 de febrero y fecha de Hermosillo frente a UTC | `ReglasDeEdadTests` | 15 |
-| ✅ | Reglas compartidas de nombre/correo: cuentas conserva 150 y pacientes 200 | `ReglasDeNombreYCorreoTests` y las pruebas de cuentas existentes | 14 |
-| ✅ | Servicio: permisos antes de leer, resultados del alta, parecidos, reenvío, carreras, búsqueda, una sola lectura, conflicto, bajas y fallos de auditoría o de la base | `ServicioPacientesTests` | 87 |
-| ✅ | Guardado y evento en una transacción, carreras del mismo alta contra la clave primaria real, conflicto de versión, ámbitos que se quitan, una sola consulta SQL a `Paciente`, comodines literales, mayúsculas fuera de A–Z, alcance tras un guardado fallido y restricciones de la base | `PacientesServidorTests` (PostgreSQL desechable) | 39 |
+| ✅ | Reglas compartidas de nombre/correo: cuentas conserva 150 y pacientes 200 | `ReglasDeNombreYCorreoTests` y las pruebas de cuentas existentes | 17 |
+| ✅ | Servicio: permisos antes de leer, resultados del alta, parecidos, reenvío, carreras, búsqueda, una sola lectura, conflicto, bajas y fallos de auditoría o de la base | `ServicioPacientesTests` | 90 |
+| ✅ | Guardado y evento en una transacción, carreras del mismo alta contra la clave primaria real, conflicto de versión, ámbitos que se quitan, una sola consulta SQL a `Paciente`, comodines literales, mayúsculas fuera de A–Z, alcance tras un guardado fallido, el mismo envío que se guarda justo antes de buscar parecidos y restricciones de la base | `PacientesServidorTests` (PostgreSQL desechable) | 40 |
 | ✅ | Migración desde datos anteriores: correspondencia de Contacto, clave igual a la de Domain, subir, bajar y volver a subir, permisos y datos intactos, cancelación previa | `MigracionDeDatosDePacienteTests` (PostgreSQL desechable) | 7 |
 
 `PacientesServidorTests` y `MigracionDeDatosDePacienteTests` son verificaciones de Miguel de lo que pide la propuesta (secciones 3.5 y 3.7: consulta SQL única, migración demostrada con muestras, carreras). Según AGENTS §2.6 el QA de integración con Testcontainers es de Lucía; estas pruebas no lo sustituyen. **Lucía decidió el 28-oct conservar las 38 pruebas de integración originales** (31 y 7); las ocho de `PacientesServidorTests` añadidas después son las regresiones de la sección 6.
@@ -25,11 +25,15 @@
 | ✅ | CI del PR #11 sobre `1eab29c` | [Ejecución 40639773900](https://github.com/LuciAguilar/Therapease/actions/runs/40639773900): cuatro trabajos correctos (38 s, 39 s, 27 s y 2 min 49 s); ventana de 3 min 33 s y suma de trabajos de 4 min 33 s. |
 | ✅ | Compilación Release de la solución, advertencias como errores, con las correcciones | 0 advertencias y 0 errores. |
 | ✅ | `dotnet ef migrations has-pending-model-changes`, con las correcciones | Sin cambios pendientes del modelo. |
-| ✅ | Unitarias, con las correcciones | 640 correctas, 0 fallidas, 0 omitidas (en `1eab29c`: 624; antes de B02: 422). |
-| ✅ | Integración completa con dos hilos, con las correcciones | 375 correctas, 0 fallidas, 0 omitidas, 2 min 41 s (en `1eab29c`: 367; antes de B02: 329). |
+| ✅ | Unitarias, con las correcciones de las dos revisiones | 646 correctas, 0 fallidas, 0 omitidas (en `a78016a`: 640; en `1eab29c`: 624; antes de B02: 422). |
+| ✅ | Integración completa con dos hilos, con las correcciones de las dos revisiones | 376 correctas, 0 fallidas, 0 omitidas, 2 min 51 s (en `a78016a`: 375; en `1eab29c`: 367; antes de B02: 329). |
 | ✅ | Concurrencia y migración repetidas tres veces | 18 correctas en cada una: `ConcurrenciaServidorTests`, las carreras de alta y edición de `PacientesServidorTests` y `MigracionDeDatosDePacienteTests`. |
 | ✅ | Comprobaciones de que las pruebas no son vacías | Con una mutación a la vez, falló la prueba esperada y se restauró el código: recorte del espacio de no separación en la migración; quitar `ChangeTracker.Clear()` (fallaron las dos pruebas de alcance); volver a la minúscula solo A–Z (fallaron 14 pruebas de clave y de búsqueda). |
 | ✅ | CI de las correcciones del 28-oct, PR #11 sobre `a78016a` | [Ejecución 40827839680](https://github.com/LuciAguilar/Therapease/actions/runs/40827839680): cuatro trabajos correctos (37 s, 46 s, 27 s y 2 min 11 s); ventana de 2 min 53 s y suma de trabajos de 4 min 1 s. Los registros de cada trabajo piden iniciar sesión, así que el número de casos de la CI no se consultó aquí. |
+| ✅ | Doble envío, 30 repeticiones | Las dos pruebas del doble envío (cinco rondas simultáneas la primera) pasaron 30 de 30 veces. |
+| ✅ | Concurrencia y migración repetidas tres veces, con las correcciones de la segunda revisión | 19 correctas en cada una. |
+| ✅ | Comprobaciones de que las pruebas de la segunda revisión no son vacías | Quitando cada corrección por separado: sin volver a buscar por número de ficha fallan 2 pruebas unitarias y la de integración del momento forzado; con la minúscula ICU anterior del correo fallan 3 pruebas de migración («οσ» contra «ος»). |
+| ⏳ | CI de las correcciones de la segunda revisión | Pendiente del commit y del push de Miguel. |
 | ⏳ | QA de Lucía, páginas de Dulce y navegador | Pendientes. |
 
 Dos incidencias de las ejecuciones, para que no se confundan con fallos del producto:
@@ -57,6 +61,7 @@ EF Core propuso renombrar `Contacto` como `TutorNombre`, lo que habría conserva
 | --- | --- | --- |
 | nulo, vacío o solo espacios | nulo | nulo |
 | `Persona@Ficticio.TEST`, `ØSCAR@Ficticio.TEST`, con espacios, tabuladores o espacios de no separación a los lados | `persona@ficticio.test`, `øscar@ficticio.test` | nulo |
+| `ΟΣ@Ficticio.TEST` (Σ mayúscula) y `İ@Ficticio.TEST` (İ turca) | `οσ@ficticio.test` (σ, no ς) y `İ@ficticio.test` (la İ no cambia), igual que en Domain | nulo |
 | ` +52 (644) 123-4567 ` | nulo | `+526441234567` |
 | `644-123-4567` | nulo | `6441234567` |
 | `sin@dominio`, `a@b..c`, un correo con un carácter invisible dentro | nulo | nulo |
@@ -64,7 +69,7 @@ EF Core propuso renombrar `Contacto` como `TutorNombre`, lo que habría conserva
 
 **Bajada:** recrea `Contacto` (`varchar(200)`) con el correo si existe y mide hasta 200 caracteres; si no, con el teléfono; si no, nulo. Si había ambos, se pierde el teléfono. Se pierden también nacimiento, escuela, grupo, tutor y clave de nombre. **Un correo de más de 200 caracteres no se trunca** (un correo cortado sería otro dato): se usa el teléfono o queda nulo. La prueba comprueba estos casos.
 
-**Qué demuestra la prueba:** con 41 contactos y 31 nombres de muestra sembrados en el esquema anterior (entre ellos Ø, Œ, Ж, İ, Σ mayúscula y la sigma final), la clave y la conversión que calcula el SQL son iguales a las de Domain; subir, bajar y volver a subir da el mismo resultado esperado; una huella de identificadores, nombre, condición, versión, metadatos y ámbitos, y la lista de permisos de la aplicación, no cambian; y la clave de nuevas escrituras de Domain coincide con la que recalcula el SQL.
+**Qué demuestra la prueba:** con 43 contactos y 31 nombres de muestra sembrados en el esquema anterior (entre ellos Ø, Œ, Ж, İ, Σ mayúscula y la sigma final), la clave y la conversión que calcula el SQL son iguales a las de Domain; subir, bajar y volver a subir da el mismo resultado esperado; una huella de identificadores, nombre, condición, versión, metadatos y ámbitos, y la lista de permisos de la aplicación, no cambian; y la clave de nuevas escrituras de Domain coincide con la que recalcula el SQL.
 
 **Comparación exhaustiva, hecha una vez a mano y sin dejarla como prueba:** se calculó la clave de `a` + cada carácter + `b` con la función de Domain y con el SQL de la migración sobre PostgreSQL 17.11, para 1 112 063 puntos de código (todos salvo los sustitutos y U+0000). .NET rechazó uno (U+FFFE, que no es un carácter) y **de los 1 112 062 restantes difieren 27**: U+1C89, U+A7CB, U+A7CC, U+A7DA, U+A7DC y U+10D50 a U+10D65 (escritura garay). Son letras de Unicode 16 que el ICU de PostgreSQL ya baja a minúscula y el .NET de esta máquina todavía no. No se dejó como prueba permanente porque su resultado depende de la versión de Unicode de cada entorno.
 
@@ -74,10 +79,10 @@ Ninguno cambia el alcance ni las reglas aprobadas; se informan para que decida s
 
 | Estado | Punto | Qué se hizo |
 | --- | --- | --- |
-| ⏳ | Minúscula después de quitar las marcas | Lucía pidió pasar a minúscula **antes** de quitar acentos. Con ese orden la İ turca no coincide: `ToLowerInvariant` la deja como İ, que al descomponerse da una `I` mayúscula y la clave sería «Istanbul», mientras que ICU da `i` más un punto. Se baja a minúscula **después** de quitar las marcas, en .NET y en PostgreSQL: la İ llega como `I` y queda como `i` en ambos. El resultado para Ø, Ж, İ y Σ es el que ella pidió. Además se iguala la sigma final (ς) con la sigma (σ), porque ICU escribe una u otra según la posición y .NET siempre la segunda. |
-| ⏳ | PostgreSQL con ICU | La migración usa `lower(... COLLATE "und-x-icu")`, que no depende de la configuración regional del servidor pero sí exige un PostgreSQL compilado con ICU. La imagen `postgres:17` lo trae. Si el servidor de destino no lo tuviera, la migración falla antes de cambiar datos; debe comprobarse antes de aplicarla en otro servidor. |
+| ✅ | Minúscula después de quitar las marcas. Lucía lo confirmó al revisar `ed162b8` («tu orden para la İ es correcto») | Lucía pidió pasar a minúscula **antes** de quitar acentos. Con ese orden la İ turca no coincide: `ToLowerInvariant` la deja como İ, que al descomponerse da una `I` mayúscula y la clave sería «Istanbul», mientras que ICU da `i` más un punto. Se baja a minúscula **después** de quitar las marcas, en .NET y en PostgreSQL: la İ llega como `I` y queda como `i` en ambos. El resultado para Ø, Ж, İ y Σ es el que ella pidió. Además se iguala la sigma final (ς) con la sigma (σ), porque ICU escribe una u otra según la posición y .NET siempre la segunda. |
+| ⏳ | PostgreSQL 17 con ICU | La clave de nombre usa `lower(... COLLATE "und-x-icu")`, que no depende de la configuración regional del servidor pero exige un PostgreSQL compilado con ICU. La minúscula del correo usa la colación integrada `pg_c_utf8`, que existe desde PostgreSQL 17. La imagen `postgres:17` trae ambas. Si el servidor de destino no tuviera alguna, la migración falla antes de cambiar datos; debe comprobarse antes de aplicarla en otro servidor. |
 | ⏳ | Restricción de la clave de nombre | La base exige que `NombreNormalizado` tenga la forma de una clave ya normalizada (no vacía, sin A–Z, sin marcas combinantes, sin espacios dobles ni en los extremos), pero **no** que sea igual a lo que recalcularía PostgreSQL. La comparación exhaustiva de la sección 3 confirma que .NET y PostgreSQL pueden diferir en letras nuevas de Unicode, y un nombre válido no debe fallar por eso. |
-| ⏳ | SQL frente a Domain en contactos | La clase `[[:space:]]` de PostgreSQL no recorta el espacio de no separación en esta configuración; se agregó una clase explícita con los espacios que recorta `string.Trim()`. Los caracteres de formato invisibles se cubren en el plano básico de Unicode. El correo se baja con la minúscula ICU en la migración y con `ToLowerInvariant` en Domain: difieren solo en una İ o una Σ final dentro de un correo anterior. Solo afecta a datos de prueba anteriores. |
+| ⏳ | SQL frente a Domain en contactos | La clase `[[:space:]]` de PostgreSQL no recorta el espacio de no separación en esta configuración; se agregó una clase explícita con los espacios que recorta `string.Trim()`. Los caracteres de formato invisibles se cubren en el plano básico de Unicode. El correo se baja con `lower(... COLLATE "pg_c_utf8")` partiendo antes cada İ (que `ToLowerInvariant` no cambia) y uniendo de nuevo: coincide con `ToLowerInvariant` en los 1 112 063 puntos de código, sin diferencias. Solo afecta a datos de prueba anteriores. |
 | ✅ | 29 de febrero | Decidido por Lucía el 28-oct: en años no bisiestos quien nació un 29 de febrero cumple el 1 de marzo. |
 | ⏳ | Contactos de más de 200 caracteres | La columna anterior no admitía más; el límite de 254 del correo nuevo solo se ejerce en escrituras nuevas y en la bajada. |
 | ✅ | Reenvío frente a la colisión de la clave primaria | Solo la excepción de la clave primaria de `Paciente` se traduce a «ya existe esa ficha»; un fallo de auditoría u otra restricción no se convierte en alta repetida. La lectura que decide `YaRegistrado` no rastrea entidades. |
@@ -109,6 +114,16 @@ Lucía revisó `1eab29c` (624 unitarias y 367 de integración correctas) y pidi�
 | ✅ | Contrato y evidencia decían «sin PR ni CI» | Actualizados con el PR #11 y la CI de `1eab29c`: este documento, el [contrato para las páginas](../planning/TherapEase-etapa09-B02-contrato-para-paginas.md), el [plan B02](../planning/TherapEase-etapa09-B02.md) y el README. Además, este documento tenía por error otro texto pegado a media tabla en los commits anteriores; se reescribió completo. |
 
 Decisiones de Lucía del mismo mensaje: conservar las 38 pruebas de integración de Miguel y el 1 de marzo para los nacidos el 29 de febrero. Después siguen la revisión humana y su aprobación final.
+
+### Segunda revisión de Lucía, sobre `ed162b8`
+
+Lucía dio por buenos R1, los nombres y los documentos, y confirmó el orden de la minúscula para la İ. Pidió dos correcciones más en el mismo PR.
+
+| Estado | Corrección | Qué se hizo |
+| --- | --- | --- |
+| ✅ | Correos antiguos: la migración convertía «ΟΣ@…» en «ος» y «İ@…» en «i» con un punto aparte, mientras la aplicación guarda «οσ» e «İ» | La minúscula del correo usa `array_to_string(ARRAY(SELECT lower(parte COLLATE "pg_c_utf8") FROM unnest(string_to_array(t, U&'\0130')) WITH ORDINALITY AS u(parte, n) ORDER BY n), U&'\0130')`, como pidió Lucía. Se reprodujo el problema con la expresión anterior y se comprobó la nueva contra `ToLowerInvariant` en 1 112 063 puntos de código: 0 diferencias. Pruebas con esos dos correos en la migración (subir, bajar y volver a subir) y en Domain. Sin la corrección fallan 3 pruebas de migración. |
+| ✅ | Doble envío: `Alta_ConDosEnviosSimultaneos…` fallaba a veces porque el segundo envío veía la ficha recién guardada como parecida | `RegistrarAsync` vuelve a buscar por número de ficha antes de devolver parecidos: si la ficha ya existe, responde como reenvío (`YaRegistrado`, o `SolicitudYaUsada` si los datos o la persona difieren). Pruebas que fuerzan ese momento: tres unitarias con un gancho en el doble del repositorio (reenvío, reenvío con otros datos y control de que un parecido legítimo sigue por confirmar) y una de integración con PostgreSQL real que ejecuta el otro envío justo antes de la consulta de parecidos. Sin la corrección fallan las tres que la ejercen. 30 de 30 repeticiones correctas. |
+
 
 ## 7. Límites de esta evidencia
 

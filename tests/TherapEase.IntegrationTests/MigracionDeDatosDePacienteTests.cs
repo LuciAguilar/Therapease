@@ -36,6 +36,8 @@ public class MigracionDeDatosDePacienteTests(PostgreSqlRevision postgres) : ICla
         "\u00A0persona@ficticio.test\u00A0",
         "MARÍA@Ficticio.TEST",
         "\u00D8SCAR@Ficticio.TEST",
+        "\u039F\u03A3@Ficticio.TEST",
+        "\u0130@Ficticio.TEST",
         "sin@dominio",
         "@ficticio.test",
         "persona@",
@@ -303,6 +305,8 @@ public class MigracionDeDatosDePacienteTests(PostgreSqlRevision postgres) : ICla
         Assert.Equal(("persona@ficticio.test", null), De("  persona@ficticio.test  "));
         Assert.Equal(("persona@ficticio.test", null), De("\u00A0persona@ficticio.test\u00A0"));
         Assert.Equal(("\u00F8scar@ficticio.test", null), De("\u00D8SCAR@Ficticio.TEST"));
+        Assert.Equal(("\u03BF\u03C3@ficticio.test", null), De("\u039F\u03A3@Ficticio.TEST"));
+        Assert.Equal(("\u0130@ficticio.test", null), De("\u0130@Ficticio.TEST"));
         Assert.Equal((null, "+526441234567"), De(" +52 (644) 123-4567 "));
         Assert.Equal((null, "6441234567"), De("644-123-4567"));
         Assert.Equal((null, null), De("sin@dominio"));
