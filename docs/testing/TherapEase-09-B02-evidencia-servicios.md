@@ -1,6 +1,6 @@
 # TherapEase — B02 · Evidencia del servidor de pacientes (verificación de Miguel)
 
-**Actualizado el 28-oct-2026 · [PR #11](https://github.com/LuciAguilar/Therapease/pull/11), rama `b02/fichas-de-pacientes`.** 
+**Actualizado el 30-oct-2026 · Servidor `52332fb` · [PR #11](https://github.com/LuciAguilar/Therapease/pull/11), rama `b02/fichas-de-pacientes`.**
 
 ## 1. Qué se implementó y con qué se comprueba
 
@@ -16,7 +16,7 @@
 | ✅ | Guardado y evento en una transacción, carreras del mismo alta contra la clave primaria real, conflicto de versión, ámbitos que se quitan, una sola consulta SQL a `Paciente`, comodines literales, mayúsculas fuera de A–Z, alcance tras un guardado fallido, el mismo envío que se guarda justo antes de buscar parecidos y restricciones de la base | `PacientesServidorTests` (PostgreSQL desechable) | 40 |
 | ✅ | Migración desde datos anteriores: correspondencia de Contacto, clave igual a la de Domain, subir, bajar y volver a subir, permisos y datos intactos, cancelación previa | `MigracionDeDatosDePacienteTests` (PostgreSQL desechable) | 7 |
 
-`PacientesServidorTests` y `MigracionDeDatosDePacienteTests` son verificaciones de Miguel de lo que pide la propuesta (secciones 3.5 y 3.7: consulta SQL única, migración demostrada con muestras, carreras). Según AGENTS §2.6 el QA de integración con Testcontainers es de Lucía; estas pruebas no lo sustituyen. **Lucía decidió el 28-oct conservar las 38 pruebas de integración originales** (31 y 7); las ocho de `PacientesServidorTests` añadidas después son las regresiones de la sección 6.
+`PacientesServidorTests` y `MigracionDeDatosDePacienteTests` son verificaciones de Miguel de lo que pide la propuesta (secciones 3.5 y 3.7: consulta SQL única, migración demostrada con muestras, carreras). Según AGENTS §2.6 el QA de integración con Testcontainers es de Lucía; estas pruebas no lo sustituyen. **Lucía decidió el 28-oct conservar las 38 pruebas de integración originales** (31 y 7); las nueve de `PacientesServidorTests` añadidas después son las regresiones de la sección 6.
 
 ## 2. Resultados
 
@@ -33,7 +33,7 @@
 | ✅ | Doble envío, 30 repeticiones | Las dos pruebas del doble envío (cinco rondas simultáneas la primera) pasaron 30 de 30 veces. |
 | ✅ | Concurrencia y migración repetidas tres veces, con las correcciones de la segunda revisión | 19 correctas en cada una. |
 | ✅ | Comprobaciones de que las pruebas de la segunda revisión no son vacías | Quitando cada corrección por separado: sin volver a buscar por número de ficha fallan 2 pruebas unitarias y la de integración del momento forzado; con la minúscula ICU anterior del correo fallan 3 pruebas de migración («οσ» contra «ος»). |
-| ⏳ | CI de las correcciones de la segunda revisión | Pendiente del commit y del push de Miguel. |
+| ✅ | CI de las correcciones de la segunda revisión | [41114443516](https://github.com/LuciAguilar/Therapease/actions/runs/41114443516), sobre `52332fb`: cuatro trabajos correctos, comprobados con GitHub el 30-oct. Los tiempos de la descripción del PR son los informados por Miguel; esta revisión no vuelve a medirlos. |
 | ⏳ | QA de Lucía, páginas de Dulce y navegador | Pendientes. |
 
 Dos incidencias de las ejecuciones, para que no se confundan con fallos del producto:
