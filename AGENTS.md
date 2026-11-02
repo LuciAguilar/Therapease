@@ -52,6 +52,7 @@
   - **Orden:** propuesta, auditoría de Claude y decisión de Lucía antes del código. Después, código/pruebas por PR con revisión humana distinta, CI y aprobación final de Lucía.
   - **Prioridad:** no retrasar el apoyo a Dulce ni las páginas de pacientes del primer avance de diciembre. Probar especialmente agendar mientras se da de baja al paciente, forzando momentos entre comprobación y guardado.
   - **Límites:** no incluye B04 (cambiar pago), B05 (reprogramar/cancelar), nuevas bajas/recuperaciones B06, directorio B07, montos, «solo particular» ni cancelación automática. Solo datos ficticios, sin nube ni gastos; B00/B01/B02/LCA/R04 siguen abiertos.
+  - **Publicación documental comprobada, 01-nov-2026:** con aprobación explícita de Lucía, 16 documentos compartidos publicados directamente en main en d2302f2. Miguel puede preparar su propuesta técnica completa; código y pruebas nuevas B03 siguen esperando auditoría y decisión posterior. Mensaje listo para que Lucía lo envíe; sin envío desde herramientas.
   - **Seguimiento y publicación:** mismo esquema de plan compartido y checklist personal. Lucía indica publicar la documentación compartida actual directamente en main durante B03. La entrega se prepara localmente; no se publica por registrar esta apertura. Notas personales, evidencia local, modelo y PDF quedan fuera.
 
 - ✅ **Precisiones de B02 aprobadas por Lucía — 28-oct-2026:**

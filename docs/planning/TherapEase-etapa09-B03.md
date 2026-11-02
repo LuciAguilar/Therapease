@@ -1,6 +1,6 @@
 # TherapEase — B03 · La agenda y las citas
 
-**01-nov-2026 · Auditoría de Claude recibida: CORREGIR; ajustes de texto aplicados.** Claude indica que estos borradores no requieren otra auditoría tras corregirlos. Falta el OK de Lucía para publicar; la propuesta técnica de Miguel sigue pendiente. Sin código ni pruebas nuevas.
+**01-nov-2026 · Auditoría de Claude recibida: CORREGIR; ajustes de texto aplicados.** Claude indica que estos borradores no requieren otra auditoría tras corregirlos. Lucía aprobó la publicación y el contenido compartido está en main, commit d2302f2; la propuesta técnica de Miguel sigue pendiente. Sin código ni pruebas nuevas.
 
 > **Ahora preparamos y decidimos.** Los días, campos y horario están decididos por Lucía el 01-nov. Miguel presenta la propuesta técnica; Claude la audita y Lucía decide antes del código. Programar y escribir o ejecutar pruebas nuevas todavía esperan esa decisión.
 
@@ -104,19 +104,19 @@ Aplicar [L-Q03-01/02](../testing/TherapEase-09-plan-de-pruebas.md#q03--auditorí
 | Estado | Paso | Resultado o dependencia |
 | --- | --- | --- |
 | ✅ | Autorizar preparación | Registrado en AGENTS, sección 3. Sin permiso para programar. |
-| ✅ borrador | Preparar seguimiento compartido y personal | Este plan y el checklist de Lucía; sujetos a revisión. |
-| ✅ correcciones aplicadas / ⏳ OK de publicación | Revisar borradores y mensaje | Veredicto CORREGIR recibido; ajustes de texto aplicados sin otra auditoría de estos borradores. Mensaje sin enviar; primero publicar en main con OK de Lucía. |
+| ✅ preparación documental | Preparar seguimiento compartido y personal | Plan aprobado por Lucía y publicado; checklist personal conservado localmente. |
+| ✅ correcciones y publicación / ⏳ envío por Lucía | Revisar borradores y mensaje | Correcciones aplicadas; Lucía aprobó y se publicó en main d2302f2. Mensaje completo preparado para que Lucía lo pase a Miguel. No se ha enviado desde herramientas. |
 | ✅ decisión 01-nov | Precisar horario | Días, inicios y duraciones decididos en AGENTS, sección 3; sustituyen la regla del 31-oct. |
 | ✅ decisiones 01-nov | Producto B03 | Paciente, ámbito, inicio y fin; siete días y horario definidos; pasado permitido y ámbito retirado conservado durante el alta. Sin preguntas de producto para Dulce. |
 | ⏳ | Recibir propuesta única | Miguel reúne opciones, reutilización y decisiones pendientes. |
 | ⏳ | Auditar y decidir | Claude audita la propuesta; Lucía resuelve antes del código. |
 | ✅ borrador / ⏳ propuesta aprobada | Diseñar QA por escrito | Secciones 4.1–4.2: órdenes forzados de agendar/baja y doble envío. Ajustar al servicio propuesto; sin pruebas ejecutables ni ejecución acreditada. |
-| ⏳ | Publicar documentación actual en main durante B03 | Conjunto preparado; requiere OK explícito de Lucía. Después de publicar se envía el mensaje a Miguel. Notas personales, TRX, modelo y PDF quedan fuera. |
+| ✅ publicación comprobada | Publicar documentación actual en main durante B03 | Dieciséis documentos compartidos publicados en d2302f2 con OK de Lucía. Notas personales, TRX, modelo y PDF excluidos. Miguel puede iniciar su propuesta técnica; código/pruebas B03 esperan su aprobación posterior. |
 | ⏳ | Implementación, QA ejecutable y páginas | Esperan propuesta aprobada y sus dependencias. Código y pruebas por PR, revisión distinta, CI y aprobación final de Lucía. |
 
 Antes de cada entrega: conservar `revision/etapa09`, hacer fetch y merge de origin/main sin reset y preservar todos los cambios locales. En esta revisión, fetch de main y merge sin cambios: `b53c5b7`. Nada de commit, push, PR, fusión de PR ni limpieza sin aprobación explícita de Lucía.
 
-**Qué está disponible:** #11/#12 están publicados y fusionados. Este plan B03 y los ajustes documentales pendientes siguen locales, incluida la copia de `docs/planning/` del clon. Lucía comparte el borrador o aprueba su publicación antes de pedir que Miguel lo consulte. Su nota personal y la evidencia quedan locales; no se incluyen en la publicación compartida prevista en main.
+**Qué está disponible:** #11/#12 están publicados y fusionados. El conjunto compartido actual, incluido este plan, está publicado en main d2302f2. Lucía puede compartir el mensaje para que Miguel prepare la propuesta técnica completa. Su nota personal y la evidencia quedan locales. La programación y las pruebas nuevas de B03 siguen sin autorizar.
 
 ## 6. Documentos de contexto
 

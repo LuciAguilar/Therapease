@@ -58,7 +58,7 @@
 | Pendientes B00 | Completar validación con las páginas y consolidar evidencia. | Base y QA ya revisados. Dulce conecta páginas; Lucía comprueba el conjunto y decide B00/LCA con evidencia, sin cierre automático. |
 | En curso: B01 | ✅ Usuarios, nombre/correo, permisos explícitos y CI de Miguel, PR #7 aprobado y fusionado el 18-oct. | ✅ QA de Servidor, Permisos, Sesiones y Contraseñas revisado y fusionado en PR #8. ✅ Eventos de #9 y QA de #10 fusionados. ⏳ Páginas de Dulce y navegador. B00/LCA/R04 abiertos. |
 | En curso: B02 | Registrar, buscar, consultar y editar pacientes ficticios. | Servidor #11 y QA #12 revisados y fusionados. ⏳ Confirmaciones de producto, páginas y navegador. |
-| Preparación: B03 | Borradores revisados por Codex; QA escrito de cambios simultáneos y mensaje para Miguel preparados, todavía locales. | Claude indicó correcciones de texto sin otra auditoría; aplicadas. Producto B03 decidido el 01-nov. Primero OK/publicación en main, después mensaje a Miguel; propuesta técnica y decisión antes del código. |
+| Preparación: B03 | Borradores revisados por Codex; QA escrito de cambios simultáneos y mensaje para Miguel preparados, todavía locales. | Claude indicó correcciones de texto sin otra auditoría; aplicadas. Producto B03 decidido el 01-nov. Publicación aprobada y comprobada en main d2302f2; mensaje listo para que Lucía lo pase a Miguel. Propuesta técnica y decisión antes del código. |
 | Posterior: B04, según capacidad | Consultar y cambiar estado pagado/pendiente. | Recorrido acceso → paciente → cita → pago aún pendiente; sin montos. |
 
 - **Diciembre:** la entrevista acepta el recorrido B01–B04; el corte B00–B04 sigue sujeto a capacidad y montos por decidir; esta secuencia no garantiza completarlo antes del 4 de diciembre.

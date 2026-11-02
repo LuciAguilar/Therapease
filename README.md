@@ -25,7 +25,7 @@ TherapEase es una aplicación web para la gestión administrativa de un consulto
 | [AGENTS](AGENTS.md) | Reglas obligatorias, alcance y límites vigentes. |
 | [Plan B01](docs/planning/TherapEase-etapa09-B01.md) | Acceso, identidad y páginas pendientes. |
 | [Plan B02](docs/planning/TherapEase-etapa09-B02.md) | Plan aprobado; [propuesta ajustada](docs/planning/TherapEase-etapa09-B02-propuesta.md) aprobada el 26-oct. |
-| [Plan B03](docs/planning/TherapEase-etapa09-B03.md) | Producto decidido el 01-nov; preparación técnica y QA escrito. Correcciones documentales aplicadas; publicación pendiente de OK. |
+| [Plan B03](docs/planning/TherapEase-etapa09-B03.md) | Producto decidido el 01-nov; documentación compartida publicada en main d2302f2. Propuesta técnica y QA escrito; sin código autorizado. |
 | [Contrato para páginas, B01](docs/planning/TherapEase-etapa09-B01-contrato-para-paginas.md) | Entradas, resultados y errores de acceso y usuarios para los PageModel de Dulce. |
 | [Contrato para páginas, B02](docs/planning/TherapEase-etapa09-B02-contrato-para-paginas.md) | Entradas, resultados y errores de pacientes para los PageModel de Dulce. |
 | [Plan de pruebas](docs/testing/TherapEase-09-plan-de-pruebas.md) | Casos, responsables y evidencia; enlaza B00. |
