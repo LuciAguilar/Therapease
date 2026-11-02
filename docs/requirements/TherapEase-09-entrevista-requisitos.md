@@ -44,7 +44,7 @@ Las fuentes originales son tres páginas de un mismo cuestionario, conservadas l
 | ✅ | 3 · Conservación actual | Marcado 5 años. | Práctica declarada recibida; no equivale a política técnica/jurídica aprobada. ⏳ Categorías, inicio del cómputo, archivo/eliminación, respaldos y revisión antes de datos reales. No aplicar plazo automático a toda tabla. |
 | ✅ | 3 · Quién ve datos reales | Marcado «Solo yo». | Preferencia de acceso exclusivo de la usuaria. ⏳ Formalizar permisos operativos/soporte dentro de R04; Superusuario no recibe acceso clínico real por su nombre de rol. Demostración y QA siguen ficticios. |
 | ✅ | 3 · Al vencer plazo o pedir supresión | Marcado «Lo consulto antes». | No hay aprobación de borrado definitivo ni de archivo indefinido. ⏳ Procedimiento y decisión antes de uso real; baja lógica no resuelve eliminación. |
-| ✅ / ⏳ | 3 · Horario y medias horas | Lucía aclaró el 14-oct: la anotación dice 3:00, no 8:00. De 9:00 a 15:00 son sesiones de 1 h; desde 15:00 puede haber sesiones de 30 min, en la franja hasta 19:00. | ✅ Duración/franja recibidas; ⏳ si 19:00 es último inicio o término, días y citas que crucen 15:00. Conservar America/Hermosillo; «puede» no impone 30 min a todas las citas de la tarde. |
+| ✅ decisión 01-nov | 3 · Horario y medias horas | Los siete días tienen el mismo horario. Inicio en cualquier minuto, sin segundos, desde las 9:00. Si empieza antes de las 15:00 dura una hora, aunque termine después de las 15:00 (14:30–15:30 sí). Desde las 15:00 dura 30 minutos o una hora. Inicio y fin en el mismo día, con fin máximo a las 19:00. Referencia America/Hermosillo. | Sustituye la precisión del 31-oct; días, duraciones e inicios resueltos. Sin pruebas nuevas. |
 | ✅ | 3 · Inicio visual | Manuscrito «Incluir un logotipo en pantalla de inicio». | Solicitud registrada para Dulce. ⏳ Logotipo autorizado/archivo, ubicación y accesibilidad; no generar ni publicar uno por este encargo documental. |
 
 ## 3. Qué se palomea y qué requiere autorización o concreción
@@ -57,7 +57,7 @@ Las fuentes originales son tres páginas de un mismo cuestionario, conservadas l
 | ⏳ | Autorizar simplificación a atención solo particular. | Lucía decide con el equipo; afecta ámbitos de Paciente/Cita y contratos/reglas/pruebas. Escuela/grupo también fueron pedidos: aclarar finalidad antes de eliminarlos o asumir contexto escolar. |
 | ⏳ | Autorizar sustitución de la baja provisional por cancelación automática. | Lucía aprueba mecanismo/impacto propuestos por Miguel, nota ADR-04 y pruebas Q03/Q06/Q07/Q08/Q20. No retirar protección PostgreSQL; cancelar conserva pago y cada cambio/evento se confirma de forma coherente. |
 | ⏳ | Concretar datos nuevos de Usuario y Paciente/Tutor. | Dulce obtiene detalles que faltan; Miguel propone contratos/modelo y migración si corresponde; Lucía revisa privacidad/seguridad. Registrar necesidad no acredita desarrollo. |
-| ⏳ | Concretar si 19:00 es último inicio o término, prioridad de bajas, versión de pantallas y lista de espera. | Dulce con la usuaria; no volver a preguntar respuestas que sí están legibles. |
+| ⏳ | Concretar prioridad de bajas, versión de pantallas y lista de espera. Días, horario y campos de cita decididos por Lucía el 01-nov. | Dulce con la usuaria; no volver a preguntar respuestas que sí están legibles. |
 | ⏳ | Aprobar actualización técnica del modelo/diagrama conforme a cambios de alcance decididos. | 08C y StarUML conservan base candidata; se registra impacto en sus notas. No fingir que la entrevista cambia automáticamente esquema o capacidades. |
 | ⏳ | Resolver R04 y autorizar uso real. | Lucía con la usuaria y revisión especializada cuando corresponda; 5 años/solo titular/papel son insumos, no cierre. Mantener TOTP/recuperación y temporal 24 h como requisitos previos. |
 | ⏳ | Autorizar Construcción e implementación por incremento. | Decisión separada de Lucía. B01 mantiene alcance de identidad, con datos de Usuario solicitados; montos/bajas/ámbitos no entran en B01 por esta entrevista. |
@@ -72,7 +72,23 @@ La revisión de Claude de este ajuste aún no se ha recibido. Miguel o Dulce rev
 
 ## 5. Aclaración del horario aportada por Lucía
 
-✅ El 14-oct Lucía confirmó que la segunda línea dice **3:00 p. m.**: de **9:00 a 15:00** hay sesiones de **una hora**; desde **15:00** puede haber sesiones de **media hora**, en la franja indicada hasta **19:00**. ⏳ Precisar último inicio o fin a las 19:00, días y conducta de una cita que cruce las 15:00; no convertir «puede» en duración fija obligatoria para toda la tarde. Se incorpora a CU05–CU07/B03/B05 y a sus casos existentes cuando se autoricen.
+**Decisión vigente de Lucía, 01-nov-2026:** Los siete días tienen el mismo horario. Inicio en cualquier minuto, sin segundos, desde las 9:00. Si empieza antes de las 15:00 dura una hora, aunque termine después de las 15:00 (14:30–15:30 sí). Desde las 15:00 dura 30 minutos o una hora. Inicio y fin en el mismo día, con fin máximo a las 19:00. Referencia America/Hermosillo.
+
+Campos: paciente, ámbito, inicio y fin. Se permite registrar fechas u horas pasadas: leyenda calculada con FechaAlta > Inicio, hora del servidor y texto fijo en el evento, sin nuevo campo ni migración. Ámbito retirado durante el alta: se conserva en la cita. Método de pago descartado; HU13/CU09 no cambian. Primero publicación aprobada en main y después mensaje a Miguel. No quedan preguntas de producto de B03 para Dulce.
+
+### Antecedente del 31-oct, sustituido por la decisión del 01-nov
+
+Origen: lectura de la entrevista del 14-oct y aclaración expresa de Lucía del 31-oct. La segunda franja empieza a las 15:00.
+
+| Estado | Regla vigente | Ejemplo |
+| --- | --- | --- |
+| ✅ | Las 19:00 son el fin máximo. El inicio debe ser anterior y la duración completa debe caber antes del cierre. | Terminar a las 19:00 sí; terminar a las 19:01 o empezar a las 19:00 no. |
+| ✅ | De 9:00 a 15:00 son horas completas con inicio en punto, desde las 9:00. | 9:00–10:00 y 14:00–15:00 sí. 9:30–10:30 y 14:30–15:30 no. |
+| ✅ recibido | Desde las 15:00 puede haber sesiones de media hora; no se vuelve una duración obligatoria para toda la tarde. | Conservar esta posibilidad al preparar la propuesta; ninguna cita puede pasar de las 19:00. |
+| ⏳ | Días de atención. | Dulce los confirma con la usuaria; Lucía decide. |
+
+America/Hermosillo es la referencia. Incorporar a los casos existentes CU05–CU07/B03/B05 cuando se autorice su implementación. Esta precisión no ejecuta pruebas ni cambia el código.
+
 
 ## 6. Control de propagación y revisión local
 

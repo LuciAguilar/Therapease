@@ -4,10 +4,10 @@
 
 TherapEase es una aplicación web para la gestión administrativa de un consultorio psicológico.
 
-**Estado de hoy — 28-oct-2026:** main `a7c0c52` (PR #10 fusionado; [CI de esa fusión correcta](https://github.com/LuciAguilar/Therapease/actions/runs/40395259207)). Miguel implementa B02 en el [PR #11](https://github.com/LuciAguilar/Therapease/pull/11) (rama `b02/fichas-de-pacientes`).
+**Estado de hoy — 31-oct-2026:** servidor B02 fusionado en main `c90b3c0` mediante [#11](https://github.com/LuciAguilar/Therapease/pull/11); QA [#12](https://github.com/LuciAguilar/Therapease/pull/12), `5e46883`, con [CI correcta](https://github.com/LuciAguilar/Therapease/actions/runs/41134402751), aprobado por Miguel y fusionado por Lucía en `b53c5b7` con Create a merge commit.
 
 - B01 espera las páginas, formularios y navegador; B00/LCA/R04 siguen abiertos.
-- B02: propuesta y diez decisiones aprobadas por Lucía el 26-oct; servidor en implementación y [contrato para páginas](docs/planning/TherapEase-etapa09-B02-contrato-para-paginas.md) preparado para Dulce.
+- B02: servidor y contrato disponibles; QA revisado y fusionado. Faltan confirmaciones de producto, páginas y navegador. B03 abierto solo para propuesta y QA escrito.
 - Solo datos ficticios, sin nube ni gastos; montos, «solo particular» y cancelación automática fuera.
 
 ## 2. Quién hace qué ahora
@@ -15,7 +15,7 @@ TherapEase es una aplicación web para la gestión administrativa de un consulto
 | Persona | Trabajo actual |
 | --- | --- |
 | Lucía | Decide las propuestas y dirige QA; otra persona revisa sus pruebas. |
-| Miguel | Implementa el servidor de B02 (campos/tutor, permisos, búsqueda/homónimos, reenvío y ámbitos) en su rama desde main y avisa a Lucía de cualquier problema técnico. |
+| Miguel | Servidor B01/B02 y QA integrados; preparar propuesta B03 y mantener apoyo a Dulce. |
 | Dulce | Confirma producto con la usuaria y prepara páginas, PageModel y sus unitarias. |
 
 ## 3. Documentos clave
@@ -25,6 +25,7 @@ TherapEase es una aplicación web para la gestión administrativa de un consulto
 | [AGENTS](AGENTS.md) | Reglas obligatorias, alcance y límites vigentes. |
 | [Plan B01](docs/planning/TherapEase-etapa09-B01.md) | Acceso, identidad y páginas pendientes. |
 | [Plan B02](docs/planning/TherapEase-etapa09-B02.md) | Plan aprobado; [propuesta ajustada](docs/planning/TherapEase-etapa09-B02-propuesta.md) aprobada el 26-oct. |
+| [Plan B03](docs/planning/TherapEase-etapa09-B03.md) | Producto decidido el 01-nov; preparación técnica y QA escrito. Correcciones documentales aplicadas; publicación pendiente de OK. |
 | [Contrato para páginas, B01](docs/planning/TherapEase-etapa09-B01-contrato-para-paginas.md) | Entradas, resultados y errores de acceso y usuarios para los PageModel de Dulce. |
 | [Contrato para páginas, B02](docs/planning/TherapEase-etapa09-B02-contrato-para-paginas.md) | Entradas, resultados y errores de pacientes para los PageModel de Dulce. |
 | [Plan de pruebas](docs/testing/TherapEase-09-plan-de-pruebas.md) | Casos, responsables y evidencia; enlaza B00. |

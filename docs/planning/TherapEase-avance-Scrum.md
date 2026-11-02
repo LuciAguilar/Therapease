@@ -1,5 +1,12 @@
 # TherapEase — Avance de Metodologías de Desarrollo Ágil
 
+**Seguimiento al 31-oct-2026.** Servidor y QA B01/B02 integrados. #12 revisado por Miguel y fusionado por Lucía con Create a merge commit en `b53c5b7`. B03 abierto solo para propuesta y QA escrito; sin autorización de programar ni ejecutar pruebas nuevas.
+
+> Las páginas siguen con Dulce; B00/B01/B02/LCA/R04 permanecen abiertos. Esta actualización no acredita Sprints, reuniones, horas ni pruebas nuevas. Documentación compartida preparada para publicación directa a main durante B03.
+
+<details>
+<summary>Cortes anteriores: conservar su fecha y alcance</summary>
+
 **Actualización del 26-oct-2026:** ✅ PR #9 y #10 revisados y fusionados. Miguel (`GalloNav`) aprobó `3a44332`; Lucía fusionó #10 con Create a merge commit en `a7c0c52`. Rama global actualizada desde main conservando el modelo/PDF locales. B02 tiene plan aprobado por Lucía y preparación de QA escrita; se espera la propuesta única de Miguel antes de programar. Páginas/PageModel de Dulce y navegador pendientes; B01/B00/LCA/R04 abiertos. Sin nuevos Sprints, reuniones, pruebas, nube o gastos acreditados por esta actualización. Los cortes siguientes se conservan como antecedentes.
 **Actualización del 24-oct-2026:** ✅ código del PR #9 (`cb7da59`) revisado, auditado y aprobado por Lucía. ⏳ Ajustes documentales de Miguel y fusión; AGENTS aprobado se publica antes o junto con esa fusión. Diez casos propios de Lucía se incorporan después con revisión de Miguel o Dulce. Páginas, navegador, B01/B00/LCA/R04 abiertos; B02 no iniciado.
 
@@ -11,13 +18,15 @@
 
 > **Corte: 12 de octubre de 2026 · Resumen para la materia.** Scrum con Sprints de dos semanas y RUP como marco de fases. La entrega del **4 de diciembre** mostrará el avance alcanzado.
 
+</details>
+
 ## 1. Equipo y responsabilidades
 
 | Integrante | Rol en Scrum | Trabajo y avance actual |
 | --- | --- | --- |
 | **Lucía** | **Scrum Master** | Facilita el proceso y seguimiento; responsable de arquitectura, documentación, seguridad, QA y pruebas de integración. Revisa cambios y conserva la aprobación final del proyecto. |
 | **Dulce Hernandez** | **Product Owner** — gestión del producto | Contacto directo con la psicóloga: requisitos, prioridades y seguimiento. Responsable del frontend y sus pruebas unitarias; diseño de acceso inspeccionado; funcionalidad de páginas y navegador pendientes. |
-| **Miguel Leyva** | **Developer** | Implementa backend y sus pruebas unitarias; atiende correcciones y revisa el trabajo de Lucía. Backend de usuarios incorporado en PR #7 y QA de Lucía revisado en PR #8; eventos aprobados en PR #9, pendiente de ajustes documentales y fusión. |
+| **Miguel Leyva** | **Developer** | Implementa backend y sus pruebas unitarias; atiende correcciones y revisa el trabajo de Lucía. Servidor de acceso y pacientes integrado, con QA revisado en #8/#10/#12. Ahora prepara la propuesta de B03 y apoya las páginas de Dulce. |
 
 > **Nombre del rol:** en Scrum usamos *Product Owner* para Dulce, aunque su labor incluya gestión del producto. Los tres contribuyen a la calidad; Lucía y Dulce también actúan como Developers al trabajar en el incremento. Priorizar el producto corresponde a Dulce; facilitar Scrum corresponde a Lucía.
 
@@ -46,10 +55,11 @@
 
 | Ciclo de dos semanas | Objetivo propuesto | Resultado esperado y condición |
 | --- | --- | --- |
-| Próximo ciclo: trabajo actual B00 | Completar la validación técnica prioritaria. | Miguel corrige backend; Lucía verifica seguridad e integración; Dulce prepara el frontend mínimo de acceso necesario. Registrar pendientes; cerrar LCA solo con evidencia y decisión expresa de Lucía. |
-| En curso: B01 | ✅ Usuarios, nombre/correo, permisos explícitos y CI de Miguel, PR #7 aprobado y fusionado el 18-oct. | ✅ QA de Servidor, Permisos, Sesiones y Contraseñas revisado y fusionado en PR #8. ✅ Código de eventos aprobado en PR #9; ⏳ ajustes documentales, fusión, páginas de Dulce y navegador. B00/LCA/R04 abiertos. |
-| Posterior: B02 | Registrar y buscar pacientes ficticios. | Recorrido integrado y probado; respuestas de campos/prioridades recibidas; detalle de formatos y cambios de alcance por concretar/aprobar. |
-| Posterior: B03–B04, según capacidad | Agendar y registrar estado pagado/pendiente. | Recorrido acceso → paciente → cita → pago probado. Dividir entre ciclos si no cabe. |
+| Pendientes B00 | Completar validación con las páginas y consolidar evidencia. | Base y QA ya revisados. Dulce conecta páginas; Lucía comprueba el conjunto y decide B00/LCA con evidencia, sin cierre automático. |
+| En curso: B01 | ✅ Usuarios, nombre/correo, permisos explícitos y CI de Miguel, PR #7 aprobado y fusionado el 18-oct. | ✅ QA de Servidor, Permisos, Sesiones y Contraseñas revisado y fusionado en PR #8. ✅ Eventos de #9 y QA de #10 fusionados. ⏳ Páginas de Dulce y navegador. B00/LCA/R04 abiertos. |
+| En curso: B02 | Registrar, buscar, consultar y editar pacientes ficticios. | Servidor #11 y QA #12 revisados y fusionados. ⏳ Confirmaciones de producto, páginas y navegador. |
+| Preparación: B03 | Borradores revisados por Codex; QA escrito de cambios simultáneos y mensaje para Miguel preparados, todavía locales. | Claude indicó correcciones de texto sin otra auditoría; aplicadas. Producto B03 decidido el 01-nov. Primero OK/publicación en main, después mensaje a Miguel; propuesta técnica y decisión antes del código. |
+| Posterior: B04, según capacidad | Consultar y cambiar estado pagado/pendiente. | Recorrido acceso → paciente → cita → pago aún pendiente; sin montos. |
 
 - **Diciembre:** la entrevista acepta el recorrido B01–B04; el corte B00–B04 sigue sujeto a capacidad y montos por decidir; esta secuencia no garantiza completarlo antes del 4 de diciembre.
 - **Alcance adicional:** B05–B06 dependen de capacidad; B07, directorio completo, queda después del primer avance de diciembre. B08 reúne evidencia adicional de calidad alcanzada.
@@ -99,7 +109,7 @@
 | Estado | Respuesta recibida | Pendiente que permanece |
 | --- | --- | --- |
 | ✅ | Paciente: nombre completo, teléfono, correo, nacimiento, escuela/grupo; anotación de edad. Tutor siempre en menores; homónimos por nacimiento y apellidos; lista solo nombre. | ⏳ Campos/formatos/obligatoriedad, datos del tutor y edad calculada o guardada; escuela/grupo ante «solo particular». |
-| ✅ | Citas contiguas permitidas; pago inicial Pendiente; corregir pago cancelada sí, de baja no. | ⏳ Implementación/QA restante; horario aclarado por Lucía (9–15: 1 h; desde 15: posibilidad de 30 min, hasta 19); límite de 19 por precisar. |
+| ✅ | Citas contiguas permitidas; pago inicial Pendiente; corregir pago cancelada sí, de baja no. | ⏳ Implementación/QA restante; horario y días decididos por Lucía el 01-nov; ver AGENTS, sección 3. Sin ejecución nueva. |
 | ✅ | Solicita solo particular, montos y cancelación automática de citas al dar de baja paciente. | ⏳ Aprobación de cambios frente a la base y mecanismo/modelo/pruebas; conservar invariantes y pago. |
 | ✅ | Solo Erika operativa; Usuario con nombre completo y correo; pantallas «Están bien»; logotipo en inicio. | ⏳ Contratos/validaciones de campos, versión exacta de pantallas y recurso visual; no recuperación por correo. |
 | ✅ | Recorrido de diciembre conforme; después expediente/notas 1, reportes 2, directorio 3, reprogramar/cancelar 4. | ⏳ Baja/recuperación sin número; capacidad/secuencia técnica, sin renumerar B/HU/CU ni adelantar clínico. |
