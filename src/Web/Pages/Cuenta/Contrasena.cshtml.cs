@@ -69,7 +69,7 @@ public class ContrasenaModel : PageModel
         }
 
         MensajeExito = "Se cambió tu contraseña.";
-        return RedirectToPage();
+        return EsTemporal ? RedirectToPage("/Index") : RedirectToPage();
     }
 
     private async Task<bool> CargarModoAsync()

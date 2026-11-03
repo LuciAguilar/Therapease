@@ -297,3 +297,22 @@
         display: none;
     }
 }
+
+.salida-acceso {
+    margin-top: .75rem;
+}
+
+.boton--secundario {
+    background: transparent;
+    border: 1px solid var(--color-niebla);
+    color: var(--color-tinta);
+}
+
+.boton--secundario:hover {
+    background: var(--color-porcelana);
+}
+
+.boton--secundario:focus-visible {
+    outline: 2px solid var(--color-marca);
+    outline-offset: 3px;
+}

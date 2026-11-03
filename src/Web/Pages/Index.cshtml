@@ -1,0 +1,44 @@
+@page
+@model IndexModel
+@{
+    Layout = "_LayoutOperativo";
+    ViewData["Title"] = "Inicio";
+    string[] indicadores = ["Citas de hoy", "Próximas citas", "Pagos pendientes", "Pacientes nuevos"];
+}
+<header class="titulo-seccion fila">
+    <div>
+        <h1>@(string.IsNullOrWhiteSpace(Model.Nombre) ? "Bienvenida" : $"Hola, {Model.Nombre}")</h1>
+        <p>Aquí tienes el resumen de tu consulta.</p>
+    </div>
+    <div class="acciones">
+        <span class="accion inactiva" aria-disabled="true">Paciente</span>
+        <span class="accion inactiva" aria-disabled="true">Nueva cita</span>
+    </div>
+</header>
+@if (Model.MensajeExito is not null)
+{
+    <p class="aviso" role="status">@Model.MensajeExito</p>
+}
+<div class="indicadores">
+    @foreach (var indicador in indicadores)
+    {
+        <section class="tarjeta indicador">
+            <h2>@indicador</h2>
+            <p class="valor-vacio">—</p>
+            <p>Sin datos disponibles</p>
+        </section>
+    }
+</div>
+<div class="resumen">
+    <section>
+        <div class="fila">
+            <h2>Citas de hoy</h2>
+            <span class="accion inactiva" aria-disabled="true">Ver agenda</span>
+        </div>
+        <p class="tarjeta">Sin citas para mostrar. Agenda aún no disponible.</p>
+    </section>
+    <div class="lista-tarjetas">
+        <section class="tarjeta siguiente-cita"><h2>Siguiente cita</h2><p>Sin datos disponibles.</p></section>
+        <section class="tarjeta"><h2>Pagos pendientes</h2><p>Sin datos disponibles.</p></section>
+    </div>
+</div>

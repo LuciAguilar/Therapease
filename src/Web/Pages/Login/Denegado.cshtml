@@ -1,0 +1,20 @@
+@page "/Acceso/Denegado"
+@using TherapEase.Domain.Identidad.Constantes
+@using Microsoft.AspNetCore.Authorization
+@attribute [AllowAnonymous]
+@attribute [Microsoft.AspNetCore.Mvc.ResponseCache(NoStore = true, Location = Microsoft.AspNetCore.Mvc.ResponseCacheLocation.None)]
+@{
+    if (User.Identity?.IsAuthenticated == true && User.FindFirst(Reclamaciones.DebeCambiarContrasena)?.Value == "true")
+    {
+        HttpContext.Response.Redirect(Url.Page("/Cuenta/Contrasena")!);
+        return;
+    }
+    HttpContext.Response.StatusCode = 403;
+    ViewData["Title"] = "Acceso denegado";
+    Layout = "_LayoutAcceso";
+}
+<main class="contenido">
+    <h1>Acceso denegado</h1>
+    <p>No tienes permiso para abrir esa página.</p>
+    <a asp-page="@(User.Identity?.IsAuthenticated == true ? "/Index" : "/Login/Index")">Continuar</a>
+</main>

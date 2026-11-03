@@ -59,6 +59,13 @@
 
                 <button type="submit" class="boton boton--primario boton--completo">Cambiar contraseña</button>
             </form>
+            @if (!Model.EsTemporal)
+            {
+                <a asp-page="/Index">Volver a inicio</a>
+            }
+            <form method="post" asp-page="/Cuenta/Salir" class="salida-acceso">
+                <button type="submit" class="boton boton--secundario boton--completo">Salir</button>
+            </form>
         </div>
     </section>
 </main>

@@ -25,8 +25,15 @@ public class IndexModel : PageModel
 
     public string? MensajeError { get; private set; }
 
-    public void OnGet()
+    public async Task<IActionResult> OnGetAsync()
     {
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            await _acceso.CerrarSesionAsync(HttpContext.RequestAborted);
+            return RedirectToPage(new { ReturnUrl });
+        }
+
+        return Page();
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -58,7 +65,7 @@ public class IndexModel : PageModel
             return LocalRedirect(ReturnUrl);
         }
 
-        return RedirectToPage("/Cuenta/Contrasena");
+        return RedirectToPage("/Index");
     }
 
     public class EntradaAcceso
