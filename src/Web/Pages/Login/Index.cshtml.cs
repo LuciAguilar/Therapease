@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TherapEase.Application.Identidad.Constantes;
@@ -58,7 +58,7 @@ public class IndexModel : PageModel
             return LocalRedirect(ReturnUrl);
         }
 
-        return LocalRedirect("/");
+        return RedirectToPage("/Cuenta/Contrasena");
     }
 
     public class EntradaAcceso

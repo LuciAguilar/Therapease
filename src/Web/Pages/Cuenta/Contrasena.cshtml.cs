@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TherapEase.Application.Identidad.Interfaces.Servicios;
@@ -6,7 +6,6 @@ using TherapEase.Web.Seguridad;
 
 namespace TherapEase.Web.Pages.Cuenta;
 
-// Abre PoliticasDeAutorizacion.cs y usa la constante de CambiarContrasenaPropia.
 [Authorize(Policy = PoliticasDeAutorizacion.CambiarContrasenaPropia)]
 [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 public class ContrasenaModel : PageModel
@@ -27,11 +26,12 @@ public class ContrasenaModel : PageModel
 
     public string? MensajeError { get; private set; }
 
-    public string? MensajeExito { get; private set; }
+    [TempData]
+    public string? MensajeExito { get; set; }
 
     public async Task<IActionResult> OnGetAsync()
     {
-        return await CargarModoAsync() ? Page() : RedirectToPage("/Acceso/Index");
+        return await CargarModoAsync() ? Page() : RedirectToPage("/Login/Index");
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -39,13 +39,18 @@ public class ContrasenaModel : PageModel
         // El modo lo decide el servidor en cada envío.
         if (!await CargarModoAsync())
         {
-            return RedirectToPage("/Acceso/Index");
+            return RedirectToPage("/Login/Index");
         }
 
         if (string.IsNullOrEmpty(Entrada.ContrasenaNueva)
             || (!EsTemporal && string.IsNullOrEmpty(Entrada.ContrasenaActual)))
         {
             return ConError("Completa todos los campos.");
+        }
+
+        if (Entrada.ContrasenaNueva.Length < 12)
+        {
+            return ConError("La contraseña nueva debe tener al menos 12 caracteres.");
         }
 
         if (Entrada.ContrasenaNueva != Entrada.Confirmacion)
@@ -63,10 +68,8 @@ public class ContrasenaModel : PageModel
             return ConError(respuesta.Mensaje);
         }
 
-        Entrada = new EntradaContrasena();
-        EsTemporal = false;
-        MensajeExito = respuesta.Mensaje;
-        return Page();
+        MensajeExito = "Se cambió tu contraseña.";
+        return RedirectToPage();
     }
 
     private async Task<bool> CargarModoAsync()
