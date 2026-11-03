@@ -1,6 +1,22 @@
 # TherapEase — 09/B01 · Acceso e identidad segura
 
-**Actualizado el 26-oct-2026:** PR #8, #9 y #10 revisados y fusionados. Miguel (`GalloNav`) aprobó los diez casos propios de eventos sobre `3a44332`; Lucía fusionó #10 con Create a merge commit en `a7c0c52`. Páginas y navegador siguen pendientes; B01 continúa abierto. B02 espera la propuesta única de Miguel.
+## Estado vigente al 31-oct-2026
+
+> **Servidor y QA de servidor entregados.** #7/#8/#9/#10 están fusionados. B01 sigue abierto por páginas, navegador y cierre completo; no hay que volver a programar el acceso.
+
+| Parte | Estado actual |
+| --- | --- |
+| Miguel | Servidor, cuentas, sesiones, contraseñas y eventos entregados; apoyo a Dulce con el contrato y corrección de un fallo real si aparece. La propuesta de B03 no retrasa este apoyo. |
+| Dulce | Páginas, formularios, PageModel y sus unitarias. Puede conectar con el servidor disponible. |
+| Lucía | Preparar recorridos escritos y evidencia; después ejecutar acceso/salida, cuentas, temporales, sesiones retiradas, formularios protegidos y consulta Q03 desde navegador. |
+| Cierre | Revisión de otra persona, CI y aprobación de Lucía después de las páginas; B00/LCA/R04 no se cierran aquí. |
+
+[Resumen de responsabilidades y siguiente decisión](TherapEase-09-avance-y-pendientes.md). La repetición local del QA B02 incluye la batería anterior B01; no acredita navegador ni pruebas nuevas por editar este documento.
+
+---
+
+
+**Actualizado el 26-oct-2026:** PR #8, #9 y #10 revisados y fusionados. Miguel (`GalloNav`) aprobó los diez casos propios de eventos sobre `3a44332`; Lucía fusionó #10 con Create a merge commit en `a7c0c52`. Páginas y navegador siguen pendientes; B01 continúa abierto. La propuesta B02 ya está aprobada; su servidor se revisa por separado en el PR #11.
 
 B01 es la puerta de entrada de TherapEase: cada persona entra con su usuario y contraseña, usa solo lo que le toca y sale de forma segura. También incluye administrar cuentas, cambiar y restablecer contraseñas, bloquear intentos fallidos y dejar registro de todo (HU01–HU03 y HU15; CU01, CU02 y CU11).
 
@@ -21,6 +37,23 @@ Miguel hace el servidor, Dulce las páginas y Lucía comprueba que todo funcione
 Seguimos solo con datos ficticios, sin nube ni gastos; B00, LCA y R04 siguen abiertos. Antes de usar datos reales hará falta la contraseña temporal de 24 horas.
 
 ✅ = hecho o aprobado. ⏳ = pendiente.
+
+## Qué cubren las pruebas de B01 · La puerta de entrada y las cuentas
+
+| Parte | Qué comprobamos |
+| --- | --- |
+| Funcionamiento normal | Entrar y salir; crear, buscar y consultar cuentas; corregir nombre/correo, cambiar rol, desactivar y cambiar o restablecer contraseñas. |
+| Validaciones | Campos vacíos o inválidos, nombres de usuario repetidos, contraseñas y protección del último Superusuario activo. |
+| Seguridad | Permisos por rol, sesión vencida o revocada, bloqueo, temporal pendiente y acceso directo a funciones protegidas. |
+| Guardado y fallos | Cambios y auditoría juntos; respuesta perdida y fallo al guardar. Salida y bloqueo conservan la protección aunque falle después su evento, según la excepción aprobada. |
+| Cambios simultáneos | No perder al último Superusuario y conservar las reglas de sesiones, contraseñas y eventos cuando coinciden solicitudes. |
+| Páginas y uso | Formularios, mensajes, menús, entrega de temporales, salida y recorrido de auditoría en navegador. Espera las páginas conectadas y las pruebas de conjunto. |
+
+> **Incluye lo que debe funcionar y lo que debe rechazarse.** Hay pruebas de servidor incorporadas; no sustituyen las de páginas y navegador. La sección 7 identifica la evidencia y los pendientes. Esta tabla no cierra B01 ni acredita ejecuciones nuevas.
+
+Para Dulce: [funciones disponibles, pendientes y documentos para su IA](TherapEase-09-guia-Dulce-B00-B01.md).
+
+Las pruebas de funciones por separado y las de servidor/base de datos no sustituyen las de páginas y navegador. Cada resultado debe indicar qué se probó.
 
 ## 1. Qué vamos a entregar y de dónde partimos
 
@@ -246,7 +279,7 @@ B01 no incluye pacientes, citas, pagos, bajas ni directorio. Desactivar una cuen
 | ⏳ | Lucía | Probar entrada/salida, dos sesiones, bloqueo, temporal, cambio propio, roles y Q03 en navegador. | Miguel o Dulce revisa sus pruebas. |
 | ⏳ | Equipo; Lucía aprueba | Corregir fallos, revisar pruebas y comprobar resultados automáticos/manuales. | Cierre B00/LCA separado. |
 
-PR #9 y #10 ya están fusionados. Miguel revisó las diez pruebas propias de Lucía sobre `3a44332`; Lucía fusionó #10 el 26-oct con Create a merge commit en `a7c0c52`. Dulce continúa las páginas y el navegador queda para su integración. B02 espera la propuesta de Miguel.
+PR #9 y #10 ya están fusionados. Miguel revisó las diez pruebas propias de Lucía sobre `3a44332`; Lucía fusionó #10 el 26-oct con Create a merge commit en `a7c0c52`. Dulce continúa las páginas y el navegador queda para su integración. La propuesta B02 ya está aprobada; su servidor se revisa por separado en el PR #11.
 
 ## 7. Qué pruebas y evidencia se necesitan
 
@@ -263,11 +296,11 @@ Los códigos vienen del [plan de pruebas](../testing/TherapEase-09-plan-de-prueb
 | ⏳ | Entradas, errores y registros sin ejecutar instrucciones ni revelar secretos. | Lucía; corrigen Miguel/Dulce | S-17–S-24/S-26–S-34 aplicables. Revisar texto, consultas y respuestas con datos ficticios rastreables; sin secretos en evidencia. |
 | ⏳ | Dos navegadores: sesiones, inactividad, salida y contraseña. | Lucía | L-CU01-01–03; S-04–S-10; CU02/CU11. HTTPS, cookies reales, 30 min sin actividad, renovación, atrás y destinos permitidos. |
 | ⏳ | Temporal y Q03 desde navegador. | Dulce: páginas; Lucía: prueba | L-CU02-01/06/07; L-Q03-03–04. §8; respuesta perdida antes/después de guardar. |
-| ⏳ | Código separado correctamente y cambios de base revisables. | Miguel prepara; Lucía comprueba | A-01 y controles aplicables. Revisar SQL, efecto y cómo deshacer migración. Nueva tecnología/mecanismo requiere ADR y decisión; no afirmar restauración no ejecutada. |
+| ✅ entregas actuales / ⏳ nuevas páginas y cambios | Código separado correctamente y cambios de base revisables. | Miguel prepara; Lucía comprueba | Las entregas vigentes tienen pruebas de arquitectura y CI. Revisar los PageModel y cualquier cambio nuevo al existir; no dar por ejecutado ese trabajo futuro. |
 
 ### Comprobaciones automáticas de GitHub Actions — CI
 
-Miguel la configura y Lucía la comprueba. En cada cambio compila, corre las pruebas y revisa seguridad e integridad; falla si un paquete tiene una vulnerabilidad alta (S-33). Las acciones y la imagen base se fijan por su huella (S-34), y se anota duración y minutos usados (A-06), sin dar por hecho que es gratis.
+La CI ya está configurada; Miguel la mantiene y Lucía comprueba sus resultados. En cada cambio compila, corre las pruebas y revisa seguridad e integridad; falla si un paquete tiene una vulnerabilidad alta (S-33). Las acciones y la imagen base se fijan por su huella (S-34), y se anota duración y minutos usados (A-06), sin dar por hecho que es gratis.
 
 **✅ CI entregada en PR #7 (18-oct):** cuatro trabajos (compilación y unitarias; integración con PostgreSQL; paquetes, archivos sensibles y migraciones; imagen sin administrador y con salud), todos en verde en la [ejecución revisada](https://github.com/LuciAguilar/Therapease/actions/runs/39152597181). ✅ El PR #8 de Lucía también pasó los cuatro ([CI](https://github.com/LuciAguilar/Therapease/actions/runs/39512430706)). Las páginas tendrán que pasarla en su propio PR.
 
@@ -349,7 +382,7 @@ Rama `b01/acceso-y-usuarios`, código probado `c3f2b63de2fce7e5f265119ba292f6c20
 
 [Plan B01](TherapEase-etapa09-B01.md): trabajo de Miguel/CI y QA autorizado que puede avanzar sin páginas; PageModel y formularios de Dulce; navegador cuando estén disponibles. La entrevista acepta el recorrido de diciembre y registra campos, tutor, homónimos/lista, contiguas, pago inicial/correcciones y prioridades futuras. Los comandos técnicos y resultados históricos anteriores se conservan; no describen montos o cancelación automática implementados. Revisar el registro de entrevista antes de retomar pendientes de producto. No publicar fuentes originales ni checklist personal.
 
-**Horario aclarado por Lucía, 14-oct:** ✅ 9:00–15:00, sesiones de 1 h; desde 15:00 puede haber sesiones de 30 min, hasta 19:00. ⏳ Último inicio o término a 19:00, días y cruce de las 15:00 por concretar. Referencia America/Hermosillo; no acredita implementación ni pruebas.
+Reglas B03 vigentes: [sección 3 de AGENTS](../../AGENTS.md#3-límites-vigentes), decisiones de Lucía del 01-nov-2026; sustituyen el horario del 31-oct.
 
 ### Detalles para conectar y mantener el servidor
 

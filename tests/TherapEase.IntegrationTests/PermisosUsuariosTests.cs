@@ -86,8 +86,8 @@ public class PermisosUsuariosTests(PostgreSqlRevision postgres) : IClassFixture<
         Assert.True(await solicitud.AutenticarAsync());
         var anterior = await EstadoAsync(escenario);
         var esperados = temporal ? Array.Empty<Permiso>() : rol == "Superusuario"
-            ? new[] { Permiso.AdministrarUsuarios, Permiso.ConsultarAuditoria, Permiso.DarDeBajaPacientes }
-            : new[] { Permiso.DarDeBajaPacientes };
+            ? new[] { Permiso.AdministrarUsuarios, Permiso.ConsultarAuditoria, Permiso.DarDeBajaPacientes, Permiso.RegistrarPacientes, Permiso.ConsultarPacientes, Permiso.ActualizarPacientes }
+            : new[] { Permiso.DarDeBajaPacientes, Permiso.RegistrarPacientes, Permiso.ConsultarPacientes, Permiso.ActualizarPacientes };
         var permisos = solicitud.Obtener<IAutorizacion>();
         var reglasWeb = solicitud.Obtener<IAuthorizationService>();
         var permitidos = new List<Permiso>();

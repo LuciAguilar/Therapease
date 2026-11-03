@@ -131,7 +131,7 @@ public sealed class ConsultaAuditoriaRevision : IAsyncLifetime
     {
         var actor = _https.Registro;
         await using var contexto = _https.Escenario.Contexto();
-        contexto.Pacientes.Add(ReglasDePaciente.Registrar(Paciente, NombrePaciente, Contacto,
+        contexto.Pacientes.Add(ReglasDePaciente.Registrar(Paciente, PacientesDePrueba.Adulto(NombrePaciente, Contacto),
             [AmbitoAtencion.Independiente], actor, Desde));
         contexto.Citas.Add(ReglasDeCita.Agendar(Cita, Paciente, AmbitoAtencion.Independiente,
             Desde, Desde.AddMinutes(30), actor, Desde));
@@ -162,7 +162,7 @@ public sealed class ConsultaAuditoriaRevision : IAsyncLifetime
         }
         await contexto.SaveChangesAsync();
         var paciente = await contexto.Pacientes.AsNoTracking().SingleAsync(p => p.IdPaciente == Paciente);
-        if (paciente.Nombre != NombrePaciente || paciente.Contacto != Contacto)
+        if (paciente.Nombre != NombrePaciente || paciente.Correo != Contacto)
             throw new InvalidOperationException("No quedaron guardados los datos privados ficticios.");
         await File.WriteAllTextAsync(Path.Combine(Evidencia, "preparacion.json"), JsonSerializer.Serialize(new
         {

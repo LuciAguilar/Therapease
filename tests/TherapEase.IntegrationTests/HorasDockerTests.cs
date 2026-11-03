@@ -107,7 +107,7 @@ public sealed class HorasDockerTests(HorasDockerRevision entorno) : IClassFixtur
         var actor = Guid.NewGuid();
         var fecha = new DateOnly(2026, 12, 31);
         var inicio = HoraHermosillo.AInstante(fecha, new TimeOnly(23, 45));
-        var paciente = ReglasDePaciente.Registrar(Guid.NewGuid(), "Paciente ficticio horas", null,
+        var paciente = ReglasDePaciente.Registrar(Guid.NewGuid(), PacientesDePrueba.Adulto("Paciente ficticio horas"),
             [AmbitoAtencion.Independiente], actor, DateTimeOffset.UtcNow);
         var cita = ReglasDeCita.Agendar(Guid.NewGuid(), paciente.IdPaciente, AmbitoAtencion.Independiente,
             inicio.ToOffset(TimeSpan.FromHours(2)), inicio.AddMinutes(30), actor, DateTimeOffset.UtcNow);

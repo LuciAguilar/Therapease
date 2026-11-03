@@ -57,11 +57,11 @@ public sealed class ErroresRegistrosRevision : IAsyncDisposable
     private async Task PrepararPrivadosAsync()
     {
         await using var contexto = _https.Escenario.Contexto();
-        contexto.Pacientes.Add(ReglasDePaciente.Registrar(Guid.NewGuid(), Nombre, Contacto,
+        contexto.Pacientes.Add(ReglasDePaciente.Registrar(Guid.NewGuid(), PacientesDePrueba.Adulto(Nombre, Contacto),
             [AmbitoAtencion.Independiente], _https.Registro, DateTimeOffset.UtcNow));
         await contexto.SaveChangesAsync();
         var paciente = await contexto.Pacientes.AsNoTracking().SingleAsync();
-        if (paciente.Nombre != Nombre || paciente.Contacto != Contacto)
+        if (paciente.Nombre != Nombre || paciente.Correo != Contacto)
             throw new InvalidOperationException("No se guardó la preparación ficticia de errores.");
 
         Agregar("Paciente", Nombre);

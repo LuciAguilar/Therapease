@@ -51,7 +51,13 @@ public static class ConfiguracionDeSeguridad
             .AddPolicy(PoliticasDeAutorizacion.AdministrarUsuarios, politica =>
                 politica.RequireAuthenticatedUser().AddRequirements(new RequisitoDePermiso(Permiso.AdministrarUsuarios)))
             .AddPolicy(PoliticasDeAutorizacion.ConsultarAuditoria, politica =>
-                politica.RequireAuthenticatedUser().AddRequirements(new RequisitoDePermiso(Permiso.ConsultarAuditoria)));
+                politica.RequireAuthenticatedUser().AddRequirements(new RequisitoDePermiso(Permiso.ConsultarAuditoria)))
+            .AddPolicy(PoliticasDeAutorizacion.RegistrarPacientes, politica =>
+                politica.RequireAuthenticatedUser().AddRequirements(new RequisitoDePermiso(Permiso.RegistrarPacientes)))
+            .AddPolicy(PoliticasDeAutorizacion.ConsultarPacientes, politica =>
+                politica.RequireAuthenticatedUser().AddRequirements(new RequisitoDePermiso(Permiso.ConsultarPacientes)))
+            .AddPolicy(PoliticasDeAutorizacion.ActualizarPacientes, politica =>
+                politica.RequireAuthenticatedUser().AddRequirements(new RequisitoDePermiso(Permiso.ActualizarPacientes)));
 
         return servicios;
     }

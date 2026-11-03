@@ -127,7 +127,7 @@ public class RecuperacionTests(PostgreSqlRevision postgres, ITestOutputHelper sa
             var nuevoEvento = Guid.NewGuid();
             await PostgreSqlRevision.Sql(nuevo.App, $"INSERT INTO \"EventoAuditoria\" SELECT '{nuevoEvento}',\"FechaEvento\",\"IdUsuarioActor\",\"TipoRegistro\",\"IdRegistro\",\"Accion\",\"CamposAfectados\",\"Hecho\" FROM \"EventoAuditoria\" WHERE \"Accion\"='Alta' LIMIT 1");
             Assert.Equal(2L, await PostgreSqlRevision.Valor<long>(nuevo.App, $"SELECT count(*) FROM \"EventoAuditoria\" e WHERE {ServidorIdentidadRevision.SoloCambiosSql}"));
-            Assert.Equal(3L, await PostgreSqlRevision.Valor<long>(nuevo.Migrador, "SELECT count(*) FROM \"__EFMigrationsHistory\""));
+            Assert.Equal(4L, await PostgreSqlRevision.Valor<long>(nuevo.Migrador, "SELECT count(*) FROM \"__EFMigrationsHistory\""));
             Assert.Equal("42501", (await Assert.ThrowsAsync<PostgresException>(() => PostgreSqlRevision.Valor<long>(nuevo.App, "SELECT count(*) FROM \"__EFMigrationsHistory\""))).SqlState);
             var version = await destino.Contenedor.ExecAsync(["pg_dump", "--version"]);
             var medicion = JsonSerializer.Serialize(new {
@@ -316,7 +316,7 @@ public class RecuperacionTests(PostgreSqlRevision postgres, ITestOutputHelper sa
         var paciente = Guid.NewGuid();
         await using (var contexto = escenario.Contexto())
         {
-            contexto.Pacientes.Add(ReglasDePaciente.Registrar(paciente, "Paciente ficticio recuperable", "contacto-rastreable@ficticio.test", [AmbitoAtencion.Independiente], actor, DateTimeOffset.UtcNow));
+            contexto.Pacientes.Add(ReglasDePaciente.Registrar(paciente, PacientesDePrueba.Adulto("Paciente ficticio recuperable", "contacto-rastreable@ficticio.test"), [AmbitoAtencion.Independiente], actor, DateTimeOffset.UtcNow));
             await contexto.SaveChangesAsync();
         }
         await PostgreSqlRevision.Sql(escenario.App, $"""

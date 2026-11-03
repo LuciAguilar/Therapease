@@ -37,6 +37,29 @@
 
 ## 3. Límites vigentes
 
+- **Avance comprobado al 31-oct-2026:** servidor B02 de #11 y QA de Lucía de #12 fusionados. Miguel aprobó #12; Lucía lo fusionó con Create a merge commit en `b53c5b7`. La CI del contenido revisado `5e46883` tuvo cuatro trabajos correctos (41134402751). Los 89 casos propios están incluidos en 465 integraciones locales correctas; 646 unitarias correctas. No hay nueva ejecución por actualizar documentos. La rama global está sincronizada con main, conservando los cambios locales. B00/B01/B02/LCA/R04 siguen abiertos; páginas y PageModel con Dulce.
+
+- ✅ **B03 abierto solo para preparación — autorización del 31-oct-2026:**
+  - **Alcance:** HU08–HU09 y CU05–CU06: consultar agenda y agendar citas ficticias en America/Hermosillo, sin cruces de citas activas, con paciente vigente y auditoría atómica.
+  - **Ahora:** Miguel prepara una sola propuesta técnica de permisos por rol, consulta, aplicación de campos y horario ya decididos, cruces, paciente/ámbitos, reenvío y auditoría. Lucía prepara su QA por escrito, reutilizando los casos existentes. No se autoriza programar ni escribir o ejecutar pruebas nuevas de B03.
+  - **Seis decisiones de Lucía, 01-nov-2026 — sustituyen el horario del 31-oct:**
+    1. Días: los siete días, con el mismo horario.
+    2. Horario: inicio en cualquier minuto, sin segundos, desde las 9:00. Antes de las 15:00, solo una hora, aunque termine después de las 15:00 (14:30–15:30 sí). Desde las 15:00, 30 minutos o una hora. Fin máximo a las 19:00 y mismo día.
+    3. Campos: paciente, ámbito, inicio y fin; sin campos nuevos. Método de pago descartado; HU13 y CU09 no cambian.
+    4. Fecha u hora pasada: permitida con las mismas reglas. Mostrar «Registrada después de su horario» si FechaAlta es posterior a Inicio, usando hora del servidor. Sin campo ni migración nuevos; el evento lo indica con texto fijo.
+    5. Ámbito retirado mientras se agenda: la cita conserva ese ámbito, sin migración. Miguel explica la protección; el QA fuerza ese orden.
+    6. Publicación: primero documentación compartida actual en main con OK explícito de Lucía; después enviar el mensaje a Miguel. No hay preguntas de producto pendientes para Dulce en B03. La propuesta técnica sigue pendiente y no se autoriza programar ni escribir o ejecutar pruebas nuevas.
+  - **Orden:** propuesta, auditoría de Claude y decisión de Lucía antes del código. Después, código/pruebas por PR con revisión humana distinta, CI y aprobación final de Lucía.
+  - **Prioridad:** no retrasar el apoyo a Dulce ni las páginas de pacientes del primer avance de diciembre. Probar especialmente agendar mientras se da de baja al paciente, forzando momentos entre comprobación y guardado.
+  - **Límites:** no incluye B04 (cambiar pago), B05 (reprogramar/cancelar), nuevas bajas/recuperaciones B06, directorio B07, montos, «solo particular» ni cancelación automática. Solo datos ficticios, sin nube ni gastos; B00/B01/B02/LCA/R04 siguen abiertos.
+  - **Publicación documental comprobada, 01-nov-2026:** con aprobación explícita de Lucía, 16 documentos compartidos publicados directamente en main en d2302f2. Miguel puede preparar su propuesta técnica completa; código y pruebas nuevas B03 siguen esperando auditoría y decisión posterior. Mensaje listo para que Lucía lo envíe; sin envío desde herramientas.
+  - **Seguimiento y publicación:** mismo esquema de plan compartido y checklist personal. Lucía indica publicar la documentación compartida actual directamente en main durante B03. La entrega se prepara localmente; no se publica por registrar esta apertura. Notas personales, evidencia local, modelo y PDF quedan fuera.
+
+- ✅ **Precisiones de B02 aprobadas por Lucía — 28-oct-2026:**
+  - Conservar las 38 pruebas originales de integración de Miguel (31 de servidor y 7 de migración), además de las regresiones necesarias. No sustituyen el QA dirigido por Lucía ni su revisión por otra persona.
+  - Para quien nació el 29 de febrero, usar el 1 de marzo en años no bisiestos al calcular edad y exigencia de tutor. Criterio provisional, solo para datos ficticios.
+  - PR #11 ya fue corregido, revisado por Lucía y fusionado el 30-oct. Su seguimiento actual y el del QA #12 están al inicio de esta sección. Se conserva la decisión del 28-oct sobre las pruebas y el 1 de marzo; no se repite ni se envía el mensaje antiguo a Miguel.
+
 - ✅ **Diez decisiones B02 aprobadas por Lucía — 26-oct-2026:** aprobación expresa «Apruebo las 10 decisiones como recomienda Claude». Solo datos ficticios; propuesta ajustada y nota ADR-04 aprobadas por Lucía, con auditoría de Claude APROBADO v1 y ajustes de texto que no requieren otra auditoría. Miguel implementa y avisa a Lucía si encuentra un problema técnico. Código y pruebas siguen en PR con revisión humana distinta, CI y aprobación final de Lucía. Las publicaciones de Codex conservan su OK explícito; no se amplían otros bloques.
   1. Campos de la propuesta del 26-oct (huella `cb7a3b9…`) aprobados provisionalmente para datos de prueba; edad calculada, no almacenada. Dulce confirma los detalles de producto y valida 08C sección 3 antes de las páginas.
   2. `Contacto`: opción A, sustituirlo por teléfono y correo. Lucía acepta expresamente perder lo que no pueda separarse en los datos de prueba; no se promete recuperar ese texto al revertir. Miguel debe resolver la contradicción de la migración y detallar su correspondencia y reversión.

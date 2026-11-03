@@ -10,4 +10,7 @@ public static class PoliticasDeAutorizacion
 
     public const string AdministrarUsuarios = nameof(AdministrarUsuarios);
     public const string ConsultarAuditoria = nameof(ConsultarAuditoria);
+    public const string RegistrarPacientes = nameof(RegistrarPacientes);
+    public const string ConsultarPacientes = nameof(ConsultarPacientes);
+    public const string ActualizarPacientes = nameof(ActualizarPacientes);
 }
