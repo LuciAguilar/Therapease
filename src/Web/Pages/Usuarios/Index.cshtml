@@ -8,12 +8,11 @@
     <div><h1>Usuarios</h1><p>Administra los accesos y permisos de tu equipo.</p></div>
     <a class="accion primaria" asp-page="Crear">+ Crear usuario</a>
 </header>
-<div class="busqueda">
+<form method="get" class="busqueda">
     <label for="busqueda">Buscar usuarios</label>
     <input id="busqueda" name="busqueda" type="search" maxlength="@IndexModel.MaximoBusqueda" value="@Model.Busqueda" />
-</div>
-<p id="estado-busqueda" role="status"></p>
-<div id="resultados-usuarios" aria-live="polite">
+    <button class="accion" type="submit">Buscar</button>
+</form>
 @if (Model.Cuentas.Count == 0)
 {
     <p class="tarjeta">No se encontraron cuentas.</p>
@@ -38,5 +37,3 @@
     </li>
 }
 </ul>
-</div>
-<script src="~/js/busqueda-usuarios.js" asp-append-version="true" defer></script>

@@ -25,17 +25,6 @@ public class IndexModel : PageModel
 
     public string? MensajeError { get; private set; }
 
-    public async Task<IActionResult> OnGetAsync()
-    {
-        if (User.Identity?.IsAuthenticated == true)
-        {
-            await _acceso.CerrarSesionAsync(HttpContext.RequestAborted);
-            return RedirectToPage(new { ReturnUrl });
-        }
-
-        return Page();
-    }
-
     public async Task<IActionResult> OnPostAsync()
     {
         // Sin try/catch: un fallo inesperado llega al error 500 general,

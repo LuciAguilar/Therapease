@@ -10,14 +10,14 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="ruta-acceso" content="@Url.Page("/Login/Index")" />
+    <link rel="icon" type="image/png" href="~/img/therapease-icono.png" asp-append-version="true" />
     <title>@ViewData["Title"] · TherapEase</title>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/operacion.css" asp-append-version="true" />
 </head>
 <body class="operacion">
     <aside class="barra-lateral">
-        <a class="marca" asp-page="/Index"><span aria-hidden="true">✚</span> TherapEase</a>
+        <a class="marca" asp-page="/Index"><img class="marca__imagen" src="~/img/therapease-logo.png" asp-append-version="true" width="1100" height="260" alt="TherapEase" /></a>
         <nav aria-label="Espacio de trabajo">
             <p>Espacio de trabajo</p>
             <a asp-page="/Index" aria-current="@(usuarios ? null : "page")">Inicio</a>
@@ -37,6 +37,5 @@
         <header class="encabezado">@ViewData["Title"]</header>
         <main class="zona-contenido">@RenderBody()</main>
     </div>
-    <script src="~/js/historial-sesion.js" asp-append-version="true"></script>
 </body>
 </html>

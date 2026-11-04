@@ -62,3 +62,9 @@ body {
     font-style: normal;
     font-display: swap;
 }
+.marca__imagen {
+    display: block;
+    width: min(100%, 20rem);
+    height: auto;
+    object-fit: contain;
+}
