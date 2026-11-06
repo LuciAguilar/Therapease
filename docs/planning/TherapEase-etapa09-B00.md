@@ -1,13 +1,13 @@
 # TherapEase — 09/B00 · Plan y estado de validación
 
-## Estado vigente al 31-oct-2026
+## Estado vigente al 05-nov-2026
 
 > **B00/LCA/R04 siguen abiertos.** La base y su QA de #4/#6 están revisados e integrados. La repetición completa de la rama de #12 también incluye las pruebas anteriores de B00; no acredita páginas, una nueva prueba de carga ni un respaldo real.
 
 | Qué falta | Quién / qué puede avanzar |
 | --- | --- |
-| Acceso y salida desde páginas; consulta final de auditoría en navegador | Dulce entrega páginas; Lucía prueba con la sesión y permisos reales. |
-| Formularios, cabeceras/caché y CSS con sesión | Dulce conecta y completa las páginas; Lucía prepara casos escritos ahora y los ejecuta después. |
+| Acceso/salida y Q03 desde páginas | Ensayados en #13/632caa7, con sesiones y permisos reales. QA B01 propio: 46/49 comprobaciones; Claude CORREGIR recibido; QA ajustado/repetido, ajuste menor de reauditoría aplicado y Chrome repetido 46/49; faltan plantilla corregida/nuevo SHA y revisión de Miguel. No cierra B00/LCA. |
+| Formularios, cabeceras/caché y CSS | Ejecutados en Chrome y HTTPS, paquete local completo. Controles HTTP propios correctos; /Error y desvío de temporal requieren corrección. Sin respaldo real, carga ni nube nuevos. |
 | Evidencia y riesgos del cierre B00/LCA | Lucía puede ordenar los resultados y reverificar protecciones de GitHub, sin cambiarlas ni dar LCA por cerrada. |
 | Agenda B03 | Preparación autorizada: propuesta y QA escrito. Los recorridos completos de reserva y baja aún esperan código autorizado y sus pruebas. |
 | Datos reales, R04 y respaldo real | Siguen fuera de esta autorización; no conectar nube ni crear respaldos operativos. |

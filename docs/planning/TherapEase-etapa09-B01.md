@@ -1,14 +1,14 @@
 # TherapEase — 09/B01 · Acceso e identidad segura
 
-## Estado vigente al 31-oct-2026
+## Estado vigente al 05-nov-2026
 
 > **Servidor y QA de servidor entregados.** #7/#8/#9/#10 están fusionados. B01 sigue abierto por páginas, navegador y cierre completo; no hay que volver a programar el acceso.
 
 | Parte | Estado actual |
 | --- | --- |
 | Miguel | Servidor, cuentas, sesiones, contraseñas y eventos entregados; apoyo a Dulce con el contrato y corrección de un fallo real si aparece. La propuesta de B03 no retrasa este apoyo. |
-| Dulce | Páginas, formularios, PageModel y sus unitarias. Puede conectar con el servidor disponible. |
-| Lucía | Preparar recorridos escritos y evidencia; después ejecutar acceso/salida, cuentas, temporales, sesiones retiradas, formularios protegidos y consulta Q03 desde navegador. |
+| Dulce | Entregó acceso y cuentas en PR #13, abierto en 632caa7. Incluye PageModel y sus unitarias; no pacientes B02 ni agenda B03. Pendiente revisión de conjunto y CI completa correcta. |
+| Lucía | QA propio ejecutado sobre #13/632caa7: 46/49 comprobaciones de navegador correctas, tres no conformes por plantilla; tres controles HTTP correctos. Claude emitió CORREGIR; QA ajustado y repetido (3/3 HTTP, 46/49 Chrome). Reauditoría CORREGIR menor recibida; ajuste aplicado y Chrome 46/49. Faltan corrección de Dulce/nuevo SHA y revisión de Miguel. Miguel revisa lo técnico en paralelo. |
 | Cierre | Revisión de otra persona, CI y aprobación de Lucía después de las páginas; B00/LCA/R04 no se cierran aquí. |
 
 [Resumen de responsabilidades y siguiente decisión](TherapEase-09-avance-y-pendientes.md). La repetición local del QA B02 incluye la batería anterior B01; no acredita navegador ni pruebas nuevas por editar este documento.
@@ -30,8 +30,8 @@ Miguel hace el servidor, Dulce las páginas y Lucía comprueba que todo funcione
 | ✅ | Pruebas de servidor, permisos, sesiones y contraseñas | Lucía; revisó Miguel | [PR #8](https://github.com/LuciAguilar/Therapease/pull/8), fusionado el 20-oct |
 | ✅ | Registrar entradas, salidas y bloqueos | Miguel | PR #9 revisado y fusionado el 25-oct en `6526607` |
 | ✅ | Diez pruebas propias de eventos | Lucía; revisó Miguel | Revisadas sobre `3a44332` y fusionadas por Lucía en PR #10, `a7c0c52`, el 26-oct. CI 40393607611: cuatro trabajos correctos. |
-| ⏳ | Páginas, formularios y PageModel | Dulce | Sin entregar; hoy solo hay diseño |
-| ⏳ | Probar formularios, navegador y la consulta de auditoría Q03 | Lucía | Cuando lleguen las páginas |
+| ✅ entregado / ⏳ revisión | Páginas, formularios y PageModel B01 | Dulce | PR #13 abierto en 632caa7. CI 41744940861: tres trabajos correctos y dos fallos de integración al abrir /Error por la plantilla predeterminada ausente. Corregir _ViewStart.cshtml con Layout = "_LayoutAcceso"; resuelve esa causa. El QA local de Lucía está separado y conserva sus resultados. |
+| ⏳ | Probar formularios, navegador y la consulta de auditoría Q03 | Lucía | Páginas B01 disponibles para revisar en #13; falta el QA de conjunto y resolver el fallo de CI. |
 | ⏳ | Cerrar B01 | Todos; aprueba Lucía | Al final, con todo probado y revisado |
 
 Seguimos solo con datos ficticios, sin nube ni gastos; B00, LCA y R04 siguen abiertos. Antes de usar datos reales hará falta la contraseña temporal de 24 horas.
@@ -124,11 +124,11 @@ Lucía tiene además un checklist personal que no se publica.
 
 | Estado | Persona | Qué debe completar |
 | --- | --- | --- |
-| ⏳ | Dulce | PageModel y sus unitarias: acceso, salida, usuarios y contraseña propia. |
-| ⏳ | Dulce | Formularios con protección contra envíos ajenos, mensajes, navegación, temporales seguras y conexión con las funciones de Miguel. |
+| ✅ entrega / ⏳ revisión técnica | Dulce | PageModel y unitarias entregados en #13; Miguel puede revisarlos conforme al contrato. No se acreditan como trabajo de Lucía. |
+| ✅ entrega / ⏳ corrección | Dulce | Formularios de #13 ensayados por Lucía; corregir layout predeterminado y desvío de temporal, con apoyo técnico de Miguel. |
 | ⏳ | Dulce | Resolver las observaciones de diseño de §4.2 en su PR; revisión distinta y aprobación de Lucía. |
 | ✅ | Lucía | Servidor, Permisos, Sesiones, Contraseñas y ayudas compartidas: auditorías resueltas, aprobación de Lucía, revisión humana de Miguel y CI correctas; incorporados en PR #8. Las cantidades y límites están en §7. |
-| ⏳ | Lucía | Probar formularios, navegador y Q03 al recibir las páginas; aprobar el cierre solo con evidencia y revisión humana. |
+| ✅ ejecución / ⏳ corrección y auditoría | Lucía | Formularios, seguridad, navegador y Q03 ensayados en #13. Falta corregir plantilla, repetir lo afectado y cerrar auditoría/revisiones antes de decidir. |
 
 
 Cada quien escribe sus unitarias y otra persona revisa sus cambios; **Miguel o Dulce revisa las pruebas de Lucía.** Una revisión de IA no sustituye la humana.
