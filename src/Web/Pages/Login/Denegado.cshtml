@@ -1,15 +1,6 @@
 @page "/Acceso/Denegado"
-@using TherapEase.Domain.Identidad.Constantes
-@using Microsoft.AspNetCore.Authorization
-@attribute [AllowAnonymous]
-@attribute [Microsoft.AspNetCore.Mvc.ResponseCache(NoStore = true, Location = Microsoft.AspNetCore.Mvc.ResponseCacheLocation.None)]
+@model TherapEase.Web.Pages.Login.DenegadoModel
 @{
-    if (User.Identity?.IsAuthenticated == true && User.FindFirst(Reclamaciones.DebeCambiarContrasena)?.Value == "true")
-    {
-        HttpContext.Response.Redirect(Url.Page("/Cuenta/Contrasena")!);
-        return;
-    }
-    HttpContext.Response.StatusCode = 403;
     ViewData["Title"] = "Acceso denegado";
     Layout = "_LayoutAcceso";
 }
