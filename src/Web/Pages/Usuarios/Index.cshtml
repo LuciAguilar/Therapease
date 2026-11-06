@@ -1,0 +1,39 @@
+@page
+@model IndexModel
+@{
+    Layout = "_LayoutOperativo";
+    ViewData["Title"] = "Usuarios";
+}
+<header class="titulo-seccion fila">
+    <div><h1>Usuarios</h1><p>Administra los accesos y permisos de tu equipo.</p></div>
+    <a class="accion primaria" asp-page="Crear">+ Crear usuario</a>
+</header>
+<form method="get" class="busqueda">
+    <label for="busqueda">Buscar usuarios</label>
+    <input id="busqueda" name="busqueda" type="search" maxlength="@IndexModel.MaximoBusqueda" value="@Model.Busqueda" />
+    <button class="accion" type="submit">Buscar</button>
+</form>
+@if (Model.Cuentas.Count == 0)
+{
+    <p class="tarjeta">No se encontraron cuentas.</p>
+}
+@if (Model.Cuentas.Count == 100)
+{
+    <p>Se muestran hasta 100 cuentas. Afina la búsqueda para encontrar una en particular.</p>
+}
+<ul class="lista-tarjetas cuentas">
+@foreach (var cuenta in Model.Cuentas)
+{
+    <li class="tarjeta fila">
+        <div class="identidad">
+            <span class="avatar" aria-hidden="true">@(cuenta.NombreUsuario.Length > 0 ? cuenta.NombreUsuario[..1].ToUpperInvariant() : "•")</span>
+            <div><strong>@cuenta.NombreCompleto</strong><div class="secundario">@cuenta.NombreUsuario</div></div>
+        </div>
+        <div class="acciones">
+            <span class="etiqueta rol">@cuenta.Rol</span>
+            <span class="etiqueta @(cuenta.Activo ? "activa" : "")">@(cuenta.Activo ? "Activa" : "Desactivada")</span>
+            <a class="accion" asp-page="Detalle" asp-route-id="@cuenta.IdUsuario">Ver cuenta</a>
+        </div>
+    </li>
+}
+</ul>

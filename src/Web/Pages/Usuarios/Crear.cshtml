@@ -1,0 +1,35 @@
+@page
+@using TherapEase.Domain.Identidad.Constantes
+@model CrearModel
+@{
+    Layout = "_LayoutOperativo";
+    ViewData["Title"] = "Crear usuario";
+}
+<a asp-page="Index">Volver a usuarios</a>
+<h1>Crear usuario</h1>
+@if (Model.Entrega is not null)
+{
+    <partial name="_EntregaTemporal" model="Model.Entrega" />
+}
+else
+{
+    <form method="post" class="tarjeta formulario-operativo">
+        <div asp-validation-summary="All" class="error-formulario"></div>
+        @if (Model.Error is not null)
+        {
+            <p class="error-formulario" role="alert">@Model.Error</p>
+        }
+        <label asp-for="Entrada.NombreUsuario">Nombre de usuario</label>
+        <input asp-for="Entrada.NombreUsuario" maxlength="50" required />
+        <label asp-for="Entrada.NombreCompleto">Nombre completo</label>
+        <input asp-for="Entrada.NombreCompleto" maxlength="150" minlength="2" required />
+        <label asp-for="Entrada.Correo">Correo (opcional)</label>
+        <input asp-for="Entrada.Correo" type="email" maxlength="254" />
+        <label asp-for="Entrada.Rol">Rol</label>
+        <select asp-for="Entrada.Rol">
+            <option value="@NombresDeRol.Usuaria">Usuaria</option>
+            <option value="@NombresDeRol.Superusuario">Superusuario</option>
+        </select>
+        <button class="accion primaria" type="submit">Crear usuario</button>
+    </form>
+}

@@ -1,0 +1,72 @@
+@page "/Acceso"
+@model TherapEase.Web.Pages.Login.IndexModel
+@attribute [Microsoft.AspNetCore.Authorization.AllowAnonymous]
+@{
+    ViewData["Title"] = "Acceso";
+    Layout = "_LayoutAcceso";
+}
+
+
+<main class="acceso">
+
+    <partial name="_AccesoHero" />
+
+    <section class="acceso-panel">
+        <div class="acceso-panel__contenido">
+
+            <div class="marca marca--movil"><img class="marca__imagen" src="~/img/therapease-logo.png" asp-append-version="true" width="1100" height="260" alt="TherapEase" /></div>
+
+            <div class="acceso-panel__encabezado">
+                <h1 class="acceso-panel__titulo">Bienvenido de nuevo</h1>
+                <p class="acceso-panel__texto">Accede a tu espacio de trabajo para comenzar.</p>
+            </div>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <form id="salir-al-volver" method="post" asp-page="/Cuenta/Salir" class="formulario-acceso">
+                    <button class="boton boton--primario boton--completo" type="submit">Cerrar sesión y volver al acceso</button>
+                </form>
+            }
+            else
+            {
+                <form method="post" class="formulario-acceso">
+
+                    <input asp-for="ReturnUrl" type="hidden" />
+                    @if (Model.MensajeError is not null)
+                    {
+                        <div class="alerta-error" role="alert">@Model.MensajeError</div>
+                    }
+
+                    <div class="campo">
+                        <label class="campo__etiqueta" for="Entrada_NombreUsuario">Nombre de usuario</label>
+                        <div class="campo__control">
+                            <svg class="campo__icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                                <circle cx="12" cy="7" r="4" />
+                            </svg>
+                            <input class="campo__entrada" asp-for="Entrada.NombreUsuario"
+                                   type="text" autocomplete="username" autocapitalize="none" spellcheck="false" autofocus />
+                        </div>
+                    </div>
+
+                    <div class="campo">
+                        <label class="campo__etiqueta" for="Entrada_Contrasena">Contraseña</label>
+                        <div class="campo__control">
+                            <svg class="campo__icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="12" cy="16" r="1" />
+                                <rect x="3" y="10" width="18" height="12" rx="2" />
+                                <path d="M7 10V7a5 5 0 0 1 10 0v3" />
+                            </svg>
+                            <input class="campo__entrada" id="Entrada_Contrasena" name="Entrada.Contrasena"
+                                   type="password" autocomplete="current-password" />
+                        </div>
+                    </div>
+
+                    <button type="submit" class="boton boton--primario boton--completo">Iniciar sesión</button>
+                </form>
+            }
+
+            <p class="acceso-panel__pie">Entorno de validación · solo datos ficticios</p>
+        </div>
+    </section>
+
+</main>

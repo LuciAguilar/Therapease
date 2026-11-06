@@ -1,0 +1,41 @@
+@using Microsoft.AspNetCore.Authorization
+@using TherapEase.Web.Seguridad
+@inject IAuthorizationService Autorizacion
+@{
+    var administra = (await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.AdministrarUsuarios)).Succeeded;
+    var usuarios = Context.Request.Path.StartsWithSegments("/Usuarios");
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="~/img/therapease-icono.png" asp-append-version="true" />
+    <title>@ViewData["Title"] · TherapEase</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/operacion.css" asp-append-version="true" />
+</head>
+<body class="operacion">
+    <aside class="barra-lateral">
+        <a class="marca" asp-page="/Index"><img class="marca__imagen" src="~/img/therapease-logo.png" asp-append-version="true" width="1100" height="260" alt="TherapEase" /></a>
+        <nav aria-label="Espacio de trabajo">
+            <p>Espacio de trabajo</p>
+            <a asp-page="/Index" aria-current="@(usuarios ? null : "page")">Inicio</a>
+            <span aria-disabled="true">Pacientes</span>
+            <span aria-disabled="true">Agenda</span>
+            @if (administra)
+            {
+                <a asp-page="/Usuarios/Index" aria-current="@(usuarios ? "page" : null)">Usuarios</a>
+            }
+        </nav>
+        <div class="barra-cuenta">
+            <a asp-page="/Cuenta/Contrasena">Cambiar contraseña</a>
+            <partial name="_FormularioSalida" />
+        </div>
+    </aside>
+    <div class="zona-trabajo">
+        <header class="encabezado">@ViewData["Title"]</header>
+        <main class="zona-contenido">@RenderBody()</main>
+    </div>
+</body>
+</html>
