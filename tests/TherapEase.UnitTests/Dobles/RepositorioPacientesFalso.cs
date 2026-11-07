@@ -28,11 +28,18 @@ internal sealed class RepositorioPacientesFalso : IRepositorioPacientes
 
     public int BusquedasDeParecidos { get; private set; }
 
+    public int LecturasDeCondicionYAmbitos { get; private set; }
+
+    public int LecturasDeNombres { get; private set; }
+
+    public Guid[]? UltimosIdsDeNombres { get; private set; }
+
     public List<PacienteAmbito> AmbitosQuitados { get; } = [];
 
     public (IReadOnlyList<string> Palabras, DateOnly? Nacimiento, int Limite)? UltimaBusqueda { get; private set; }
 
-    public int Lecturas => LecturasParaEscribir + LecturasParaComparacion + LecturasParaConsulta + LecturasDeCondicion + BusquedasDeVigentes + BusquedasDeParecidos;
+    public int Lecturas => LecturasParaEscribir + LecturasParaComparacion + LecturasParaConsulta + LecturasDeCondicion + BusquedasDeVigentes + BusquedasDeParecidos
+        + LecturasDeCondicionYAmbitos + LecturasDeNombres;
 
     public Task AgregarAsync(Paciente paciente, CancellationToken cancelacion = default)
     {
@@ -77,6 +84,34 @@ internal sealed class RepositorioPacientesFalso : IRepositorioPacientes
     {
         LecturasDeCondicion++;
         return Task.FromResult<CondicionRegistro?>(Pacientes.TryGetValue(idPaciente, out var p) ? p.Condicion : null);
+    }
+
+    public Task<FilaDeCondicionYAmbitos?> ObtenerCondicionYAmbitosAsync(Guid idPaciente, CancellationToken cancelacion = default)
+    {
+        LecturasDeCondicionYAmbitos++;
+        if (!Pacientes.TryGetValue(idPaciente, out var p))
+        {
+            return Task.FromResult<FilaDeCondicionYAmbitos?>(null);
+        }
+
+        // Igual que la proyección real: de una baja solo se entrega la condición.
+        var vigente = p.Condicion == CondicionRegistro.Vigente;
+        FilaDeCondicionYAmbitos fila = new(
+            p.Condicion,
+            vigente && p.Ambitos.Any(a => a.Ambito == AmbitoAtencion.Escolar),
+            vigente && p.Ambitos.Any(a => a.Ambito == AmbitoAtencion.Independiente));
+        return Task.FromResult<FilaDeCondicionYAmbitos?>(fila);
+    }
+
+    public Task<IReadOnlyList<NombreDePacienteVigente>> ObtenerNombresDeVigentesAsync(Guid[] idsPacientes, CancellationToken cancelacion = default)
+    {
+        LecturasDeNombres++;
+        UltimosIdsDeNombres = idsPacientes;
+        IReadOnlyList<NombreDePacienteVigente> filas = Pacientes.Values
+            .Where(p => p.Condicion == CondicionRegistro.Vigente && idsPacientes.Contains(p.IdPaciente))
+            .Select(p => new NombreDePacienteVigente(p.IdPaciente, p.Nombre))
+            .ToList();
+        return Task.FromResult(filas);
     }
 
     public Task<IReadOnlyList<FilaDeBusquedaDePaciente>> BuscarVigentesAsync(

@@ -1,3 +1,4 @@
+using TherapEase.Domain.Citas.Constantes;
 using TherapEase.Domain.Citas.Entidades;
 using TherapEase.Domain.Citas.Entidades.Enums;
 using TherapEase.Domain.Compartido.Entidades.Enums;
@@ -50,6 +51,26 @@ public static class ReglasDeCita
         MetadatosDeAuditoria.RegistrarAlta(cita, idActor, ahora);
         return cita;
     }
+
+    // Nombres de los campos que lleva el evento de alta de una cita. Nunca valores: ni el paciente, ni las horas.
+    public static IReadOnlyList<string> CamposDeAlta() =>
+    [
+        CamposDeCita.IdPaciente, CamposDeCita.Ambito, CamposDeCita.Inicio, CamposDeCita.Fin, CamposDeCita.Estado, CamposDeCita.EstadoPago
+    ];
+
+    // Reconoce el reenvío de una reserva ya confirmada: sigue agendada y vigente, la creó el mismo actor y coinciden paciente, ámbito, inicio y fin.
+    // Los instantes se comparan en UTC. Cualquier otro caso (otro actor, otros datos, cancelada o de baja) no es la misma reserva.
+    public static bool EsLaMismaReserva(Cita existente, Cita candidata) =>
+        existente.EsActiva
+        && existente.IdUsuarioAlta == candidata.IdUsuarioAlta
+        && existente.IdPaciente == candidata.IdPaciente
+        && existente.Ambito == candidata.Ambito
+        && existente.Inicio == candidata.Inicio
+        && existente.Fin == candidata.Fin;
+
+    // «Registrada después de su horario» (decisión de Lucía, 01-nov-2026): la cita se guardó cuando ya había empezado. FechaAlta la pone el servidor, nunca la página.
+    // Las consultas de agenda calculan la misma comparación en la base; ambas deben coincidir.
+    public static bool FueRegistradaDespuesDeSuHorario(Cita cita) => cita.FechaAlta > cita.Inicio;
 
     // Cancelar libera el horario pero no da de baja ni cambia el pago.
     public static void Cancelar(Cita cita, int versionEsperada, Guid idActor, DateTimeOffset ahora)
