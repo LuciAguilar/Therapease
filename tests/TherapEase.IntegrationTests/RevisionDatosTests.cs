@@ -67,7 +67,7 @@ public class RevisionDatosTests : IClassFixture<PostgreSqlRevision>
     // ──── BASE Y AUDITORÍA ───────────────────────────────────────────────────────────────────
 
 
-    /// Las tres migraciones reales se aplican y la aplicación se conecta con su propio usuario,
+    /// Las migraciones reales se aplican (cinco con la del bloqueo de la agenda) y la aplicación se conecta con su propio usuario,
     /// que no es administrador de PostgreSQL.
     [Fact]
     public async Task Migraciones_Reales_Con_Usuario_Separado()
@@ -79,7 +79,7 @@ public class RevisionDatosTests : IClassFixture<PostgreSqlRevision>
 
         // Assert
 
-        Assert.Equal(4L, await PostgreSqlRevision.Valor<long>(e.Migrador, "SELECT count(*) FROM \"__EFMigrationsHistory\""));
+        Assert.Equal(5L, await PostgreSqlRevision.Valor<long>(e.Migrador, "SELECT count(*) FROM \"__EFMigrationsHistory\""));
         Assert.Equal("therapease_app", await PostgreSqlRevision.Valor<string>(e.App, "SELECT current_user"));
         Assert.False(await PostgreSqlRevision.Valor<bool>(e.App, "SELECT rolsuper FROM pg_roles WHERE rolname=current_user"));
     }

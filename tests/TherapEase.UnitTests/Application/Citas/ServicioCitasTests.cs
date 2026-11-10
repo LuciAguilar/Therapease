@@ -9,7 +9,6 @@ using TherapEase.Domain.Citas.Entidades.Enums;
 using TherapEase.Domain.Citas.Excepciones;
 using TherapEase.Domain.Citas.Reglas;
 using TherapEase.Domain.Compartido.Entidades.Enums;
-using TherapEase.Domain.Compartido.Excepciones;
 using TherapEase.Domain.Pacientes.Entidades.Enums;
 using TherapEase.UnitTests.Dobles;
 
@@ -661,51 +660,24 @@ public class ServicioCitasTests
         Assert.Equal(2, _citas.LecturasParaComparacion);
     }
 
-    // Dos altas conflictivas simultáneas pueden bloquearse entre sí: la base aborta una por interbloqueo y el alta lo trata como el conflicto de horario.
+    // Un interbloqueo (40P01) llega envuelto como fallo transitorio de la base y NO se traduce a ninguna excepción de dominio: sube como error general.
+    // No es un conflicto de horario, no se relee la cita (aunque la gemela ya estuviera confirmada) y no se anuncia ni éxito ni rechazo.
     [Fact]
-    public async Task Agendar_ElInterbloqueoSinCitaConEseNumero_RespondeHorarioOcupado()
-    {
-        _citas.AlAgregar = _ => throw new InterbloqueoDeBaseException();
-
-        var respuesta = await _servicio.AgendarAsync(Guid.NewGuid(), Datos());
-
-        Assert.False(respuesta.Exito);
-        Assert.Equal(MensajesDeCitas.HorarioOcupado, respuesta.Mensaje);
-        Assert.Empty(_repositorioAuditoria.Eventos);
-        Assert.Equal(0, _unidad.Confirmaciones);
-        Assert.Equal(2, _citas.LecturasParaComparacion);
-    }
-
-    [Fact]
-    public async Task Agendar_ElInterbloqueoCuandoLaGemelaYaConfirmo_ReconoceLaReserva()
+    public async Task Agendar_UnFalloTransitorioDeLaBase_SubeComoErrorGeneralSinRelecturaNiAnuncio()
     {
         var id = Guid.NewGuid();
         _citas.AlAgregar = _ =>
         {
             Gemela(id);
-            throw new InterbloqueoDeBaseException();
+            throw new InvalidOperationException("Fallo transitorio simulado.", new InvalidOperationException("Interbloqueo simulado."));
         };
 
-        var respuesta = await _servicio.AgendarAsync(id, Datos());
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _servicio.AgendarAsync(id, Datos()));
 
-        Assert.True(respuesta.Exito);
-        Assert.Equal(EstadoDeAgendar.YaAgendada, respuesta.Datos!.Estado);
-        Assert.Single(_citas.Citas);
+        Assert.Equal(1, _citas.LecturasParaComparacion);
+        Assert.Equal(0, _unidad.Confirmaciones);
+        Assert.Equal(1, _unidad.Reversiones);
         Assert.Empty(_repositorioAuditoria.Eventos);
-    }
-
-    [Fact]
-    public async Task Agendar_ElInterbloqueoCuandoSeRetiraElPermiso_RespondeSinPermiso()
-    {
-        _citas.AlAgregar = _ =>
-        {
-            _autorizacion.Permisos.Remove(Permiso.AgendarCitas);
-            throw new InterbloqueoDeBaseException();
-        };
-
-        var respuesta = await _servicio.AgendarAsync(Guid.NewGuid(), Datos());
-
-        Assert.Equal(MensajesDeCitas.SinPermiso, respuesta.Mensaje);
     }
 
     [Fact]

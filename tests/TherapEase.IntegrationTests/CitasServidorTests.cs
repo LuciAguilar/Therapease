@@ -19,6 +19,7 @@ using TherapEase.Domain.Citas.Entidades;
 using TherapEase.Domain.Citas.Entidades.Enums;
 using TherapEase.Domain.Citas.Excepciones;
 using TherapEase.Domain.Citas.Reglas;
+using TherapEase.Domain.Compartido.Excepciones;
 using TherapEase.Domain.Compartido.Reglas;
 using TherapEase.Domain.Pacientes.Entidades.Enums;
 using TherapEase.Infrastructure.Configuracion;
@@ -82,38 +83,20 @@ public class CitasServidorTests(PostgreSqlRevision postgres) : IClassFixture<Pos
         }
     }
 
-    // Simula que PostgreSQL aborta la transacción por interbloqueo en el primer guardado de una cita o de una ficha, con la misma forma con la que llega desde EF:
-    // un fallo transitorio que envuelve a la excepción de actualización y esta, a la de PostgreSQL (SQLSTATE 40P01). Antes de abortar puede ejecutar una acción.
-    private sealed class InterbloqueoAlGuardar<TEntidad> : SaveChangesInterceptor where TEntidad : class
+    // Hace que solo el INSERT del evento de auditoría falle con interbloqueo (40P01): el de la cita no. Sirve para comprobar que ese código no se confunde con un cruce.
+    private static Task SimularInterbloqueoEnAuditoriaAsync(Escenario escenario) =>
+        PostgreSqlRevision.Sql(escenario.Migrador, """
+            CREATE FUNCTION rechazar_evento_con_interbloqueo() RETURNS trigger LANGUAGE plpgsql AS $$
+            BEGIN RAISE EXCEPTION 'Interbloqueo ficticio de auditoria' USING ERRCODE = '40P01'; END $$;
+            CREATE TRIGGER rechazar_evento_con_interbloqueo BEFORE INSERT ON "EventoAuditoria"
+            FOR EACH ROW EXECUTE FUNCTION rechazar_evento_con_interbloqueo();
+            """);
+
+    private static IEnumerable<Exception> CadenaDe(Exception excepcion)
     {
-        private Func<Task>? _antes;
-        private int _intentos;
-        private int _pendiente = 1;
-
-        public int Intentos => Volatile.Read(ref _intentos);
-
-        public void Antes(Func<Task> accion) => Volatile.Write(ref _antes, accion);
-
-        public override async ValueTask<InterceptionResult<int>> SavingChangesAsync(
-            DbContextEventData datos, InterceptionResult<int> resultado, CancellationToken cancelacion = default)
+        for (var actual = excepcion; actual is not null; actual = actual.InnerException)
         {
-            if (datos.Context!.ChangeTracker.Entries<TEntidad>().Any(e => e.State == EntityState.Added))
-            {
-                Interlocked.Increment(ref _intentos);
-                if (Interlocked.Exchange(ref _pendiente, 0) == 1)
-                {
-                    if (Interlocked.Exchange(ref _antes, null) is { } accion)
-                    {
-                        await accion();
-                    }
-
-                    throw new InvalidOperationException(
-                        "Fallo transitorio simulado.",
-                        new DbUpdateException("Interbloqueo simulado.", new PostgresException("deadlock detected", "ERROR", "ERROR", PostgresErrorCodes.DeadlockDetected)));
-                }
-            }
-
-            return resultado;
+            yield return actual;
         }
     }
 
@@ -485,9 +468,8 @@ public class CitasServidorTests(PostgreSqlRevision postgres) : IClassFixture<Pos
         Assert.Equal(3, (await e.EventosDeCitasAsync()).Count);
     }
 
-    // Hallazgo: con una restricción de exclusión, dos altas conflictivas que llegan a la vez pueden bloquearse entre sí y PostgreSQL aborta una con
-    // «deadlock detected» (40P01) en lugar del cruce (23P01). El alta de una cita trata ese aborto como conflicto de horario, de modo que con cualquier cantidad
-    // de reservas simultáneas por el mismo horario solo una guarda y las demás reciben el mismo conflicto.
+    // El disparador de Cita toma un bloqueo de asesoría antes de escribir una cita activa: las altas simultáneas se serializan y la restricción compara contra filas
+    // ya confirmadas. Las demás reciben el cruce real (23P01); ningún interbloqueo (40P01) llega hasta aquí porque ya no se traduce, así que uno solo haría fallar la prueba.
     [Fact]
     public async Task Agendar_DiezReservasSimultaneasPorElMismoHorario_SoloUnaGuardaYLasDemasRecibenHorarioOcupado()
     {
@@ -502,40 +484,48 @@ public class CitasServidorTests(PostgreSqlRevision postgres) : IClassFixture<Pos
                 .WaitAsync(TimeSpan.FromSeconds(90));
 
             Assert.Equal(1, resultados.Count(r => r.Exito));
-            Assert.All(resultados.Where(r => !r.Exito), r => Assert.Equal(MensajesDeCitas.HorarioOcupado, r.Mensaje));
+            Assert.Equal(9, resultados.Count(r => !r.Exito && r.Mensaje == MensajesDeCitas.HorarioOcupado));
         }
 
         Assert.Equal(2, (await e.CitasGuardadasAsync()).Count);
         Assert.Equal(2, (await e.EventosDeCitasAsync()).Count);
     }
 
+    // Regresión: un 40P01 provocado solo al guardar el evento de auditoría NO es un conflicto de horario. Sube como error general, sin relectura de la cita,
+    // sin anunciar éxito y sin dejar ni la cita ni su evento.
     [Fact]
-    public async Task Agendar_SiPostgreSqlAbortaPorInterbloqueoYNadieConfirmoLaCita_RespondeHorarioOcupadoSinGuardarNada()
+    public async Task Agendar_SiLaAuditoriaFallaConInterbloqueo_SubeComoErrorGeneralSinRelecturaNiCambios()
     {
-        var interbloqueo = new InterbloqueoAlGuardar<Cita>();
-        using var e = await PrepararAsync(configurar: s => s.ConfigureDbContext<ContextoDeDatos>(o => o.AddInterceptors(interbloqueo)));
+        using var e = await PrepararAsync();
         var paciente = await RegistrarPacienteAsync(e);
+        await SimularInterbloqueoEnAuditoriaAsync(e.Escenario);
+        e.Comandos.Limpiar();
 
-        var respuesta = await e.Citas(s => s.AgendarAsync(Guid.NewGuid(), Datos(paciente)));
+        var error = await Assert.ThrowsAnyAsync<Exception>(() => e.Citas(s => s.AgendarAsync(Guid.NewGuid(), Datos(paciente))));
 
-        Assert.False(respuesta.Exito);
-        Assert.Equal(MensajesDeCitas.HorarioOcupado, respuesta.Mensaje);
-        Assert.Equal(1, interbloqueo.Intentos);
+        Assert.IsNotAssignableFrom<ReglaDeNegocioException>(error);
+        Assert.Contains(CadenaDe(error), x => x is PostgresException { SqlState: PostgresErrorCodes.DeadlockDetected });
         Assert.Empty(await e.CitasGuardadasAsync());
         Assert.Empty(await e.EventosDeCitasAsync());
+
+        // Solo la primera lectura por número: ninguna relectura tras el fallo.
+        var lecturasDeCitas = e.Comandos.Textos.Count(t => t.Contains("FROM \"Cita\"", StringComparison.Ordinal));
+        Assert.Equal(1, lecturasDeCitas);
     }
 
-    // Si el aborto por interbloqueo llega justo cuando la gemela ya confirmó la misma reserva, se reconoce lo confirmado: sin otra cita ni otro evento.
+    // Las pausas del plan B03 §4.1 siguen funcionando con el bloqueo: A se detiene justo antes de guardar y la gemela B confirma su reserva completa mientras tanto.
+    // Como el bloqueo se toma al insertar y no al iniciar la transacción, B no queda esperando a A; al reanudar, A reconoce la reserva ya confirmada.
     [Fact]
-    public async Task Agendar_SiPostgreSqlAbortaPorInterbloqueoPeroLaGemelaYaConfirmo_ReconoceLaReserva()
+    public async Task Agendar_LaGemelaConfirmaCompletaMientrasLaOtraEstaEnPausaAntesDeGuardar_NoQuedaEsperandoElBloqueo()
     {
         var id = Guid.NewGuid();
-        var interbloqueo = new InterbloqueoAlGuardar<Cita>();
-        using var e = await PrepararAsync(configurar: s => s.ConfigureDbContext<ContextoDeDatos>(o => o.AddInterceptors(interbloqueo)));
+        var adelantada = new AdelantadaAlGuardarCita();
+        using var e = await PrepararAsync(configurar: s => s.ConfigureDbContext<ContextoDeDatos>(o => o.AddInterceptors(adelantada)));
         var paciente = await RegistrarPacienteAsync(e);
-        interbloqueo.Antes(async () =>
+        adelantada.Armar(async () =>
         {
-            var gemela = await e.Citas(s => s.AgendarAsync(id, Datos(paciente)));
+            // Si el bloqueo se hubiera tomado al iniciar la transacción de A, esta llamada esperaría a A, que espera a esta, y se agotaría el tiempo.
+            var gemela = await e.Citas(s => s.AgendarAsync(id, Datos(paciente))).WaitAsync(TimeSpan.FromSeconds(20));
             Assert.Equal(EstadoDeAgendar.Agendada, gemela.Datos!.Estado);
         });
 
@@ -545,18 +535,6 @@ public class CitasServidorTests(PostgreSqlRevision postgres) : IClassFixture<Pos
         Assert.Equal(EstadoDeAgendar.YaAgendada, respuesta.Datos!.Estado);
         Assert.Single(await e.CitasGuardadasAsync());
         Assert.Single(await e.EventosDeCitasAsync());
-    }
-
-    // Fuera del alta de citas el interbloqueo no se convierte en un rechazo de negocio: sube como excepción y la aplicación responde su error general.
-    [Fact]
-    public async Task UnInterbloqueoEnElAltaDeUnaFicha_NoSeTrataComoRechazoDeNegocioSinoQueSubeComoExcepcion()
-    {
-        var interbloqueo = new InterbloqueoAlGuardar<TherapEase.Domain.Pacientes.Entidades.Paciente>();
-        using var e = await PrepararAsync(configurar: s => s.ConfigureDbContext<ContextoDeDatos>(o => o.AddInterceptors(interbloqueo)));
-
-        await Assert.ThrowsAsync<TherapEase.Domain.Compartido.Excepciones.InterbloqueoDeBaseException>(() => RegistrarPacienteAsync(e));
-
-        Assert.Empty(await e.EventosAsync(TipoRegistroAuditoria.Paciente));
     }
 
     [Fact]

@@ -1,6 +1,6 @@
 # TherapEase — B03 · Contrato de las funciones del servidor para las páginas de agenda y citas
 
-**Preparado el 07-nov-2026.** Autor: Miguel. Para: Dulce. Revisa: Lucía. Rama `b03/agenda-y-citas`, aún sin PR, revisión ni CI. Detalle de lo comprobado en la [evidencia](../testing/TherapEase-09-B03-evidencia-servicios.md).
+**Actualizado el 09-nov-2026.** Autor: Miguel. Para: Dulce. Revisa: Lucía. [PR #18](https://github.com/LuciAguilar/Therapease/pull/18), rama `b03/agenda-y-citas`. Lucía revisó `fe6b79a` (CI correcta) y pidió las correcciones de esta versión: un `40P01` ya no se confunde con «horario ocupado» y la agenda serializa las altas con un bloqueo de asesoría dentro de un disparador de `Cita`. Detalle de lo comprobado en la [evidencia](../testing/TherapEase-09-B03-evidencia-servicios.md).
 
 Concreta la sección 3.13 de la [propuesta aprobada](TherapEase-etapa09-B03-propuesta.md) (D1–D13, aprobadas por Lucía el 05-nov-2026). El [contrato de B01](TherapEase-etapa09-B01-contrato-para-paginas.md) sigue siendo la referencia para llamar al servidor, usar `RespuestaServicio<T>`, mostrar el error 500, proteger formularios y evitar que se guarden páginas privadas en caché. El [contrato de B02](TherapEase-etapa09-B02-contrato-para-paginas.md) explica la búsqueda y la ficha de pacientes, que la página de agendar usa para elegir al paciente.
 
@@ -85,7 +85,7 @@ Requiere `AgendarCitas` **y** `ConsultarPacientes`.
 - **Cruces:** solo las citas agendadas y vigentes ocupan horario, **también entre ámbitos**. Las citas contiguas (una termina cuando empieza la otra) se permiten. Una cancelada libera su horario. `HorarioOcupado` no revela datos de la otra cita.
 - **Fecha u hora pasada:** se permite, con las mismas reglas. La cita lleva la leyenda de registro tardío y su evento lo indica con un texto fijo.
 - **Ámbito retirado mientras se agenda:** si el retiro del ámbito se confirma después de la comprobación del servidor, la cita **conserva** el ámbito elegido y el servidor no se lo devuelve al paciente. Si todavía no hay cita confirmada, el ámbito retirado rechaza el alta con `AmbitoNoPermitido`.
-- **Reservas distintas por el mismo horario:** con cualquier cantidad de solicitudes simultáneas solo una guarda; las demás reciben `HorarioOcupado` (sección 6).
+- **Reservas distintas por el mismo horario:** con dos y con diez solicitudes simultáneas (lo ensayado) solo una guarda; las demás reciben `HorarioOcupado` (sección 6).
 
 **Reenvío de la misma reserva.** Reenviar el mismo número es seguro. El servidor lo reconoce con una relectura por número, con permisos vigentes, y hay tres salidas:
 
@@ -114,11 +114,13 @@ Rechazos, todos con mensajes fijos de `MensajesDeHorarioDeCita`: `HorasConSegund
 
 `MensajesDeHorarioDeCita` (Domain, solo constantes): `HorasConSegundos`, `FinNoPosteriorAlInicio`, `FueraDelHorarioDeAtencion`, `DuracionAntesDeLas15`, `DuracionDesdeLas15`, `FechaNoRepresentable`.
 
-**Reservas simultáneas.** Si dos solicitudes distintas llegan a la vez por el mismo horario, PostgreSQL puede resolver el cruce de dos maneras: rechazar a la segunda con la restricción de cruce, o abortar una de las transacciones por interbloqueo. El servidor trata ambas como `HorarioOcupado` (antes comprueba si la cita ya confirmada era la propia). Quien reciba `HorarioOcupado` en una carrera puede reintentar manualmente si el horario quedó libre.
+**Reservas simultáneas.** Si varias solicitudes distintas llegan a la vez por el mismo horario, un disparador de `Cita` toma un bloqueo de asesoría de transacción antes de escribir una cita activa: las altas se hacen una tras otra, la primera se guarda y la restricción de cruces rechaza a las demás con el cruce real. Para la página es el mismo `HorarioOcupado` de siempre, sin datos de la otra cita. El bloqueo se toma al insertar, no al abrir la solicitud, y lo libera PostgreSQL al confirmar o revertir; la página no hace nada especial. Ensayado con dos y con diez solicitudes simultáneas.
 
 ## 7. Fallos inesperados
 
 Una falla de la base o de la auditoría **no vuelve como `Exito = false`**: sube como excepción y el servidor responde el error 500 fijo de B01 §1.3. La página no la captura, no la presenta como error de validación y no reintenta sola. Cita y evento se guardan juntos o no se guarda ninguno: tras un 500, reenviar el mismo número (sección 4.3) es seguro. Si un guardado falla, la unidad de trabajo descarta lo que dejó pendiente en el contexto, de modo que la siguiente operación de la misma solicitud no repite el cambio fallido.
+
+**Un interbloqueo (`40P01`) u otro fallo de la base es un fallo inesperado y nada más:** no se traduce a ninguna regla de negocio. Si ocurre, también al guardar solo el evento de auditoría, el resultado es el error 500, sin releer la cita, sin anunciar éxito ni «horario ocupado», y sin dejar la cita ni su evento. Las reservas simultáneas ya no dependen de eso (sección 6).
 
 El pago inicial de una cita es **Pendiente**; el formulario no tiene campo de pago y cambiarlo es de B04. Reprogramar y cancelar son de B05; nuevas bajas y recuperaciones de citas, de B06.
 
@@ -127,8 +129,9 @@ El pago inicial de una cita es **Pendiente**; el formulario no tiene campo de pa
 | Estado | Parte | Dónde |
 | --- | --- | --- |
 | ✅ | Regla de horario: las 752 combinaciones válidas contra una lista escrita aparte, los ejemplos del plan y las fechas límite | `ReglasDeHorarioDeCitaTests`, `HoraHermosilloTests`, `ReglasDeCitaTests` (unitarias). |
-| ✅ | Permisos por rol y por estado de sesión, entradas, paciente, reenvío con sus tres salidas, interbloqueo, fallos y agenda | `ServicioCitasTests`, `ConsultaDePacientesParaCitasTests` y `MatrizDePermisosTests` (unitarias). |
-| ✅ | Guardado y evento en una transacción, `PK_Cita`, reenvío con la gemela confirmada antes del guardado o antes del rechazo de ámbito, reservas simultáneas (dos y diez), fallo de auditoría, una sola consulta por lectura y agenda con PostgreSQL real | `CitasServidorTests` (integración con PostgreSQL desechable), como verificación de Miguel. |
+| ✅ | Permisos por rol y por estado de sesión, entradas, paciente, reenvío con sus tres salidas, fallos inesperados sin relectura y agenda | `ServicioCitasTests`, `ConsultaDePacientesParaCitasTests` y `MatrizDePermisosTests` (unitarias). |
+| ✅ | Guardado y evento en una transacción, `PK_Cita`, reenvío con la gemela confirmada antes del guardado o antes del rechazo de ámbito, reservas simultáneas (dos y diez), pausas antes de guardar, fallo de auditoría incluido un `40P01` solo en `EventoAuditoria`, una sola consulta por lectura y agenda con PostgreSQL real | `CitasServidorTests` (integración con PostgreSQL desechable), como verificación de Miguel. |
+| ✅ | Disparador del bloqueo de la agenda: cuándo se toma, orden antes del control del paciente, serialización con cruce real, liberación al revertir y migración de subida, bajada y subida | `BloqueoDeAgendaEnCitaActivaTests` (integración con PostgreSQL desechable), como verificación de Miguel. |
 | ⏳ | QA de Lucía: agendar frente a baja en sus tres órdenes, ámbito retirado sin cita confirmada, zonas horarias, páginas y navegador | Espera su propia entrega y las páginas. |
 
 Los resultados con número de casos, comando y entorno están en [la evidencia de B03](../testing/TherapEase-09-B03-evidencia-servicios.md) y no equivalen a la aprobación de Lucía.

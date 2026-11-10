@@ -186,13 +186,6 @@ public class ServicioCitas : IServicioCitas
         {
             return await ResolverRechazoAsync(candidata, MensajesDeCitas.HorarioOcupado, cancelacion);
         }
-        catch (InterbloqueoDeBaseException)
-        {
-            // Dos altas conflictivas que llegan a la vez se bloquean entre sí en la restricción de cruce y PostgreSQL aborta una por interbloqueo en lugar de
-            // rechazarla con el cruce. En el alta de una cita eso es una reserva simultánea por el mismo horario: se resuelve igual que el cruce, con la misma relectura
-            // por si fuera la propia gemela ya confirmada.
-            return await ResolverRechazoAsync(candidata, MensajesDeCitas.HorarioOcupado, cancelacion);
-        }
         catch (CitaActivaConPacienteDeBajaException)
         {
             return await ResolverRechazoAsync(candidata, MensajesDeCitas.PacienteDeBaja, cancelacion);
