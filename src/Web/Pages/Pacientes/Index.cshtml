@@ -1,0 +1,59 @@
+@page
+@using TherapEase.Application.Pacientes.Constantes
+@model TherapEase.Web.Pages.Pacientes.IndexModel
+@{
+    Layout = "_LayoutOperativo";
+    ViewData["Title"] = "Pacientes";
+}
+<header class="titulo-seccion fila">
+    <div>
+        <h1>Pacientes</h1>
+        <p>Busca una ficha por el nombre del paciente.</p>
+    </div>
+</header>
+<form method="post" class="busqueda">
+    <div>
+        <label asp-for="Texto">Nombre del paciente</label>
+        <input asp-for="Texto" type="search" maxlength="@LimitesDeBusquedaDePacientes.LongitudMaximaDelTexto" />
+    </div>
+    <div>
+        <label asp-for="NacimientoExacto">Fecha de nacimiento (opcional)</label>
+        <input asp-for="NacimientoExacto" type="date" />
+    </div>
+    <button class="accion primaria" type="submit">Buscar</button>
+</form>
+@if (Model.Error is not null)
+{
+    <p class="error-formulario" role="alert">@Model.Error</p>
+}
+else if (Model.Resultado is { } resultado)
+{
+    @if (resultado.HayMas)
+    {
+        <p class="aviso" role="status">Hay más resultados. Afina la búsqueda para encontrar la ficha.</p>
+    }
+    @if (resultado.Pacientes.Count == 0)
+    {
+        <p class="tarjeta" role="status">No se encontraron pacientes.</p>
+    }
+    <ul class="lista-tarjetas">
+    @foreach (var paciente in resultado.Pacientes)
+    {
+        <li class="tarjeta">
+            <strong>@paciente.Nombre</strong>
+            @if (paciente.FechaNacimiento is { } nacimiento)
+            {
+                <p class="secundario">Nacimiento: @nacimiento.ToString("dd/MM/yyyy")</p>
+            }
+            else if (paciente.NacimientoDesconocido)
+            {
+                <p class="secundario">Fecha de nacimiento desconocida.</p>
+            }
+        </li>
+    }
+    </ul>
+}
+else
+{
+    <p class="tarjeta">Escribe al menos @LimitesDeBusquedaDePacientes.LongitudMinimaDelTexto caracteres para buscar un paciente.</p>
+}
