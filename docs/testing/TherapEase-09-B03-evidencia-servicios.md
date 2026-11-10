@@ -6,8 +6,8 @@
 
 | Ronda | Contenido | Resultado |
 | --- | --- | --- |
-| 1 | `fe6b79a`: servidor de agenda y citas, con un tratamiento especial del `40P01` en el alta. | Lucía revisó ese SHA: 810 unitarias, 27 integraciones de citas y [CI 4/4 (42688775887)](https://github.com/LuciAguilar/Therapease/actions/runs/42688775887). Su QA dirigido dio **4/5**: un `40P01` provocado solo en `EventoAuditoria` respondía «horario ocupado» con cero citas y eventos; debía subir como error 500 sin relectura, como estaba aprobado. Aprobó la alternativa del bloqueo de asesoría en un disparador de `Cita`. |
-| 2 | Esta corrección: migración con el disparador (§3), retiro del `catch` y de la traducción del `40P01` (vuelve a ser error general), pruebas nuevas y documentos. | Resultados de la sección 2. SHA y CI: ver la última fila de esa tabla. |
+| 1 | `fe6b79a`: servidor de agenda y citas, con un tratamiento especial del `40P01` en el alta. | Lucía revisó ese SHA: 810 unitarias y 27 integraciones de citas. Su QA dirigido dio **4/5**: un `40P01` provocado solo en `EventoAuditoria` respondía «horario ocupado» con cero citas y eventos; debía subir como error 500 sin relectura, como estaba aprobado. Aprobó la alternativa del bloqueo de asesoría en un disparador de `Cita`. |
+| 2 | Esta corrección: migración con el disparador (§3), retiro del `catch` y de la traducción del `40P01` (vuelve a ser error general), pruebas nuevas y documentos. | Resultados de la sección 2. |
 
 ## 1. Qué se implementó y con qué se comprueba
 
@@ -16,10 +16,10 @@
 | ✅ | Dos permisos nuevos (`ConsultarAgenda`, `AgendarCitas`) para Usuaria y Superusuario, con sus políticas web | `MatrizDePermisosTests` (incluye su prueba de completitud) | 34 |
 | ✅ | Regla de horario en Domain: las 752 combinaciones válidas contra una lista escrita aparte, los 1 440 × 1 440 pares de minutos, ejemplos del plan, segundos y fracciones, fin del día siguiente, siete días, fecha pasada y fechas límite | `ReglasDeHorarioDeCitaTests` | 41 |
 | ✅ | Conversión: `HoraHermosillo.EsRepresentable` y leyenda «Registrada después de su horario» (`FechaAlta` mayor, igual y menor que `Inicio`) | `HoraHermosilloTests` (13, seis nuevos) y `ReglasDeCitaTests` (21, cuatro nuevos) | 34 |
-| ✅ | Servicio de citas: permisos antes de leer, entradas, horario, paciente y ámbito, resultados, los estados del reenvío con sus tres salidas, fallos de auditoría o de la base sin relectura (también un fallo transitorio), agenda (periodos, vistas, 500 filas, bajas sin nombre, conversión de horas) y detalle | `ServicioCitasTests` | {{SERVICIO}} |
+| ✅ | Servicio de citas: permisos antes de leer, entradas, horario, paciente y ámbito, resultados, los estados del reenvío con sus tres salidas, fallos de auditoría o de la base sin relectura (también un fallo transitorio), agenda (periodos, vistas, 500 filas, bajas sin nombre, conversión de horas) y detalle | `ServicioCitasTests` | 94 |
 | ✅ | Contrato de Pacientes para Citas: permiso, condición y ámbitos, baja sin ámbitos, nombres solo de vigentes, una sola consulta | `ConsultaDePacientesParaCitasTests` | 12 |
-| ✅ | Guardado y evento en una transacción, `PK_Cita`, reenvío con la gemela confirmada antes del guardado, entre la primera lectura y el guardado y antes del rechazo de ámbito (sin restaurarlo), pausas antes de guardar, reservas simultáneas (dos y diez), fallo de auditoría y alcance posterior, **`40P01` solo en `EventoAuditoria` como error general**, una sola consulta por lectura, agenda con PostgreSQL real y detalle | `CitasServidorTests` (PostgreSQL desechable) | {{CITAS}} |
-| ✅ | Disparador del bloqueo: cuándo se toma y cuándo no (altas y cambios), orden antes del `FOR SHARE` del paciente, serialización con cruce real, liberación al revertir, migración que sube, baja y vuelve a subir, y el esquema que la aplicación no puede cambiar | `BloqueoDeAgendaEnCitaActivaTests` (PostgreSQL desechable) | {{BLOQUEO}} |
+| ✅ | Guardado y evento en una transacción, `PK_Cita`, reenvío con la gemela confirmada antes del guardado, entre la primera lectura y el guardado y antes del rechazo de ámbito (sin restaurarlo), pausas antes de guardar, reservas simultáneas (dos y diez), fallo de auditoría y alcance posterior, **`40P01` solo en `EventoAuditoria` como error general**, una sola consulta por lectura, agenda con PostgreSQL real y detalle | `CitasServidorTests` (PostgreSQL desechable) | 26 |
+| ✅ | Disparador del bloqueo: cuándo se toma y cuándo no (altas y cambios), orden antes del `FOR SHARE` del paciente, serialización con cruce real, liberación al revertir, migración que sube, baja y vuelve a subir, y el esquema que la aplicación no puede cambiar | `BloqueoDeAgendaEnCitaActivaTests` (PostgreSQL desechable) | 20 |
 
 `CitasServidorTests` y `BloqueoDeAgendaEnCitaActivaTests` son verificaciones de Miguel de lo que pide la propuesta (secciones 3.11 y 3.12, D9) y la revisión de Lucía. Según AGENTS §2.6 el QA de integración con Testcontainers es de Lucía; estas pruebas no lo sustituyen. **Quedan para el QA dirigido de Lucía** y no se incluyen aquí: agendar frente a baja en sus tres órdenes (plan B03 §4.1), el ámbito retirado sin cita confirmada con sus pausas forzadas, las zonas horarias, las páginas y el navegador.
 
@@ -28,13 +28,13 @@
 | Estado | Comprobación | Resultado |
 | --- | --- | --- |
 | ✅ | Compilación Release de la solución, advertencias como errores | 0 advertencias y 0 errores. |
-| ✅ | Unitarias | {{UNITARIAS}} correctas, 0 fallidas, 0 omitidas (ronda 1: 810; antes de B03: 646). |
-| ✅ | Integración completa con dos hilos | {{INTEGRACION}} correctas, 0 fallidas, 0 omitidas, {{TIEMPO}} (ronda 1: 492; antes de B03: 465). |
-| ✅ | `CitasServidorTests` repetida cinco veces seguidas | {{CITAS}} de {{CITAS}} en cada una, con las dos rondas de diez reservas simultáneas incluidas. |
-| ✅ | `dotnet ef migrations has-pending-model-changes` | «No changes have been made to the model since the last migration.» Con la cadena ficticia que usa la CI. |
-| ✅ | Comprobaciones estáticas de la CI que se pueden correr en local | `revisar-fijaciones.sh` y `revisar-archivos-sensibles.sh` sin hallazgos. |
+| ✅ | Unitarias | 808 correctas, 0 fallidas, 0 omitidas (ronda 1: 810; antes de B03: 646). |
+| ✅ | Integración completa con dos hilos | 511 correctas, 0 fallidas, 0 omitidas, 4 min 15 s (ronda 1: 492; antes de B03: 465). |
+| ✅ | `CitasServidorTests` repetida cinco veces seguidas | 26 de 26 en cada una, con las dos rondas de diez reservas simultáneas incluidas. |
+| ✅ | `dotnet ef migrations has-pending-model-changes` | «No changes have been made to the model since the last migration.» Con una cadena de conexión ficticia. |
+| ✅ | Fijaciones y archivos sensibles del repositorio | `revisar-fijaciones.sh` y `revisar-archivos-sensibles.sh` sin hallazgos. |
 | ✅ | Comprobaciones de que las pruebas no son vacías | Con una mutación a la vez, falló lo esperado y se restauró el código (sección 6). |
-| ⏳ | SHA y CI de esta ronda | Se registran aquí después de enviar la corrección al PR #18 y de que termine su CI. La ronda 1 es `fe6b79a` con la CI 42688775887. |
+| ⏳ | SHA de esta ronda | Se registra aquí después de enviar la corrección al PR #18. La ronda 1 es `fe6b79a`. |
 | ⏳ | QA de Lucía, páginas de Dulce y navegador | Pendientes. Lucía revisa el SQL de la migración antes de aprobar. |
 
 ```powershell
@@ -52,9 +52,10 @@ Archivo: `src/Infrastructure/Migraciones/20261110025757_BloqueoDeAgendaEnCitaAct
 
 **Por qué.** `EX_Cita_SinCruceActivo` es una restricción de exclusión: cada alta inserta su fila y después comprueba si choca. Con dos altas conflictivas que llegan a la vez, cada una encuentra la fila aún sin confirmar de la otra y espera su transacción; PostgreSQL aborta una por interbloqueo (`40P01`) en lugar de rechazarla con el cruce (`23P01`). Con el bloqueo, la segunda espera a que la primera confirme o se revierta y la restricción compara contra filas ya confirmadas.
 
-**Subida (SQL).**
+**Subida: script que genera EF** (`dotnet ef migrations script 20261028032404_DatosDePacienteYTutor 20261110025757_BloqueoDeAgendaEnCitaActiva`), con su transacción y el registro en el historial de migraciones.
 
 ```sql
+START TRANSACTION;
 CREATE FUNCTION "FnCitaSerializaCruceActivo"() RETURNS trigger
 LANGUAGE plpgsql AS $$
 BEGIN
@@ -74,21 +75,25 @@ FOR EACH ROW WHEN (
     AND (NEW."Inicio", NEW."Fin", NEW."Estado", NEW."Condicion")
         IS DISTINCT FROM (OLD."Inicio", OLD."Fin", OLD."Estado", OLD."Condicion"))
 EXECUTE FUNCTION "FnCitaSerializaCruceActivo"();
+
+INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+VALUES ('20261110025757_BloqueoDeAgendaEnCitaActiva', '10.0.12');
+
+COMMIT;
 ```
 
-**Bajada (SQL).**
+**Bajada: script que genera EF** (`dotnet ef migrations script 20261110025757_BloqueoDeAgendaEnCitaActiva 20261028032404_DatosDePacienteYTutor`).
 
 ```sql
+START TRANSACTION;
 DROP TRIGGER IF EXISTS "TR_Cita_00SerializaCambioActivo" ON "Cita";
 DROP TRIGGER IF EXISTS "TR_Cita_00SerializaAltaActiva" ON "Cita";
 DROP FUNCTION IF EXISTS "FnCitaSerializaCruceActivo"();
-```
 
-Para revisar el script completo que generaría EF, con la inserción o el borrado en el historial de migraciones:
+DELETE FROM "__EFMigrationsHistory"
+WHERE "MigrationId" = '20261110025757_BloqueoDeAgendaEnCitaActiva';
 
-```powershell
-dotnet ef migrations script 20261028032404_DatosDePacienteYTutor 20261110025757_BloqueoDeAgendaEnCitaActiva --project src/Infrastructure --startup-project src/Web
-dotnet ef migrations script 20261110025757_BloqueoDeAgendaEnCitaActiva 20261028032404_DatosDePacienteYTutor --project src/Infrastructure --startup-project src/Web
+COMMIT;
 ```
 
 **Cómo cumple lo pedido.**
@@ -152,6 +157,19 @@ Ninguna otra comprobación se redujo.
 ## 6. Comprobaciones de que las pruebas no son vacías
 
 Una mutación a la vez, con compilación Release, y restauración del archivo original después de cada una.
+
+**Ronda 2 (esta corrección):**
+
+| Mutación | Pruebas que fallaron |
+| --- | --- |
+| El traductor vuelve a convertir el `40P01` en cruce (el tratamiento de la ronda 1) | `Agendar_SiLaAuditoriaFallaConInterbloqueo_SubeComoErrorGeneralSinRelecturaNiCambios`: la regresión que pidió Lucía. |
+| La función del disparador no toma el bloqueo (`PERFORM 1`) | Cuatro casos de `UnCambioDeCita_…`, `UnaTransaccionRevertida_LiberaElBloqueoYLaSiguienteAltaSeConfirma` y `Agendar_DiezReservasSimultaneasPorElMismoHorario…`. La corrida llegó a su límite de 330 s sin terminar (alguna prueba quedó esperando), así que no hay recuento total; lo que falló basta para detectar la mutación. |
+| Los disparadores se llaman `TR_Cita_ZZ…` y se ejecutarían después del control del paciente | Las 2 de 2: `ElBloqueoSeTomaAntesDelBloqueoCompartidoDelPaciente` y `LosDisparadoresDeAntesSeEjecutanEnEsteOrden_…`. |
+| El disparador del alta pierde su cláusula `WHEN` (tomaría el bloqueo aunque la cita no quede agendada y vigente) | Las 3 de 3 de `UnaAltaQueNoQuedaAgendadaYVigente_NoTomaElBloqueo`. |
+| El disparador de cambios usa `IS NOT DISTINCT FROM` (condición invertida) | 5 de los 9 casos de `UnCambioDeCita_TomaElBloqueo…`. |
+| `Down` no elimina el disparador de cambios | `LaMigracion_SubeBajaYVuelveASubir_SinTocarLaRestriccionNiLosControlesDelPaciente`: PostgreSQL no deja eliminar la función porque aún depende de ella. |
+
+Una primera corrida de estas mutaciones se interrumpió y sus resultados se perdieron; se repitió completa, una a la vez, con límite de tiempo por corrida y comprobando al final que cada archivo quedó restaurado.
 
 **Ronda 1, siguen vigentes** (el código que prueban no cambió):
 

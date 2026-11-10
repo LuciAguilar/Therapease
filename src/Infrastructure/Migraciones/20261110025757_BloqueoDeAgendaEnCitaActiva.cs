@@ -30,7 +30,7 @@ namespace TherapEase.Infrastructure.Migraciones
                 CREATE FUNCTION "FnCitaSerializaCruceActivo"() RETURNS trigger
                 LANGUAGE plpgsql AS $$
                 BEGIN
-                    PERFORM 1;
+                    PERFORM pg_advisory_xact_lock(7301);
                     RETURN NEW;
                 END $$;
                 """);
