@@ -23,7 +23,7 @@ public class IndexModel(IServicioCuentaPropia cuenta) : PageModel
             return Challenge();
         }
 
-        Nombre = respuesta.Datos.Datos.NombreCompleto;
+        Nombre = respuesta.Datos.Datos.NombreUsuario;
         return Page();
     }
 }

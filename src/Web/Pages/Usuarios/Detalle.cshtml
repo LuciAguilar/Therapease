@@ -38,7 +38,7 @@ else if (Model.Ficha is { } ficha)
                 <option value="@NombresDeRol.Usuaria" selected="@(ficha.Datos.Rol == NombresDeRol.Usuaria)">Usuaria</option>
                 <option value="@NombresDeRol.Superusuario" selected="@(ficha.Datos.Rol == NombresDeRol.Superusuario)">Superusuario</option>
             </select>
-            <label><input type="checkbox" name="confirmar" value="true" required /> Confirmo el cambio de rol y el cierre de sesiones de esta cuenta.</label>
+            <label><input type="checkbox" name="confirmar" value="true" required /> Confirmo el cambio de rol y el cierre de sesiones de esta cuenta, incluida mi sesión si es mi propia cuenta.</label>
             <button class="accion" type="submit">Cambiar rol</button>
         </form>
         @if (ficha.Datos.Activo)
@@ -51,7 +51,7 @@ else if (Model.Ficha is { } ficha)
             </form>
             <form method="post" asp-page-handler="Desactivar" asp-route-id="@ficha.Datos.IdUsuario" class="tarjeta formulario-operativo">
                 <h2>Desactivar cuenta</h2>
-                <label><input type="checkbox" name="confirmar" value="true" required /> Confirmo la desactivación y el cierre de sesiones de esta cuenta.</label>
+                <label><input type="checkbox" name="confirmar" value="true" required /> Confirmo la desactivación y el cierre de sesiones de esta cuenta, incluida mi sesión si es mi propia cuenta.</label>
                 <button class="accion" type="submit">Desactivar cuenta</button>
             </form>
         }

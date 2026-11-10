@@ -12,7 +12,7 @@ public class DenegadoModel : PageModel
     public IActionResult OnGet()
     {
         if (User.Identity?.IsAuthenticated == true &&
-            User.FindFirst(Reclamaciones.DebeCambiarContrasena)?.Value == "true")
+            User.FindFirst(Reclamaciones.DebeCambiarContrasena)?.Value != "false")
         {
             return RedirectToPage("/Cuenta/Contrasena");
         }

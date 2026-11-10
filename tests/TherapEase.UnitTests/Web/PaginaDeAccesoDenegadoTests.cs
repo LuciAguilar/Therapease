@@ -9,10 +9,13 @@ namespace TherapEase.UnitTests.Web;
 
 public class PaginaDeAccesoDenegadoTests
 {
-    [Fact]
-    public void SesionConTemporalRedirigeAlCambioDeContrasena()
+    [Theory]
+    [InlineData("true")]
+    [InlineData(null)]
+    [InlineData("otro")]
+    public void SesionConTemporalRedirigeAlCambioDeContrasena(string? temporal)
     {
-        var pagina = CrearPagina("Cookies", "true");
+        var pagina = CrearPagina("Cookies", temporal);
 
         var resultado = Assert.IsType<RedirectToPageResult>(pagina.OnGet());
 
@@ -21,7 +24,6 @@ public class PaginaDeAccesoDenegadoTests
 
     [Theory]
     [InlineData("Cookies", "false")]
-    [InlineData("Cookies", null)]
     [InlineData(null, null)]
     [InlineData(null, "true")]
     public void SinSesionAutenticadaConTemporalMuestraAccesoDenegado(string? autenticacion, string? temporal)

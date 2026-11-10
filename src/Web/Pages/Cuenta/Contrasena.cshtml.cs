@@ -48,11 +48,6 @@ public class ContrasenaModel : PageModel
             return ConError("Completa todos los campos.");
         }
 
-        if (Entrada.ContrasenaNueva.Length < 12)
-        {
-            return ConError("La contraseña nueva debe tener al menos 12 caracteres.");
-        }
-
         if (Entrada.ContrasenaNueva != Entrada.Confirmacion)
         {
             return ConError("La confirmación no coincide con la contraseña nueva.");
@@ -68,7 +63,7 @@ public class ContrasenaModel : PageModel
             return ConError(respuesta.Mensaje);
         }
 
-        MensajeExito = "Se cambió tu contraseña.";
+        MensajeExito = respuesta.Mensaje;
         return EsTemporal ? RedirectToPage("/Index") : RedirectToPage();
     }
 

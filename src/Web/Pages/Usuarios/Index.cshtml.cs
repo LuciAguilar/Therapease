@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TherapEase.Application.Identidad.Interfaces.Servicios;
 using TherapEase.Application.Identidad.Modelos;
+using TherapEase.Application.Identidad.Constantes;
 using TherapEase.Web.Seguridad;
 
 namespace TherapEase.Web.Pages.Usuarios;
@@ -11,7 +12,7 @@ namespace TherapEase.Web.Pages.Usuarios;
 [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
 public class IndexModel(IServicioUsuarios usuarios) : PageModel
 {
-    public const int MaximoBusqueda = 100;
+    public string? Error { get; private set; }
 
     public string? Busqueda { get; private set; }
 
@@ -19,11 +20,17 @@ public class IndexModel(IServicioUsuarios usuarios) : PageModel
 
     public async Task<IActionResult> OnGetAsync(string? busqueda)
     {
-        Busqueda = busqueda?.Length > MaximoBusqueda ? busqueda[..MaximoBusqueda] : busqueda;
+        Busqueda = busqueda;
         var respuesta = await usuarios.ListarUsuariosAsync(Busqueda, HttpContext.RequestAborted);
         if (!respuesta.Exito || respuesta.Datos is null)
         {
-            return Forbid();
+            if (respuesta.Mensaje == MensajesDeIdentidad.SinPermiso)
+            {
+                return Forbid();
+            }
+
+            Error = respuesta.Mensaje;
+            return Page();
         }
 
         Cuentas = respuesta.Datos;

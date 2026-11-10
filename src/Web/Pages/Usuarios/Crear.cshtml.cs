@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TherapEase.Application.Identidad.Interfaces.Servicios;
 using TherapEase.Application.Identidad.Modelos;
+using TherapEase.Application.Identidad.Constantes;
 using TherapEase.Domain.Identidad.Constantes;
 using TherapEase.Web.Seguridad;
 
@@ -43,14 +44,14 @@ public class CrearModel(IServicioUsuarios usuarios) : PageModel
     public class DatosDeAlta
     {
         [Required(ErrorMessage = "Escribe el nombre de usuario.")]
-        [StringLength(50, ErrorMessage = "Usa hasta 50 caracteres.")]
+        [StringLength(LimitesDeIdentidad.LongitudMaximaNombreUsuario, ErrorMessage = "Usa hasta 50 caracteres.")]
         public string NombreUsuario { get; set; } = "";
 
         [Required(ErrorMessage = "Escribe el nombre completo.")]
-        [StringLength(150, MinimumLength = 2, ErrorMessage = "Usa de 2 a 150 caracteres.")]
+        [StringLength(LimitesDeCuenta.LongitudMaximaNombreCompleto, MinimumLength = LimitesDeCuenta.LongitudMinimaNombreCompleto, ErrorMessage = "Usa de 2 a 150 caracteres.")]
         public string NombreCompleto { get; set; } = "";
 
-        [StringLength(254, ErrorMessage = "Usa hasta 254 caracteres.")]
+        [StringLength(LimitesDeCuenta.LongitudMaximaCorreo, ErrorMessage = "Usa hasta 254 caracteres.")]
         public string? Correo { get; set; }
 
         public string Rol { get; set; } = NombresDeRol.Usuaria;

@@ -1,4 +1,5 @@
 @page
+@using TherapEase.Application.Identidad.Constantes
 @model IndexModel
 @{
     Layout = "_LayoutOperativo";
@@ -10,16 +11,20 @@
 </header>
 <form method="get" class="busqueda">
     <label for="busqueda">Buscar usuarios</label>
-    <input id="busqueda" name="busqueda" type="search" maxlength="@IndexModel.MaximoBusqueda" value="@Model.Busqueda" />
+    <input id="busqueda" name="busqueda" type="search" maxlength="@LimitesDeIdentidad.LongitudMaximaBusquedaDeUsuarios" value="@Model.Busqueda" />
     <button class="accion" type="submit">Buscar</button>
 </form>
-@if (Model.Cuentas.Count == 0)
+@if (Model.Error is not null)
+{
+    <p class="error-formulario" role="alert">@Model.Error</p>
+}
+else if (Model.Cuentas.Count == 0)
 {
     <p class="tarjeta">No se encontraron cuentas.</p>
 }
-@if (Model.Cuentas.Count == 100)
+@if (Model.Cuentas.Count == LimitesDeIdentidad.MaximoDeUsuariosListados)
 {
-    <p>Se muestran hasta 100 cuentas. Afina la búsqueda para encontrar una en particular.</p>
+    <p>Se muestran hasta @LimitesDeIdentidad.MaximoDeUsuariosListados cuentas. Afina la búsqueda para encontrar una en particular.</p>
 }
 <ul class="lista-tarjetas cuentas">
 @foreach (var cuenta in Model.Cuentas)
@@ -27,7 +32,13 @@
     <li class="tarjeta fila">
         <div class="identidad">
             <span class="avatar" aria-hidden="true">@(cuenta.NombreUsuario.Length > 0 ? cuenta.NombreUsuario[..1].ToUpperInvariant() : "•")</span>
-            <div><strong>@cuenta.NombreCompleto</strong><div class="secundario">@cuenta.NombreUsuario</div></div>
+            <div>
+                <strong>@(string.IsNullOrWhiteSpace(cuenta.NombreCompleto) ? cuenta.NombreUsuario : cuenta.NombreCompleto)</strong>
+                @if (!string.IsNullOrWhiteSpace(cuenta.NombreCompleto))
+                {
+                    <div class="secundario">@cuenta.NombreUsuario</div>
+                }
+            </div>
         </div>
         <div class="acciones">
             <span class="etiqueta rol">@cuenta.Rol</span>
