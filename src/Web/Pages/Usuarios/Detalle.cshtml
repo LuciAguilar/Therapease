@@ -1,0 +1,59 @@
+@page "{id:guid}"
+@using TherapEase.Domain.Identidad.Constantes
+@model DetalleModel
+@{
+    Layout = "_LayoutOperativo";
+    ViewData["Title"] = "Cuenta de usuario";
+}
+<a asp-page="Index">Volver a usuarios</a>
+<h1>Cuenta de usuario</h1>
+@if (Model.Error is not null)
+{
+    <p class="error-formulario" role="alert">@Model.Error</p>
+}
+@if (Model.Confirmacion is not null)
+{
+    <p class="aviso" role="status">@Model.Confirmacion</p>
+}
+@if (Model.Entrega is not null)
+{
+    <partial name="_EntregaTemporal" model="Model.Entrega" />
+}
+else if (Model.Ficha is { } ficha)
+{
+    <p><strong>@ficha.Datos.NombreUsuario</strong> · @ficha.Datos.Rol · @(ficha.Datos.Activo ? "Activa" : "Desactivada")</p>
+    <div class="lista-tarjetas">
+        <form method="post" asp-page-handler="Datos" asp-route-id="@ficha.Datos.IdUsuario" class="tarjeta formulario-operativo">
+            <h2>Datos de la cuenta</h2>
+            <label for="nombreCompleto">Nombre completo</label>
+            <input id="nombreCompleto" name="nombreCompleto" value="@ficha.Datos.NombreCompleto" required minlength="2" maxlength="150" />
+            <label for="correo">Correo (opcional)</label>
+            <input id="correo" name="correo" value="@ficha.Correo" type="email" maxlength="254" />
+            <button class="accion primaria" type="submit">Guardar datos</button>
+        </form>
+        <form method="post" asp-page-handler="Rol" asp-route-id="@ficha.Datos.IdUsuario" class="tarjeta formulario-operativo">
+            <h2>Cambiar rol</h2>
+            <label for="rol">Nuevo rol</label>
+            <select id="rol" name="rol">
+                <option value="@NombresDeRol.Usuaria" selected="@(ficha.Datos.Rol == NombresDeRol.Usuaria)">Usuaria</option>
+                <option value="@NombresDeRol.Superusuario" selected="@(ficha.Datos.Rol == NombresDeRol.Superusuario)">Superusuario</option>
+            </select>
+            <label><input type="checkbox" name="confirmar" value="true" required /> Confirmo el cambio de rol y el cierre de sesiones de esta cuenta, incluida mi sesión si es mi propia cuenta.</label>
+            <button class="accion" type="submit">Cambiar rol</button>
+        </form>
+        @if (ficha.Datos.Activo)
+        {
+            <form method="post" asp-page-handler="Restablecer" asp-route-id="@ficha.Datos.IdUsuario" class="tarjeta formulario-operativo">
+                <h2>Restablecer contraseña</h2>
+                <p>Verifica la identidad en persona o llamando a un número previamente conocido. Usa un canal distinto para entregar la contraseña temporal.</p>
+                <label><input type="checkbox" name="confirmar" value="true" required /> Verifiqué la identidad y confirmo el restablecimiento.</label>
+                <button class="accion" type="submit">Generar temporal</button>
+            </form>
+            <form method="post" asp-page-handler="Desactivar" asp-route-id="@ficha.Datos.IdUsuario" class="tarjeta formulario-operativo">
+                <h2>Desactivar cuenta</h2>
+                <label><input type="checkbox" name="confirmar" value="true" required /> Confirmo la desactivación y el cierre de sesiones de esta cuenta, incluida mi sesión si es mi propia cuenta.</label>
+                <button class="accion" type="submit">Desactivar cuenta</button>
+            </form>
+        }
+    </div>
+}
