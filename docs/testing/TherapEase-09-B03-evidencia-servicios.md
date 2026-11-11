@@ -8,7 +8,7 @@
 | --- | --- | --- |
 | 1 | `fe6b79a`: servidor de agenda y citas, con un tratamiento especial del `40P01` en el alta. | Lucía revisó ese SHA: 810 unitarias y 27 integraciones de citas. Su QA dirigido dio **4/5**: un `40P01` provocado solo en `EventoAuditoria` respondía «horario ocupado» con cero citas y eventos; debía subir como error 500 sin relectura, como estaba aprobado. Aprobó la alternativa del bloqueo de asesoría en un disparador de `Cita`. |
 | 2 | `05a7936`: migración con el disparador (§3), retiro del `catch` y de la traducción del `40P01` (vuelve a ser error general), pruebas nuevas y documentos. | Lucía revisó ese SHA: ya aparecen el disparador y la retirada del tratamiento especial del `40P01`. Pidió incluir en este mismo PR la mejora de arranque. |
-| 3 | Esta corrección: si falta `ConnectionStrings:TherapEase`, la aplicación y los comandos del operador se detienen con un mensaje fijo, sin mostrar la cadena (§4.1). | Resultados de la sección 2. |
+| 3 | Esta corrección: si falta `ConnectionStrings:TherapEase`, la aplicación y los comandos del operador se detienen con un mensaje fijo, sin mostrar la cadena (§4.1). | `479ab5b`. Resultados de la sección 2. |
 
 ## 1. Qué se implementó y con qué se comprueba
 
@@ -37,7 +37,7 @@
 | ✅ | `dotnet ef migrations has-pending-model-changes` | «No changes have been made to the model since the last migration.» Con una cadena de conexión ficticia. |
 | ✅ | Fijaciones y archivos sensibles del repositorio | `revisar-fijaciones.sh` y `revisar-archivos-sensibles.sh` sin hallazgos. |
 | ✅ | Comprobaciones de que las pruebas no son vacías | Con una mutación a la vez, falló lo esperado y se restauró el código (sección 6). |
-| ⏳ | SHA de esta ronda | Se registra aquí después de enviar la corrección al PR #18. La ronda 1 es `fe6b79a` y la 2, `05a7936`. |
+| ✅ | SHA de esta ronda | `479ab5b` (`479ab5ba41bc617c510b799661874808981e6f0a`): arranque sin cadena de conexión, ya publicado en el PR #18. Rondas anteriores: `fe6b79a` (1) y `05a7936` (2). Es el código que se verificó y sobre el que Lucía repite su QA; el commit que registra este número solo cambia documentación. |
 | ⏳ | QA de Lucía, páginas de Dulce y navegador | Pendientes. Lucía revisa el SQL de la migración antes de aprobar. |
 
 ```powershell
