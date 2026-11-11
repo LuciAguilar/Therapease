@@ -1,13 +1,14 @@
 # TherapEase — B03 · Evidencia del servidor de agenda y citas (verificación de Miguel)
 
-**Actualizada el 09-nov-2026 · [PR #18](https://github.com/LuciAguilar/Therapease/pull/18), rama `b03/agenda-y-citas`, desde main `6dd13d9`.**
+**Actualizada el 11-nov-2026 · [PR #18](https://github.com/LuciAguilar/Therapease/pull/18), rama `b03/agenda-y-citas`, desde main `6dd13d9`.**
 
 ## 0. Rondas de revisión
 
 | Ronda | Contenido | Resultado |
 | --- | --- | --- |
 | 1 | `fe6b79a`: servidor de agenda y citas, con un tratamiento especial del `40P01` en el alta. | Lucía revisó ese SHA: 810 unitarias y 27 integraciones de citas. Su QA dirigido dio **4/5**: un `40P01` provocado solo en `EventoAuditoria` respondía «horario ocupado» con cero citas y eventos; debía subir como error 500 sin relectura, como estaba aprobado. Aprobó la alternativa del bloqueo de asesoría en un disparador de `Cita`. |
-| 2 | Esta corrección: migración con el disparador (§3), retiro del `catch` y de la traducción del `40P01` (vuelve a ser error general), pruebas nuevas y documentos. | Resultados de la sección 2. |
+| 2 | `05a7936`: migración con el disparador (§3), retiro del `catch` y de la traducción del `40P01` (vuelve a ser error general), pruebas nuevas y documentos. | Lucía revisó ese SHA: ya aparecen el disparador y la retirada del tratamiento especial del `40P01`. Pidió incluir en este mismo PR la mejora de arranque. |
+| 3 | Esta corrección: si falta `ConnectionStrings:TherapEase`, la aplicación y los comandos del operador se detienen con un mensaje fijo, sin mostrar la cadena (§4.1). | Resultados de la sección 2. |
 
 ## 1. Qué se implementó y con qué se comprueba
 
@@ -20,6 +21,8 @@
 | ✅ | Contrato de Pacientes para Citas: permiso, condición y ámbitos, baja sin ámbitos, nombres solo de vigentes, una sola consulta | `ConsultaDePacientesParaCitasTests` | 12 |
 | ✅ | Guardado y evento en una transacción, `PK_Cita`, reenvío con la gemela confirmada antes del guardado, entre la primera lectura y el guardado y antes del rechazo de ámbito (sin restaurarlo), pausas antes de guardar, reservas simultáneas (dos y diez), fallo de auditoría y alcance posterior, **`40P01` solo en `EventoAuditoria` como error general**, una sola consulta por lectura, agenda con PostgreSQL real y detalle | `CitasServidorTests` (PostgreSQL desechable) | 26 |
 | ✅ | Disparador del bloqueo: cuándo se toma y cuándo no (altas y cambios), orden antes del `FOR SHARE` del paciente, serialización con cruce real, liberación al revertir, migración que sube, baja y vuelve a subir, y el esquema que la aplicación no puede cambiar | `BloqueoDeAgendaEnCitaActivaTests` (PostgreSQL desechable) | 20 |
+| ✅ | Arranque sin cadena de conexión: `AgregarPersistencia` se detiene con el mensaje fijo si la cadena es nula, vacía o solo espacios, antes de registrar nada; el mensaje nombra la clave y la variable y no lleva ninguna cadena ni secreto; con cadena registra la unidad de trabajo y los repositorios; una configuración posterior del contexto sigue sustituyendo la conexión | `InyeccionDeDependenciasTests` | 11 |
+| ✅ | La aplicación y los comandos `--crear-superusuario` y `--restablecer-superusuario`, como procesos sin la cadena: salen con código 1, solo el mensaje fijo por el error estándar, sin traza, sin contraseña temporal y sin ningún valor de configuración; el error de uso (código 2) y la sonda de salud no cambian | `ArranqueSinCadenaDeConexionTests` (procesos; no necesitan PostgreSQL) | 10 |
 
 `CitasServidorTests` y `BloqueoDeAgendaEnCitaActivaTests` son verificaciones de Miguel de lo que pide la propuesta (secciones 3.11 y 3.12, D9) y la revisión de Lucía. Según AGENTS §2.6 el QA de integración con Testcontainers es de Lucía; estas pruebas no lo sustituyen. **Quedan para el QA dirigido de Lucía** y no se incluyen aquí: agendar frente a baja en sus tres órdenes (plan B03 §4.1), el ámbito retirado sin cita confirmada con sus pausas forzadas, las zonas horarias, las páginas y el navegador.
 
@@ -28,13 +31,13 @@
 | Estado | Comprobación | Resultado |
 | --- | --- | --- |
 | ✅ | Compilación Release de la solución, advertencias como errores | 0 advertencias y 0 errores. |
-| ✅ | Unitarias | 808 correctas, 0 fallidas, 0 omitidas (ronda 1: 810; antes de B03: 646). |
-| ✅ | Integración completa con dos hilos | 511 correctas, 0 fallidas, 0 omitidas, 4 min 15 s (ronda 1: 492; antes de B03: 465). |
-| ✅ | `CitasServidorTests` repetida cinco veces seguidas | 26 de 26 en cada una, con las dos rondas de diez reservas simultáneas incluidas. |
+| ✅ | Unitarias | 819 correctas, 0 fallidas, 0 omitidas (ronda 2: 808; ronda 1: 810; antes de B03: 646). |
+| ✅ | Integración completa con dos hilos | 521 correctas, 0 fallidas, 0 omitidas, 4 min 1 s (ronda 2: 511; ronda 1: 492; antes de B03: 465). Incluye todas las pruebas que sustituyen la conexión. |
+| ✅ | `CitasServidorTests` repetida cinco veces seguidas (ronda 2) | 26 de 26 en cada una, con las dos rondas de diez reservas simultáneas incluidas. |
 | ✅ | `dotnet ef migrations has-pending-model-changes` | «No changes have been made to the model since the last migration.» Con una cadena de conexión ficticia. |
 | ✅ | Fijaciones y archivos sensibles del repositorio | `revisar-fijaciones.sh` y `revisar-archivos-sensibles.sh` sin hallazgos. |
 | ✅ | Comprobaciones de que las pruebas no son vacías | Con una mutación a la vez, falló lo esperado y se restauró el código (sección 6). |
-| ⏳ | SHA de esta ronda | Se registra aquí después de enviar la corrección al PR #18. La ronda 1 es `fe6b79a`. |
+| ⏳ | SHA de esta ronda | Se registra aquí después de enviar la corrección al PR #18. La ronda 1 es `fe6b79a` y la 2, `05a7936`. |
 | ⏳ | QA de Lucía, páginas de Dulce y navegador | Pendientes. Lucía revisa el SQL de la migración antes de aprobar. |
 
 ```powershell
@@ -142,6 +145,28 @@ COMMIT;
 
 Lo ensayado con simultaneidad es **dos y diez solicitudes**; no se afirma nada sobre otras cantidades.
 
+### 4.1. Arranque sin cadena de conexión (ronda 3)
+
+**Qué pidió Lucía.** Si falta `ConnectionStrings:TherapEase`, la aplicación y `--crear-superusuario` deben detenerse con un mensaje claro y fijo, sin mostrar la cadena. Centralizarlo en `AgregarPersistencia`, con su unitaria y conservando las pruebas que sustituyen la conexión.
+
+**Qué se hizo.**
+
+- `InyeccionDeDependencias.AgregarPersistencia` lanza `InvalidOperationException` con el mensaje fijo `MensajeSinCadenaDeConexion` si la cadena es nula, vacía o solo espacios, **antes de registrar nada**. Es el único lugar donde se decide.
+- El mensaje nombra la clave `ConnectionStrings:TherapEase` y la variable `ConnectionStrings__TherapEase`; nunca una cadena de conexión ni un valor de configuración.
+- `Program.cs` y `ComandosDeIdentidad` solo presentan el error: escriben ese mensaje por el error estándar y salen con código 1, sin traza. `--restablecer-superusuario` recibe el mismo trato que `--crear-superusuario`, porque ambos pasan por el mismo arranque.
+- No cambian el error de uso del comando (código 2, antes de mirar la conexión), la sonda de salud del contenedor (corre antes de configurar la persistencia), `dotnet ef` (usa la conexión de migración) ni las pruebas que sustituyen la conexión: ninguna prueba existente se modificó.
+- Efecto para quien desarrolla: sin la variable `ConnectionStrings__TherapEase` la aplicación ya no arranca. El README lo indica.
+
+| Qué se comprueba | Prueba |
+| --- | --- |
+| Cadena nula, vacía o de espacios: mensaje fijo y nada registrado; el mensaje no lleva `Host=`, `Username=`, `Password=`, `Database=` ni `Port=` | `AgregarPersistencia_SinCadenaDeConexion_…`, `…NoRegistraNada` y `ElMensajeFijo_…` |
+| Con cadena se registran la unidad de trabajo y los tres repositorios, y el contexto usa esa conexión | `AgregarPersistencia_ConCadena_…` |
+| Una configuración posterior del contexto (como la de las pruebas de integración) sigue sustituyendo la conexión | `UnaConfiguracionPosteriorDelContexto_SustituyeLaConexion` |
+| La aplicación sin cadena (variable ausente, vacía o de espacios) sale con código 1, solo el mensaje fijo, sin escuchar | `LaAplicacion_SinCadenaDeConexion_…` |
+| Los dos comandos sin cadena: código 1, solo el mensaje fijo, sin contraseña temporal ni salida estándar | `ElComandoDelOperador_SinCadenaDeConexion_…` |
+| Ninguna salida muestra un secreto de otra variable de configuración, ni «Password», ni traza | `ComprobarQueSoloSeMuestraElMensajeFijo` en esas pruebas |
+| El error de uso sigue siendo código 2 y la sonda de salud no exige la cadena | `ElComandoSinNombreDeUsuario_…` y `LaSondaDeSalud_…` |
+
 ## 5. Pruebas existentes que se tocaron
 
 | Prueba | Cambio | Por qué |
@@ -152,13 +177,23 @@ Lo ensayado con simultaneidad es **dos y diez solicitudes**; no se afirma nada s
 | `RepositorioCitasFalso` y `RepositorioPacientesFalso` | Implementan los métodos nuevos de los puertos, con contadores y ganchos para forzar momentos | Los puertos ampliaron su contrato. |
 | `ServicioCitasTests` y `CitasServidorTests` | Se retiran las pruebas del tratamiento especial del `40P01` en el alta (tres unitarias y tres de integración); se agregan la regresión de la auditoría, la del fallo transitorio y la pausa | El tratamiento ya no existe. |
 
-Ninguna otra comprobación se redujo.
+Ninguna otra comprobación se redujo. En la ronda 3 no se modificó ninguna prueba existente: las que sustituyen la conexión con otra configuración del contexto se ejecutaron completas en la suite de integración.
 
 ## 6. Comprobaciones de que las pruebas no son vacías
 
 Una mutación a la vez, con compilación Release, y restauración del archivo original después de cada una.
 
-**Ronda 2 (esta corrección):**
+**Ronda 3 (arranque sin cadena de conexión):**
+
+| Mutación | Pruebas que fallaron |
+| --- | --- |
+| `AgregarPersistencia` deja de validar la cadena | 7 de las 11 unitarias y 8 de las 10 de proceso (la aplicación llega a escuchar; esa corrida tardó 2 min 8 s). |
+| La aplicación no captura el error | 3 de las 10 de proceso: las de la aplicación sin cadena. |
+| El comando no captura el error | 5 de las 10 de proceso: las de los dos comandos. |
+| La aplicación imprime la excepción completa en lugar del mensaje fijo | 3 de las 10 de proceso: sin traza ni «Unhandled exception». |
+| El mensaje fijo llevaría una cadena de conexión de ejemplo | 1 de las 11 unitarias y 8 de las 10 de proceso. |
+
+**Ronda 2:**
 
 | Mutación | Pruebas que fallaron |
 | --- | --- |

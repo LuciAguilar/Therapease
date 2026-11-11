@@ -50,7 +50,7 @@ TherapEase es una aplicación web para la gestión administrativa de un consulto
 
 SDK de `global.json`; Visual Studio 18 o superior o VS Code/terminal. Desde la raíz, en PowerShell; sustituir `<clave>` por contraseñas locales y mantener las variables en la misma terminal. La aplicación no carga `.env`.
 
-Arranque predeterminado: `dotnet run --project src/Web`. Imagen: `docker build -t therapease:local .` construye; `docker run --rm -p 8080:8080 therapease:local` ejecuta.
+Arranque predeterminado: `dotnet run --project src/Web`. Sin `ConnectionStrings__TherapEase` la aplicación y los comandos `--crear-superusuario` y `--restablecer-superusuario` se detienen con un mensaje fijo, sin mostrar ninguna cadena. Imagen: `docker build -t therapease:local .` construye; `docker run --rm -p 8080:8080 therapease:local` ejecuta.
 ```powershell
 dotnet build TherapEase.sln   # compilar
 dotnet test TherapEase.sln    # probar; Docker debe estar disponible
