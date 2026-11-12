@@ -3,10 +3,7 @@
 @inject IAuthorizationService Autorizacion
 @{
     var administra = (await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.AdministrarUsuarios)).Succeeded;
-    var consultaPacientes = (await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.ConsultarPacientes)).Succeeded;
     var usuarios = Context.Request.Path.StartsWithSegments("/Usuarios");
-    var pacientes = Context.Request.Path.StartsWithSegments("/Pacientes");
-    var inicio = Context.Request.Path == "/" || Context.Request.Path == "/Index";
 }
 <!DOCTYPE html>
 <html lang="es">
@@ -23,11 +20,8 @@
         <a class="marca" asp-page="/Index"><img class="marca__imagen" src="~/img/therapease-logo.png" asp-append-version="true" width="1100" height="260" alt="TherapEase" /></a>
         <nav aria-label="Espacio de trabajo">
             <p>Espacio de trabajo</p>
-            <a asp-page="/Index" aria-current="@(inicio ? "page" : null)">Inicio</a>
-            @if (consultaPacientes)
-            {
-                <a asp-page="/Pacientes/Index" aria-current="@(pacientes ? "page" : null)">Pacientes</a>
-            }
+            <a asp-page="/Index" aria-current="@(usuarios ? null : "page")">Inicio</a>
+            <span aria-disabled="true">Pacientes</span>
             <span aria-disabled="true">Agenda</span>
             @if (administra)
             {

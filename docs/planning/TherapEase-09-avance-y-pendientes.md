@@ -1,6 +1,6 @@
 # TherapEase — Etapa 09 · Avance y pendientes
 
-**Actualizado el 01-nov-2026.** B03 está abierto solo para preparar la propuesta y el QA por escrito. No autoriza programar, no acredita pruebas nuevas ni cierra B00/B01/B02/LCA/R04.
+**Actualizado el 05-nov-2026.** B03 tiene D1–D13 aprobadas por Lucía tras Claude CORREGIR y precisiones documentales aplicadas. Implementación y pruebas pendientes; esta entrega no las toca ni cierra B00/B01/B02/LCA/R04.
 
 > **El servidor de B01 y B02 ya está entregado.** Nuestro QA B02 está en el PR #12, con CI correcta, aprobación de Miguel y fusión por Lucía en `b53c5b7`. Las páginas y los PageModel siguen con Dulce.
 
@@ -11,9 +11,9 @@ El alcance de las pruebas está en las tablas de los planes [B00](TherapEase-eta
 | Bloque | Entregado | Sigue pendiente |
 | --- | --- | --- |
 | **B00 · Los cimientos y los candados** | Base del sistema, controles de datos y acceso, horas de Hermosillo, recuperación local y QA revisado de PR #4/#6. | Recorrido desde páginas, consulta final de auditoría en navegador, seguridad de las páginas y decisión expresa de cierre de B00/LCA. R04 sigue abierto. |
-| **B01 · La entrada y las cuentas** | Servidor, sesiones, permisos, contraseñas y eventos. QA revisado e integrado en #8 y #10; servidor de eventos en #9. | Páginas y sus pruebas de Dulce; después, navegador y revisión final de Lucía. No falta volver a implementar el acceso. |
+| **B01 · La entrada y las cuentas** | Servidor, sesiones, permisos, contraseñas y eventos. QA revisado e integrado en #8 y #10; servidor de eventos en #9. | Dulce entregó PR #13, abierto en 632caa7: acceso/cuentas B01. QA de Lucía ejecutado: 46/49 comprobaciones Chrome y 3 controles HTTP correctos; persiste la plantilla ausente. Claude emitió CORREGIR; QA ajustado y repetido. Reauditoría recibida y ajuste menor aplicado; Chrome repetido 46/49. Pendientes Dulce/nuevo SHA, CI/QA y Miguel antes de decidir. No entrega B02/B03. |
 | **B02 · Las fichas de pacientes** | Servidor revisado por Lucía y fusionado en [#11](https://github.com/LuciAguilar/Therapease/pull/11), main `c90b3c0`. Registrar, buscar, consultar y editar con sus controles y auditoría. | QA [#12](https://github.com/LuciAguilar/Therapease/pull/12) revisado y fusionado. Faltan confirmaciones de producto, páginas, navegador y uso con una persona ajena. |
-| **B03 · La agenda y las citas** | Plan y seguimiento revisados localmente por Codex; diseño escrito de cambios simultáneos y mensaje para Miguel preparados. | Correcciones de Claude recibidas y aplicadas; sin otra auditoría de estos textos. Lucía aprobó y se publicó el conjunto en main d2302f2; mensaje listo para que lo envíe. Producto B03 decidido el 01-nov; recibir propuesta técnica, auditarla y decidir antes de programar. Pruebas nuevas no autorizadas. |
+| **B03 · La agenda y las citas** | Propuesta de Miguel auditada CORREGIR; D1–D13 aprobadas por Lucía y precisiones documentales aplicadas. QA escrito conserva los momentos forzados del plan. | Versión ajustada local y mensaje listo para Lucía; no publicados/enviados desde herramientas. Implementación, pruebas, CI y revisión pendientes del PR de servidor; páginas con Dulce. Sin índice, mediciones o sondeos nuevos. |
 
 | Evidencia vigente de B02 | Resultado y límite |
 | --- | --- |
@@ -29,7 +29,7 @@ Los 89 están incluidos en los 465. No sumar ambas cifras ni las repeticiones co
 | Persona | Puede avanzar ya | Espera una dependencia |
 | --- | --- | --- |
 | **Miguel** | Preparar una propuesta de B03. Ya aprobó el QA de #12. Ayudar a Dulce con los contratos B01/B02 ya entregados y corregir un fallo concreto si aparece. | No hay correcciones obligatorias conocidas pendientes del servidor B02. Preparar la propuesta única de B03; todavía no programarlo. |
-| **Lucía** | Preparar el QA escrito de B03 y decidir su propuesta tras auditoría. Preparar por escrito los recorridos de navegador con los casos ya existentes; ordenar evidencia y pendientes de B00/LCA; revisar la documentación y la privacidad pendiente; continuar los pendientes de páginas y cierre del bloque. | #12 ya fusionado con Create a merge commit. Ejecutar formularios y navegador cuando haya páginas. |
+| **Lucía** | Recomendación de Codex, pendiente de decisión de Lucía: primero revisar B01/#13; después la propuesta técnica B03 cuando esté identificada. Preparar el QA escrito B03 y decidir tras auditoría. Preparar por escrito los recorridos de navegador con los casos ya existentes; ordenar evidencia y pendientes de B00/LCA; revisar la documentación y la privacidad pendiente; continuar los pendientes de páginas y cierre del bloque. | #12 ya fusionado con Create a merge commit. Ejecutar formularios y navegador cuando haya páginas. |
 | **Dulce** | Conectar B01/B02 con los servicios disponibles, escribir PageModel y sus pruebas; confirmar campos/tutor/escuela/grupo y dar su visto bueno a 08C sección 3. | No necesita esperar a que termine todo el QA para comenzar sus páginas. Lucía decide las respuestas de producto que cambien lo aprobado. |
 
 Para cerrar B00, Lucía también debe consolidar la evidencia, revisar los riesgos que sigan abiertos y decidir expresamente el cierre. Puede preparar ese registro ahora, sin dar el cierre por hecho. Quedan por comprobar desde páginas la entrega segura de contraseñas temporales, salida/sesiones, formularios protegidos, caché y cabeceras; CSS con sesión y política de recursos. La protección actual de ramas se puede reverificar y documentar, sin cambiarla.
