@@ -1,6 +1,6 @@
 # TherapEase — B01 · QA de páginas de Lucía
 
-**Preparación local del 10-nov-2026 sobre main 32e7bca, después de #13.** Sin commit ni PR nuevo. Autoría de las pruebas de esta entrega, Lucía con Codex. Claude APROBADO v1, 11-nov, reauditoría. Publicación, CI nueva y revisión humana de Miguel pendientes. B00/B01/LCA/R04 siguen abiertos.
+**Preparación local del 10-nov-2026 sobre main 32e7bca, después de #13.** Publicado el 11-nov en [PR #19](https://github.com/LuciAguilar/Therapease/pull/19), commit 656bba1, sin fusionar. Autoría de las pruebas de esta entrega, Lucía con Codex. Claude APROBADO v1, 11-nov, reauditoría. CI nueva con dos fallos de navegador; diagnóstico y revisión humana de Miguel pendientes. B00/B01/LCA/R04 siguen abiertos.
 
 ## 1. Alcance y trazabilidad
 
@@ -13,7 +13,7 @@
 | ✅ ejecutado | Historial sin temporal, una sola respuesta al POST y respuesta perdida antes/después de guardar | Casos de alta e interrupción con Route.Fetch/Abort, sin reintentos. |
 | ✅ ejecutado | Fallo del evento de entrada, reversión de alta y POST complementarios | FallosDeFormularioTests, tres pruebas HTTP procedentes del QA local auditado. |
 | ✅ ejecutado | Cabeceras y /Acceso/Denegado anónimo con 403 y no-store | CabecerasSeguridadTests. |
-| ✅ Claude / ⌛ publicación y revisión humana | Auditoría, revisión humana, CI publicada y decisión | Claude APROBADO v1, 11-nov, reauditoría. Miguel revisa las pruebas y Lucía decide. |
+| ✅ Claude y publicación / ⌛ CI y revisión humana | Auditoría, revisión humana, CI publicada y decisión | Claude APROBADO v1, 11-nov, reauditoría. Miguel revisa las pruebas y Lucía decide. |
 
 Se reutilizan los identificadores del [plan de pruebas](TherapEase-09-plan-de-pruebas.md), CU01/CU02/CU11, Q03/Q08 y los controles S aplicables. No se duplican sus tablas de casos. Las 57 comprobaciones anteriores de Node se reorganizan en 54 casos xUnit, con varias comprobaciones por caso. No sumar cifras ni presentarlas como 54 funciones nuevas.
 
@@ -60,7 +60,7 @@ La ejecución de servidor comprueba caducidad con cookies firmadas 29, 31 y 16 m
 
 ## 4. Entrega y revisión
 
-La primera pasada de adaptación tuvo 52/54 correctas; la segunda, 53/54. Los fallos correspondieron a preparar la expectativa de redirección al cambiar rol y a leer el documento durante el cambio al error de caché de Chrome. Se conservaron los resultados anteriores y se corrigieron las pruebas. La versión final dio 54/54 desde el script repetible en Chrome 157.0.8103.50. Compilación sin errores ni advertencias, 710/710 unitarias y 469/469 integraciones, incluidas 10 de cabeceras y 3 HTTP. Sin fallidas ni omitidas. Los controles locales de fijaciones y archivos sensibles pasaron. NuGet no reportó vulnerabilidades en E2ETests ni sus transitivos en la consulta de esta entrega. Estos resultados son locales; la CI remota del nuevo PR está pendiente.
+La primera pasada de adaptación tuvo 52/54 correctas; la segunda, 53/54. Los fallos correspondieron a preparar la expectativa de redirección al cambiar rol y a leer el documento durante el cambio al error de caché de Chrome. Se conservaron los resultados anteriores y se corrigieron las pruebas. La versión final dio 54/54 desde el script repetible en Chrome 157.0.8103.50. Compilación sin errores ni advertencias, 710/710 unitarias y 469/469 integraciones, incluidas 10 de cabeceras y 3 HTTP. Sin fallidas ni omitidas. Los controles locales de fijaciones y archivos sensibles pasaron. NuGet no reportó vulnerabilidades en E2ETests ni sus transitivos en la consulta de esta entrega. Estos resultados son locales. La [CI de #19](https://github.com/LuciAguilar/Therapease/actions/runs/43145066229) dio 469/469 integración y 52/54 Chromium en Linux, sin omitidas; tres trabajos correctos y uno fallido. Fallaron sesión de 31 minutos y alta con rol inválido durante la navegación. La misma versión dio 54/54 Chromium en Windows; no elimina el fallo remoto ni permite afirmar su causa. Se prepara diagnóstico seguro, sin cambiar aserciones, reintentar ni aceptar errores.
 
 El mismo PR retirará tres notas de docs/reviews. Sus copias personales se conservan fuera del repositorio y sus enlaces compartidos apuntan a los PR originales. No se modifica el historial de Git.
 
@@ -71,3 +71,13 @@ Antes de publicar se revisan la evidencia final, este documento y la [nota de de
 Los seis grupos explican su alcance y las 24 pruebas describen el resultado esperado. Se separan fases e instrucciones sin cambiar la lógica. Pruebas comentadas según el skill del proyecto. Comprobado con el analizador de C#: solo comentarios y espacios, sin cambios en los tokens del código. Repetición final de 54/54 en Chrome, sin omitidas. Claude APROBADO v1, 11-nov, reauditoría. La guía B02 conserva su publicación documental separada y queda fuera de este PR de QA.
 
 **Opcionales tras la reauditoría.** Rótulos antes del if y llaves en los dos casos señalados. Compilación correcta y 6/6 casos afectados de Chrome correctos, sin omitidas. Forman parte de los 54; no se suman como pruebas nuevas.
+
+### Diagnóstico de la CI, 12-nov
+
+Claude APROBADO v1, 11-nov, sobre el diagnóstico. La causa en Linux sigue sin conocer. Lucía aprobó el 12-nov aplicar las dos mejoras y publicar este archivo y la ayuda de navegador en el mismo #19.
+
+Los errores muestran el estado HTTP y un nombre fijo de página. Se extrae únicamente un código con el formato net::ERR_[A-Z0-9_]+, o se usa el texto fijo de navegación interrumpida o página/navegador cerrados. No se copia el mensaje original, que puede contener datos privados. Ante un 500 se nombran solo las categorías AntiforgeryValidationException, CryptographicException, NpgsqlException y 40P01 presentes en los registros; nunca sus líneas. Esas coincidencias en los registros compartidos del entorno orientan la revisión, pero no demuestran por sí solas qué causó ese 500.
+
+No cambian las esperas, las aserciones ni los reintentos. Sin trazas ni capturas. La CI que incluya este diagnóstico debe ejecutarse para conocer el resultado de Linux. Si pasa, se repetirá una vez con Re-run all jobs; dos pasadas correctas no explican por sí solas el fallo anterior. Lucía decide cómo registrar lo observado antes de solicitar la revisión de Miguel. #18 sigue en espera.
+
+**Comprobación local del 12-nov.** Compilación sin errores ni advertencias y 54/54 Chromium en Windows. Se forzaron contraseña incorrecta, puerto bloqueado, puerto cerrado y fallo 500 de auditoría: los dos casos seleccionados fallaron en cada preparación y mostraron respectivamente HTTP 200 en Acceso, ERR_UNSAFE_PORT, ERR_CONNECTION_REFUSED y HTTP 500 con 40P01. El código se restauró tras cada preparación. El intento inicial sin Docker se conserva aparte y no acredita estas comprobaciones. Los fallos preparados no se suman a las 54 ni explican los dos fallos previos de Linux.

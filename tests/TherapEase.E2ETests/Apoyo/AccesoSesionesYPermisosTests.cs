@@ -20,6 +20,8 @@ public sealed partial class AccesoSesionesYPermisosTests(NavegadorRevision entor
 
     private readonly List<IBrowserContext> _contextos = [];
     private string _paso = "preparación";
+    private string _ultimaRespuesta = "sin respuesta de documento";
+    private bool _huboErrorServidor;
 
     /// Busca un botón por su nombre visible para usar el mismo control que la persona.
     private static ILocator Boton(IPage p, string nombre) => p.GetByRole(AriaRole.Button, new() { Name = nombre, Exact = true });
@@ -41,7 +43,27 @@ public sealed partial class AccesoSesionesYPermisosTests(NavegadorRevision entor
         catch (Exception e)
         {
             var linea = new System.Diagnostics.StackTrace(e, true).GetFrames().FirstOrDefault(f => f.GetFileName()?.EndsWith("Tests.cs") == true)?.GetFileLineNumber();
-            throw new XunitException($"Recorrido no conforme en {_paso}, línea {linea} ({e.GetType().Name}). Sin datos del formulario en evidencia.");
+
+            // El mensaje completo puede incluir direcciones o datos del formulario; se extrae solo el código.
+
+            var codigo = System.Text.RegularExpressions.Regex.Match(e.Message, @"net::ERR_[A-Z0-9_]+").Value;
+            if (codigo.Length == 0)
+            {
+                codigo = e.Message.Contains("interrupted by another navigation", StringComparison.OrdinalIgnoreCase)
+                    ? "navegación interrumpida por otra"
+                    : e.Message.Contains("has been closed", StringComparison.OrdinalIgnoreCase)
+                        ? "navegador o página cerrados"
+                        : "sin código de red reconocido";
+            }
+
+            // Ante un 500 se nombran solo categorías conocidas, sin copiar las líneas del servidor.
+
+            var categorias = _huboErrorServidor
+                ? string.Join(", ", new[] { "AntiforgeryValidationException", "CryptographicException", "NpgsqlException", "40P01" }
+                    .Where(entorno.Servidor.RegistrosContienen))
+                : "";
+            var registro = categorias.Length == 0 ? "" : $"; categorías presentes en registros: {categorias}";
+            throw new XunitException($"Recorrido no conforme en {_paso}, línea {linea} ({e.GetType().Name}); {_ultimaRespuesta}; {codigo}{registro}. Sin datos del formulario en evidencia.");
         }
         finally
         {
@@ -57,7 +79,29 @@ public sealed partial class AccesoSesionesYPermisosTests(NavegadorRevision entor
         var contexto = await entorno.Navegador.NewContextAsync(new() { IgnoreHTTPSErrors = true });
         contexto.SetDefaultTimeout(10000);
         _contextos.Add(contexto);
-        return await contexto.NewPageAsync();
+        var pagina = await contexto.NewPageAsync();
+
+        // Solo se conserva el estado HTTP y un nombre fijo de página; nunca la URL ni sus parámetros.
+
+        pagina.Response += (_, respuesta) =>
+        {
+            if (!respuesta.Request.IsNavigationRequest || respuesta.Request.Frame != pagina.MainFrame)
+                return;
+            var destino = new Uri(respuesta.Url).AbsolutePath switch
+            {
+                "/" => "Inicio",
+                "/Acceso" => "Acceso",
+                "/Error" => "Error",
+                "/Acceso/Denegado" => "Acceso denegado",
+                "/Cuenta/Contrasena" => "Contraseña",
+                "/Usuarios" => "Usuarios",
+                "/Usuarios/Crear" => "Crear usuario",
+                _ => "otra página"
+            };
+            _ultimaRespuesta = $"HTTP {respuesta.Status} en {destino}";
+            _huboErrorServidor |= respuesta.Status == 500;
+        };
+        return pagina;
     }
 
     /// Abre una página real y conserva una referencia segura al paso que se está comprobando.
