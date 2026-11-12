@@ -53,3 +53,24 @@ La auditoría comprueba paquetes NuGet; no sustituye la revisión de SDK/runtime
 ✅ Entrevista recibida; cambios de requisitos registrados, no implementación autorizada. ⏳ Solo particular puede cambiar el modelo de ámbitos; montos requieren definir datos/reglas/migración; cancelación automática en baja requiere atomicidad/eventos/concurrencia y pago conservado conforme a ADR-04. Miguel propone impacto y Lucía decide antes de modificar mecanismos Q/R. No se elige tecnología nueva por esta entrevista.
 
 ✅ Campos de Usuario/Paciente/Tutor solicitados, pantallas aceptadas en general y preferencias futuras recibidas. ⏳ Detalle/contratos/persistencia y pruebas. Papel/5 años/solo la usuaria/consulta antes de eliminar son insumos R04, no política legal aprobada. Se conserva texto original de ADR, historia ejecutada y límites B00/LCA/R04. Véase el registro local de entrevista.
+
+
+## Nota posterior — QA de páginas B01, 10-nov-2026
+
+Lucía autorizó preparar y ejecutar su QA de acceso, sesiones y permisos. Playwright con xUnit ya pertenece al stack aprobado. Esta entrega fija Microsoft.Playwright 1.58.0 en TherapEase.E2ETests y usa la biblioteca oficial directamente con xUnit existente. No cambia dependencias de producción.
+
+E2ETests referencia IntegrationTests para reutilizar HttpsLocalRevision, PostgreSQL y los escenarios existentes. InternalsVisibleTo se limita a E2ETests. Se evita copiar las ayudas de identidad/base de datos y no se permite acceso nuevo entre capas de producción. Si estas ayudas crecen, su extracción a un proyecto común requiere una revisión separada.
+
+Los recorridos usan contextos nuevos y cuentas ficticias independientes. Production es una ejecución local con salida de dotnet publish para los recursos estáticos. El cliente .NET comprueba TLS y nombre; el navegador acepta el certificado temporal solo en su contexto. En esta revisión de identidad se conservan resultados seguros sin trazas, capturas ni contenido de formularios.
+
+El trabajo existente de integración en CI incorpora Chromium y estos recorridos, con artefactos TRX de siete días y medición A-06. Su ejecución remota espera la publicación autorizada del PR. Q16 completo sigue en B04.
+
+Fuentes de la herramienta: [biblioteca oficial](https://playwright.dev/dotnet/docs/intro) y [paquete fijado](https://www.nuget.org/packages/Microsoft.Playwright/1.58.0). La nota documenta la implementación de QA para revisión; no declara cerrado B00/B01/LCA/R04.
+
+### Organización del QA — 11-nov-2026
+
+Se clasifican únicamente archivos de Lucía en carpetas funcionales. Los namespaces y filtros permanecen. E2E reparte la clase de recorridos en archivos partial con un mismo fixture para conservar su preparación y ejecución. La autorización posterior del 11-nov incluye los tres archivos de pacientes de Miguel, movidos sin cambios de contenido. Las unitarias de Miguel/Dulce no se reorganizan. Las rutas actuales están en los README de ambos proyectos de pruebas.
+
+### Trazas de identidad — decisión de Lucía, 11-nov-2026
+
+La excepción aprobada está en AGENTS sección 2.7: no grabar trazas de identidad hasta Q16/B04, para evitar que los artefactos del repositorio público incluyan formularios, contraseñas o cookies. En B04 se decidirá el uso de trazas enmascaradas antes de habilitarlas. Los TRX seguros conservan la retención de siete días. La configuración actual no graba trazas; esta nota registra la decisión, sin cambiar la lógica de las pruebas.

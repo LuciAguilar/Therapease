@@ -1,13 +1,13 @@
 # TherapEase — 09/B00 · Plan y estado de validación
 
-## Estado vigente al 05-nov-2026
+## Estado vigente al 10-nov-2026
 
 > **B00/LCA/R04 siguen abiertos.** La base y su QA de #4/#6 están revisados e integrados. La repetición completa de la rama de #12 también incluye las pruebas anteriores de B00; no acredita páginas, una nueva prueba de carga ni un respaldo real.
 
 | Qué falta | Quién / qué puede avanzar |
 | --- | --- |
-| Acceso/salida y Q03 desde páginas | Ensayados en #13/632caa7, con sesiones y permisos reales. QA B01 propio: 46/49 comprobaciones; Claude CORREGIR recibido; QA ajustado/repetido, ajuste menor de reauditoría aplicado y Chrome repetido 46/49; faltan plantilla corregida/nuevo SHA y revisión de Miguel. No cierra B00/LCA. |
-| Formularios, cabeceras/caché y CSS | Ejecutados en Chrome y HTTPS, paquete local completo. Controles HTTP propios correctos; /Error y desvío de temporal requieren corrección. Sin respaldo real, carga ni nube nuevos. |
+| Acceso/salida y Q03 desde páginas | ✅ #13 fusionado en 32e7bca. QA propio B01 preparado y ejecutado, con auditoría y publicación pendientes. Ver [plan B01](TherapEase-etapa09-B01.md). |
+| Formularios, cabeceras/caché y CSS | Comprobados en las páginas de acceso y cuentas. Sigue aparte la observación sobre CSS con sesión. |
 | Evidencia y riesgos del cierre B00/LCA | Lucía puede ordenar los resultados y reverificar protecciones de GitHub, sin cambiarlas ni dar LCA por cerrada. |
 | Agenda B03 | Preparación autorizada: propuesta y QA escrito. Los recorridos completos de reserva y baja aún esperan código autorizado y sus pruebas. |
 | Datos reales, R04 y respaldo real | Siguen fuera de esta autorización; no conectar nube ni crear respaldos operativos. |
@@ -51,7 +51,7 @@ Las pruebas de funciones por separado y las de servidor/base de datos no sustitu
 | PR #1: pasos 1–3 de Miguel | ✅ Corregido, aprobado y fusionado con Squash and merge. | [PR #1](https://github.com/LuciAguilar/Therapease/pull/1); main `41123f2d2c115a05ff1df944457195a7f671cc17`. |
 | PR #3: documentación compartida | ✅ Fusionado el 06-oct. | [PR #3](https://github.com/LuciAguilar/Therapease/pull/3); main `8baf8fbc34890d4710c2b78e920f10b8d3e92cb3`. |
 | PR #4: pruebas de Lucía | ✅ Revisado por Miguel y fusionado el 11-oct. | [PR #4](https://github.com/LuciAguilar/Therapease/pull/4); main `709ff615e1f1add0b008deff57e567de719b241c`. |
-| PR #5: correcciones de Miguel | ✅ Corregido, comprobado y fusionado el 13-oct, main 40785d2. | [PR #5](https://github.com/LuciAguilar/Therapease/pull/5); §4.10 e [informe](../reviews/TherapEase-09-B00-revision-PR05.md). |
+| PR #5: correcciones de Miguel | ✅ Corregido, comprobado y fusionado el 13-oct, main 40785d2. | [PR #5](https://github.com/LuciAguilar/Therapease/pull/5); §4.10 e [informe](https://github.com/LuciAguilar/Therapease/pull/5). |
 | PR #6: ampliación QA de Lucía | ✅ Miguel revisó la versión `0db344a`; Lucía fusionó mediante squash el 15-oct. | [PR #6](https://github.com/LuciAguilar/Therapease/pull/6); main `ffb2494ad9da026f24a57826c45f6f530afb467b`. Resultados anteriores en §4.10–§4.11; sin nueva ejecución por esta actualización. |
 | Arquitectura | ✅ 30/30 correctas sobre PR #5; correcciones de Web y coordinador implementadas. | §4.9; PR #5 ya revisado y fusionado. Las páginas funcionales siguen pendientes. |
 | Horas y Docker del 08–09-oct | ✅ 12 correctas; reinicio real y claves/sesión conservadas. | §4.4; PR #4 revisado/fusionado; repetido en §4.9. |
@@ -64,7 +64,7 @@ Las pruebas de funciones por separado y las de servidor/base de datos no sustitu
 | Documento | Para qué sirve |
 | --- | --- |
 | [Guía / README](../../README.md) y [AGENTS](../../AGENTS.md) | Preparación y comandos; reglas compartidas en AGENTS. |
-| [Informe PR01](../reviews/TherapEase-09-B00-revision-PR01.md) | Ajustes ya comprobados y mejoras opcionales del PR #1. |
+| [Informe PR01](https://github.com/LuciAguilar/Therapease/pull/1) | Ajustes ya comprobados y mejoras opcionales del PR #1. |
 | [Plan de pruebas](../testing/TherapEase-09-plan-de-pruebas.md) | Casos y estados de toda 09; cada caso entra en su bloque. |
 | [08B](../requirements/TherapEase-etapa08-casos-historias.md), [08C](../requirements/TherapEase-etapa08-modelos-interfaces.md), [08D](TherapEase-etapa08-backlog-trazabilidad.md) y [Q/R](../requirements/TherapEase-requisitos-arquitectonicos.md) | Alcance, alternos, modelos, orden propuesto y criterios. |
 | [ADR-01…05](../architecture/adr/ADR-01-a-05-provisionales.md) y [ADR-06](../architecture/adr/ADR-06-monorepo.md) | Decisiones y notas posteriores; las propuestas no se convierten en decisiones por ejecutarlas en QA. |
@@ -195,7 +195,7 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj -c Release --filter FullyQualifiedName~HorasDockerTests --logger "trx;LogFileName=b00-horas-docker.trx"
 ```
 
-[Casos de prueba](../../tests/TherapEase.IntegrationTests/HorasDockerTests.cs) y [preparación del entorno](../../tests/TherapEase.IntegrationTests/HorasDockerRevision.cs). La consola temporal de QA se genera en TestResults, no agrega un proyecto a la solución. El entorno actual usa host.docker.internal para comunicar la imagen con el PostgreSQL desechable de Docker Desktop.
+[Casos de prueba](../../tests/TherapEase.IntegrationTests/Entorno/HorasYDocker/HorasDockerTests.cs) y [preparación del entorno](../../tests/TherapEase.IntegrationTests/Apoyo/HorasYDocker/HorasDockerRevision.cs). La consola temporal de QA se genera en TestResults, no agrega un proyecto a la solución. El entorno actual usa host.docker.internal para comunicar la imagen con el PostgreSQL desechable de Docker Desktop.
 
 | Trazabilidad | Dato |
 | --- | --- |
@@ -224,7 +224,7 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj -c Release --filter FullyQualifiedName~HttpsLocalTests --logger "trx;LogFileName=b00-https.trx"
 ```
 
-[Pruebas HTTPS](../../tests/TherapEase.IntegrationTests/HttpsLocalTests.cs) y [entorno temporal](../../tests/TherapEase.IntegrationTests/HttpsLocalRevision.cs). La evidencia automática queda en TestResults/https y se excluye de Git. TRX de esta ejecución: b00-https-final-10oct.trx, SHA-256 dd0dd08048c161a5cf2d7dd1fde06ee92d98f94c5c44edc89282d6b1193a3b46. Base local 47ca601; ampliación incluida en el mismo PR #4. Pruebas comentadas según el skill del proyecto. Auditoría HTTPS recibida de Claude: APROBADO, sin correcciones obligatorias; revisión humana pendiente. La ampliación Q03 de §4.6 ya tiene auditoría APROBADO; implementación de Miguel y revisión humana pendientes.
+[Pruebas HTTPS](../../tests/TherapEase.IntegrationTests/Http/Https/HttpsLocalTests.cs) y [entorno temporal](../../tests/TherapEase.IntegrationTests/Apoyo/Https/HttpsLocalRevision.cs). La evidencia automática queda en TestResults/https y se excluye de Git. TRX de esta ejecución: b00-https-final-10oct.trx, SHA-256 dd0dd08048c161a5cf2d7dd1fde06ee92d98f94c5c44edc89282d6b1193a3b46. Base local 47ca601; ampliación incluida en el mismo PR #4. Pruebas comentadas según el skill del proyecto. Auditoría HTTPS recibida de Claude: APROBADO, sin correcciones obligatorias; revisión humana pendiente. La ampliación Q03 de §4.6 ya tiene auditoría APROBADO; implementación de Miguel y revisión humana pendientes.
 
 > La redirección no protege datos que un cliente ya haya enviado por HTTP. La prueba envía las credenciales de sesión únicamente por HTTPS. HSTS necesita un cliente compatible y una primera conexión segura; ASP.NET Core excluye localhost por defecto. [Referencia oficial de Microsoft](https://learn.microsoft.com/en-us/aspnet/core/security/enforcing-ssl?view=aspnetcore-10.0).
 
@@ -259,7 +259,7 @@ Propuesta fundamentada en [OWASP HTTP Headers](https://cheatsheetseries.owasp.or
 dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj -c Release --filter FullyQualifiedName~ConsultaAuditoriaApiTests --logger "trx;LogFileName=b00-q03.trx"
 ```
 
-[Casos API](../../tests/TherapEase.IntegrationTests/ConsultaAuditoriaApiTests.cs) y [datos/entorno](../../tests/TherapEase.IntegrationTests/ConsultaAuditoriaRevision.cs). Las cinco entradas inválidas citadas **permanecen fallidas**, sin omitirla ni cambiar el resultado esperado. [Ajuste propuesto para Miguel, §7](../reviews/TherapEase-09-B00-revision-PR01.md). Para comprobarlo, GET /api/auditoria/eventos con fechas válidas y tipoRegistro=Paciente%2CCita, usando una sesión ficticia de superusuario por HTTPS: esperado 400; observado 200 y tipo Cita. Enum.TryParse acepta listas y combina sus valores; IsDefined no basta si el resultado combinado coincide con otro valor válido. [Documentación de Microsoft](https://learn.microsoft.com/en-us/dotnet/api/system.enum.tryparse?view=net-10.0).
+[Casos API](../../tests/TherapEase.IntegrationTests/Auditoria/ConsultaAuditoriaApiTests.cs) y [datos/entorno](../../tests/TherapEase.IntegrationTests/Apoyo/Auditoria/ConsultaAuditoriaRevision.cs). Las cinco entradas inválidas citadas **permanecen fallidas**, sin omitirla ni cambiar el resultado esperado. [Ajuste propuesto para Miguel, §7](https://github.com/LuciAguilar/Therapease/pull/1). Para comprobarlo, GET /api/auditoria/eventos con fechas válidas y tipoRegistro=Paciente%2CCita, usando una sesión ficticia de superusuario por HTTPS: esperado 400; observado 200 y tipo Cita. Enum.TryParse acepta listas y combina sus valores; IsDefined no basta si el resultado combinado coincide con otro valor válido. [Documentación de Microsoft](https://learn.microsoft.com/en-us/dotnet/api/system.enum.tryparse?view=net-10.0).
 
 **Evidencia:** b00-q03-https-entrega-10oct.trx, SHA-256 17e9fe894f1d4895c171ec9089019b3b20f19af1555964892747376155ddb3eb. Resumen del hallazgo original en tipo-combinado.json, sin valores de sesión. Ampliación: q03-ampliado-10oct.trx, 51 casos (46 correctos, 5 fallidos). Base local e97646d; ampliación incluida en el mismo PR #4. Pruebas comentadas según el skill del proyecto. Veredicto recibido: APROBADO para las pruebas; números/listas ampliados conforme a Claude. Corrección de Miguel y revisión humana pendientes; B00/LCA/R04 abiertos.
 
@@ -283,7 +283,7 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj -c Release --filter FullyQualifiedName~InterrupcionesIdentidadTests --logger "trx;LogFileName=b00-q08.trx"
 ~~~
 
-[Pruebas Q08](../../tests/TherapEase.IntegrationTests/InterrupcionesIdentidadTests.cs) y [preparación/cortes de confirmación](../../tests/TherapEase.IntegrationTests/InterrupcionesIdentidadRevision.cs). Herramientas: xUnit, Testcontainers, Npgsql y callbacks de transacción de EF sobre la unidad de trabajo real. La aplicación usa su usuario PostgreSQL sin privilegios; solo el corte de conexión usa el administrador del contenedor ficticio. Datos exclusivamente ficticios. Pruebas comentadas según el skill del proyecto.
+[Pruebas Q08](../../tests/TherapEase.IntegrationTests/Identidad/Interrupciones/InterrupcionesIdentidadTests.cs) y [preparación/cortes de confirmación](../../tests/TherapEase.IntegrationTests/Apoyo/Interrupciones/InterrupcionesIdentidadRevision.cs). Herramientas: xUnit, Testcontainers, Npgsql y callbacks de transacción de EF sobre la unidad de trabajo real. La aplicación usa su usuario PostgreSQL sin privilegios; solo el corte de conexión usa el administrador del contenedor ficticio. Datos exclusivamente ficticios. Pruebas comentadas según el skill del proyecto.
 
 **Evidencia:** q08-entrega-ampliada-10oct.trx, SHA-256 2beba1cf37a328f877ea2de216aaf6d320bb08e30a4fa5f46372eba4a9819f27; resúmenes JSON solo con estados/huellas y manifest.json. Se comprobó que no quedan contenedores Testcontainers; no se construyeron imágenes nuevas. No se repitieron los bloques anteriores. Ampliación incluida en el mismo PR #4; sin cierre B00/LCA.
 
@@ -307,7 +307,7 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj -c Release --filter FullyQualifiedName~ErroresRegistrosTests --logger "trx;LogFileName=b00-errores-registros.trx"
 ~~~
 
-[Pruebas de errores](../../tests/TherapEase.IntegrationTests/ErroresRegistrosTests.cs) y [preparación/búsqueda](../../tests/TherapEase.IntegrationTests/ErroresRegistrosRevision.cs). Se reutiliza el servidor HTTPS existente mediante tres consultas de registros en memoria, sin modificar su arranque o limpieza. Herramientas: xUnit/HttpClient, Kestrel real en modo Production local, EF/Npgsql y PostgreSQL desechable/Testcontainers con migraciones/roles reales. Solo el migrador altera los permisos temporales de prueba; el servidor conserva su usuario limitado.
+[Pruebas de errores](../../tests/TherapEase.IntegrationTests/Seguridad/ErroresYRegistros/ErroresRegistrosTests.cs) y [preparación/búsqueda](../../tests/TherapEase.IntegrationTests/Apoyo/ErroresYRegistros/ErroresRegistrosRevision.cs). Se reutiliza el servidor HTTPS existente mediante tres consultas de registros en memoria, sin modificar su arranque o limpieza. Herramientas: xUnit/HttpClient, Kestrel real en modo Production local, EF/Npgsql y PostgreSQL desechable/Testcontainers con migraciones/roles reales. Solo el migrador altera los permisos temporales de prueba; el servidor conserva su usuario limitado.
 
 **Evidencia:** errores-registros-10oct.trx, SHA-256 efba171d31b618949584a1da04dcdc97d9783be7a3cdf17c7f2b8b49f8f8cdd2; manifest.json y resúmenes por caso sin valores privados. Base local 1bf4f45; ampliación incluida en el mismo PR #4. Pruebas comentadas según el skill del proyecto. Auditoría de errores/registros: Claude APROBADO, sin correcciones obligatorias. Decisión ADR-05 registrada el 10-oct, sin implementación; revisión humana y otros pendientes B00/LCA/R04 permanecen abiertos.
 
@@ -323,7 +323,7 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 | Nueve adicionales locales CU04 | 9 correctas; 0 fallidas/omitidas. Sin citas/con citas inactivas, rechazo de activa, cita posterior a consulta, versión concurrente, fallo de auditoría, respuesta perdida/repetición y bloqueo real baja frente a cita. Archivo local BajaPacienteTests, renombrado el 12-oct; correspondencia con casos existentes en plan §0.3. Incorporación pendiente en un PR de Lucía, con revisión distinta. No están en PR #5 ni tienen aún revisión humana. |
 | Alcance técnico | Windows, .NET 10.0.401, Docker 29.8.1, PostgreSQL 17 desechable/Testcontainers. Migraciones, roles y servicios reales; datos ficticios. Tres ejecuciones de pruebas separadas, no CI. |
 | Arranque intermitente de QA | Miguel lo reprodujo en PR #4/PR #5: tiempo de espera HTTP de 3 s no capturado. No ocurrió en esta ejecución; mejora del apoyo de pruebas de Lucía, no defecto nuevo de producción. |
-| Resultado propuesto | CORREGIR menor: README desactualizado y permiso ampliado aprobado por Lucía el 11-oct, aún por implementar/probar. Los resultados citados pertenecen al commit anterior a esa ampliación. Código solicitado comprobado. [Informe PR #5](../reviews/TherapEase-09-B00-revision-PR05.md). |
+| Resultado propuesto | CORREGIR menor: README desactualizado y permiso ampliado aprobado por Lucía el 11-oct, aún por implementar/probar. Los resultados citados pertenecen al commit anterior a esa ampliación. Código solicitado comprobado. [Informe PR #5](https://github.com/LuciAguilar/Therapease/pull/5). |
 
 Los TRX y el manifiesto local identifican el commit y las huellas. Sin contenedores Testcontainers ni imágenes therapease-b00-* restantes al finalizar. El checkout revisado conserva intactos los archivos versionados; solo se agregó QA local. No se acreditan páginas, permisos operativos definitivos, respaldo diario ni cierre B00/LCA/R04.
 
@@ -555,7 +555,7 @@ No crear un PR por cada mejora. GitHub Settings y el correo local se verifican/c
 | R04, datos reales, TOTP y recuperación; expediente/notas/reportes/capturista. | Fuera de B00; Lucía decide con respuestas de la usuaria y equipo. | R04 sigue abierto. Solo datos ficticios; no trasladar estos pendientes a una falsa aprobación actual. |
 | Skills adaptadas. | PR posterior autorizado. | No bloquean por sí solas el trabajo del equipo. |
 
-> **Documentación:** ajustes en `docs/reviews/`, B00 en `docs/planning/`, pruebas/evidencia en `docs/testing/`, reglas en AGENTS y entrada técnica en README. El StarUML de 08 es un antecedente: no autoriza la pantalla de auditoría retirada.
+> **Documentación:** notas de revisión solo locales, B00 en `docs/planning/`, pruebas/evidencia en `docs/testing/`, reglas en AGENTS y entrada técnica en README. El StarUML de 08 es un antecedente: no autoriza la pantalla de auditoría retirada.
 >
 > **Cierre:** publicar documentos, fusionar un PR parcial y cerrar LCA son decisiones distintas. Conservar los pendientes visibles y actualizar este documento cuando exista nueva evidencia o decisión.
 

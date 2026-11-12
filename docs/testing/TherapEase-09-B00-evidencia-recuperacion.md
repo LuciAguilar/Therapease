@@ -64,7 +64,7 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 
 Los 50 casos corresponden a la ejecución conjunta de Identity/recuperación del 08-oct. Hoy, sin filtro se incluyen también los bloques nuevos y los fallos conocidos de arquitectura/Q03; el comando anterior selecciona solo recuperación. TRX corregido del 08-oct: `b00-conjunto-50-corregido-08oct.trx`, con mediciones sin datos ni claves. Dos intentos anteriores fallaron en comprobaciones nuevas: consulta HTTP sin fechas y consulta del historial EF con usuario de app; se corrigieron las pruebas sin cambiar la aplicación ni omitir casos. Evidencia anterior conservada localmente.
 
-Código: [casos](../../tests/TherapEase.IntegrationTests/RecuperacionTests.cs), [apoyo de cifrado/volcado/restauración](../../tests/TherapEase.IntegrationTests/RecuperacionRevision.cs).
+Código: [casos](../../tests/TherapEase.IntegrationTests/Datos/Recuperacion/RecuperacionTests.cs), [apoyo de cifrado/volcado/restauración](../../tests/TherapEase.IntegrationTests/Apoyo/Recuperacion/RecuperacionRevision.cs).
 
 Volcados sin cifrar: solo temporales dentro del contenedor, modo 0600 comprobado; el descifrado de restauración usa 0600. Se retiran en `finally`. En el equipo solo se escriben copia cifrada/huella en una carpeta temporal del caso, también eliminada al finalizar. La clave no se guarda/imprime y se limpia de memoria. Comandos sin contraseñas, mediante conexión local del contenedor ficticio; no acredita TLS/autenticación de producción. Volcado/restauración cancelables a 30 s.
 

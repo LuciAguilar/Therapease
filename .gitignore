@@ -54,3 +54,6 @@ backups/
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# Notas personales de revision: conservar fuera de Git.
+/docs/reviews/

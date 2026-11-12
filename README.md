@@ -51,7 +51,9 @@ SDK de `global.json`; Visual Studio 18 o superior o VS Code/terminal. Desde la r
 Arranque predeterminado: `dotnet run --project src/Web`. Imagen: `docker build -t therapease:local .` construye; `docker run --rm -p 8080:8080 therapease:local` ejecuta.
 ```powershell
 dotnet build TherapEase.sln   # compilar
-dotnet test TherapEase.sln    # probar; Docker debe estar disponible
+dotnet test tests/TherapEase.UnitTests
+dotnet test tests/TherapEase.IntegrationTests    # Docker debe estar disponible
+# Navegador: seguir la preparación de abajo.
 docker run -d --name therapease-pg -e POSTGRES_PASSWORD=<clave> -e POSTGRES_DB=therapease_ficticia -p 55432:5432 postgres:17 # base local ficticia
 Get-Content scripts/db/crear-roles.sql -Raw | docker exec -i therapease-pg psql -U postgres -v ON_ERROR_STOP=1 -v base=therapease_ficticia -v clave_migrador=<clave> -v clave_app=<clave> -f - # crear los roles
 $env:ConnectionStrings__Migraciones = "Host=localhost;Port=55432;Database=therapease_ficticia;Username=therapease_migrador;Password=<clave>" # conexión de migración
@@ -74,6 +76,20 @@ bash scripts/ci/revisar-archivos-sensibles.sh # revisar archivos sensibles
 - Nueva migración: `dotnet ef migrations add <Nombre> --project src/Infrastructure --startup-project src/Web --output-dir Migraciones`; revisar SQL con `dotnet ef migrations script`. Al terminar: `Remove-Item Env:ConnectionStrings__TherapEase, Env:ConnectionStrings__Migraciones`.
 - Auditoría: superusuario activo sin temporal, en la misma ventana autenticada: `GET /api/auditoria/eventos?desde=<instante-con-zona>&hasta=<instante-con-zona>`; opcionales `tipoRegistro` (Paciente/Cita/Usuario, nombres completos), `idRegistro`, `limite` (1–500; 100 por defecto). Sin zona, números/listas en tipoRegistro o filtros inválidos: 400; sin sesión: 401; sin permiso: 403. El recorrido espera páginas.
 - Reglas y `/salud`: identidad, cabeceras, citas y auditoría en [AGENTS §2](AGENTS.md#2-reglas-que-deben-acompañar-cada-cambio-05e-y-07a07c). `/salud` mide el proceso, no PostgreSQL; el detalle operativo está en [B00](docs/planning/TherapEase-etapa09-B00.md) y [B01](docs/planning/TherapEase-etapa09-B01.md).
+
+### Pruebas de acceso, sesiones y permisos en navegador
+
+Docker debe estar disponible. El proyecto usa Playwright .NET y el servidor local en Production con PostgreSQL desechable. Preparar el navegador una vez después de restaurar y compilar.
+
+~~~powershell
+dotnet build tests/TherapEase.E2ETests -c Release
+pwsh tests/TherapEase.E2ETests/bin/Release/net10.0/playwright.ps1 install chromium
+pwsh scripts/qa/probar-paginas.ps1
+~~~
+
+En Linux, usar install --with-deps chromium para instalar también las dependencias del navegador. Con Chrome ya instalado, ejecutar el script con -Canal chrome. El script prepara Web local, ejecuta los recorridos y guarda el TRX en TestResults/paginas. No conecta servicios externos. No se guardan trazas ni capturas de formularios de identidad.
+
+La entrega de [QA de páginas B01](docs/testing/TherapEase-09-B01-QA-paginas.md) explica cobertura, comandos y límites. Las notas personales de revisión se conservan fuera de Git; docs/reviews se retira en esta entrega.
 
 ## 6. Cómo está organizado el código
 

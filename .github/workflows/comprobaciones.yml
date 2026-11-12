@@ -107,14 +107,30 @@ jobs:
 
       - name: Restaurar y compilar
         run: |
-          dotnet restore tests/TherapEase.IntegrationTests
-          dotnet build tests/TherapEase.IntegrationTests --configuration Release --no-restore -warnaserror
+          dotnet restore tests/TherapEase.E2ETests
+          dotnet build tests/TherapEase.E2ETests --configuration Release --no-restore -warnaserror
+
+      - name: Preparar Web local y navegador
+        run: |
+          dotnet publish src/Web --configuration Release --no-restore -o TestResults/web
+          echo "THERAPEASE_WEB_QA_DLL=$GITHUB_WORKSPACE/TestResults/web/TherapEase.Web.dll" >> "$GITHUB_ENV"
+          echo "ASPNETCORE_CONTENTROOT=$GITHUB_WORKSPACE/TestResults/web" >> "$GITHUB_ENV"
+          pwsh tests/TherapEase.E2ETests/bin/Release/net10.0/playwright.ps1 install --with-deps chromium
 
       # Testcontainers levanta PostgreSQL con el Docker del runner. Sin reintentos: una falla intermitente debe verse, no ocultarse.
       - name: Pruebas de integración
         run: >
           dotnet test tests/TherapEase.IntegrationTests --configuration Release --no-build
           --logger "trx;LogFileName=integracion.trx" --results-directory resultados
+
+      - name: Acceso, sesiones y permisos en navegador
+        run: >
+          dotnet test tests/TherapEase.E2ETests --configuration Release --no-build
+          --logger "trx;LogFileName=navegador.trx" --results-directory resultados
+
+      - name: Resumir pruebas de navegador
+        if: always()
+        run: bash scripts/ci/resumir-resultados.sh resultados/navegador.trx "Navegador"
 
       - name: Resumir pruebas de integración
         if: always()
