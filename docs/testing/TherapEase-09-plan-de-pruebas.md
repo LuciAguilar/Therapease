@@ -271,10 +271,10 @@ Los identificadores de la sección 3 conservan ⏳ si su alcance completo aún f
 
 | ID | Estado | Qué hacer → qué debe pasar | Origen |
 | --- | --- | --- | --- |
-| M-13 ★ | ⏳ | Cita activa solo si está agendada **y** vigente (probar las 4 combinaciones). | Q06 |
-| M-14 ★ | ⏳ | Agendar con inicio ≥ fin, paciente inexistente o de baja, o ámbito que el paciente no tiene → rechaza. | HU09, CU06 A1 |
-| M-15 ★ | ⏳ | Cruce: solapada con una activa → rechaza, aunque sea de otro ámbito. Cancelada o de baja → no bloquea. Contigua (10–11 y 11–12) → permite. ✅ Preferencia recibida: contiguas sí; ⏳ ejecución del caso restante. | HU09, CU06 A2 |
-| M-16 ★ | ⏳ | Una cita nueva queda agendada, vigente y con pago pendiente. ✅ Respuesta recibida: inicial Pendiente; ⏳ pruebas. | 08C §2 |
+| M-13 ★ | ✅ servidor / ⌛ páginas y revisión | Cita activa solo si está agendada **y** vigente (probar las 4 combinaciones). | Q06 |
+| M-14 ★ | ✅ servidor / ⌛ páginas y revisión | Agendar con inicio ≥ fin, paciente inexistente o de baja, o ámbito que el paciente no tiene → rechaza. | HU09, CU06 A1 |
+| M-15 ★ | ✅ servidor / ⌛ páginas y revisión | Cruce: solapada con una activa → rechaza, aunque sea de otro ámbito. Cancelada o de baja → no bloquea. Contigua (10–11 y 11–12) → permite. ✅ Preferencia recibida: contiguas sí; ⏳ ejecución del caso restante. | HU09, CU06 A2 |
+| M-16 ★ | ✅ servidor / ⌛ páginas y revisión | Una cita nueva queda agendada, vigente y con pago pendiente. ✅ Respuesta recibida: inicial Pendiente; ⏳ pruebas. | 08C §2 |
 | M-17 ★ | ⏳ | El pago solo acepta Pagado o Pendiente. | HU13, CU09 A6 |
 | M-18 | ⏳ | Reprogramar conserva el pago. Cita cancelada, de baja o con paciente de baja → rechaza. | HU10, CU07 A3–A4 |
 | M-19 | ⏳ | Cancelar → cancelada, conserva pago y condición. | HU11, Q20 |
@@ -387,8 +387,8 @@ Integración: xUnit + Testcontainers, con el esquema creado por **las migracione
 | L-CU04-03 | ⏳ | Baja → sale de listas y búsquedas, aparece en «Pacientes de baja» y sigue en la base. | Q20 |
 | L-CU04-04 | ⏳ | Recuperar → vuelve a las listas; se limpian los datos de baja; el evento histórico se conserva. | Q20, 08C |
 | L-CU04-05 | ⏳ | Base B00 probada: rechazo con cita activa. La entrevista pide cancelación automática al dar de baja paciente; cambiar expectativa solo tras decisión/implementación, con baja/cancelaciones/eventos atómicos, pago y concurrencia protegidos. | CU04 A2 |
-| L-CU04-06 | ⏳ ejecución / diseño escrito | Forzar ambos órdenes entre comprobar y guardar al agendar frente a una baja; observar la espera si compiten transacciones sin confirmar. Nunca queda cita activa de paciente de baja; solo eventos de cambios confirmados. [Diseño B03](../planning/TherapEase-etapa09-B03.md#41-cómo-prepararemos-los-cambios-simultáneos). Repetir complementa esa comprobación; no la sustituye. | CU06 A3 |
-| L-CU04-07 | ⏳ | Retirar ámbito conserva el original de las citas según entrevista. Recuperar/reprogramar con ámbito retirado y el cambio a solo particular siguen pendientes; probar tras concretarlos. | CU04 A5 |
+| L-CU04-06 | ✅ servicios y espera real / ⌛ auditoría | Forzar ambos órdenes entre comprobar y guardar al agendar frente a una baja; observar la espera si compiten transacciones sin confirmar. Nunca queda cita activa de paciente de baja; solo eventos de cambios confirmados. [Diseño B03](../planning/TherapEase-etapa09-B03.md#41-cómo-prepararemos-los-cambios-simultáneos). Repetir complementa esa comprobación; no la sustituye. | CU06 A3 |
+| L-CU04-07 | ✅ ámbito B03 / ⌛ B05–B06 | Retirar el ámbito mientras se agenda conserva la cita; reenvío comprobado antes y después de consultar al paciente. Recuperar/reprogramar corresponde a B05–B06. Solo particular sigue fuera del alcance aprobado. | CU04 A5 |
 
 ### CU05 — Consultar agenda (B03) ★
 
@@ -396,9 +396,9 @@ Integración: xUnit + Testcontainers, con el esquema creado por **las migracione
 
 | ID | Estado | Qué hacer → qué debe pasar | Origen |
 | --- | --- | --- | --- |
-| L-CU05-01 | ⏳ | Muestra solo las activas del periodo; canceladas con filtro; de baja nunca. | HU08 |
+| L-CU05-01 | ✅ servidor / ⌛ páginas y revisión | Muestra solo las activas del periodo; canceladas con filtro; de baja nunca. | HU08 |
 | L-CU05-02 | ⏳ | Navegador con otra zona horaria (p. ej. Ciudad de México y Madrid) → mismas horas de Hermosillo. | Q09 |
-| L-CU05-03 | ⏳ | Periodo sin citas → estado vacío. | CU05 A1 |
+| L-CU05-03 | ✅ servidor / ⌛ páginas y revisión | Periodo sin citas → estado vacío. | CU05 A1 |
 
 ### CU06 — Agendar cita (B03) ★
 
@@ -412,15 +412,15 @@ Integración: xUnit + Testcontainers, con el esquema creado por **las migracione
 
 | ID | Estado | Qué hacer → qué debe pasar | Origen |
 | --- | --- | --- | --- |
-| L-CU06-01 | ⏳ | Cita válida → guardada con pago pendiente y auditada. | HU09 |
-| L-CU06-02 | ⏳ | Solapada con una activa, aunque sea de otro ámbito → rechaza. | Q06 |
-| L-CU06-03 | ⏳ | Contigua (una termina 11:00, otra empieza 11:00) → permitida, según entrevista. Prueba del flujo B03 pendiente; no volver a pedir esa decisión. | 08B §1.1 |
-| L-CU06-04 | ⏳ | Solapada con una cancelada o de baja → permitida. | Q06 |
-| L-CU06-05 | ⏳ | 2 y 10 reservas distintas simultáneas por el mismo horario → se guarda exactamente una cita con su evento. Forzar la coincidencia antes de guardar; el reenvío de la misma reserva se sigue en L-CU06-09. | Q06, R02 |
-| L-CU06-06 | ⏳ | Agendar desde un equipo en otra zona horaria → al consultarla, la hora de Hermosillo está intacta. | HU09 CA4, Q09 |
-| L-CU06-07 | ⏳ | Servidor/imagen y persistencia probados (B00 §4.4); falta recorrido de agenda. **Extra:** citas en las fechas de cambio de horario de EE. UU. y del resto de México (Hermosillo no cambia) → la hora no se desplaza. | Q09 |
-| L-CU06-08 | ⏳ | Paciente de baja o ámbito que no tiene → rechaza. | CU06 A1 |
-| L-CU06-09 | ⏳ ejecución / diseño escrito | Respuesta interrumpida y reenvíos de la misma solicitud, en los distintos órdenes del plan B03 → no existe segunda cita ni segundo evento. Cubrir primer intento confirmado y revertido. Mecanismo pendiente de propuesta y decisión; sin reintento automático. | S5 |
+| L-CU06-01 | ✅ servidor / ⌛ páginas y revisión | Cita válida → guardada con pago pendiente y auditada. | HU09 |
+| L-CU06-02 | ✅ servidor / ⌛ páginas y revisión | Solapada con una activa, aunque sea de otro ámbito → rechaza. | Q06 |
+| L-CU06-03 | ✅ servidor / ⌛ páginas y revisión | Contigua (una termina 11:00, otra empieza 11:00) → permitida, según entrevista. Prueba del flujo B03 pendiente; no volver a pedir esa decisión. | 08B §1.1 |
+| L-CU06-04 | ✅ servidor / ⌛ páginas y revisión | Solapada con una cancelada o de baja → permitida. | Q06 |
+| L-CU06-05 | ✅ servidor / ⌛ páginas y revisión | 2 y 10 reservas distintas simultáneas por el mismo horario → se guarda exactamente una cita con su evento. Forzar la coincidencia antes de guardar; el reenvío de la misma reserva se sigue en L-CU06-09. | Q06, R02 |
+| L-CU06-06 | ✅ regla del servidor / ⌛ recorrido de páginas | Agendar desde un equipo en otra zona horaria → al consultarla, la hora de Hermosillo está intacta. | HU09 CA4, Q09 |
+| L-CU06-07 | ✅ regla del servidor / ⌛ recorrido de páginas | Servidor/imagen y persistencia probados (B00 §4.4); falta recorrido de agenda. **Extra:** citas en las fechas de cambio de horario de EE. UU. y del resto de México (Hermosillo no cambia) → la hora no se desplaza. | Q09 |
+| L-CU06-08 | ✅ servidor / ⌛ páginas y revisión | Paciente de baja o ámbito que no tiene → rechaza. | CU06 A1 |
+| L-CU06-09 | ✅ servicio / ⌛ transporte HTTP y páginas | Respuesta interrumpida y reenvíos de la misma solicitud, en los distintos órdenes del plan B03 → no existe segunda cita ni segundo evento. Cubrir primer intento confirmado y revertido. Mecanismo D2 aprobado. QA de servicios ejecutado el 12-nov; el corte HTTP y el doble clic esperan páginas. Sin reintento automático. | S5 |
 
 ### CU07 — Reprogramar o cancelar cita (B05)
 
@@ -597,3 +597,7 @@ Referencia: OWASP Top 10:2025, ASVS 5.0 aplicable y 07B. «Todas las rutas» = l
 Todos los estados ⏳ de ejecución se conservan. Incorporar a los casos existentes de CU01/CU02 (datos de Usuario), CU03/CU04 (campos/tutor/homónimos/baja), CU05–CU09 (horario/montos/pago) y futuros CU-F11–F13 el alcance aprobado cuando se implemente. No crear IDs ficticios ni contar respuestas de entrevista como casos correctos.
 
 Reglas B03 vigentes: [sección 3 de AGENTS](../../AGENTS.md#3-límites-vigentes), decisiones de Lucía del 01-nov-2026; sustituyen el horario del 31-oct.
+
+**B03, ejecución del 12-nov.** Las marcas de servidor se apoyan en #18/bfc78f2: 819 unitarias, 521 integraciones del PR y 37 casos propios de Lucía; 18 de concurrencia/reenvíos repetidos dos veces más. No se suman subgrupos ni repeticiones. Zonas: 20 conversiones de Domain y fecha máxima por zona, UTC y Tokio; no acredita navegador. Reauditoría, publicación del QA nuevo, revisión humana y aprobación pendientes. Los criterios permanecen en estas mismas filas; [plan B03](../planning/TherapEase-etapa09-B03.md).
+
+**Seguimiento de B03, 12-nov.** #18 integrado en 8bcc7c6; Claude APROBADO v1 sobre el QA propio de 37 casos. Se preparan sin duplicar los casos para #19, junto con la unitaria de cita agendada sin nombre. La revisión humana y las páginas permanecen pendientes.

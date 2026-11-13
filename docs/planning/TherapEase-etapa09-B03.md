@@ -1,8 +1,17 @@
 # TherapEase — B03 · La agenda y las citas
 
-**05-nov-2026 · Claude: CORREGIR recibido; Lucía aprobó D1–D13 ✅.** Precisiones documentales aplicadas. El plan del 01-nov se publicó en d2302f2; esta versión ajustada y la propuesta siguen locales. No se acredita implementación, pruebas o nueva auditoría APROBADO.
+**Estado vigente, 12-nov-2026.** ✅ #18 aprobado por Lucía y fusionado con squash en 8bcc7c6, tras Claude APROBADO v1, 12-nov. Preparación local para #19: 37 casos propios B03 y una unitaria de cita agendada sin nombre; 884/884 unitarias, 562/562 integraciones y 54/54 Chrome B01 correctas. ✅ Ampliación de #19: Claude APROBADO v1, 12-nov. ✅ Publicación autorizada por Lucía. ⌛ CI del nuevo SHA y revisión de Miguel. Páginas B03 con Dulce después de B02. B00/B01/B02/LCA/R04 siguen abiertos. Lucía autorizó esta entrega para el mismo PR #19; su CI y la revisión humana siguen pendientes.
 
-> Los días, campos y horario del 01-nov siguen vigentes. La propuesta técnica y D1–D13 ya fueron revisadas/decididas; Lucía comparte las precisiones con Miguel. Esta entrega solo prepara documentos y el aviso del helper B01; no modifica código/pruebas B03 ni publica desde herramientas.
+✅ indica una tarea terminada en el alcance descrito. ⏳ indica un pendiente. Entregar código, ejecutar pruebas, revisar y aprobar son pasos distintos.
+
+| Parte | Estado comprobado |
+| --- | --- |
+| Diseño y publicación | ✅ Decisiones del 01-nov y D1–D13 del 05-nov. Documentación compartida publicada en main `6dd13d9`. |
+| Servidor de Miguel | ✅ Claude APROBADO v1, 12-nov; Lucía aprobó bfc78f2 y fusionó #18 con squash en 8bcc7c6. |
+| CI de #18 | ✅ [43058777583](https://github.com/LuciAguilar/Therapease/actions/runs/43058777583), 4/4; 883 unitarias y 521 integraciones. GitHub probó 2c440f1, combinación con main 32e7bca. |
+| QA propio de Lucía | ✅ 37 casos auditados por Claude el 12-nov. Preparados para #19, junto con una unitaria nueva; 562/562 integraciones y 884/884 unitarias locales correctas. ✅ Ampliación de #19: Claude APROBADO v1, 12-nov. ⌛ Autorización de publicación y revisión de Miguel. |
+| Páginas y uso | ✅ #13 fusionado en 32e7bca; QA B01 propio en #19, revisión de Miguel pendiente. ⌛ Dulce termina pacientes B02 antes de páginas B03. HTTP, navegador y uso B03 siguen pendientes. |
+| Decisión final | ✅ Lucía decidió fusionar #18. ⌛ #19 requiere auditoría de la ampliación, publicación, CI y revisión de Miguel antes de la decisión final. No se cierra B03. |
 
 ## 1. Qué abarca y qué comprobaremos
 
@@ -16,35 +25,41 @@ HU08–HU09 y CU05–CU06: consultar la agenda y reservar una cita ficticia en h
 | Cruces              | Solo agendada y vigente ocupa horario. Cruces incluso entre ámbitos, citas contiguas y reservas simultáneas.                                                                                                                                                                                                                                          |
 | Guardado y fallos   | Cita y evento juntos, éxito solo después de guardar y ningún cambio parcial si falla la auditoría.                                                                                                                                                                                                                                                    |
 | Cambios simultáneos | Agendar mientras se da de baja al paciente; no dejar una cita activa de un paciente de baja.                                                                                                                                                                                                                                                          |
-| Reenvío             | Respuesta perdida o envío repetido sin otra cita ni otro evento. El mecanismo lo propone Miguel y lo decide Lucía.                                                                                                                                                                                                                                    |
-| Páginas y uso       | Campos, mensajes, doble clic, permisos y horas desde el navegador; requieren páginas y PageModel de Dulce.                                                                                                                                                                                                                                            |
+| Reenvío             | Respuesta perdida o envío repetido sin otra cita ni otro evento. Identificador fijo y relectura aprobados por Lucía e integrados en #18.                                                                                                                                                                                                                                    |
+| Páginas y uso | ✅ #13 fusionado en 32e7bca; QA B01 propio en #19, revisión de Miguel pendiente. ⌛ Dulce termina pacientes B02 antes de páginas B03. HTTP, navegador y uso B03 siguen pendientes. |
 
-**Estado:** toda esta cobertura está prevista. Las unitarias comprueban reglas por separado; la integración comprueba servicios y PostgreSQL juntos; el navegador comprueba las páginas. La base de B00 ayuda, pero no acredita el recorrido completo de B03.
+**Estado:** Miguel entregó cobertura de servicios en #18. El QA propio de servicios está ejecutado y auditado; quedan su incorporación a #19 y los recorridos de páginas. Las unitarias comprueban reglas por separado; la integración comprueba servicios y PostgreSQL juntos; el navegador comprueba las páginas. La base de B00 ayuda, pero no acredita el recorrido completo de B03.
 
 Los casos siguen en el [plan de pruebas: CU05](../testing/TherapEase-09-plan-de-pruebas.md#cu05--consultar-agenda-b03-) y [CU06](../testing/TherapEase-09-plan-de-pruebas.md#cu06--agendar-cita-b03-). No se copian sus tablas aquí ni al checklist personal.
 
 ---
 
-## 2. Quién hace qué ahora
+## 2. Qué hará cada persona
 
-| Persona | Trabajo autorizado | Qué espera |
-| --- | --- | --- |
-| Miguel | Una propuesta completa; señalar qué reutiliza de B00/B01/B02 y qué falta decidir. Mantener el apoyo a Dulce. | Claude CORREGIR recibido y D1–D13 aprobadas; Lucía transmite las precisiones. Trabajo de servidor pendiente del PR de Miguel. |
-| Dulce | Seguir conectando las páginas B01/B02; no quedan preguntas de producto B03 para Dulce. | Contrato decidido para las páginas de B03; conserva PageModel y sus unitarias. |
-| Lucía con Codex | Preparar documentos y QA por escrito a partir de los casos existentes; revisar privacidad y reunir decisiones. | Propuesta para auditar con Claude y decidir. Las pruebas ejecutables esperan la implementación aprobada. |
+| Estado | Persona | Trabajo de agenda y citas | Qué falta |
+| --- | --- | --- | --- |
+| ✅ | Miguel | Propuesta, permisos, horario y servicios de agenda y citas. | Servidor fusionado en #18/8bcc7c6, con aprobación de Lucía y Claude APROBADO v1. |
+| ✅ | Miguel | Unitarias, integración de apoyo y evidencia del servidor. | #18 integrado. Las pruebas propias de Lucía se incorporan a su #19 y Miguel las revisa. |
+| ✅ contrato / ⏳ apoyo | Miguel | Contrato publicado en su rama para las páginas de Dulce. | Apoyar también B01/#13 y pacientes B02. Revisar el QA de Lucía cuando se comparta. |
+| ✅ | Lucía con Miguel | Disparador y arranque sin conexión de #18. | SQL, impacto y reversión revisados; Claude APROBADO v1, 12-nov; Lucía aprobó y fusionó #18. |
+| ⏳ | Dulce | Agenda con vistas, fechas, límite y estados vacíos; formulario de paciente, ámbito e inicio/fin; resultado y mensajes. | Usar el contrato B03. Prioridad en páginas de pacientes B02, desde main actualizado, que ya incluye #13 en 32e7bca. |
+| ⏳ | Dulce | PageModel y sus unitarias, antifalsificación, campos y navegación. | Entregar por PR con revisión humana distinta. |
+| ✅ ejecución y auditoría previa / ⌛ ampliación | Lucía con Codex | QA de servicios y PostgreSQL de la sección 4.1. | 37 casos aprobados por Claude; importados sin cambios a la rama de #19. Con la unitaria nueva: 884/884 unitarias y 562/562 integraciones. Claude APROBADO v1 sobre la ampliación, 12-nov. Falta publicación y revisión humana. |
+| ✅ | Lucía | Claude APROBADO v1, 12-nov, sobre #18 y QA de 37 casos. | Aprobé fusionar #18; la nueva unitaria, los dos textos y su incorporación a #19 recibieron Claude APROBADO v1, 12-nov. Publicación autorizada por Lucía; falta CI y revisión de Miguel. |
+| ⏳ páginas | Lucía con Dulce | Formularios, doble clic real, respuesta HTTP perdida, Chrome y uso. | Necesita las páginas. Los casos continúan en el plan de pruebas existente. |
 
-Miguel y Dulce eligen sus herramientas. La auditoría de IA no sustituye la revisión humana del código y las pruebas.
+Miguel y Dulce eligen sus herramientas. Lucía conserva la aprobación final.
 
-## 3. Una sola propuesta y decisiones juntas
+## 3. Reglas aprobadas y decisiones que se conservan
 
 | Tema | Qué debe quedar claro |
 | --- | --- |
 | Campos de cita | Paciente, ámbito, inicio y fin; sin campos nuevos. Método de pago descartado; HU13/CU09 no cambian. Opcional: Miguel y Dulce pueden proponer inicio y duración en la página, calculando fin; 30 minutos solo desde las 15:00. El servidor valida siempre. |
 | Permisos | Quién puede consultar y agendar, con una tabla expresa por rol. No conceder permisos nuevos por suposición. |
-| Consulta de agenda | Mostrar los siete días y citas en cualquier minuto. Proponer periodo y límites, datos visibles, detalle autorizado y estado vacío; canceladas fuera de la agenda activa. Si el paciente de una cancelada está de baja, explicar qué se muestra sin revelar su nombre o ficha: B02 solo permite «Está dada de baja». Su consulta nueva queda en B06. Explicar cómo se convierten los días del periodo con HoraHermosillo. |
+| Consulta de agenda | Mostrar los siete días y citas en cualquier minuto. Periodo de 1 a 35 días y hasta 500 filas con aviso, datos visibles, detalle autorizado y estado vacío; canceladas fuera de la agenda activa. Si el paciente de una cancelada está de baja, explicar qué se muestra sin revelar su nombre o ficha: B02 solo permite «Está dada de baja». Su consulta nueva queda en B06. Explicar cómo se convierten los días del periodo con HoraHermosillo. |
 | Horario | Los siete días; inicio en cualquier minuto sin segundos, desde las 9:00. Antes de las 15:00 dura una hora, aunque termine después de las 15:00; desde las 15:00 dura 30 minutos o una hora. Fin máximo a las 19:00 y mismo día. 14:30–15:30 sí se permite. Explicar dónde vive y se valida la regla y cómo tratar citas ficticias o pruebas existentes fuera de horario, sin cambiarlas ni borrarlas ahora. La página debe enviar fecha y hora de forma definida, convertidas mediante HoraHermosillo sin depender de la zona del navegador o servidor. |
 | Cruces y paciente | Conservar controles B00 frente a otra reserva y baja del paciente. Si se retira el ámbito mientras se agenda, la cita lo conserva, sin migración; Miguel explica cómo protege ese orden. |
-| Reenvío seguro | Misma reserva sin otra cita ni evento. Nunca responder «horario ocupado» por chocar con su propia cita. Hoy la base reconoce el identificador repetido de pacientes, no de citas: Miguel propone cómo resolverlo, sin copiar B02 a ciegas. Mantener permisos, actor y datos comprobados. |
+| Reenvío seguro | Misma reserva sin otra cita ni evento. Nunca responder «horario ocupado» por chocar con su propia cita. El traductor de #18 reconoce PK_Cita y la relectura compara la misma reserva confirmada. Mantener permisos, actor y datos comprobados. |
 | Registro después del horario | Se permite con las mismas reglas. Calcular «Registrada después de su horario» comparando FechaAlta > Inicio; la hora procede del servidor, nunca de la página. Sin campo ni migración nuevos; su evento lo indica con texto fijo. |
 | Guardado y auditoría | Cambio y evento juntos, respuesta de conflicto comprensible y evento sin contactos ni valores privados. |
 | Datos y código existentes | Reutilización, cambios de datos necesarios, impacto y reversión si hubiera migración; ningún cambio de tecnología se da por aprobado. |
@@ -64,13 +79,13 @@ Reglas vigentes y seis decisiones: [AGENTS, sección 3](../../AGENTS.md#3-límit
 | Acceso B01 y auditoría B00 | Reutilizar sesiones, permisos, guardado y eventos; no inventar otra autenticación. |
 | Ayudas de QA | Reutilizar PostgreSQL desechable, usuarios ficticios, reloj y fallos controlados. |
 
-Hay reglas, repositorio y restricciones de citas. Todavía no hay un servicio completo para consultar agenda y agendar.
+Las reglas y restricciones de B00 se reutilizan. El servicio de #18 quedó aprobado y fusionado en 8bcc7c6. Su QA de servicios tiene Claude APROBADO v1, 12-nov; la ampliación de #19 tiene Claude APROBADO v1, 12-nov; faltan publicación y revisión humana.
 
-> **Lección de B02:** diseñar el QA para forzar los distintos momentos entre comprobar y guardar, también cuando una solicitud gemela termina antes de buscar coincidencias. Una coincidencia solo al guardar puede dejar un fallo sin comprobar. Son pruebas futuras, no resultados de esta apertura. Si una regla queda tanto en SQL como en .NET, comparar todos los minutos del día y sus límites para detectar diferencias; ahora solo se diseña por escrito.
+> **Lección de B02:** diseñar el QA para forzar los distintos momentos entre comprobar y guardar, también cuando una solicitud gemela termina antes de buscar coincidencias. Una coincidencia solo al guardar puede dejar un fallo sin comprobar. Los resultados ejecutados se identifican en la sección 5. Si una regla queda tanto en SQL como en .NET, comparar sus minutos y límites. El horario actual vive solo en Domain; el QA de servidor disponible se ejecutó el 12-nov.
 
 ### 4.1. Cómo prepararemos los cambios simultáneos
 
-**Diseño escrito ajustado a D1–D13 y a Claude.** Se enlaza a los casos existentes; no añade identificadores ni sustituye sus tablas. Los puntos de espera se enlazan al servicio propuesto; se implementan cuando corresponda el PR, sin acreditar ejecución aquí.
+**Diseño escrito ajustado a D1–D13 y a Claude.** Se enlaza a los casos existentes; no añade identificadores ni sustituye sus tablas. Los puntos de espera se enlazan al servicio propuesto; sus ejecuciones y pendientes se identifican en la sección 5.
 
 Cada solicitud tendrá su propio contexto y conexión a PostgreSQL. Prepararemos señales que indiquen «la comprobación terminó» y «puede continuar», con tiempo máximo y liberación también si falla el caso. La prueba deberá demostrar que alcanzó ese punto. Lanzar dos tareas juntas o esperar unos milisegundos no demuestra ese orden.
 
@@ -97,28 +112,30 @@ D2 está aprobado con las precisiones de Claude: una misma relectura con permiso
 
 La lectura del código de `b53c5b7` confirma la restricción `EX_Cita_SinCruceActivo` y los controles `TR_Cita_ActivaExigePacienteVigente` y `TR_Paciente_BajaSinCitasActivas`, en la migración inicial de Infrastructure. Son base de protección, no un servicio de agenda terminado.
 
-En `tests/TherapEase.IntegrationTests/`, revisar `PostgreSqlRevision.cs`, `ConcurrenciaSqlRevision.cs`, `PacientesRevision.cs` y `InterrupcionesIdentidadRevision.cs`: entorno desechable, observación de bloqueos, solicitudes separadas y cortes de guardado. Reutilizar lo que sirva; las esperas para las nuevas operaciones aún no están implementadas. Un ensayo SQL aislado no sustituye el recorrido del servicio de agendar.
+En `tests/TherapEase.IntegrationTests/`, revisar `PostgreSqlRevision.cs`, `ConcurrenciaSqlRevision.cs`, `PacientesRevision.cs` y `InterrupcionesIdentidadRevision.cs`: entorno desechable, observación de bloqueos, solicitudes separadas y cortes de guardado. Reutilizar lo que sirva; el QA local añade pausas antes de guardar una cita o una baja y comprueba que se alcanzaron. Un ensayo SQL aislado no sustituye el recorrido del servicio de agendar.
 
 Aplicar [L-Q03-01/02](../testing/TherapEase-09-plan-de-pruebas.md#q03--auditoría-en-base-captura-desde-b01-sin-pantalla-cu10-en-09) y L-CU06-09 al fallo de auditoría y la respuesta perdida: verificar juntos cita y evento, tanto si se revirtió todo como si se confirmó todo antes del corte. El corte del guardado, el corte HTTP y el doble clic real son comprobaciones distintas; las últimas esperan las páginas correspondientes. Permisos y resultados siguen D1/D2 aprobados: sin cita, cruce conserva horario ocupado, TE001 texto de baja y clave repetida 500; errores inesperados/auditoría no se releen.
 
-## 5. Seguimiento y publicación
+## 5. Seguimiento, revisión y publicación
 
 | Estado | Paso | Resultado o dependencia |
 | --- | --- | --- |
-| ✅ | Autorizar preparación | Antecedente del 31-oct: solo preparación. D1–D13 aprobadas el 05-nov; esta entrega Codex sigue documental. |
-| ✅ preparación documental | Preparar seguimiento compartido y personal | Plan aprobado por Lucía y publicado; checklist personal conservado localmente. |
-| ✅ correcciones y publicación / ⏳ envío por Lucía | Revisar borradores y mensaje | Correcciones aplicadas; Lucía aprobó y se publicó en main d2302f2. Mensaje completo preparado para que Lucía lo pase a Miguel. No se ha enviado desde herramientas. |
-| ✅ decisión 01-nov | Precisar horario | Días, inicios y duraciones decididos en AGENTS, sección 3; sustituyen la regla del 31-oct. |
-| ✅ decisiones 01-nov | Producto B03 | Paciente, ámbito, inicio y fin; siete días y horario definidos; pasado permitido y ámbito retirado conservado durante el alta. Sin preguntas de producto para Dulce. |
-| ✅ revisada y ajustada | Recibir propuesta técnica | Propuesta del 03-nov/0e2838b auditada CORREGIR; precisiones documentales aplicadas y D1–D13 aprobadas por Lucía. |
-| ✅ auditoría recibida / ✅ decisión | Auditar y decidir | Claude CORREGIR del 05-nov; Lucía aprobó D1–D13. No se atribuye otro APROBADO. Implementación, pruebas y publicación son pasos distintos. |
-| ✅ diseño escrito / ⏳ ejecución | Diseñar QA por escrito | Sección 4.1 como fuente única: agendar/baja, gemelo y ámbito retirado. Añadir en la implementación las tres salidas y límites; ninguna prueba B03 ejecutada aquí. |
-| ✅ publicación anterior / ⏳ versión ajustada | Publicar documentación actual en main durante B03 | Dieciséis documentos del 01-nov publicados en d2302f2. La aprobación D1–D13 no publica esta versión: queda local; sin envío/publicación desde herramientas. |
-| ⏳ | Implementación, QA ejecutable y páginas | D1–D13 aprobadas. [PR #18](https://github.com/LuciAguilar/Therapease/pull/18): Lucía revisó `fe6b79a` (810 unitarias y 27 integraciones de citas; su QA dirigido dio 4/5) y aprobó el bloqueo de la agenda en un disparador de `Cita` (migración `BloqueoDeAgendaEnCitaActiva`; [ADR-04](../architecture/adr/ADR-01-a-05-provisionales.md#adr-04--integridad-y-ciclo-de-datos)). Esta corrección lo implementa, retira el tratamiento especial del `40P01` (vuelve a ser error 500, sin relectura) y agrega sus pruebas. El mismo PR incluye la mejora de arranque: sin `ConnectionStrings:TherapEase`, la aplicación y los comandos del operador se detienen con un mensaje fijo, centralizado en `AgregarPersistencia`. Detalle en la [evidencia](../testing/TherapEase-09-B03-evidencia-servicios.md). [Contrato para páginas](TherapEase-etapa09-B03-contrato-para-paginas.md) actualizado. QA dirigido de Lucía y páginas de Dulce pendientes. Revisión distinta y decisión final permanecen. |
+| ✅ | Preparar y decidir el diseño | D1–D13 aprobadas el 05-nov con las precisiones de Claude. |
+| ✅ | Publicar documentación compartida | Main `6dd13d9`, con autorización de Lucía. Notas personales y evidencia quedan locales. |
+| ✅ | Recibir implementación y pruebas de Miguel | #18 en bfc78f2; código 479ab5b. 21 cambios de archivo desde fe6b79a, sin modificar su código al revisar. |
+| ✅ | Revisar y devolver correcciones | Claude APROBADO v1, 12-nov. #18 fusionado; la precisión del contrato sección 4.3 y la del impacto se preparan en #19. |
+| ✅ comprobado | Tratamiento de 40P01 | Disparador con clave 7301, antes del FOR SHARE; sin traducción especial del interbloqueo. SQL, impacto y reversión revisados. Fallo preparado en auditoría: excepción técnica, sin relectura y cero cita/evento. |
+| ✅ servicios / ⌛ entrega y páginas | QA propio de Lucía | 37/37, dos repeticiones adicionales 18/18, sin omitidas. Consulta, horarios, privacidad, reenvíos y baja/cita con commit y rollback; no acredita páginas ni cortes HTTP. |
+| ✅ #18 y QA previo / ⌛ ampliación #19 | Auditoría, revisión humana y aprobación | Claude APROBADO v1, 12-nov; Lucía fusionó #18. Ampliación de #19: Claude APROBADO v1, 12-nov. Después de publicar y comprobar CI, Miguel revisa el PR completo y Lucía decide. |
+| ✅ auditoría / ⌛ publicación | Incorporar el seguimiento de #18 a #19 | ✅ Una unitaria: Agendada, nombre nulo y PacienteDeBaja=false tras denegarse el nombre después de confirmar. ✅ Los 37 casos propios se conservan sin cambios. ✅ Contrato sección 4.3 e impacto del bloqueo precisados; B08 medirá su costo. Claude APROBADO v1, 12-nov; falta autorización de publicación, CI y Miguel. |
+| ⏳ | Páginas, navegador y uso | Dulce conserva su entrega. B01/#13 fusionado en 32e7bca. B02 espera sus páginas. |
+| ✅ autorización / ⌛ CI | Publicar esta actualización con el QA de #19 | Lucía autorizó commit y push normal de los 15 archivos auditados. Miguel revisará el PR completo tras la CI. |
 
-Antes de cada entrega: conservar `revision/etapa09`, hacer fetch y merge de origin/main sin reset y preservar todos los cambios locales. En esta entrega, fetch/merge sin cambios sobre 0e2838b; rama global y cambios locales conservados. Nada de commit, push, PR, fusión de PR ni limpieza sin aprobación explícita de Lucía.
+Se conserva `revision/etapa09`, con fetch y merge de origin/main y los cambios locales. No se cierra ningún bloque por recibir #18.
 
-**Qué está disponible:** #11/#12 están publicados y fusionados. La versión del plan del 01-nov está publicada en main d2302f2; la propuesta recibida y esta revisión del 05-nov siguen locales. Su nota personal y la evidencia quedan locales. D1–D13 ya están aprobadas con las precisiones de Claude; implementación y pruebas siguen pendientes de su PR. Esta entrega Codex no las toca.
+**Resultado del 12-nov.** ✅ #18 aprobado por Lucía y fusionado con squash en 8bcc7c6, tras Claude APROBADO v1, 12-nov. Preparación local para #19: 37 casos propios B03 y una unitaria de cita agendada sin nombre; 884/884 unitarias y 562/562 integraciones correctas. ✅ Ampliación de #19: Claude APROBADO v1, 12-nov. ✅ Publicación autorizada por Lucía. ⌛ CI del nuevo SHA y revisión de Miguel. Páginas B03 con Dulce después de B02. Las cifras de las rondas anteriores conservan su versión y no se suman. El sondeo UTC/Tokio comprueba Domain, no páginas.
+
+**Material disponible para el equipo.** El diseño aprobado está en main `6dd13d9`. El código, contrato y evidencia de Miguel ya están integrados en main 8bcc7c6 por #18. Las dos precisiones de texto posteriores están preparadas localmente para #19. Este seguimiento posterior y el checklist personal se preparan localmente.
 
 ## 6. Documentos de contexto
 
@@ -133,3 +150,5 @@ Antes de cada entrega: conservar `revision/etapa09`, hacer fetch y merge de orig
 | [ADR-04](../architecture/adr/ADR-01-a-05-provisionales.md#adr-04--integridad-y-ciclo-de-datos) | Integridad, cruces, auditoría y reenvío. |
 
 Fuera: B04 de cambio de pago, reprogramar/cancelar B05, nuevas bajas/recuperaciones B06, directorio B07, montos, «solo particular» y cancelación automática. No se cierra B00/B01/B02/LCA/R04. Solo datos ficticios, sin nube ni gastos.
+
+Servidor fusionado: [#18](https://github.com/LuciAguilar/Therapease/pull/18). [Contrato para páginas](TherapEase-etapa09-B03-contrato-para-paginas.md) y [evidencia del servidor](../testing/TherapEase-09-B03-evidencia-servicios.md).

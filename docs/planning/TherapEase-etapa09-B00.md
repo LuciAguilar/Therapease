@@ -1,15 +1,15 @@
 # TherapEase — 09/B00 · Plan y estado de validación
 
-## Estado vigente al 10-nov-2026
+## Estado vigente al 11-nov-2026
 
 > **B00/LCA/R04 siguen abiertos.** La base y su QA de #4/#6 están revisados e integrados. La repetición completa de la rama de #12 también incluye las pruebas anteriores de B00; no acredita páginas, una nueva prueba de carga ni un respaldo real.
 
 | Qué falta | Quién / qué puede avanzar |
 | --- | --- |
-| Acceso/salida y Q03 desde páginas | ✅ #13 fusionado en 32e7bca. QA propio B01 preparado y ejecutado, con auditoría y publicación pendientes. Ver [plan B01](TherapEase-etapa09-B01.md). |
+| Acceso/salida y Q03 desde páginas | ✅ #13 fusionado en 32e7bca. QA propio B01 auditado por Claude APROBADO v1 y publicado en [#19](https://github.com/LuciAguilar/Therapease/pull/19), 656bba1. CI: 469/469 integración, 52/54 navegador; falta diagnosticar y corregir los dos fallos, revisión humana y fusión. Ver [plan B01](TherapEase-etapa09-B01.md). |
 | Formularios, cabeceras/caché y CSS | Comprobados en las páginas de acceso y cuentas. Sigue aparte la observación sobre CSS con sesión. |
 | Evidencia y riesgos del cierre B00/LCA | Lucía puede ordenar los resultados y reverificar protecciones de GitHub, sin cambiarlas ni dar LCA por cerrada. |
-| Agenda B03 | Preparación autorizada: propuesta y QA escrito. Los recorridos completos de reserva y baja aún esperan código autorizado y sus pruebas. |
+| Agenda B03 | ✅ #18 fusionado en 8bcc7c6 y QA de 37 casos con Claude APROBADO v1, 12-nov. ⌛ Ampliación de #19, revisión humana y páginas. Ver [plan B03](TherapEase-etapa09-B03.md). |
 | Datos reales, R04 y respaldo real | Siguen fuera de esta autorización; no conectar nube ni crear respaldos operativos. |
 
 [Resumen de responsabilidades y siguiente decisión](TherapEase-09-avance-y-pendientes.md). Las cifras y estados de las secciones fechadas anteriores son antecedentes; esta tabla prevalece para los pendientes actuales. Sin pruebas nuevas por esta actualización documental.
@@ -477,7 +477,7 @@ No crear un PR por cada mejora. GitHub Settings y el correo local se verifican/c
 | ⏳ | Completar/probar acceso y comando autenticado de lectura Q03. | Miguel/Dulce implementan su parte; Lucía prueba | **Órdenes 8–9 aprobados el 12-oct; 16–17 pendientes.** Opción A: navegador autenticado. La API exige permiso actual; sesiones de QA no sustituyen el acceso/cierre de sesión de Dulce ni el recorrido final. Sin pantalla de auditoría. |
 | ✅ Identity/pacientes / ⏳ citas/pago | Cambio y evento atómicos; sin éxito ante fallo. | Lucía prueba; Miguel corrige si aparece un fallo | Identity revisado e integrado; pacientes ejecutados y auditados en #12, aprobado por Miguel y fusionado por Lucía en `b53c5b7`. Citas/pago esperan sus bloques. |
 | ⏳ | Probar reservas y recuperación de cita agendada por servicios; estados alternos y nuevas comprobaciones de cruce. | Lucía prueba; Miguel implementa/corrige | Paciente vigente; cancelada/de baja no bloquea; contiguas permitidas y pago inicial Pendiente ya confirmados. Quedan los servicios completos de sus bloques; no volver a pedir esas decisiones. |
-| ⏳ | Completar concurrencia por servicios: agendar frente a baja y recuperar frente a otra reserva. | Lucía prueba; Miguel implementa/corrige | El QA de baja mínima fue revisado en #6. Queda el recorrido completo por los servicios de agenda/reserva (B03) y recuperación (B06). Conservar bloqueo PostgreSQL. |
+| ⏳ | Completar concurrencia por servicios: agendar frente a baja y recuperar frente a otra reserva. | Lucía prueba; Miguel implementa/corrige | El QA de baja mínima fue revisado en #6. Agenda/reserva B03 de servidor comprobada con 37 casos auditados, preparados para #19; quedan revisión humana, páginas y recuperación B06. Conservar bloqueo PostgreSQL. |
 | ✅ pacientes / ⏳ otros registros | Conflictos de edición sin sobrescribir. | Lucía prueba; Miguel corrige si corresponde | Pacientes comprobados en #12 y QA aprobado por Miguel y fusionado por Lucía en `b53c5b7`. Los otros registros se prueban cuando existan sus servicios. |
 | ⏳ | Probar baja/consulta/recuperación autorizada, sin borrado físico y fuera de listados ordinarios. | Lucía prueba; Miguel/Dulce implementan su parte | Conservación inicial probada; faltan servicios, filtros y caminos restantes (Q20). |
 | ✅ | Probar interrupciones/reintentos de Identity en el alcance disponible. | Lucía; Miguel o Dulce revisa | 16 casos correctos: seis escenarios, pausa, cancelación y corte real de conexión; límites en §4.7. |

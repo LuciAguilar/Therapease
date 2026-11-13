@@ -1,6 +1,6 @@
 # TherapEase — B01 · QA de páginas de Lucía
 
-**Preparación local del 10-nov-2026 sobre main 32e7bca, después de #13.** Publicado el 11-nov en [PR #19](https://github.com/LuciAguilar/Therapease/pull/19), commit 656bba1, sin fusionar. Autoría de las pruebas de esta entrega, Lucía con Codex. Claude APROBADO v1, 11-nov, reauditoría. CI nueva con dos fallos de navegador; diagnóstico y revisión humana de Miguel pendientes. B00/B01/LCA/R04 siguen abiertos.
+**Preparación local del 10-nov-2026 sobre main 32e7bca, después de #13.** Publicado el 11-nov en [PR #19](https://github.com/LuciAguilar/Therapease/pull/19), commit 656bba1, sin fusionar. Autoría de las pruebas de esta entrega, Lucía con Codex. Claude APROBADO v1, 11-nov, reauditoría. Diagnóstico publicado en 21981d6; CI 43294599703 correcta en dos pasadas 4/4, con 54/54 Chromium Linux cada una. La causa de los dos fallos de la primera CI sigue sin identificar. Revisión humana de Miguel y fusión pendientes. B00/B01/LCA/R04 siguen abiertos.
 
 ## 1. Alcance y trazabilidad
 
@@ -13,7 +13,7 @@
 | ✅ ejecutado | Historial sin temporal, una sola respuesta al POST y respuesta perdida antes/después de guardar | Casos de alta e interrupción con Route.Fetch/Abort, sin reintentos. |
 | ✅ ejecutado | Fallo del evento de entrada, reversión de alta y POST complementarios | FallosDeFormularioTests, tres pruebas HTTP procedentes del QA local auditado. |
 | ✅ ejecutado | Cabeceras y /Acceso/Denegado anónimo con 403 y no-store | CabecerasSeguridadTests. |
-| ✅ Claude y publicación / ⌛ CI y revisión humana | Auditoría, revisión humana, CI publicada y decisión | Claude APROBADO v1, 11-nov, reauditoría. Miguel revisa las pruebas y Lucía decide. |
+| ✅ Claude, publicación y CI 2×4/4 / ⌛ revisión humana y fusión | Auditoría, revisión humana, CI publicada y decisión | Claude APROBADO v1, 11-nov, reauditoría. Miguel revisa las pruebas y Lucía decide. |
 
 Se reutilizan los identificadores del [plan de pruebas](TherapEase-09-plan-de-pruebas.md), CU01/CU02/CU11, Q03/Q08 y los controles S aplicables. No se duplican sus tablas de casos. Las 57 comprobaciones anteriores de Node se reorganizan en 54 casos xUnit, con varias comprobaciones por caso. No sumar cifras ni presentarlas como 54 funciones nuevas.
 
@@ -78,6 +78,14 @@ Claude APROBADO v1, 11-nov, sobre el diagnóstico. La causa en Linux sigue sin c
 
 Los errores muestran el estado HTTP y un nombre fijo de página. Se extrae únicamente un código con el formato net::ERR_[A-Z0-9_]+, o se usa el texto fijo de navegación interrumpida o página/navegador cerrados. No se copia el mensaje original, que puede contener datos privados. Ante un 500 se nombran solo las categorías AntiforgeryValidationException, CryptographicException, NpgsqlException y 40P01 presentes en los registros; nunca sus líneas. Esas coincidencias en los registros compartidos del entorno orientan la revisión, pero no demuestran por sí solas qué causó ese 500.
 
-No cambian las esperas, las aserciones ni los reintentos. Sin trazas ni capturas. La CI que incluya este diagnóstico debe ejecutarse para conocer el resultado de Linux. Si pasa, se repetirá una vez con Re-run all jobs; dos pasadas correctas no explican por sí solas el fallo anterior. Lucía decide cómo registrar lo observado antes de solicitar la revisión de Miguel. #18 sigue en espera.
+No cambian las esperas, las aserciones ni los reintentos. Sin trazas ni capturas. La CI 43294599703 de 21981d6 pasó sus cuatro trabajos dos veces, usando Re-run all jobs. Esas pasadas no explican el fallo anterior. #18 se fusionó después en 8bcc7c6; la ampliación de este QA sigue su propia revisión antes de publicarse.
 
 **Comprobación local del 12-nov.** Compilación sin errores ni advertencias y 54/54 Chromium en Windows. Se forzaron contraseña incorrecta, puerto bloqueado, puerto cerrado y fallo 500 de auditoría: los dos casos seleccionados fallaron en cada preparación y mostraron respectivamente HTTP 200 en Acceso, ERR_UNSAFE_PORT, ERR_CONNECTION_REFUSED y HTTP 500 con 40P01. El código se restauró tras cada preparación. El intento inicial sin Docker se conserva aparte y no acredita estas comprobaciones. Los fallos preparados no se suman a las 54 ni explican los dos fallos previos de Linux.
+
+### Ampliación B03 tras fusionar el servidor #18 — preparación local del 12-nov
+
+Lucía aprobó reunir en el mismo #19 su QA B01 y el seguimiento B03 del PR #18 de Miguel. Se prepara una unitaria en ServicioCitasTests: si Pacientes niega el nombre después de confirmar el guardado, devuelve Agendada, nombre nulo y PacienteDeBaja=false. Se incorporan los 37 casos propios de servicios de agenda, bajas simultáneas y reenvíos; los cuatro archivos conservan el contenido aprobado por Claude el 12-nov.
+
+Tras integrar main 8bcc7c6: compilación sin errores ni advertencias, 884/884 unitarias, 562/562 integraciones y 54/54 Chrome correctas. Incluyen los casos anteriores y no se suman entre sí. El [plan B03](../planning/TherapEase-etapa09-B03.md) mantiene la cobertura y los pendientes. El contrato sección 4.3 distingue el guardado confirmado de las comprobaciones de permiso; la evidencia deja el costo del bloqueo para B08.
+
+Lucía autorizó publicar esta ampliación en el mismo PR #19. Ampliación de #19: Claude APROBADO v1, 12-nov. Lucía autorizó publicar; faltan CI del nuevo SHA y revisión de Miguel del PR completo. El QA de navegador B03 y sus páginas siguen con Dulce después de B02. No se cierra ningún bloque.
