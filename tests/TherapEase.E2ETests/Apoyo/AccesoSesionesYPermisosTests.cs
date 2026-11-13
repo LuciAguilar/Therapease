@@ -118,8 +118,12 @@ public sealed partial class AccesoSesionesYPermisosTests(NavegadorRevision entor
         _paso = "inicio de sesión";
         await p.Locator("[name='Entrada.NombreUsuario']").FillAsync(cuenta.Usuario);
         await p.Locator("[name='Entrada.Contrasena']").FillAsync(cuenta.Clave);
-        await Boton(p, "Iniciar sesión").ClickAsync();
-        await p.WaitForURLAsync(u => new Uri(u).AbsolutePath != "/Acceso");
+
+        // Se empieza a esperar antes del clic para no perder el aviso si la página llega muy rápido.
+        // Se comprueban tanto el clic como la llegada completa, con el mismo límite de tiempo.
+
+        var navegacion = p.WaitForURLAsync(u => new Uri(u).AbsolutePath != "/Acceso");
+        await Task.WhenAll(navegacion, Boton(p, "Iniciar sesión").ClickAsync());
         foreach (var cookie in await p.Context.CookiesAsync())
             entorno.Privados.Add(cookie.Value);
     }
