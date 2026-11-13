@@ -7,7 +7,8 @@ TherapEase es una aplicación web para la gestión administrativa de un consulto
 **Estado de hoy — 31-oct-2026:** servidor B02 fusionado en main `c90b3c0` mediante [#11](https://github.com/LuciAguilar/Therapease/pull/11); QA [#12](https://github.com/LuciAguilar/Therapease/pull/12), `5e46883`, con [CI correcta](https://github.com/LuciAguilar/Therapease/actions/runs/41134402751), aprobado por Miguel y fusionado por Lucía en `b53c5b7` con Create a merge commit.
 
 - B01 espera las páginas, formularios y navegador; B00/LCA/R04 siguen abiertos.
-- B02: servidor y contrato disponibles; QA revisado y fusionado. Faltan confirmaciones de producto, páginas y navegador. B03 abierto solo para propuesta y QA escrito.
+- B02: servidor y contrato disponibles; QA revisado y fusionado. Faltan confirmaciones de producto, páginas y navegador.
+- B03: propuesta técnica aprobada (D1–D13, 05-nov). Servidor y contrato para las páginas en el [PR #18](https://github.com/LuciAguilar/Therapease/pull/18): Lucía revisó `fe6b79a` (810 unitarias y 27 integraciones de citas; su QA dirigido dio 4/5) y aprobó el bloqueo de la agenda en un disparador de `Cita`, que esta corrección implementa. Detalle en la [evidencia](docs/testing/TherapEase-09-B03-evidencia-servicios.md). QA de Lucía, páginas y navegador pendientes.
 - Solo datos ficticios, sin nube ni gastos; montos, «solo particular» y cancelación automática fuera.
 
 ## 2. Quién hace qué ahora
@@ -15,7 +16,7 @@ TherapEase es una aplicación web para la gestión administrativa de un consulto
 | Persona | Trabajo actual |
 | --- | --- |
 | Lucía | Decide las propuestas y dirige QA; otra persona revisa sus pruebas. |
-| Miguel | Servidor B01/B02 y QA integrados; preparar propuesta B03 y mantener apoyo a Dulce. |
+| Miguel | Servidor B01/B02 y QA integrados; correcciones del servidor B03 en el PR #18 y mantener apoyo a Dulce. |
 | Dulce | Confirma producto con la usuaria y prepara páginas, PageModel y sus unitarias. |
 
 ## 3. Documentos clave
@@ -25,7 +26,8 @@ TherapEase es una aplicación web para la gestión administrativa de un consulto
 | [AGENTS](AGENTS.md) | Reglas obligatorias, alcance y límites vigentes. |
 | [Plan B01](docs/planning/TherapEase-etapa09-B01.md) | Acceso, identidad y páginas pendientes. |
 | [Plan B02](docs/planning/TherapEase-etapa09-B02.md) | Plan aprobado; [propuesta ajustada](docs/planning/TherapEase-etapa09-B02-propuesta.md) aprobada el 26-oct. |
-| [Plan B03](docs/planning/TherapEase-etapa09-B03.md) | Producto decidido el 01-nov; documentación compartida publicada en main d2302f2. Propuesta técnica y QA escrito; sin código autorizado. |
+| [Plan B03](docs/planning/TherapEase-etapa09-B03.md) | Producto decidido el 01-nov; [propuesta técnica](docs/planning/TherapEase-etapa09-B03-propuesta.md) con D1–D13 aprobada el 05-nov. El código y las pruebas del servidor van en el [PR #18](https://github.com/LuciAguilar/Therapease/pull/18), con revisión distinta y aprobación final de Lucía. |
+| [Contrato para páginas, B03](docs/planning/TherapEase-etapa09-B03-contrato-para-paginas.md) | Entradas, resultados y errores de agenda y citas para los PageModel de Dulce. |
 | [Contrato para páginas, B01](docs/planning/TherapEase-etapa09-B01-contrato-para-paginas.md) | Entradas, resultados y errores de acceso y usuarios para los PageModel de Dulce. |
 | [Contrato para páginas, B02](docs/planning/TherapEase-etapa09-B02-contrato-para-paginas.md) | Entradas, resultados y errores de pacientes para los PageModel de Dulce. |
 | [Plan de pruebas](docs/testing/TherapEase-09-plan-de-pruebas.md) | Casos, responsables y evidencia; enlaza B00. |
@@ -48,7 +50,7 @@ TherapEase es una aplicación web para la gestión administrativa de un consulto
 
 SDK de `global.json`; Visual Studio 18 o superior o VS Code/terminal. Desde la raíz, en PowerShell; sustituir `<clave>` por contraseñas locales y mantener las variables en la misma terminal. La aplicación no carga `.env`.
 
-Arranque predeterminado: `dotnet run --project src/Web`. Imagen: `docker build -t therapease:local .` construye; `docker run --rm -p 8080:8080 therapease:local` ejecuta.
+Arranque predeterminado: `dotnet run --project src/Web`. Sin `ConnectionStrings__TherapEase` la aplicación y los comandos `--crear-superusuario` y `--restablecer-superusuario` se detienen con un mensaje fijo, sin mostrar ninguna cadena. Imagen: `docker build -t therapease:local .` construye; `docker run --rm -p 8080:8080 therapease:local` ejecuta.
 ```powershell
 dotnet build TherapEase.sln   # compilar
 dotnet test tests/TherapEase.UnitTests

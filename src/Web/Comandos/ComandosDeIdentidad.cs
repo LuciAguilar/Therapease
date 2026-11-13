@@ -28,7 +28,17 @@ public static class ComandosDeIdentidad
 
         var constructor = Host.CreateApplicationBuilder(args);
         constructor.Logging.SetMinimumLevel(LogLevel.Warning);
-        constructor.Services.AgregarPersistencia(constructor.Configuration.GetConnectionString("TherapEase"));
+        try
+        {
+            constructor.Services.AgregarPersistencia(constructor.Configuration.GetConnectionString("TherapEase"));
+        }
+        catch (InvalidOperationException excepcion) when (excepcion.Message == InyeccionDeDependencias.MensajeSinCadenaDeConexion)
+        {
+            // Sin la conexión el comando no hace nada: mensaje fijo por el error estándar, sin traza, sin contraseña y sin ningún valor de configuración.
+            Console.Error.WriteLine(InyeccionDeDependencias.MensajeSinCadenaDeConexion);
+            return 1;
+        }
+
         constructor.Services.AgregarIdentidad();
         constructor.Services.AgregarServiciosDeAplicacion();
 
