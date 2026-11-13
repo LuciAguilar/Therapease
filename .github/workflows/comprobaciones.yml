@@ -119,14 +119,67 @@ jobs:
 
       # Testcontainers levanta PostgreSQL con el Docker del runner. Sin reintentos: una falla intermitente debe verse, no ocultarse.
       - name: Pruebas de integración
-        run: >
-          dotnet test tests/TherapEase.IntegrationTests --configuration Release --no-build
-          --logger "trx;LogFileName=integracion.trx" --results-directory resultados
+        run: |
+          # Conserva la hora de salida, también si falla la integración.
+          trap 'echo "FIN_INTEGRACION=$(date -u +%Y-%m-%dT%H:%M:%S.%NZ)" >> "$GITHUB_ENV"' EXIT
+          dotnet test tests/TherapEase.IntegrationTests --configuration Release --no-build \
+            --logger "trx;LogFileName=integracion.trx" --results-directory resultados
+
+      # Ryuk limpia recursos después de salir de las pruebas. El navegador espera esa limpieza, sin reintentar sus casos.
+      - name: Esperar la limpieza de Testcontainers
+        run: |
+          # Escucha antes de esperar: Docker solo conserva los últimos 256 eventos para consultas posteriores.
+          # El filtro excluye ejecuciones de comandos; solo se guardan hora, acción e imagen, nunca variables.
+          docker events --since "$FIN_INTEGRACION" \
+            --filter type=container --filter label=org.testcontainers=true \
+            --filter event=create --filter event=start --filter event=die --filter event=destroy \
+            --format '{{.TimeNano}} | {{.Action}} | {{index .Actor.Attributes "image"}}' \
+            > "$RUNNER_TEMP/testcontainers-eventos.log" 2> "$RUNNER_TEMP/testcontainers-eventos-error.log" &
+          echo "PID_EVENTOS_DOCKER=$!" >> "$GITHUB_ENV"
+
+          if timeout 60s bash -c '
+            while true; do
+              pendientes="$(docker ps --all --quiet --filter label=org.testcontainers=true 2>/dev/null)" || exit 2
+              if [ -z "$pendientes" ]; then
+                exit 0
+              fi
+              sleep 1
+            done
+          '; then
+            echo "INICIO_E2E=$(date -u +%Y-%m-%dT%H:%M:%S.%NZ)" >> "$GITHUB_ENV"
+            echo "La limpieza de Testcontainers terminó; puede empezar el navegador."
+          else
+            codigo=$?
+            if [ "$codigo" -eq 124 ]; then
+              echo "::error::Testcontainers no terminó su limpieza en 60 segundos; no se ejecutará el navegador."
+            else
+              echo "::error::No se pudo comprobar la limpieza de Testcontainers; no se ejecutará el navegador."
+            fi
+            exit 1
+          fi
 
       - name: Acceso, sesiones y permisos en navegador
         run: >
           dotnet test tests/TherapEase.E2ETests --configuration Release --no-build
           --logger "trx;LogFileName=navegador.trx" --results-directory resultados
+
+      - name: Mostrar eventos seguros de Docker
+        if: ${{ always() && env.PID_EVENTOS_DOCKER != '' }}
+        run: |
+          # Se detiene únicamente el observador iniciado por este trabajo; no se cambia ningún contenedor.
+          # Es solo un registro de apoyo: si falla, avisa sin cambiar el resultado de las pruebas.
+          if kill -0 "$PID_EVENTOS_DOCKER" 2>/dev/null; then
+            kill "$PID_EVENTOS_DOCKER" 2>/dev/null || true
+          else
+            echo "::warning::El registro de eventos de Docker terminó antes de lo previsto; puede estar incompleto."
+          fi
+          if [ -s "$RUNNER_TEMP/testcontainers-eventos-error.log" ]; then
+            echo "::warning::Docker no pudo registrar todos los eventos; no se muestran detalles de su error."
+          fi
+          echo "Fin de integración (UTC): $FIN_INTEGRACION"
+          echo "Inicio permitido de E2E (UTC): ${INICIO_E2E:-no autorizado}"
+          echo "Hora Unix en nanosegundos | acción | imagen"
+          cat "$RUNNER_TEMP/testcontainers-eventos.log" 2>/dev/null || echo "::warning::No hay registro de eventos para mostrar."
 
       - name: Resumir pruebas de navegador
         if: always()
