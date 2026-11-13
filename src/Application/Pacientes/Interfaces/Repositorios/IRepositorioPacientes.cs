@@ -22,6 +22,12 @@ public interface IRepositorioPacientes
     // Solo la condición, sin leer el contenido de la ficha. Nulo si no existe.
     Task<CondicionRegistro?> ObtenerCondicionAsync(Guid idPaciente, CancellationToken cancelacion = default);
 
+    // Condición y ámbitos en UNA sola consulta, para quien agenda una cita. Los ámbitos van llenos solo si la ficha está vigente. Nulo si no existe.
+    Task<FilaDeCondicionYAmbitos?> ObtenerCondicionYAmbitosAsync(Guid idPaciente, CancellationToken cancelacion = default);
+
+    // Nombre de los pacientes vigentes entre los indicados, en UNA sola consulta, sin rastrear. Los de baja no se devuelven.
+    Task<IReadOnlyList<NombreDePacienteVigente>> ObtenerNombresDeVigentesAsync(Guid[] idsPacientes, CancellationToken cancelacion = default);
+
     // Fichas vigentes cuyo nombre normalizado contiene todas las palabras (ya normalizadas), con el nacimiento exacto opcional.
     // Orden estable por nombre normalizado y, para empates, por identificador. Se piden limite filas; quien llama pide una más para saber si hay más.
     Task<IReadOnlyList<FilaDeBusquedaDePaciente>> BuscarVigentesAsync(

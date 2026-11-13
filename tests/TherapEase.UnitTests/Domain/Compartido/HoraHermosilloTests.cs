@@ -36,6 +36,28 @@ public class HoraHermosilloTests
         Assert.Equal(17, instante.UtcDateTime.Hour);
     }
 
+    [Theory]
+    [InlineData(2026, 11, 2, 10, 0, true)]
+    [InlineData(1, 1, 1, 0, 0, true)]
+    [InlineData(9999, 12, 31, 16, 59, true)]
+    [InlineData(9999, 12, 31, 17, 0, false)]
+    [InlineData(9999, 12, 31, 23, 59, false)]
+    public void EsRepresentable_DiceSiElInstanteUtcCabeEnElRango(int anio, int mes, int dia, int hora, int minuto, bool esperado)
+    {
+        Assert.Equal(esperado, HoraHermosillo.EsRepresentable(new DateOnly(anio, mes, dia), new TimeOnly(hora, minuto)));
+    }
+
+    [Fact]
+    public void EsRepresentable_CoincideConCuandoAInstanteNoFalla()
+    {
+        var fecha = new DateOnly(9999, 12, 31);
+
+        Assert.True(HoraHermosillo.EsRepresentable(fecha, new TimeOnly(16, 59)));
+        Assert.Equal(new DateTimeOffset(9999, 12, 31, 23, 59, 0, TimeSpan.Zero), HoraHermosillo.AInstante(fecha, new TimeOnly(16, 59)));
+        Assert.False(HoraHermosillo.EsRepresentable(fecha, new TimeOnly(17, 0)));
+        Assert.Throws<ArgumentOutOfRangeException>(() => HoraHermosillo.AInstante(fecha, new TimeOnly(17, 0)));
+    }
+
     [Fact]
     public void ALocal_ConvierteCualquierInstanteALaHoraDeHermosillo()
     {
