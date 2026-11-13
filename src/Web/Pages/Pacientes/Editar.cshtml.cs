@@ -21,13 +21,16 @@ public class EditarModel(IServicioPacientes pacientes) : PageModel
     [BindProperty, BindRequired]
     public int VersionEsperada { get; set; }
 
-    public FichaDePaciente? Ficha { get; private set; }
+    public Guid IdPaciente { get; private set; }
+    public bool MostrarFormulario { get; private set; }
     public string? Error { get; private set; }
-    public string? Confirmacion { get; private set; }
+    [TempData]
+    public string? Confirmacion { get; set; }
     public bool HayConflicto { get; private set; }
 
-    public async Task<IActionResult> OnGetAsync(Guid id)
+    public async Task<IActionResult> OnGetAsync([FromRoute] Guid id)
     {
+        IdPaciente = id;
         var respuesta = await pacientes.ObtenerAsync(id, HttpContext.RequestAborted);
         if (respuesta.Mensaje == MensajesDePacientes.SinPermiso) return Forbid();
         if (respuesta.Exito && respuesta.Datos is { } ficha) CargarFicha(ficha);
@@ -42,6 +45,8 @@ public class EditarModel(IServicioPacientes pacientes) : PageModel
 
     public async Task<IActionResult> OnPostAsync([FromRoute] Guid id)
     {
+        IdPaciente = id;
+        MostrarFormulario = id != Guid.Empty;
         if (!ModelState.IsValid || id == Guid.Empty || VersionEsperada < 1)
         {
             Error = MensajesDePacientes.SolicitudInvalida;
@@ -53,16 +58,18 @@ public class EditarModel(IServicioPacientes pacientes) : PageModel
         if (respuesta.Mensaje == MensajesDePacientes.SinPermiso) return Forbid();
         if (respuesta.Exito && respuesta.Datos is { } resultado)
         {
-            // Los Tag Helpers priorizan ModelState: retirar la versión anterior y los valores sin normalizar.
-            ModelState.Clear();
-            CargarFicha(resultado.Ficha);
             Confirmacion = resultado.Estado == EstadoDeEdicion.SinCambios
                 ? MensajesDePacientes.SinCambios : MensajesDePacientes.DatosActualizados;
+            return RedirectToPage("Index", new { ficha = resultado.Ficha.IdPaciente });
         }
         else
         {
             Error = respuesta.Mensaje;
             HayConflicto = respuesta.Mensaje == MensajesDePacientes.ConflictoDeVersion;
+            if (respuesta.Mensaje == MensajesDePacientes.PacienteNoEncontrado)
+                Response.StatusCode = StatusCodes.Status404NotFound;
+            MostrarFormulario = respuesta.Mensaje is not (MensajesDePacientes.PacienteNoEncontrado
+                or MensajesDePacientes.FichaDeBajaNoSeActualiza);
             // No consultar ni reenviar automáticamente: conservar la captura y su versión para decidir.
         }
         return Page();
@@ -70,7 +77,7 @@ public class EditarModel(IServicioPacientes pacientes) : PageModel
 
     private void CargarFicha(FichaDePaciente ficha)
     {
-        Ficha = ficha;
+        MostrarFormulario = true;
         Entrada = DatosDelFormularioDePaciente.DesdeFicha(ficha);
         VersionEsperada = ficha.Version;
     }

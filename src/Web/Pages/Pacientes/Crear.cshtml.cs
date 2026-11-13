@@ -12,7 +12,6 @@ namespace TherapEase.Web.Pages.Pacientes;
 [Authorize(Policy = PoliticasDeAutorizacion.RegistrarPacientes)]
 [Authorize(Policy = PoliticasDeAutorizacion.ConsultarPacientes)]
 [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
-
 public class CrearModel(IServicioPacientes pacientes) : PageModel
 {
     [BindProperty, BindRequired]
@@ -50,7 +49,7 @@ public class CrearModel(IServicioPacientes pacientes) : PageModel
         {
             Confirmacion = Resultado.Estado == EstadoDeAlta.YaRegistrado
                 ? MensajesDePacientes.PacienteYaRegistrado : MensajesDePacientes.PacienteRegistrado;
-            return RedirectToPage("Detalle", new { id });
+            return RedirectToPage("Index", new { ficha = id });
         }
 
         // Las coincidencias llegan con Exito falso y no significan que se guardó la ficha.

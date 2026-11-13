@@ -1,0 +1,96 @@
+@page "{id:guid}"
+@using Microsoft.AspNetCore.Authorization
+@using TherapEase.Web.Seguridad
+@inject IAuthorizationService Autorizacion
+@model DetalleModel
+@{
+    Layout = "_LayoutOperativo";
+    ViewData["Title"] = "Ficha de paciente";
+}
+<a asp-page="Index">Volver a pacientes</a>
+<div id="contenido-ficha-paciente">
+
+@if (Model.Ficha is { } ficha)
+{
+    var telefono = ficha.Telefono;
+    if (telefono is { Length: 10 } && telefono.All(char.IsAsciiDigit))
+    {
+        telefono = $"{telefono[..3]} {telefono[3..6]} {telefono[6..]}";
+    }
+    else if (telefono is { Length: 13 } && telefono.StartsWith("+52", StringComparison.Ordinal))
+    {
+        telefono = $"+52 {telefono[3..6]} {telefono[6..9]} {telefono[9..]}";
+    }
+    @if (Model.Confirmacion is { } confirmacion)
+    {
+        <partial name="_ConfirmacionPaciente" model="confirmacion" />
+    }
+    <section class="ficha-paciente">
+        <header class="identidad">
+            <span class="avatar" aria-hidden="true">@IndexModel.Iniciales(ficha.Nombre)</span>
+            <h2>@ficha.Nombre</h2>
+        </header>
+        <div class="acciones ficha-paciente-acciones">
+            <button class="accion primaria ficha-nueva-cita" type="button" disabled title="Agenda pendiente">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+                Nueva cita
+            </button>
+            @if ((await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.ActualizarPacientes)).Succeeded)
+            {
+                <a class="accion ficha-editar" asp-page="Editar" asp-route-id="@ficha.IdPaciente">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5 4 4m-14 6L16 4a2.8 2.8 0 0 1 4 4L9 19l-5 1z" /></svg>
+                    Editar
+                </a>
+            }
+        </div>
+        <section>
+            <h3>Información de contacto</h3>
+            <div class="ficha-contacto">
+                <p>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m4 7 8 6 8-6" /></svg>
+                    <span aria-label="Correo">@(ficha.Correo ?? "Correo sin registrar")</span>
+                </p>
+                <p>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M5 22v-2a7 7 0 0 1 14 0v2" /></svg>
+                    <span aria-label="Teléfono">@(telefono ?? "Teléfono sin registrar")</span>
+                </p>
+            </div>
+        </section>
+        <section><h3>Próxima cita</h3></section>
+        <section><h3>Historial reciente</h3></section>
+        <details class="ficha-datos" open>
+        <summary><h3>Datos de la ficha</h3></summary>
+        <dl>
+            <dt>Fecha de nacimiento</dt>
+            <dd>@(ficha.FechaNacimiento?.ToString("dd/MM/yyyy") ?? "Desconocida")</dd>
+            <dt>Edad</dt>
+            <dd>@(ficha.Edad is int edad ? $"{edad} años" : "Edad desconocida")</dd>
+            <dt>Escuela</dt>
+            <dd>@(ficha.Escuela ?? "Sin registrar")</dd>
+            <dt>Grupo</dt>
+            <dd>@(ficha.Grupo ?? "Sin registrar")</dd>
+            <dt>Ámbitos de atención</dt>
+            <dd>@string.Join(", ", ficha.Ambitos)</dd>
+        </dl>
+        @if (ficha.Tutor is { } tutor)
+        {
+            <h2>Tutor</h2>
+            <dl>
+                <dt>Nombre</dt>
+                <dd>@tutor.Nombre</dd>
+                <dt>Parentesco</dt>
+                <dd>@tutor.Parentesco</dd>
+                <dt>Teléfono</dt>
+                <dd>@(tutor.Telefono ?? "Sin registrar")</dd>
+                <dt>Correo</dt>
+                <dd>@(tutor.Correo ?? "Sin registrar")</dd>
+            </dl>
+        }
+        </details>
+    </section>
+}
+else if (Model.Error is { } error)
+{
+    <p role="status">@error</p>
+}
+</div>

@@ -1,0 +1,10 @@
+@model (int Actual, bool HaySiguiente)
+
+@if (Model.Actual > 1 || Model.HaySiguiente)
+{
+    <nav class="paginacion" aria-label="Paginación de resultados">
+        <button class="accion" type="submit" name="numeroPagina" value="@(Model.Actual - 1)" disabled="@(Model.Actual == 1)">Anterior</button>
+        <span aria-current="page">Página @Model.Actual</span>
+        <button class="accion" type="submit" name="numeroPagina" value="@(Model.Actual + 1)" disabled="@(!Model.HaySiguiente)">Siguiente</button>
+    </nav>
+}

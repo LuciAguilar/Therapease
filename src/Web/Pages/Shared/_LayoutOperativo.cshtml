@@ -1,9 +1,13 @@
 @using Microsoft.AspNetCore.Authorization
+@using TherapEase.Application.Identidad.Interfaces.Servicios
 @using TherapEase.Web.Seguridad
 @inject IAuthorizationService Autorizacion
+@inject IServicioCuentaPropia CuentaPropia
 @{
     var administra = (await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.AdministrarUsuarios)).Succeeded;
+    var consultaPacientes = (await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.ConsultarPacientes)).Succeeded;
     var usuarios = Context.Request.Path.StartsWithSegments("/Usuarios");
+    var pacientes = Context.Request.Path.StartsWithSegments("/Pacientes");
 }
 <!DOCTYPE html>
 <html lang="es">
@@ -20,8 +24,11 @@
         <a class="marca" asp-page="/Index"><img class="marca__imagen" src="~/img/therapease-logo.png" asp-append-version="true" width="1100" height="260" alt="TherapEase" /></a>
         <nav aria-label="Espacio de trabajo">
             <p>Espacio de trabajo</p>
-            <a asp-page="/Index" aria-current="@(usuarios ? null : "page")">Inicio</a>
-            <span aria-disabled="true">Pacientes</span>
+            <a asp-page="/Index" aria-current="@(Context.Request.Path == "/" || Context.Request.Path == "/Index" ? "page" : null)">Inicio</a>
+            @if (consultaPacientes)
+            {
+                <a asp-page="/Pacientes/Index" aria-current="@(pacientes ? "page" : null)">Pacientes</a>
+            }
             <span aria-disabled="true">Agenda</span>
             @if (administra)
             {
@@ -29,6 +36,21 @@
             }
         </nav>
         <div class="barra-cuenta">
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                var cuenta = await CuentaPropia.ObtenerMisDatosAsync(Context.RequestAborted);
+                if (cuenta.Exito && cuenta.Datos is { Datos: var datos })
+                {
+                    var nombre = string.IsNullOrWhiteSpace(datos.NombreCompleto) ? datos.NombreUsuario : datos.NombreCompleto;
+                    <div class="identidad perfil-lateral">
+                        <span class="avatar" aria-hidden="true">@TherapEase.Web.Pages.Pacientes.IndexModel.Iniciales(nombre)</span>
+                        <div>
+                            <strong>@nombre</strong>
+                            <span class="secundario">@datos.Rol</span>
+                        </div>
+                    </div>
+                }
+            }
             <a asp-page="/Cuenta/Contrasena">Cambiar contraseña</a>
             <partial name="_FormularioSalida" />
         </div>

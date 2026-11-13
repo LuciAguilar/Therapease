@@ -1,7 +1,10 @@
 .operacion {
-    min-height: 100vh;
+    --color-superficie-operativa: #E3E6EA;
+    height: 100dvh;
+    overflow: hidden;
     display: grid;
     grid-template-columns: clamp(13rem, 16vw, 19rem) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
     font-family: var(--fuente-base);
     color: var(--color-tinta);
     background: linear-gradient(135deg, var(--color-fondo), var(--color-porcelana));
@@ -12,6 +15,7 @@
     flex-direction: column;
     gap: 2rem;
     padding: 1.5rem 1rem;
+    overflow-y: auto;
     background: linear-gradient(155deg,
         color-mix(in srgb, var(--color-niebla) 65%, white) 38%,
         color-mix(in srgb, var(--color-lavanda) 25%, white) 57%,
@@ -38,8 +42,34 @@
 }
 .barra-lateral nav [aria-current="page"] { background: var(--color-fondo); color: var(--color-bosque); font-weight: 700; }
 .barra-cuenta { margin-top: auto; }
+.barra-cuenta { border-top: 1px solid rgb(31 41 51 / 15%); padding-top: 1rem; }
+.perfil-lateral { padding: 0 .75rem; flex-wrap: nowrap; overflow-wrap: anywhere; }
+.perfil-lateral .avatar { flex: 0 0 2.75rem; background: #c2bfd7; }
+.perfil-lateral .secundario { display: block; font-size: .875rem; }
+.salir-lateral {
+    display: inline-flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .45rem 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+.salir-lateral:hover { text-decoration: underline; }
+.salir-lateral svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
 .barra-cuenta form { margin: 0 .75rem; }
-.zona-trabajo > .encabezado { padding: 1.25rem clamp(1rem, 3vw, 2.5rem); font-size: 1.25rem; font-weight: 700; }
+.zona-trabajo { min-height: 0; overflow-y: auto; background: #D5DDE6; }
+.zona-trabajo > .encabezado { padding: 1.25rem clamp(1rem, 3vw, 2.5rem); font-size: 1.25rem; font-weight: 700; background: var(--color-superficie-operativa); }
 .zona-contenido { padding: clamp(1rem, 4vw, 4rem); }
 .zona-contenido h1, .zona-contenido h2 { margin: 0; line-height: 1.25; }
 .zona-contenido h2 { font-size: 1.125rem; }
@@ -50,7 +80,7 @@
 .tarjeta {
     padding: 1.25rem;
     border-radius: 1.15rem;
-    background: var(--color-fondo);
+    background: var(--color-superficie-operativa);
     box-shadow: 0 .35rem 1.15rem rgb(31 41 51 / 9%);
     overflow-wrap: anywhere;
 }
@@ -71,7 +101,7 @@
 .accion, .operacion input:not([type="checkbox"]), .operacion select {
     font: inherit;
     color: inherit;
-    background: var(--color-fondo);
+    background: var(--color-superficie-operativa);
     border: 1px solid var(--color-niebla);
     border-radius: .75rem;
     padding: .55rem .85rem;
@@ -79,15 +109,171 @@
 }
 .accion { display: inline-block; text-decoration: none; cursor: pointer; }
 .accion.primaria { background: var(--color-bosque); border-color: var(--color-bosque); color: white; }
+.zona-contenido table { background: var(--color-superficie-operativa); }
 .accion.inactiva { cursor: default; }
 .formulario-operativo { display: grid; gap: .65rem; max-width: 42rem; }
 .formulario-operativo button { justify-self: start; }
+.tarjetas-pacientes {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    list-style: none;
+    padding: 0;
+}
+.tarjeta-paciente dl {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: .6rem 1rem;
+    border-top: 1px solid var(--color-niebla);
+    padding-top: 1rem;
+}
+.tarjeta-paciente dd { margin: 0; text-align: end; }
+.tarjeta-paciente footer a { font-weight: 700; color: var(--color-bosque); }
+.tarjeta-paciente { position: relative; }
+.tarjeta-paciente a[data-abrir-ficha]::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.tarjeta-paciente:focus-within { outline: 2px solid var(--color-marca); }
+.panel-ficha-paciente {
+    position: fixed;
+    inset: 0 0 0 auto;
+    margin: 0;
+    width: min(100%, 38rem);
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    box-sizing: border-box;
+    padding: 0;
+    border: 0;
+    color: var(--color-tinta);
+    background: var(--color-superficie-operativa);
+    box-shadow: -.5rem 0 2rem rgb(0 0 0 / 18%);
+}
+.panel-ficha-paciente::backdrop { background: rgb(0 0 0 / 42%); backdrop-filter: blur(4px); }
+body:has(.panel-ficha-paciente[open]) { overflow: hidden; }
+.panel-ficha-paciente > header {
+    padding: 1.5rem clamp(1rem, 3vw, 1.75rem);
+    border-bottom: 1px solid #bdcdda;
+}
+#panel-contenido-ficha { padding: clamp(1rem, 3vw, 1.75rem); }
+.ficha-paciente { display: grid; gap: 2rem; overflow-wrap: anywhere; }
+.ficha-paciente .identidad { flex-wrap: nowrap; gap: 1.25rem; }
+.ficha-paciente .identidad h2 { font-size: clamp(1.4rem, 4vw, 1.65rem); }
+.ficha-paciente .avatar {
+    flex: 0 0 auto;
+    width: 4.75rem;
+    height: 4.75rem;
+    background: #d4c2e1;
+    color: #40354c;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+.ficha-paciente-acciones > * {
+    display: inline-flex;
+    flex: 1 1 8rem;
+    align-items: center;
+    justify-content: center;
+    gap: .55rem;
+    min-height: 3rem;
+    box-sizing: border-box;
+}
+.ficha-paciente .ficha-nueva-cita {
+    background: linear-gradient(105deg, #348151, #246341);
+    border-color: transparent;
+    box-shadow: 0 .25rem .55rem rgb(36 99 65 / 22%);
+    cursor: default;
+}
+.ficha-paciente .ficha-editar { background: transparent; border-color: #91afc5; }
+.ficha-paciente h3 { margin: 0; color: #52606b; font-size: .875rem; letter-spacing: .025em; text-transform: uppercase; }
+.ficha-contacto { margin-top: 1rem; color: #52606b; }
+.ficha-contacto p { display: flex; align-items: center; gap: .85rem; }
+.ficha-paciente svg, .ficha-cerrar svg {
+    width: 1.2rem;
+    height: 1.2rem;
+    flex-shrink: 0;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.ficha-cerrar {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 0;
+    background: transparent;
+    color: #52606b;
+    cursor: pointer;
+}
+.ficha-cerrar:hover { color: var(--color-tinta); }
+.ficha-paciente dd { margin: 0 0 .65rem; }
+.ficha-datos summary { cursor: pointer; }
+.ficha-datos summary h3 { display: inline; }
+.ficha-datos dt { font-weight: 700; }
+.formulario-paciente {
+    max-width: 76rem;
+    padding: clamp(1rem, 4vw, 2rem);
+}
+.formulario-paciente-cabecera { border-bottom: 1px solid #bdcdda; padding-bottom: 1.25rem; }
+.formulario-paciente-cabecera p { margin: .25rem 0 0; color: #52606b; }
+.formulario-paciente .icono-registro-paciente { width: 1.6rem; height: 1.6rem; stroke-width: 3; }
+.formulario-paciente .avatar .icono-registro-paciente { width: 2.25rem; height: 2.25rem; }
+.formulario-paciente .formulario-operativo { max-width: none; }
+.formulario-paciente-columnas {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: clamp(1rem, 3vw, 2rem);
+}
+.formulario-paciente fieldset.formulario-paciente-tutor { min-width: 0; margin: 0; }
+@media (max-width: 65rem) {
+    .formulario-paciente-columnas { grid-template-columns: minmax(0, 1fr); }
+}
+.formulario-paciente label, .formulario-paciente legend { font-weight: 700; }
+.formulario-paciente fieldset { border: 1px solid #bdcdda; border-radius: .75rem; margin: .6rem 0; }
+.formulario-paciente button.ficha-nueva-cita { display: inline-flex; align-items: center; gap: .5rem; cursor: pointer; }
+.confirmacion-paciente {
+    position: fixed;
+    inset: 1rem 1rem auto auto;
+    --duracion-confirmacion: 7s;
+    z-index: 5;
+    display: flex;
+    gap: .75rem;
+    max-width: calc(100vw - 2rem);
+    box-sizing: border-box;
+    padding: .9rem 1.25rem;
+    border: 1px solid #a9c7b5;
+    border-radius: .85rem;
+    overflow: hidden;
+    background: linear-gradient(120deg, #d8eafd, #d8efdf);
+    color: #205138;
+    box-shadow: 0 .35rem 1.2rem rgb(36 99 65 / 20%);
+    font-weight: 700;
+    animation: ocultar-confirmacion var(--duracion-confirmacion) step-end forwards;
+}
+.confirmacion-paciente::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: .25rem;
+    background: #348151;
+    transform-origin: left;
+    animation: consumir-confirmacion var(--duracion-confirmacion) linear forwards;
+}
+@keyframes consumir-confirmacion { to { transform: scaleX(0); } }
+@keyframes ocultar-confirmacion { to { visibility: hidden; } }
+.paginacion { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .75rem; }
+.paginacion button:disabled { opacity: .55; cursor: default; }
+@media (max-width: 42rem) {
+    .tarjetas-pacientes { grid-template-columns: minmax(0, 1fr); }
+}
 .error-formulario { color: var(--color-error); }
 .secreto { font-size: 1.2rem; }
 .operacion :focus-visible { outline: 2px solid var(--color-marca); outline-offset: 3px; }
 
 @media (max-width: 52rem) {
     .operacion, .resumen { grid-template-columns: minmax(0, 1fr); }
+    .operacion { grid-template-rows: auto minmax(0, 1fr); }
     .barra-lateral { gap: .5rem; }
     .barra-lateral nav, .barra-cuenta { display: flex; flex-wrap: wrap; align-items: center; }
     .barra-lateral nav p { flex-basis: 100%; }

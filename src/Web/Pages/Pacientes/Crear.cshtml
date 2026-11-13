@@ -1,0 +1,54 @@
+@page
+@using TherapEase.Application.Pacientes.Constantes
+@using TherapEase.Application.Pacientes.Modelos
+@model CrearModel
+@{
+    Layout = "_LayoutOperativo";
+    ViewData["Title"] = "Registrar paciente";
+}
+<section class="tarjeta ficha-paciente formulario-paciente">
+<header class="fila formulario-paciente-cabecera">
+    <div class="identidad">
+        <span class="avatar" aria-hidden="true"><svg class="icono-registro-paciente" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg></span>
+        <div><h1>Registrar paciente</h1><p>Usa solo datos ficticios.</p></div>
+    </div>
+    <a asp-page="Index" class="ficha-cerrar" aria-label="Volver a pacientes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg></a>
+</header>
+
+@if (Model.Error is not null)
+{
+    <p class="error-formulario" role="alert">@Model.Error</p>
+}
+@if (Model.Error == MensajesDePacientes.SolicitudYaUsada || Model.IdSolicitud == Guid.Empty)
+{
+    <a asp-page="Crear">Abrir un formulario nuevo</a>
+}
+else
+{
+    <form method="post" class="formulario-operativo">
+        <input asp-for="IdSolicitud" type="hidden" />
+        @if (Model.Resultado is { Estado: EstadoDeAlta.CoincidenciasPorConfirmar } resultado)
+        {
+            <h2>Fichas con el mismo nombre</h2>
+            @if (resultado.Coincidencias is { } coincidencias)
+            {
+                <partial name="_ResultadosDePacientes" model="coincidencias" />
+            }
+            @if (resultado.HayMasCoincidencias)
+            {
+                <p role="status">Hay más coincidencias. Usa la búsqueda para encontrar otras fichas.</p>
+            }
+        }
+        <partial name="_CamposDePaciente" for="Entrada" />
+        <div class="acciones">
+            <button class="accion primaria ficha-nueva-cita" type="submit"><svg class="icono-registro-paciente" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg> Registrar paciente</button>
+            @if (Model.Resultado?.Estado == EstadoDeAlta.CoincidenciasPorConfirmar)
+            {
+                <button class="accion" type="submit" name="ConfirmaQueEsOtraPersona" value="true">
+                    Confirmar que es otra persona
+                </button>
+            }
+        </div>
+    </form>
+}
+</section>

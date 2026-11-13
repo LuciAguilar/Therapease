@@ -1,0 +1,47 @@
+@page "{id:guid}"
+@model EditarModel
+@{
+    Layout = "_LayoutOperativo";
+    ViewData["Title"] = "Editar ficha";
+}
+<section class="tarjeta ficha-paciente formulario-paciente">
+<header class="fila formulario-paciente-cabecera">
+    <div class="identidad">
+        <span class="avatar" aria-hidden="true">
+            @if (!string.IsNullOrWhiteSpace(Model.Entrada.Nombre))
+            {
+                @IndexModel.Iniciales(Model.Entrada.Nombre)
+            }
+            else
+            {
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5 4 4m-14 6L16 4a2.8 2.8 0 0 1 4 4L9 19l-5 1z" /></svg>
+            }
+        </span>
+        <div><h1>Editar ficha</h1><p>Usa solo datos ficticios.</p></div>
+    </div>
+    <a asp-page="Index" class="ficha-cerrar" aria-label="Volver a pacientes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg></a>
+</header>
+
+@if (Model.Error is not null)
+{
+    <p class="error-formulario" role="alert">@Model.Error</p>
+}
+@if (Model.MostrarFormulario)
+{
+    <form method="post" asp-route-id="@Model.IdPaciente" class="formulario-operativo">
+        <input asp-for="VersionEsperada" type="hidden" />
+        <partial name="_CamposDePaciente" for="Entrada" />
+        <div class="acciones">
+            @if (Model.HayConflicto)
+            {
+                <a class="accion primaria" asp-page="Editar" asp-route-id="@Model.IdPaciente">Recargar ficha para editar</a>
+                <a class="accion" asp-page="Detalle" asp-route-id="@Model.IdPaciente" target="_blank" rel="noopener">Consultar ficha vigente en otra pestaña</a>
+            }
+            else
+            {
+                <button class="accion primaria ficha-nueva-cita" type="submit"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5 4 4m-14 6L16 4a2.8 2.8 0 0 1 4 4L9 19l-5 1z" /></svg> Guardar cambios</button>
+            }
+        </div>
+    </form>
+}
+</section>

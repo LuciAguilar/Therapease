@@ -1,5 +1,8 @@
 @page
+@using Microsoft.AspNetCore.Authorization
 @using TherapEase.Application.Pacientes.Constantes
+@using TherapEase.Web.Seguridad
+@inject IAuthorizationService Autorizacion
 @model TherapEase.Web.Pages.Pacientes.IndexModel
 @{
     Layout = "_LayoutOperativo";
@@ -10,18 +13,24 @@
         <h1>Pacientes</h1>
         <p>Busca una ficha por el nombre del paciente.</p>
     </div>
+    @if ((await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.RegistrarPacientes)).Succeeded)
+    {
+        <a class="accion primaria" asp-page="Crear">Nuevo paciente</a>
+    }
 </header>
-<form method="post" class="busqueda">
+<form method="post" class="tarjeta busqueda" id="busqueda-pacientes"
+      data-minimo="@LimitesDeBusquedaDePacientes.LongitudMinimaDelTexto">
     <div>
         <label asp-for="Texto">Nombre del paciente</label>
         <input asp-for="Texto" type="search" maxlength="@LimitesDeBusquedaDePacientes.LongitudMaximaDelTexto" />
     </div>
     <div>
         <label asp-for="NacimientoExacto">Fecha de nacimiento (opcional)</label>
-        <input asp-for="NacimientoExacto" type="date" />
+        <input asp-for="NacimientoExacto" asp-format="{0:yyyy-MM-dd}" type="date" />
     </div>
-    <button class="accion primaria" type="submit">Buscar</button>
 </form>
+<p id="estado-busqueda-pacientes" role="status"></p>
+<div id="resultados-pacientes">
 @if (Model.Error is not null)
 {
     <p class="error-formulario" role="alert">@Model.Error</p>
@@ -30,30 +39,58 @@ else if (Model.Resultado is { } resultado)
 {
     @if (resultado.HayMas)
     {
-        <p class="aviso" role="status">Hay más resultados. Afina la búsqueda para encontrar la ficha.</p>
+        <p role="status">Hay más resultados. Afina la búsqueda para encontrarlos.</p>
     }
-    @if (resultado.Pacientes.Count == 0)
+    @if (Model.Tarjetas.Count == 0)
     {
-        <p class="tarjeta" role="status">No se encontraron pacientes.</p>
+        <p class="tarjeta" role="status">No se encontraron pacientes en esta página.</p>
     }
-    <ul class="lista-tarjetas">
-    @foreach (var paciente in resultado.Pacientes)
+    else
     {
-        <li class="tarjeta">
-            <strong>@paciente.Nombre</strong>
-            @if (paciente.FechaNacimiento is { } nacimiento)
-            {
-                <p class="secundario">Nacimiento: @nacimiento.ToString("dd/MM/yyyy")</p>
-            }
-            else if (paciente.NacimientoDesconocido)
-            {
-                <p class="secundario">Fecha de nacimiento desconocida.</p>
-            }
-        </li>
+        <ul class="tarjetas-pacientes">
+        @foreach (var paciente in Model.Tarjetas)
+        {
+            <li class="tarjeta tarjeta-paciente">
+                <header class="identidad">
+                    <span class="avatar" aria-hidden="true">@IndexModel.Iniciales(paciente.Nombre)</span>
+                    <div>
+                        <h2>@paciente.Nombre</h2>
+                        @if (paciente.FechaNacimiento is { } nacimiento)
+                        {
+                            <span class="secundario">Nacimiento: @nacimiento.ToString("dd/MM/yyyy")</span>
+                        }
+                    </div>
+                </header>
+                <footer class="fila">
+                    <span class="etiqueta activa">Vigente</span>
+                    <a asp-page="Detalle" asp-route-id="@paciente.IdPaciente" data-abrir-ficha aria-label="Ver ficha de @paciente.Nombre">Ver ficha <span aria-hidden="true">›</span></a>
+                </footer>
+            </li>
+        }
+        </ul>
     }
-    </ul>
+    <form method="post" data-paginacion-pacientes>
+        <input asp-for="Texto" type="hidden" id="FiltroTexto" />
+        <input asp-for="NacimientoExacto" type="hidden" asp-format="{0:yyyy-MM-dd}" id="FiltroNacimiento" />
+        <partial name="_Paginacion" model="(Model.NumeroPagina, Model.HaySiguiente)" />
+    </form>
 }
 else
 {
-    <p class="tarjeta">Escribe al menos @LimitesDeBusquedaDePacientes.LongitudMinimaDelTexto caracteres para buscar un paciente.</p>
+    <p class="tarjeta">Escribe al menos @LimitesDeBusquedaDePacientes.LongitudMinimaDelTexto caracteres para ver las fichas.</p>
 }
+</div>
+<dialog id="panel-ficha-paciente" class="panel-ficha-paciente" aria-labelledby="titulo-ficha-paciente"
+        data-ficha-inicial="@(Model.FichaInicial is { } id ? Url.Page("Detalle", new { id }) : null)">
+    <header class="fila">
+        <h2 id="titulo-ficha-paciente">Ficha del paciente</h2>
+        <form method="dialog">
+            <button class="ficha-cerrar" aria-label="Cerrar ficha" autofocus>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+            </button>
+        </form>
+    </header>
+    <div id="panel-contenido-ficha" aria-live="polite"></div>
+</dialog>
+<script src="~/js/busqueda-pacientes.js" asp-append-version="true" defer></script>
+<script src="~/js/ficha-paciente.js" asp-append-version="true" defer></script>

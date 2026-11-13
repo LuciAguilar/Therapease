@@ -19,7 +19,7 @@ public class DetalleModel(IServicioPacientes pacientes) : PageModel
     [TempData]
     public string? Confirmacion { get; set; }
 
-    public async Task<IActionResult> OnGetAsync(Guid id)
+    public async Task<IActionResult> OnGetAsync([FromRoute] Guid id)
     {
         var respuesta = await pacientes.ObtenerAsync(id, HttpContext.RequestAborted);
         if (respuesta.Mensaje == MensajesDePacientes.SinPermiso) return Forbid();
