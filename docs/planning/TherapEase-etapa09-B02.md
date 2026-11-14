@@ -11,7 +11,7 @@
 | CI | [41134402751](https://github.com/LuciAguilar/Therapease/actions/runs/41134402751): cuatro trabajos correctos sobre `5e46883`. |
 | Próximo paso | #12 ya está fusionado. Faltan confirmaciones de producto, páginas, navegador y uso; después Lucía decide el cierre de B02. |
 | Páginas y producto | Dulce confirma detalles, valida 08C sección 3 y entrega páginas/PageModel con sus pruebas; Lucía comprueba formularios, navegador y uso cuando estén disponibles. |
-| Listado paginado (cambio posterior, 13-nov) | La pantalla Pacientes muestra todos los pacientes vigentes al abrir, de seis en seis, con «Página X de Y» y el total de pacientes, sin cargarlos todos de una vez. Implementado en la rama `frontend/B02`, sin commit ni PR; **⏳ espera la decisión de Lucía**, porque adelanta parte del directorio B07. No incluye teléfono ni última cita. Contrato en la [sección 3.2.1 del contrato para páginas](TherapEase-etapa09-B02-contrato-para-paginas.md#321-listar-con-páginas--cu03-cambio-posterior). |
+| Listado paginado (cambio posterior, 13-nov) | La pantalla Pacientes muestra todos los pacientes vigentes al abrir, de seis en seis, con «Página X de Y» y el total de pacientes, sin cargarlos todos de una vez. Implementado en la rama `frontend/B02` |
 
 B02 sigue abierto. [Avance y preparación de B03](TherapEase-09-avance-y-pendientes.md). [B03](TherapEase-etapa09-B03.md) está abierto solo para preparación. Este seguimiento no acredita otra ejecución ni publica documentos nuevos.
 
