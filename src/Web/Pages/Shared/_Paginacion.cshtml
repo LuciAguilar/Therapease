@@ -1,10 +1,19 @@
-@model (int Actual, bool HaySiguiente)
+@model (int Actual, int TotalDePaginas, int TotalDeElementos, int Desde, int Hasta, string Elementos)
 
-@if (Model.Actual > 1 || Model.HaySiguiente)
+@if (Model.TotalDeElementos > 0)
 {
     <nav class="paginacion" aria-label="Paginación de resultados">
-        <button class="accion" type="submit" name="numeroPagina" value="@(Model.Actual - 1)" disabled="@(Model.Actual == 1)">Anterior</button>
-        <span aria-current="page">Página @Model.Actual</span>
-        <button class="accion" type="submit" name="numeroPagina" value="@(Model.Actual + 1)" disabled="@(!Model.HaySiguiente)">Siguiente</button>
+        @if (Model.TotalDePaginas > 1)
+        {
+            <button class="accion" type="submit" name="numeroPagina" value="@(Model.Actual - 1)" disabled="@(Model.Actual <= 1)">Anterior</button>
+        }
+        <div class="paginacion-resumen">
+            <span aria-current="page">Página @Model.Actual de @Model.TotalDePaginas</span>
+            <span class="secundario">Mostrando @Model.Desde–@Model.Hasta de @Model.TotalDeElementos @Model.Elementos</span>
+        </div>
+        @if (Model.TotalDePaginas > 1)
+        {
+            <button class="accion" type="submit" name="numeroPagina" value="@(Model.Actual + 1)" disabled="@(Model.Actual >= Model.TotalDePaginas)">Siguiente</button>
+        }
     </nav>
 }

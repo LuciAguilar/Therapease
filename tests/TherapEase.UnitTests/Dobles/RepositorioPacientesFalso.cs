@@ -28,11 +28,18 @@ internal sealed class RepositorioPacientesFalso : IRepositorioPacientes
 
     public int BusquedasDeParecidos { get; private set; }
 
+    public int ConteosDeVigentes { get; private set; }
+
+    public int ListadosDeVigentes { get; private set; }
+
     public List<PacienteAmbito> AmbitosQuitados { get; } = [];
 
     public (IReadOnlyList<string> Palabras, DateOnly? Nacimiento, int Limite)? UltimaBusqueda { get; private set; }
 
-    public int Lecturas => LecturasParaEscribir + LecturasParaComparacion + LecturasParaConsulta + LecturasDeCondicion + BusquedasDeVigentes + BusquedasDeParecidos;
+    public (IReadOnlyList<string> Palabras, DateOnly? Nacimiento, int Omitir, int Limite)? UltimoListado { get; private set; }
+
+    public int Lecturas => LecturasParaEscribir + LecturasParaComparacion + LecturasParaConsulta + LecturasDeCondicion + BusquedasDeVigentes + BusquedasDeParecidos
+        + ConteosDeVigentes + ListadosDeVigentes;
 
     public Task AgregarAsync(Paciente paciente, CancellationToken cancelacion = default)
     {
@@ -97,6 +104,37 @@ internal sealed class RepositorioPacientesFalso : IRepositorioPacientes
             .ToList();
         return Task.FromResult(filas);
     }
+
+    public Task<int> ContarVigentesAsync(
+        IReadOnlyList<string> palabras, DateOnly? nacimiento, CancellationToken cancelacion = default)
+    {
+        ConteosDeVigentes++;
+        return Task.FromResult(VigentesOrdenadas(palabras, nacimiento).Count());
+    }
+
+    public Task<IReadOnlyList<FilaDeBusquedaDePaciente>> ListarVigentesAsync(
+        IReadOnlyList<string> palabras, DateOnly? nacimiento, int omitir, int limite, CancellationToken cancelacion = default)
+    {
+        ListadosDeVigentes++;
+        UltimoListado = (palabras, nacimiento, omitir, limite);
+        var vigentes = Pacientes.Values.Where(p => p.Condicion == CondicionRegistro.Vigente).ToList();
+        IReadOnlyList<FilaDeBusquedaDePaciente> filas = VigentesOrdenadas(palabras, nacimiento)
+            .Skip(omitir)
+            .Take(limite)
+            .Select(p => new FilaDeBusquedaDePaciente(
+                p.IdPaciente, p.Nombre, p.FechaNacimiento,
+                vigentes.Any(o => o.IdPaciente != p.IdPaciente && o.NombreNormalizado == p.NombreNormalizado)))
+            .ToList();
+        return Task.FromResult(filas);
+    }
+
+    private IEnumerable<Paciente> VigentesOrdenadas(IReadOnlyList<string> palabras, DateOnly? nacimiento) =>
+        Pacientes.Values
+            .Where(p => p.Condicion == CondicionRegistro.Vigente)
+            .Where(p => palabras.All(w => p.NombreNormalizado.Contains(w, StringComparison.Ordinal)))
+            .Where(p => nacimiento is null || p.FechaNacimiento == nacimiento)
+            .OrderBy(p => p.NombreNormalizado, StringComparer.Ordinal)
+            .ThenBy(p => p.IdPaciente);
 
     public Task<IReadOnlyList<ParecidoDePaciente>> BuscarParecidosAsync(
         string nombreNormalizado, int limite, CancellationToken cancelacion = default)

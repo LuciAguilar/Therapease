@@ -27,6 +27,14 @@ public interface IRepositorioPacientes
     Task<IReadOnlyList<FilaDeBusquedaDePaciente>> BuscarVigentesAsync(
         IReadOnlyList<string> palabras, DateOnly? nacimiento, int limite, CancellationToken cancelacion = default);
 
+    // Cuántas fichas vigentes cumplen el filtro (palabras ya normalizadas; sin palabras ni nacimiento son todas las vigentes). Es el total del listado paginado.
+    Task<int> ContarVigentesAsync(
+        IReadOnlyList<string> palabras, DateOnly? nacimiento, CancellationToken cancelacion = default);
+
+    // Una página del listado: mismo filtro y mismo orden estable que BuscarVigentesAsync, saltando omitir filas y trayendo como máximo limite.
+    Task<IReadOnlyList<FilaDeBusquedaDePaciente>> ListarVigentesAsync(
+        IReadOnlyList<string> palabras, DateOnly? nacimiento, int omitir, int limite, CancellationToken cancelacion = default);
+
     // Fichas vigentes con exactamente ese nombre normalizado, en el mismo orden estable.
     Task<IReadOnlyList<ParecidoDePaciente>> BuscarParecidosAsync(
         string nombreNormalizado, int limite, CancellationToken cancelacion = default);

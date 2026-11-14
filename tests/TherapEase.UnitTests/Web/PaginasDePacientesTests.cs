@@ -19,24 +19,50 @@ public class PaginasDePacientesTests
         IdPaciente, 3, "Paciente ficticio", Nacimiento, 11, null, null, null, null,
         [AmbitoAtencion.Escolar, AmbitoAtencion.Independiente], Tutor);
 
+    private static PaginaDePacientes PaginaDeSeis(int actual, int totalDePaginas, int total) =>
+        new(Enumerable.Range(1, 6).Select(i => new ResumenDePaciente(Guid.NewGuid(), $"Paciente {i}")).ToList(),
+            actual, totalDePaginas, total, 6);
+
     [Fact]
-    public async Task BusquedaConservaFiltrosYPaginaDeSeisEnSeis()
+    public async Task AlAbrirListaLaPrimeraPaginaSinFiltroYConservaLaFichaInicial()
     {
-        var filas = Enumerable.Range(1, 7).Select(i => new ResumenDePaciente(Guid.NewGuid(), $"Paciente {i}")).ToList();
-        var resultado = new ResultadoDeBusqueda(filas, false);
-        var servicio = new Pacientes { Busqueda = RespuestaServicio<ResultadoDeBusqueda>.Correcta(resultado) };
+        var primera = PaginaDeSeis(1, 3, 14);
+        var servicio = new Pacientes { Listado = RespuestaServicio<PaginaDePacientes>.Correcta(primera) };
+        var pagina = new IndexModel(servicio) { PageContext = Contexto() };
+
+        Assert.IsType<PageResult>(await pagina.OnGetAsync(IdPaciente));
+
+        Assert.Equal((null, null, 1), servicio.Filtro);
+        Assert.Same(primera, pagina.Pagina);
+        Assert.Equal(IdPaciente, pagina.FichaInicial);
+        Assert.False(pagina.HayFiltro);
+        Assert.Null(pagina.Error);
+    }
+
+    [Fact]
+    public async Task ElListadoConservaFiltrosYPideAlServicioLaPaginaElegida()
+    {
+        var segunda = PaginaDeSeis(2, 2, 12);
+        var servicio = new Pacientes { Listado = RespuestaServicio<PaginaDePacientes>.Correcta(segunda) };
         var pagina = new IndexModel(servicio) { PageContext = Contexto(), Texto = "Paciente", NacimientoExacto = Nacimiento };
 
-        pagina.OnGet();
-        Assert.Null(servicio.Filtro);
-        Assert.IsType<PageResult>(await pagina.OnPostAsync());
-        Assert.Equal(6, pagina.Tarjetas.Count);
-        Assert.True(pagina.HaySiguiente);
-
         Assert.IsType<PageResult>(await pagina.OnPostAsync(2));
-        Assert.Equal((pagina.Texto, pagina.NacimientoExacto), servicio.Filtro);
-        Assert.Equal(filas[6], Assert.Single(pagina.Tarjetas));
-        Assert.False(pagina.HaySiguiente);
+
+        Assert.Equal(("Paciente", Nacimiento, 2), servicio.Filtro);
+        Assert.Same(segunda, pagina.Pagina);
+        Assert.True(pagina.HayFiltro);
+    }
+
+    [Fact]
+    public async Task UnFiltroInvalidoMuestraElMensajeFijoDelServicio()
+    {
+        var servicio = new Pacientes { Listado = RespuestaServicio<PaginaDePacientes>.Fallida(MensajesDePacientes.BusquedaInvalida) };
+        var pagina = new IndexModel(servicio) { PageContext = Contexto(), Texto = "a" };
+
+        Assert.IsType<PageResult>(await pagina.OnPostAsync());
+
+        Assert.Null(pagina.Pagina);
+        Assert.Equal(MensajesDePacientes.BusquedaInvalida, pagina.Error);
     }
 
     [Fact]
@@ -47,6 +73,18 @@ public class PaginasDePacientesTests
         pagina.ModelState.AddModelError(nameof(IndexModel.NacimientoExacto), "Fecha inválida");
 
         Assert.IsType<PageResult>(await pagina.OnPostAsync());
+        Assert.Null(servicio.Filtro);
+        Assert.Equal(MensajesDePacientes.BusquedaInvalida, pagina.Error);
+    }
+
+    [Fact]
+    public async Task UnaPaginaMenorQueUnoNoConsulta()
+    {
+        var servicio = new Pacientes();
+        var pagina = new IndexModel(servicio) { PageContext = Contexto() };
+
+        Assert.IsType<PageResult>(await pagina.OnPostAsync(0));
+
         Assert.Null(servicio.Filtro);
         Assert.Equal(MensajesDePacientes.BusquedaInvalida, pagina.Error);
     }
@@ -130,12 +168,13 @@ public class PaginasDePacientesTests
         var detalle = new DetalleModel(servicio) { PageContext = Contexto() };
         var editar = new EditarModel(servicio) { PageContext = Contexto(), VersionEsperada = 1 };
 
+        Assert.IsType<ForbidResult>(await buscar.OnGetAsync());
         Assert.IsType<ForbidResult>(await buscar.OnPostAsync());
         Assert.IsType<ForbidResult>(await crear.OnPostAsync());
         Assert.IsType<ForbidResult>(await detalle.OnGetAsync(IdPaciente));
         Assert.IsType<ForbidResult>(await editar.OnGetAsync(IdPaciente));
         Assert.IsType<ForbidResult>(await editar.OnPostAsync(IdPaciente));
-        Assert.Empty(buscar.Tarjetas);
+        Assert.Null(buscar.Pagina);
         Assert.Null(crear.Resultado);
         Assert.Null(detalle.Ficha);
         Assert.Null(editar.Confirmacion);
@@ -221,12 +260,13 @@ public class PaginasDePacientesTests
     {
         public RespuestaServicio<ResultadoDeAlta> Alta { get; set; } = SinPermiso<ResultadoDeAlta>();
         public RespuestaServicio<ResultadoDeBusqueda> Busqueda { get; init; } = SinPermiso<ResultadoDeBusqueda>();
+        public RespuestaServicio<PaginaDePacientes> Listado { get; init; } = SinPermiso<PaginaDePacientes>();
         public RespuestaServicio<FichaDePaciente> Lectura { get; init; } = SinPermiso<FichaDePaciente>();
         public RespuestaServicio<ResultadoDeEdicion> Edicion { get; init; } = SinPermiso<ResultadoDeEdicion>();
 
         public List<(Guid Id, DatosDePacienteEntrada Datos, bool Confirmada)> Altas { get; } = [];
         public List<Guid> Lecturas { get; } = [];
-        public (string? Texto, DateOnly? Nacimiento)? Filtro { get; private set; }
+        public (string? Texto, DateOnly? Nacimiento, int Pagina)? Filtro { get; private set; }
         public (Guid Id, int Version, DatosDePacienteEntrada Datos)? Cambio { get; private set; }
 
         public Task<RespuestaServicio<ResultadoDeAlta>> RegistrarAsync(
@@ -239,8 +279,14 @@ public class PaginasDePacientesTests
         public Task<RespuestaServicio<ResultadoDeBusqueda>> BuscarAsync(
             string? texto, DateOnly? nacimientoExacto, CancellationToken cancelacion)
         {
-            Filtro = (texto, nacimientoExacto);
             return Task.FromResult(Busqueda);
+        }
+
+        public Task<RespuestaServicio<PaginaDePacientes>> ListarAsync(
+            string? texto, DateOnly? nacimientoExacto, int pagina, CancellationToken cancelacion)
+        {
+            Filtro = (texto, nacimientoExacto, pagina);
+            return Task.FromResult(Listado);
         }
 
         public Task<RespuestaServicio<FichaDePaciente>> ObtenerAsync(Guid idPaciente, CancellationToken cancelacion)

@@ -18,6 +18,12 @@ public interface IServicioPacientes
     Task<RespuestaServicio<ResultadoDeBusqueda>> BuscarAsync(
         string? texto, DateOnly? nacimientoExacto = null, CancellationToken cancelacion = default);
 
+    // Requiere ConsultarPacientes. Lista las fichas vigentes por páginas de LimitesDeBusquedaDePacientes.TamanoDePagina, en orden estable por nombre.
+    // Sin texto (nulo o en blanco) ni fecha muestra todas; con texto aplica las mismas reglas que BuscarAsync (2 a 100 caracteres, hasta 6 palabras).
+    // pagina empieza en 1; si pide una posterior a la última se devuelve la última. Trae solo las filas de la página y los totales. No guarda ni audita el texto.
+    Task<RespuestaServicio<PaginaDePacientes>> ListarAsync(
+        string? texto, DateOnly? nacimientoExacto = null, int pagina = 1, CancellationToken cancelacion = default);
+
     // Requiere ConsultarPacientes. Una sola consulta: ficha vigente con contenido, o, si está de baja, solo MensajesDePacientes.FichaDeBaja.
     Task<RespuestaServicio<FichaDePaciente>> ObtenerAsync(Guid idPaciente, CancellationToken cancelacion = default);
 

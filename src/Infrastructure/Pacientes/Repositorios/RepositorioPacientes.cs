@@ -75,33 +75,20 @@ public class RepositorioPacientes : IRepositorioPacientes
     public async Task<IReadOnlyList<FilaDeBusquedaDePaciente>> BuscarVigentesAsync(
         IReadOnlyList<string> palabras, DateOnly? nacimiento, int limite, CancellationToken cancelacion = default)
     {
-        var consulta = _contexto.Pacientes.AsNoTracking().Where(p => p.Condicion == CondicionRegistro.Vigente);
+        return await ProyectarFilas(VigentesQueCoinciden(palabras, nacimiento).Take(limite)).ToListAsync(cancelacion);
+    }
 
-        // Contains con parámetro se traduce a strpos: las palabras buscadas no son patrones y %, _ o \ no tienen significado especial.
-        foreach (var palabra in palabras)
-        {
-            var buscada = palabra;
-            consulta = consulta.Where(p => p.NombreNormalizado.Contains(buscada));
-        }
+    public Task<int> ContarVigentesAsync(
+        IReadOnlyList<string> palabras, DateOnly? nacimiento, CancellationToken cancelacion = default)
+    {
+        return VigentesQueCoinciden(palabras, nacimiento).CountAsync(cancelacion);
+    }
 
-        if (nacimiento is { } fecha)
-        {
-            consulta = consulta.Where(p => p.FechaNacimiento == fecha);
-        }
-
-        return await consulta
-            .OrderBy(p => p.NombreNormalizado)
-            .ThenBy(p => p.IdPaciente)
-            .Take(limite)
-            .Select(p => new FilaDeBusquedaDePaciente(
-                p.IdPaciente,
-                p.Nombre,
-                p.FechaNacimiento,
-                _contexto.Pacientes.Any(o =>
-                    o.IdPaciente != p.IdPaciente
-                    && o.Condicion == CondicionRegistro.Vigente
-                    && o.NombreNormalizado == p.NombreNormalizado)))
-            .ToListAsync(cancelacion);
+    public async Task<IReadOnlyList<FilaDeBusquedaDePaciente>> ListarVigentesAsync(
+        IReadOnlyList<string> palabras, DateOnly? nacimiento, int omitir, int limite, CancellationToken cancelacion = default)
+    {
+        // Skip/Take se traducen a OFFSET/LIMIT: la base entrega solo las filas de la página.
+        return await ProyectarFilas(VigentesQueCoinciden(palabras, nacimiento).Skip(omitir).Take(limite)).ToListAsync(cancelacion);
     }
 
     public async Task<IReadOnlyList<ParecidoDePaciente>> BuscarParecidosAsync(
@@ -116,6 +103,37 @@ public class RepositorioPacientes : IRepositorioPacientes
             .Select(p => new ParecidoDePaciente(p.IdPaciente, p.Nombre, p.FechaNacimiento))
             .ToListAsync(cancelacion);
     }
+
+    // Vigentes que contienen todas las palabras (y el nacimiento, si se pide), ya en el orden estable por nombre normalizado e identificador.
+    // El conteo ignora el orden; la búsqueda y el listado lo necesitan antes de Skip/Take.
+    private IOrderedQueryable<Paciente> VigentesQueCoinciden(IReadOnlyList<string> palabras, DateOnly? nacimiento)
+    {
+        var consulta = _contexto.Pacientes.AsNoTracking().Where(p => p.Condicion == CondicionRegistro.Vigente);
+
+        // Contains con parámetro se traduce a strpos: las palabras buscadas no son patrones y %, _ o \ no tienen significado especial.
+        foreach (var palabra in palabras)
+        {
+            var buscada = palabra;
+            consulta = consulta.Where(p => p.NombreNormalizado.Contains(buscada));
+        }
+
+        if (nacimiento is { } fecha)
+        {
+            consulta = consulta.Where(p => p.FechaNacimiento == fecha);
+        }
+
+        return consulta.OrderBy(p => p.NombreNormalizado).ThenBy(p => p.IdPaciente);
+    }
+
+    private IQueryable<FilaDeBusquedaDePaciente> ProyectarFilas(IQueryable<Paciente> consulta) =>
+        consulta.Select(p => new FilaDeBusquedaDePaciente(
+            p.IdPaciente,
+            p.Nombre,
+            p.FechaNacimiento,
+            _contexto.Pacientes.Any(o =>
+                o.IdPaciente != p.IdPaciente
+                && o.Condicion == CondicionRegistro.Vigente
+                && o.NombreNormalizado == p.NombreNormalizado)));
 
     // Se marcan para borrar sin detección intermedia de cambios: la clave de PacienteAmbito incluye a Paciente y, si EF viera primero el ámbito fuera de la
     // colección, lo leería como una relación obligatoria rota y fallaría con DeleteBehavior.Restrict.

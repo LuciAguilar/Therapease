@@ -1,7 +1,6 @@
 const formulario = document.querySelector('#busqueda-pacientes');
 const resultados = document.querySelector('#resultados-pacientes');
 const estado = document.querySelector('#estado-busqueda-pacientes');
-const inicial = Array.from(resultados.childNodes, nodo => nodo.cloneNode(true));
 let espera;
 let solicitud;
 
@@ -10,9 +9,9 @@ async function consultar(numeroPagina) {
     solicitud?.abort();
     const texto = formulario.elements.Texto.value.trim();
     const minimo = Number(formulario.dataset.minimo);
-    if (texto.length < minimo) {
-        resultados.replaceChildren(...inicial.map(nodo => nodo.cloneNode(true)));
-        estado.textContent = '';
+    // Sin texto se lista todo, paginado por el servidor; con una sola letra se espera a tener el mínimo para filtrar.
+    if (texto.length > 0 && texto.length < minimo) {
+        estado.textContent = `Escribe al menos ${minimo} caracteres para filtrar por nombre.`;
         return;
     }
 

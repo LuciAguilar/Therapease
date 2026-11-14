@@ -776,6 +776,220 @@ public class ServicioPacientesTests
         Assert.Equal(0, _unidad.Confirmaciones);
     }
 
+    // ----- Listar (paginado) -----
+
+    private void ExistentesNumerados(int cantidad)
+    {
+        for (var i = 1; i <= cantidad; i++)
+        {
+            Existente($"Persona Ficticia {i:00}", new DateOnly(1980, 1, 1).AddDays(i));
+        }
+    }
+
+    [Fact]
+    public async Task Listar_SinPermisoDeConsulta_RechazaAntesDeLeerNada()
+    {
+        _autorizacion.Permisos.Remove(Permiso.ConsultarPacientes);
+
+        var respuesta = await _servicio.ListarAsync(null);
+
+        Assert.False(respuesta.Exito);
+        Assert.Equal(MensajesDePacientes.SinPermiso, respuesta.Mensaje);
+        Assert.Null(respuesta.Datos);
+        AssertSinEfectos();
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public async Task Listar_ConPaginaMenorQueUno_RechazaSinConsultar(int pagina)
+    {
+        var respuesta = await _servicio.ListarAsync(null, null, pagina);
+
+        Assert.False(respuesta.Exito);
+        Assert.Equal(MensajesDePacientes.BusquedaInvalida, respuesta.Mensaje);
+        Assert.Equal(0, _pacientes.Lecturas);
+    }
+
+    [Theory]
+    [InlineData("a")]
+    [InlineData("uno dos tres cuatro cinco seis siete")]
+    [InlineData("Ana\u0007Perez")]
+    public async Task Listar_ConTextoInvalido_RechazaSinConsultar(string texto)
+    {
+        var respuesta = await _servicio.ListarAsync(texto);
+
+        Assert.False(respuesta.Exito);
+        Assert.Equal(MensajesDePacientes.BusquedaInvalida, respuesta.Mensaje);
+        Assert.Equal(0, _pacientes.Lecturas);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task Listar_SinTextoNiFecha_MuestraTodasLasFichasVigentes(string? texto)
+    {
+        Existente("María Muñoz");
+        Existente("Luis Pérez");
+        Existente("Ana Ramos");
+
+        var respuesta = await _servicio.ListarAsync(texto);
+
+        Assert.True(respuesta.Exito);
+        var pagina = respuesta.Datos!;
+        Assert.Equal(["Ana Ramos", "Luis Pérez", "María Muñoz"], pagina.Pacientes.Select(p => p.Nombre));
+        Assert.Equal(3, pagina.TotalDePacientes);
+        Assert.Equal(1, pagina.TotalDePaginas);
+        Assert.Empty(_pacientes.UltimoListado!.Value.Palabras);
+    }
+
+    [Fact]
+    public async Task Listar_ConVariasPaginas_DevuelveSeisPorPaginaConSusTotalesYPosicion()
+    {
+        ExistentesNumerados(14);
+        var nombres = Enumerable.Range(1, 14).Select(i => $"Persona Ficticia {i:00}").ToList();
+
+        var primera = (await _servicio.ListarAsync(null, null, 1)).Datos!;
+        var segunda = (await _servicio.ListarAsync(null, null, 2)).Datos!;
+        var tercera = (await _servicio.ListarAsync(null, null, 3)).Datos!;
+
+        Assert.Equal(nombres.Take(6), primera.Pacientes.Select(p => p.Nombre));
+        Assert.Equal(nombres.Skip(6).Take(6), segunda.Pacientes.Select(p => p.Nombre));
+        Assert.Equal(nombres.Skip(12), tercera.Pacientes.Select(p => p.Nombre));
+        Assert.All(new[] { primera, segunda, tercera }, p =>
+        {
+            Assert.Equal(14, p.TotalDePacientes);
+            Assert.Equal(3, p.TotalDePaginas);
+            Assert.Equal(LimitesDeBusquedaDePacientes.TamanoDePagina, p.TamanoDePagina);
+        });
+        Assert.Equal((1, 1, 6, false, true), (primera.PaginaActual, primera.Desde, primera.Hasta, primera.HayAnterior, primera.HaySiguiente));
+        Assert.Equal((2, 7, 12, true, true), (segunda.PaginaActual, segunda.Desde, segunda.Hasta, segunda.HayAnterior, segunda.HaySiguiente));
+        Assert.Equal((3, 13, 14, true, false), (tercera.PaginaActual, tercera.Desde, tercera.Hasta, tercera.HayAnterior, tercera.HaySiguiente));
+    }
+
+    [Fact]
+    public async Task Listar_ConUnaPaginaExactamenteLlena_NoOfreceLaSiguiente()
+    {
+        ExistentesNumerados(LimitesDeBusquedaDePacientes.TamanoDePagina);
+
+        var pagina = (await _servicio.ListarAsync(null)).Datos!;
+
+        Assert.Equal(LimitesDeBusquedaDePacientes.TamanoDePagina, pagina.Pacientes.Count);
+        Assert.Equal(1, pagina.TotalDePaginas);
+        Assert.False(pagina.HaySiguiente);
+    }
+
+    [Theory]
+    [InlineData(3)]
+    [InlineData(int.MaxValue)]
+    public async Task Listar_ConUnaPaginaPosteriorALaUltima_DevuelveLaUltimaSinDesbordar(int pedida)
+    {
+        ExistentesNumerados(8);
+
+        var pagina = (await _servicio.ListarAsync(null, null, pedida)).Datos!;
+
+        Assert.Equal(2, pagina.PaginaActual);
+        Assert.Equal(["Persona Ficticia 07", "Persona Ficticia 08"], pagina.Pacientes.Select(p => p.Nombre));
+        Assert.Equal(6, _pacientes.UltimoListado!.Value.Omitir);
+    }
+
+    [Fact]
+    public async Task Listar_SinFichas_DevuelveUnaPaginaVaciaSinPedirFilas()
+    {
+        var pagina = (await _servicio.ListarAsync(null, null, 4)).Datos!;
+
+        Assert.Empty(pagina.Pacientes);
+        Assert.Equal((1, 0, 0), (pagina.PaginaActual, pagina.TotalDePaginas, pagina.TotalDePacientes));
+        Assert.Equal((0, 0), (pagina.Desde, pagina.Hasta));
+        Assert.False(pagina.HayAnterior);
+        Assert.False(pagina.HaySiguiente);
+        Assert.Equal(0, _pacientes.ListadosDeVigentes);
+    }
+
+    [Fact]
+    public async Task Listar_ExcluyeLasBajasDelListadoYDelTotal()
+    {
+        ExistentesNumerados(7);
+        var baja = Existente("Persona Ficticia 00");
+        ReglasDePaciente.DarDeBaja(baja, 1, _idActor, Ahora);
+
+        var pagina = (await _servicio.ListarAsync(null)).Datos!;
+
+        Assert.Equal(7, pagina.TotalDePacientes);
+        Assert.Equal(2, pagina.TotalDePaginas);
+        Assert.DoesNotContain(pagina.Pacientes, p => p.IdPaciente == baja.IdPaciente);
+    }
+
+    [Fact]
+    public async Task Listar_PidePorSeparadoElTotalYSoloLasFilasDeLaPagina()
+    {
+        ExistentesNumerados(14);
+
+        await _servicio.ListarAsync(null, null, 3);
+
+        Assert.Equal(1, _pacientes.ConteosDeVigentes);
+        var listado = _pacientes.UltimoListado!.Value;
+        Assert.Equal(12, listado.Omitir);
+        Assert.Equal(LimitesDeBusquedaDePacientes.TamanoDePagina, listado.Limite);
+    }
+
+    [Fact]
+    public async Task Listar_ConTextoYNacimiento_FiltraYCuentaConElMismoFiltro()
+    {
+        Existente("María Muñoz", new DateOnly(1990, 1, 15));
+        Existente("María Muñoz López", new DateOnly(1991, 2, 2));
+        Existente("Luis Pérez", new DateOnly(1990, 1, 15));
+
+        var pagina = (await _servicio.ListarAsync("  MARÍA   Muñoz ", new DateOnly(1990, 1, 15))).Datos!;
+
+        Assert.Equal(["María Muñoz"], pagina.Pacientes.Select(p => p.Nombre));
+        Assert.Equal(1, pagina.TotalDePacientes);
+        var listado = _pacientes.UltimoListado!.Value;
+        Assert.Equal(["maria", "munoz"], listado.Palabras);
+        Assert.Equal(new DateOnly(1990, 1, 15), listado.Nacimiento);
+    }
+
+    [Fact]
+    public async Task Listar_ConUnFiltroSinCoincidencias_DevuelveUnaPaginaVacia()
+    {
+        Existente("María Muñoz");
+
+        var respuesta = await _servicio.ListarAsync("inexistente");
+
+        Assert.True(respuesta.Exito);
+        Assert.Empty(respuesta.Datos!.Pacientes);
+        Assert.Equal(0, respuesta.Datos.TotalDePacientes);
+    }
+
+    [Fact]
+    public async Task Listar_MuestraElNacimientoSoloAQuienesComparteNombreConOtraFichaVigente()
+    {
+        var unica = Existente("Luis Pérez", new DateOnly(1975, 5, 5));
+        var ana1 = Existente("Ana Pérez", new DateOnly(1980, 1, 1));
+        var ana2 = Existente("ANA PEREZ", new DateOnly(1981, 2, 2));
+
+        var pagina = (await _servicio.ListarAsync(null)).Datos!;
+
+        var porId = pagina.Pacientes.ToDictionary(p => p.IdPaciente);
+        Assert.Null(porId[unica.IdPaciente].FechaNacimiento);
+        Assert.Equal(new DateOnly(1980, 1, 1), porId[ana1.IdPaciente].FechaNacimiento);
+        Assert.Equal(new DateOnly(1981, 2, 2), porId[ana2.IdPaciente].FechaNacimiento);
+    }
+
+    [Fact]
+    public async Task Listar_NoRegistraEventosNiGuardaNada()
+    {
+        ExistentesNumerados(3);
+        var eventosAntes = _repositorioAuditoria.Eventos.Count;
+
+        await _servicio.ListarAsync(null);
+        await _servicio.ListarAsync("persona");
+
+        Assert.Equal(eventosAntes, _repositorioAuditoria.Eventos.Count);
+        Assert.Equal(0, _unidad.Confirmaciones);
+    }
+
     // ----- Obtener -----
 
     [Fact]

@@ -18,14 +18,18 @@ public class IndexModel(IServicioPacientes pacientes) : PageModel
     [BindProperty]
     public DateOnly? NacimientoExacto { get; set; }
 
-    public ResultadoDeBusqueda? Resultado { get; private set; }
-    public IReadOnlyList<ResumenDePaciente> Tarjetas { get; private set; } = [];
-    public bool HaySiguiente { get; private set; }
-    public int NumeroPagina { get; private set; } = 1;
+    public PaginaDePacientes? Pagina { get; private set; }
     public string? Error { get; private set; }
     public Guid? FichaInicial { get; private set; }
 
-    public void OnGet(Guid? ficha = null) => FichaInicial = ficha;
+    public bool HayFiltro => !string.IsNullOrWhiteSpace(Texto) || NacimientoExacto is not null;
+
+    // Al abrir se muestra la primera página de todos los pacientes vigentes, sin filtro.
+    public Task<IActionResult> OnGetAsync(Guid? ficha = null)
+    {
+        FichaInicial = ficha;
+        return CargarAsync(1);
+    }
 
     public Task<IActionResult> OnPostAsync(int numeroPagina = 1) => CargarAsync(numeroPagina);
 
@@ -37,16 +41,9 @@ public class IndexModel(IServicioPacientes pacientes) : PageModel
             return Page();
         }
 
-        var respuesta = await pacientes.BuscarAsync(Texto, NacimientoExacto, HttpContext.RequestAborted);
+        var respuesta = await pacientes.ListarAsync(Texto, NacimientoExacto, numeroPagina, HttpContext.RequestAborted);
         if (respuesta.Mensaje == MensajesDePacientes.SinPermiso) return Forbid();
-        if (respuesta.Exito && respuesta.Datos is { } resultado)
-        {
-            const int tamano = 6;
-            Resultado = resultado;
-            NumeroPagina = Math.Min(numeroPagina, Math.Max(1, (resultado.Pacientes.Count + tamano - 1) / tamano));
-            Tarjetas = resultado.Pacientes.Skip((NumeroPagina - 1) * tamano).Take(tamano).ToList();
-            HaySiguiente = NumeroPagina * tamano < resultado.Pacientes.Count;
-        }
+        if (respuesta.Exito && respuesta.Datos is { } pagina) Pagina = pagina;
         else Error = respuesta.Mensaje;
         return Page();
     }

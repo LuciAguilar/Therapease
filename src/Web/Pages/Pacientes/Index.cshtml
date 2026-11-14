@@ -11,7 +11,7 @@
 <header class="titulo-seccion fila">
     <div>
         <h1>Pacientes</h1>
-        <p>Busca una ficha por el nombre del paciente.</p>
+        <p>Consulta los pacientes registrados o filtra por nombre.</p>
     </div>
     @if ((await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.RegistrarPacientes)).Succeeded)
     {
@@ -35,20 +35,16 @@
 {
     <p class="error-formulario" role="alert">@Model.Error</p>
 }
-else if (Model.Resultado is { } resultado)
+else if (Model.Pagina is { } pagina)
 {
-    @if (resultado.HayMas)
+    @if (pagina.TotalDePacientes == 0)
     {
-        <p role="status">Hay más resultados. Afina la búsqueda para encontrarlos.</p>
-    }
-    @if (Model.Tarjetas.Count == 0)
-    {
-        <p class="tarjeta" role="status">No se encontraron pacientes en esta página.</p>
+        <p class="tarjeta" role="status">@(Model.HayFiltro ? "No se encontraron pacientes con ese filtro." : "Todavía no hay pacientes registrados.")</p>
     }
     else
     {
         <ul class="tarjetas-pacientes">
-        @foreach (var paciente in Model.Tarjetas)
+        @foreach (var paciente in pagina.Pacientes)
         {
             <li class="tarjeta tarjeta-paciente">
                 <header class="identidad">
@@ -72,12 +68,11 @@ else if (Model.Resultado is { } resultado)
     <form method="post" data-paginacion-pacientes>
         <input asp-for="Texto" type="hidden" id="FiltroTexto" />
         <input asp-for="NacimientoExacto" type="hidden" asp-format="{0:yyyy-MM-dd}" id="FiltroNacimiento" />
-        <partial name="_Paginacion" model="(Model.NumeroPagina, Model.HaySiguiente)" />
+        @{
+            var elementos = pagina.TotalDePacientes == 1 ? "paciente" : "pacientes";
+        }
+        <partial name="_Paginacion" model="(pagina.PaginaActual, pagina.TotalDePaginas, pagina.TotalDePacientes, pagina.Desde, pagina.Hasta, elementos)" />
     </form>
-}
-else
-{
-    <p class="tarjeta">Escribe al menos @LimitesDeBusquedaDePacientes.LongitudMinimaDelTexto caracteres para ver las fichas.</p>
 }
 </div>
 <dialog id="panel-ficha-paciente" class="panel-ficha-paciente" aria-labelledby="titulo-ficha-paciente"

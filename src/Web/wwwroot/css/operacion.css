@@ -264,6 +264,7 @@ body:has(.panel-ficha-paciente[open]) { overflow: hidden; }
 @keyframes ocultar-confirmacion { to { visibility: hidden; } }
 .paginacion { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .75rem; }
 .paginacion button:disabled { opacity: .55; cursor: default; }
+.paginacion-resumen { display: flex; flex-direction: column; align-items: center; gap: .125rem; text-align: center; }
 @media (max-width: 42rem) {
     .tarjetas-pacientes { grid-template-columns: minmax(0, 1fr); }
 }
