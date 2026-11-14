@@ -44,9 +44,7 @@ internal sealed class RepositorioPacientesFalso : IRepositorioPacientes
     public (IReadOnlyList<string> Palabras, DateOnly? Nacimiento, int Omitir, int Limite)? UltimoListado { get; private set; }
 
     public int Lecturas => LecturasParaEscribir + LecturasParaComparacion + LecturasParaConsulta + LecturasDeCondicion + BusquedasDeVigentes + BusquedasDeParecidos
-        + ConteosDeVigentes + ListadosDeVigentes;
-    public int Lecturas => LecturasParaEscribir + LecturasParaComparacion + LecturasParaConsulta + LecturasDeCondicion + BusquedasDeVigentes + BusquedasDeParecidos
-        + LecturasDeCondicionYAmbitos + LecturasDeNombres;
+        + ConteosDeVigentes + ListadosDeVigentes + LecturasDeCondicionYAmbitos + LecturasDeNombres;
 
     public Task AgregarAsync(Paciente paciente, CancellationToken cancelacion = default)
     {
