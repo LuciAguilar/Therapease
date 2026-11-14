@@ -21,7 +21,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
 builder.Services.AddHealthChecks();
-builder.Services.AgregarPersistencia(builder.Configuration.GetConnectionString("TherapEase"));
+try
+{
+    builder.Services.AgregarPersistencia(builder.Configuration.GetConnectionString("TherapEase"));
+}
+catch (InvalidOperationException excepcion) when (excepcion.Message == InyeccionDeDependencias.MensajeSinCadenaDeConexion)
+{
+    // Sin la conexión no se inicia: mensaje fijo, sin traza y sin ningún valor de configuración.
+    Console.Error.WriteLine(InyeccionDeDependencias.MensajeSinCadenaDeConexion);
+    return 1;
+}
+
 builder.Services.AgregarIdentidad();
 builder.Services.AgregarServiciosDeAplicacion();
 builder.Services.AgregarSeguridadWeb();

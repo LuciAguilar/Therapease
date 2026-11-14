@@ -23,9 +23,19 @@ namespace TherapEase.Infrastructure.Configuracion;
 
 public static class InyeccionDeDependencias
 {
+    // Mensaje fijo de arranque cuando falta la conexión. Nombra la clave de configuración y la variable de entorno, nunca una cadena de conexión ni su valor.
+    public const string MensajeSinCadenaDeConexion =
+        "Falta la cadena de conexión «ConnectionStrings:TherapEase» (variable de entorno ConnectionStrings__TherapEase). La aplicación no se inicia sin ella.";
+
     // La conexión es la del usuario de la aplicación, sin permisos de esquema ni de modificar la auditoría.
+    // Sin cadena (nula, vacía o solo espacios) se detiene antes de registrar nada: es el único lugar donde se decide, para la aplicación y para los comandos del operador.
     public static IServiceCollection AgregarPersistencia(this IServiceCollection servicios, string? cadenaConexion)
     {
+        if (string.IsNullOrWhiteSpace(cadenaConexion))
+        {
+            throw new InvalidOperationException(MensajeSinCadenaDeConexion);
+        }
+
         servicios.AddDbContext<ContextoDeDatos>(opciones => opciones.UseNpgsql(cadenaConexion));
         servicios.AddScoped<IUnidadDeTrabajo, UnidadDeTrabajo>();
         servicios.AddScoped<IRepositorioPacientes, RepositorioPacientes>();

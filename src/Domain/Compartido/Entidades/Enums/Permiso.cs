@@ -13,5 +13,10 @@ public enum Permiso
     // ConsultarPacientes cubre la búsqueda, la ficha y la lista de parecidos al registrar.
     RegistrarPacientes,
     ConsultarPacientes,
-    ActualizarPacientes
+    ActualizarPacientes,
+
+    // Propuesta B03 (D1, aprobada por Lucía el 05-nov-2026): usuaria y superusuario; los del superusuario valen solo con datos de prueba.
+    // Ambas operaciones exigen además ConsultarPacientes, porque leen o devuelven datos del paciente.
+    ConsultarAgenda,
+    AgendarCitas
 }

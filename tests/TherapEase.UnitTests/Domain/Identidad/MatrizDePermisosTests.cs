@@ -61,6 +61,10 @@ public class MatrizDePermisosTests
     [InlineData(NombresDeRol.Usuaria, Permiso.RegistrarPacientes, true)]
     [InlineData(NombresDeRol.Usuaria, Permiso.ConsultarPacientes, true)]
     [InlineData(NombresDeRol.Usuaria, Permiso.ActualizarPacientes, true)]
+    [InlineData(NombresDeRol.Superusuario, Permiso.ConsultarAgenda, true)]
+    [InlineData(NombresDeRol.Superusuario, Permiso.AgendarCitas, true)]
+    [InlineData(NombresDeRol.Usuaria, Permiso.ConsultarAgenda, true)]
+    [InlineData(NombresDeRol.Usuaria, Permiso.AgendarCitas, true)]
     public void RolTienePermiso_CoincideConLaTablaAprobada(string rol, Permiso permiso, bool esperado)
     {
         Assert.Equal(esperado, MatrizDePermisos.RolTienePermiso(rol, permiso));
@@ -68,22 +72,39 @@ public class MatrizDePermisosTests
     }
 
     [Fact]
-    public void PermisosDelSuperusuario_SonLosSeisDecididosPorEscrito()
+    public void PermisosDelSuperusuario_SonLosOchoDecididosPorEscrito()
     {
         Assert.Equal(
             [
                 Permiso.AdministrarUsuarios, Permiso.ConsultarAuditoria, Permiso.DarDeBajaPacientes,
-                Permiso.RegistrarPacientes, Permiso.ConsultarPacientes, Permiso.ActualizarPacientes
+                Permiso.RegistrarPacientes, Permiso.ConsultarPacientes, Permiso.ActualizarPacientes,
+                Permiso.ConsultarAgenda, Permiso.AgendarCitas
             ],
             MatrizDePermisos.PermisosDelRol(NombresDeRol.Superusuario));
     }
 
     [Fact]
-    public void PermisosDeLaUsuaria_SonLaBajaYLasTresOperacionesDePacientes_SinAdministrarUsuariosNiAuditoria()
+    public void PermisosDeLaUsuaria_SonLaBajaLasOperacionesDePacientesYLasDeAgenda_SinAdministrarUsuariosNiAuditoria()
     {
         Assert.Equal(
-            [Permiso.DarDeBajaPacientes, Permiso.RegistrarPacientes, Permiso.ConsultarPacientes, Permiso.ActualizarPacientes],
+            [
+                Permiso.DarDeBajaPacientes, Permiso.RegistrarPacientes, Permiso.ConsultarPacientes, Permiso.ActualizarPacientes,
+                Permiso.ConsultarAgenda, Permiso.AgendarCitas
+            ],
             MatrizDePermisos.PermisosDelRol(NombresDeRol.Usuaria));
+    }
+
+    // Consultar la agenda y agendar son permisos distintos entre sí y de los de pacientes: conceder uno no concede el otro.
+    [Fact]
+    public void ConsultarAgendaYAgendarCitas_SonPermisosSeparadosYDistintosDeLosDePacientes()
+    {
+        var permisos = new[]
+        {
+            Permiso.ConsultarAgenda, Permiso.AgendarCitas, Permiso.RegistrarPacientes,
+            Permiso.ConsultarPacientes, Permiso.ActualizarPacientes, Permiso.DarDeBajaPacientes
+        };
+
+        Assert.Equal(permisos.Length, permisos.Distinct().Count());
     }
 
     // Cada operación de pacientes tiene su propio permiso: conceder uno no concede los otros.

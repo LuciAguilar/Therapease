@@ -17,7 +17,11 @@ public static class MatrizDePermisos
         // Solo con datos de prueba: antes de datos reales se vuelve a decidir con R04 (el nombre del rol no da acceso clínico real).
         [Permiso.RegistrarPacientes] = true,
         [Permiso.ConsultarPacientes] = true,
-        [Permiso.ActualizarPacientes] = true
+        [Permiso.ActualizarPacientes] = true,
+
+        // Agenda y citas (B03, D1): también solo con datos de prueba hasta decidir con R04.
+        [Permiso.ConsultarAgenda] = true,
+        [Permiso.AgendarCitas] = true
     }.ToFrozenDictionary();
 
     private static readonly FrozenDictionary<Permiso, bool> DecisionesDeLaUsuaria = new Dictionary<Permiso, bool>
@@ -27,7 +31,9 @@ public static class MatrizDePermisos
         [Permiso.DarDeBajaPacientes] = true,
         [Permiso.RegistrarPacientes] = true,
         [Permiso.ConsultarPacientes] = true,
-        [Permiso.ActualizarPacientes] = true
+        [Permiso.ActualizarPacientes] = true,
+        [Permiso.ConsultarAgenda] = true,
+        [Permiso.AgendarCitas] = true
     }.ToFrozenDictionary();
 
     private static readonly FrozenDictionary<Permiso, bool> SinDecisiones = FrozenDictionary<Permiso, bool>.Empty;

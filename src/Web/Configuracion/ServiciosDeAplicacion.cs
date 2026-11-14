@@ -1,5 +1,7 @@
 using TherapEase.Application.Auditoria.Interfaces.Servicios;
 using TherapEase.Application.Auditoria.Servicios;
+using TherapEase.Application.Citas.Interfaces.Servicios;
+using TherapEase.Application.Citas.Servicios;
 using TherapEase.Application.Compartido.Interfaces.Servicios;
 using TherapEase.Application.Coordinadores.Interfaces.Servicios;
 using TherapEase.Application.Coordinadores.Servicios;
@@ -24,6 +26,8 @@ public static class ServiciosDeAplicacion
         servicios.AddScoped<IServicioContrasena, ServicioContrasena>();
         servicios.AddScoped<IServicioArranqueDeIdentidad, ServicioArranqueDeIdentidad>();
         servicios.AddScoped<IServicioPacientes, ServicioPacientes>();
+        servicios.AddScoped<IConsultaDePacientesParaCitas, ConsultaDePacientesParaCitas>();
+        servicios.AddScoped<IServicioCitas, ServicioCitas>();
         servicios.AddScoped<ICoordinadorDeBajaDePaciente, CoordinadorDeBajaDePaciente>();
         return servicios;
     }

@@ -72,6 +72,29 @@ public class RepositorioPacientes : IRepositorioPacientes
             .FirstOrDefaultAsync(cancelacion);
     }
 
+    // Una sola instrucción SQL: los ámbitos se proyectan solo para una ficha vigente, de modo que de una baja no sale nada más que su condición.
+    public Task<FilaDeCondicionYAmbitos?> ObtenerCondicionYAmbitosAsync(Guid idPaciente, CancellationToken cancelacion = default)
+    {
+        return _contexto.Pacientes
+            .AsNoTracking()
+            .Where(p => p.IdPaciente == idPaciente)
+            .Select(p => new FilaDeCondicionYAmbitos(
+                p.Condicion,
+                p.Condicion == CondicionRegistro.Vigente && p.Ambitos.Any(a => a.Ambito == AmbitoAtencion.Escolar),
+                p.Condicion == CondicionRegistro.Vigente && p.Ambitos.Any(a => a.Ambito == AmbitoAtencion.Independiente)))
+            .FirstOrDefaultAsync(cancelacion);
+    }
+
+    // Una sola instrucción SQL. Los pacientes de baja no se devuelven: ni su nombre ni un indicio de su ficha.
+    public async Task<IReadOnlyList<NombreDePacienteVigente>> ObtenerNombresDeVigentesAsync(Guid[] idsPacientes, CancellationToken cancelacion = default)
+    {
+        return await _contexto.Pacientes
+            .AsNoTracking()
+            .Where(p => p.Condicion == CondicionRegistro.Vigente && idsPacientes.Contains(p.IdPaciente))
+            .Select(p => new NombreDePacienteVigente(p.IdPaciente, p.Nombre))
+            .ToListAsync(cancelacion);
+    }
+
     public async Task<IReadOnlyList<FilaDeBusquedaDePaciente>> BuscarVigentesAsync(
         IReadOnlyList<string> palabras, DateOnly? nacimiento, int limite, CancellationToken cancelacion = default)
     {

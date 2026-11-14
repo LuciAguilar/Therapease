@@ -29,6 +29,25 @@ public class ReglasDeCitaTests
         Assert.Equal(Actor, cita.IdUsuarioAlta);
     }
 
+    // La leyenda compara FechaAlta (la hora del servidor al guardar) con el inicio: solo si se guardó después de empezar.
+    [Theory]
+    [InlineData(1, true)]
+    [InlineData(0, false)]
+    [InlineData(-1, false)]
+    public void FueRegistradaDespuesDeSuHorario_ComparaLaFechaDeAltaConElInicio(int segundosDespuesDelInicio, bool esperado)
+    {
+        var cita = ReglasDeCita.Agendar(
+            Guid.NewGuid(), Guid.NewGuid(), AmbitoAtencion.Escolar, Inicio, Inicio.AddHours(1), Actor, Inicio.AddSeconds(segundosDespuesDelInicio));
+
+        Assert.Equal(esperado, ReglasDeCita.FueRegistradaDespuesDeSuHorario(cita));
+    }
+
+    [Fact]
+    public void FueRegistradaDespuesDeSuHorario_UnaCitaFuturaNoLlevaLaLeyenda()
+    {
+        Assert.False(ReglasDeCita.FueRegistradaDespuesDeSuHorario(NuevaCita()));
+    }
+
     [Theory]
     [InlineData(EstadoCita.Agendada, CondicionRegistro.Vigente, true)]
     [InlineData(EstadoCita.Agendada, CondicionRegistro.Baja, false)]

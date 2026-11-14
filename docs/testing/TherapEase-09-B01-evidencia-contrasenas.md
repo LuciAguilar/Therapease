@@ -32,7 +32,7 @@ Evidencia final: `contrasenas-integracion.trx`, `contrasenas-unitarias.trx` y `m
 
 ## 3. Código y repetición
 
-Fuente nueva: [ContrasenasServidorTests.cs](../../tests/TherapEase.IntegrationTests/ContrasenasServidorTests.cs). Usa ayudas simples para verificar contraseñas y leer eventos, intentos y fin del bloqueo. La solicitud y su autenticación siguen visibles en cada prueba.
+Fuente nueva: [ContrasenasServidorTests.cs](../../tests/TherapEase.IntegrationTests/Identidad/Contrasenas/ContrasenasServidorTests.cs). Usa ayudas simples para verificar contraseñas y leer eventos, intentos y fin del bloqueo. La solicitud y su autenticación siguen visibles en cada prueba.
 
 Con Docker disponible, este comando repite las 28 nuevas:
 

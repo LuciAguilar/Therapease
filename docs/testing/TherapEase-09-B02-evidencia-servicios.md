@@ -101,7 +101,7 @@ Cambios mecánicos por la nueva firma de `ReglasDePaciente.Registrar` y `Actuali
 | `CoordinadorDeBajaDePacienteTests`, `MatrizDePermisosTests` (unitarias) | Firma nueva de registrar; filas y casos de los permisos nuevos. |
 | `RepositorioPacientesFalso` (doble) | Implementa el contrato ampliado, con contadores de lecturas. |
 
-Nuevo: `tests/TherapEase.IntegrationTests/PacientesDePrueba.cs`, que entrega datos válidos de una persona adulta con nacimiento fijo.
+Nuevo: `tests/TherapEase.IntegrationTests/Apoyo/Pacientes/PacientesDePrueba.cs`, que entrega datos válidos de una persona adulta con nacimiento fijo.
 
 ## 6. Correcciones de Lucía del 28-oct-2026
 

@@ -60,7 +60,7 @@ dotnet test tests/TherapEase.IntegrationTests/TherapEase.IntegrationTests.csproj
 
 No requiere `.env`, PostgreSQL instalado ni conexión externa de base. Testcontainers usa puertos locales asignados y sus credenciales ficticias; puede descargar imágenes si no están disponibles. El servidor HTTP de prueba arranca la aplicación compilada desde la solución del clon, sin rutas nuevas ni referencias a carpetas históricas.
 
-Archivos principales: [casos Identity](../../tests/TherapEase.IntegrationTests/IdentidadServidorTests.cs), [casos complementarios](../../tests/TherapEase.IntegrationTests/IdentidadComplementariaTests.cs), [11 casos incorporados](../../tests/TherapEase.IntegrationTests/RevisionDatosTests.cs), [coordinación de pruebas de concurrencia](../../tests/TherapEase.IntegrationTests/ConcurrenciaSqlRevision.cs).
+Archivos principales: [casos Identity](../../tests/TherapEase.IntegrationTests/Identidad/Acceso/IdentidadServidorTests.cs), [casos complementarios](../../tests/TherapEase.IntegrationTests/Identidad/Acceso/IdentidadComplementariaTests.cs), [11 casos incorporados](../../tests/TherapEase.IntegrationTests/Datos/Integridad/RevisionDatosTests.cs), [coordinación de pruebas de concurrencia](../../tests/TherapEase.IntegrationTests/Apoyo/BaseDeDatos/ConcurrenciaSqlRevision.cs).
 
 La revisión humana de Miguel o Dulce y la aprobación final de Lucía siguen pendientes. Este resultado no acredita CI: no se configuró un flujo nuevo. La concreción de la dependencia de pruebas está registrada como nota posterior en ADR-05, sin cambiar la decisión arquitectónica original.
 
