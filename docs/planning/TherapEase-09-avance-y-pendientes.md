@@ -1,8 +1,8 @@
 # TherapEase — Etapa 09 · Avance y pendientes
 
-**Actualizado el 05-nov-2026.** B03 tiene D1–D13 aprobadas por Lucía tras Claude CORREGIR y precisiones documentales aplicadas. Implementación y pruebas pendientes; esta entrega no las toca ni cierra B00/B01/B02/LCA/R04.
+**Estado vigente, 12-nov-2026.** ✅ #18 aprobado por Lucía y fusionado con squash en 8bcc7c6, tras Claude APROBADO v1, 12-nov. Preparación local para #19: 37 casos propios B03 y una unitaria de cita agendada sin nombre; 884/884 unitarias y 562/562 integraciones correctas. ✅ Ampliación de #19: Claude APROBADO v1, 12-nov. ✅ Publicación autorizada por Lucía. ⌛ CI del nuevo SHA y revisión de Miguel. Páginas B03 con Dulce después de B02. B00/B01/B02/LCA/R04 siguen abiertos. Lucía autorizó esta entrega para el mismo PR #19; su CI y la revisión humana siguen pendientes.
 
-> **El servidor de B01 y B02 ya está entregado.** Nuestro QA B02 está en el PR #12, con CI correcta, aprobación de Miguel y fusión por Lucía en `b53c5b7`. Las páginas y los PageModel siguen con Dulce.
+> **El servidor de B01 y B02 ya está entregado.** Nuestro QA B02 está en el PR #12, con CI correcta, aprobación de Miguel y fusión por Lucía en `b53c5b7`. Las páginas B01 y sus PageModel ya están fusionados en #13, main 32e7bca. Las páginas B02 y posteriores siguen con Dulce.
 
 El alcance de las pruebas está en las tablas de los planes [B00](TherapEase-etapa09-B00.md), [B01](TherapEase-etapa09-B01.md), [B02](TherapEase-etapa09-B02.md) y [B03](TherapEase-etapa09-B03.md). Allí se distingue servidor de páginas y navegador.
 
@@ -10,10 +10,10 @@ El alcance de las pruebas está en las tablas de los planes [B00](TherapEase-eta
 
 | Bloque | Entregado | Sigue pendiente |
 | --- | --- | --- |
-| **B00 · Los cimientos y los candados** | Base del sistema, controles de datos y acceso, horas de Hermosillo, recuperación local y QA revisado de PR #4/#6. | Recorrido desde páginas, consulta final de auditoría en navegador, seguridad de las páginas y decisión expresa de cierre de B00/LCA. R04 sigue abierto. |
-| **B01 · La entrada y las cuentas** | Servidor, sesiones, permisos, contraseñas y eventos. QA revisado e integrado en #8 y #10; servidor de eventos en #9. | Dulce entregó PR #13, abierto en 632caa7: acceso/cuentas B01. QA de Lucía ejecutado: 46/49 comprobaciones Chrome y 3 controles HTTP correctos; persiste la plantilla ausente. Claude emitió CORREGIR; QA ajustado y repetido. Reauditoría recibida y ajuste menor aplicado; Chrome repetido 46/49. Pendientes Dulce/nuevo SHA, CI/QA y Miguel antes de decidir. No entrega B02/B03. |
+| **B00 · Los cimientos y los candados** | Base, controles de datos y acceso, horas de Hermosillo, recuperación local y QA de #4/#6. Los controles desde páginas B01 se ejecutaron en #13. | Revisiones del [plan B01](TherapEase-etapa09-B01.md), pendientes propios de B00/LCA y decisión de cierre. R04 sigue abierto. |
+| **B01 · La entrada y las cuentas** | Servidor y QA integrados en #8–#10. Dulce revisada en #13/8b18422, Claude APROBADO v2, Miguel aprobó, QA correcto y CI 4/4. Lucía fusionó con squash en 32e7bca. | QA propio publicado en [#19](https://github.com/LuciAguilar/Therapease/pull/19), 656bba1; Claude APROBADO v1. CI: 469/469 integración y 52/54 navegador. Falta diagnosticar/corregir CI, revisión de Miguel, fusión y cierre. Ver [plan B01](TherapEase-etapa09-B01.md). |
 | **B02 · Las fichas de pacientes** | Servidor revisado por Lucía y fusionado en [#11](https://github.com/LuciAguilar/Therapease/pull/11), main `c90b3c0`. Registrar, buscar, consultar y editar con sus controles y auditoría. | QA [#12](https://github.com/LuciAguilar/Therapease/pull/12) revisado y fusionado. Faltan confirmaciones de producto, páginas, navegador y uso con una persona ajena. |
-| **B03 · La agenda y las citas** | Propuesta de Miguel auditada CORREGIR; D1–D13 aprobadas por Lucía y precisiones documentales aplicadas. QA escrito conserva los momentos forzados del plan. | Versión ajustada local y mensaje listo para Lucía; no publicados/enviados desde herramientas. Implementación, pruebas, CI y revisión pendientes del PR de servidor; páginas con Dulce. Sin índice, mediciones o sondeos nuevos. |
+| **B03 · La agenda y las citas** | ✅ Servidor fusionado en #18/8bcc7c6. Claude APROBADO v1, 12-nov; 37 casos propios auditados. | Ampliación local de #19 con Claude APROBADO v1, 12-nov: unitaria de cita sin nombre, 37 integraciones y dos textos. Publicación autorizada por Lucía; falta CI y Miguel. Páginas con Dulce después de B02. |
 
 | Evidencia vigente de B02 | Resultado y límite |
 | --- | --- |
@@ -28,17 +28,17 @@ Los 89 están incluidos en los 465. No sumar ambas cifras ni las repeticiones co
 
 | Persona | Puede avanzar ya | Espera una dependencia |
 | --- | --- | --- |
-| **Miguel** | Preparar una propuesta de B03. Ya aprobó el QA de #12. Ayudar a Dulce con los contratos B01/B02 ya entregados y corregir un fallo concreto si aparece. | No hay correcciones obligatorias conocidas pendientes del servidor B02. Preparar la propuesta única de B03; todavía no programarlo. |
-| **Lucía** | Recomendación de Codex, pendiente de decisión de Lucía: primero revisar B01/#13; después la propuesta técnica B03 cuando esté identificada. Preparar el QA escrito B03 y decidir tras auditoría. Preparar por escrito los recorridos de navegador con los casos ya existentes; ordenar evidencia y pendientes de B00/LCA; revisar la documentación y la privacidad pendiente; continuar los pendientes de páginas y cierre del bloque. | #12 ya fusionado con Create a merge commit. Ejecutar formularios y navegador cuando haya páginas. |
-| **Dulce** | Conectar B01/B02 con los servicios disponibles, escribir PageModel y sus pruebas; confirmar campos/tutor/escuela/grupo y dar su visto bueno a 08C sección 3. | No necesita esperar a que termine todo el QA para comenzar sus páginas. Lucía decide las respuestas de producto que cambien lo aprobado. |
+| **Miguel** | ✅ Servidor B03 fusionado en #18. Ayudar a Dulce con pacientes B02 y revisar el QA completo de #19 cuando esté publicado. | Espera la ampliación de #19 auditada y publicada; no necesita otra ronda en #18. |
+| **Lucía** | ✅ Aprobó #18 y su fusión. Prepara B01+B03 para #19: 884 unitarias y 562 integraciones correctas. | Claude APROBADO v1 sobre la ampliación, 12-nov. Falta autorización de publicación, CI, revisión de Miguel y decisión final. |
+| **Dulce** | ✅ B01 fusionado. Conectar B02 con los servicios disponibles, escribir PageModel y sus pruebas; confirmar campos/tutor/escuela/grupo y dar su visto bueno a 08C sección 3. | No necesita esperar a que termine todo el QA para comenzar sus páginas. Lucía decide las respuestas de producto que cambien lo aprobado. |
 
 Para cerrar B00, Lucía también debe consolidar la evidencia, revisar los riesgos que sigan abiertos y decidir expresamente el cierre. Puede preparar ese registro ahora, sin dar el cierre por hecho. Quedan por comprobar desde páginas la entrega segura de contraseñas temporales, salida/sesiones, formularios protegidos, caché y cabeceras; CSS con sesión y política de recursos. La protección actual de ramas se puede reverificar y documentar, sin cambiarla.
 
 La descripción de #12 quedó vacía al fusionar; se conserva el texto preparado como antecedente. La limpieza sigue pendiente de tabla y OK; la fusión no autoriza borrar la copia del 30-oct ni otra evidencia.
 
-## 3. B03 · Preparación de la agenda y las citas
+## 3. B03 · Servidor integrado y QA en preparación para #19
 
-**Preparación autorizada el 31-oct.** Seguir el [plan B03](TherapEase-etapa09-B03.md): aclarar producto, recibir la propuesta de Miguel, auditarla y decidir antes de programar.
+**Avance del 12-nov.** Seguir el [plan B03](TherapEase-etapa09-B03.md). Diseño aprobado, servidor integrado por #18 y QA propio auditado; #19 reunirá B01 y el seguimiento B03. Páginas y navegador B03 siguen pendientes.
 
 | Persona | Primer trabajo autorizado ahora |
 | --- | --- |

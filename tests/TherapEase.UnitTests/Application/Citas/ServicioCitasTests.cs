@@ -2,6 +2,7 @@ using TherapEase.Application.Auditoria.Servicios;
 using TherapEase.Application.Citas.Constantes;
 using TherapEase.Application.Citas.Modelos;
 using TherapEase.Application.Citas.Servicios;
+using TherapEase.Application.Compartido.Interfaces.Repositorios;
 using TherapEase.Domain.Auditoria.Entidades.Enums;
 using TherapEase.Domain.Citas.Constantes;
 using TherapEase.Domain.Citas.Entidades;
@@ -335,6 +336,38 @@ public class ServicioCitasTests
         Assert.Equal(id, evento.IdRegistro);
         Assert.Equal(_idActor, evento.IdUsuarioActor);
         Assert.Equal("Se agendó una cita.", evento.Hecho);
+    }
+
+    /// Si Pacientes niega el nombre después de confirmar, conserva la cita agendada
+    /// sin nombre y sin indicar que el paciente está dado de baja.
+    [Fact]
+    public async Task Agendar_SiPacientesNiegaElNombreDespuesDeConfirmar_ConservaLaCitaSinMarcarBaja()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var unidad = new UnidadDeTrabajoConAccionAlConfirmar(_unidad, () => _pacientes.SinPermiso = true);
+        var reloj = new RelojFijo(Ahora);
+        var auditoria = new ServicioAuditoria(_repositorioAuditoria, _autorizacion, reloj);
+        var servicio = new ServicioCitas(_citas, _pacientes, unidad, auditoria, _autorizacion, _actual, reloj);
+
+        // Act
+        var respuesta = await servicio.AgendarAsync(id, Datos());
+
+        // Assert
+        Assert.True(respuesta.Exito);
+        Assert.Equal(MensajesDeCitas.CitaAgendada, respuesta.Mensaje);
+        Assert.Equal(EstadoDeAgendar.Agendada, respuesta.Datos!.Estado);
+        Assert.Equal(EstadoCita.Agendada, respuesta.Datos.Cita.Estado);
+        Assert.Equal(id, respuesta.Datos.Cita.IdCita);
+        Assert.Equal(_idPaciente, respuesta.Datos.Cita.IdPaciente);
+        Assert.Null(respuesta.Datos.Cita.NombreDelPaciente);
+        Assert.False(respuesta.Datos.Cita.PacienteDeBaja);
+        Assert.Equal(1, _unidad.Confirmaciones);
+        Assert.Equal(0, _unidad.Reversiones);
+        Assert.Equal(1, _pacientes.ConsultasDeCondicion);
+        Assert.Equal(1, _pacientes.ConsultasDeNombres);
+        Assert.Equal(id, Assert.Single(_citas.Citas).Key);
+        Assert.Equal(id, Assert.Single(_repositorioAuditoria.Eventos).IdRegistro);
     }
 
     [Fact]
@@ -1071,5 +1104,20 @@ public class ServicioCitasTests
         Assert.Equal(nameof(DetalleDeCita), detalle.ToString());
         Assert.Equal(nameof(DatosDeCitaEntrada), entrada.ToString());
         Assert.DoesNotContain("Nombre Privado", new ResultadoDeAgendar(EstadoDeAgendar.Agendada, detalle).ToString());
+    }
+
+    /// <summary>
+    /// Retira el acceso al nombre justo después de confirmar el guardado ficticio.
+    /// Permite comprobar la respuesta sin pausas ni depender del orden de dos tareas.
+    /// </summary>
+    private sealed class UnidadDeTrabajoConAccionAlConfirmar(
+        UnidadDeTrabajoFalsa unidad, Action alConfirmar) : IUnidadDeTrabajo
+    {
+        /// Ejecuta el cambio de acceso solo si la cita y su evento ya se confirmaron.
+        public async Task EjecutarAsync(Func<CancellationToken, Task> operacion, CancellationToken cancelacion = default)
+        {
+            await unidad.EjecutarAsync(operacion, cancelacion);
+            alConfirmar();
+        }
     }
 }

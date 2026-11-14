@@ -235,7 +235,9 @@ public sealed class HttpsLocalRevision : IAsyncLifetime
     private void ArrancarServidor(int puertoHttp, int puertoHttps)
     {
         var configuracion = new DirectoryInfo(AppContext.BaseDirectory).Parent!.Name;
-        var dll = Path.Combine(ServidorRevision.RaizRepositorio(), "src", "Web", "bin", configuracion, "net10.0", "TherapEase.Web.dll");
+        // Las páginas en Production necesitan la salida publicada con sus recursos estáticos.
+        var dll = Environment.GetEnvironmentVariable("THERAPEASE_WEB_QA_DLL")
+            ?? Path.Combine(ServidorRevision.RaizRepositorio(), "src", "Web", "bin", configuracion, "net10.0", "TherapEase.Web.dll");
         var inicio = new ProcessStartInfo("dotnet")
         {
             UseShellExecute = false, RedirectStandardOutput = true, RedirectStandardError = true,
