@@ -15,7 +15,10 @@
     </div>
     @if ((await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.RegistrarPacientes)).Succeeded)
     {
-        <a class="accion primaria" asp-page="Crear">Nuevo paciente</a>
+        <a class="accion primaria nuevo-paciente" asp-page="Crear">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+            Nuevo paciente
+        </a>
     }
 </header>
 <form method="post" class="tarjeta busqueda" id="busqueda-pacientes"
@@ -28,6 +31,7 @@
         <label asp-for="NacimientoExacto">Fecha de nacimiento (opcional)</label>
         <input asp-for="NacimientoExacto" asp-format="{0:yyyy-MM-dd}" type="date" />
     </div>
+    <button class="accion" type="button" id="limpiar-busqueda-pacientes">Limpiar</button>
 </form>
 <p id="estado-busqueda-pacientes" role="status"></p>
 <div id="resultados-pacientes">

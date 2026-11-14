@@ -27,7 +27,7 @@
                 }
                 @if (Model.MensajeExito is not null)
                 {
-                    <div class="alerta-exito" role="status">@Model.MensajeExito</div>
+                    <partial name="_AvisoDeConfirmacion" model="Model.MensajeExito" />
                 }
 
                 @if (!Model.EsTemporal)

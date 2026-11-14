@@ -53,6 +53,11 @@ formulario.addEventListener('submit', evento => {
     evento.preventDefault();
     consultar(1);
 });
+document.querySelector('#limpiar-busqueda-pacientes').addEventListener('click', () => {
+    formulario.elements.Texto.value = '';
+    formulario.elements.NacimientoExacto.value = '';
+    consultar(1);
+});
 resultados.addEventListener('submit', evento => {
     if (!evento.target.matches('[data-paginacion-pacientes]')) return;
     evento.preventDefault();

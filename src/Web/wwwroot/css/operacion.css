@@ -109,6 +109,36 @@
 }
 .accion { display: inline-block; text-decoration: none; cursor: pointer; }
 .accion.primaria { background: var(--color-bosque); border-color: var(--color-bosque); color: white; }
+.accion.primaria.nuevo-paciente {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .55rem;
+    min-height: 3rem;
+    box-sizing: border-box;
+    padding: .65rem 1.2rem;
+    background: linear-gradient(105deg, #348151, #246341);
+    border-color: transparent;
+    box-shadow: 0 .25rem .65rem rgb(36 99 65 / 25%);
+    font-weight: 700;
+}
+.accion.primaria.nuevo-paciente:hover { background: #246341; }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .accion.primaria.nuevo-paciente { transition: transform .18s ease, box-shadow .18s ease; }
+    .accion.primaria.nuevo-paciente:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 .45rem .9rem rgb(36 99 65 / 32%);
+    }
+}
+.nuevo-paciente svg {
+    width: 1.3rem;
+    height: 1.3rem;
+    flex-shrink: 0;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+}
 .zona-contenido table { background: var(--color-superficie-operativa); }
 .accion.inactiva { cursor: default; }
 .formulario-operativo { display: grid; gap: .65rem; max-width: 42rem; }
@@ -129,7 +159,21 @@
 }
 .tarjeta-paciente dd { margin: 0; text-align: end; }
 .tarjeta-paciente footer a { font-weight: 700; color: var(--color-bosque); }
-.tarjeta-paciente { position: relative; }
+.tarjeta-paciente {
+    position: relative;
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+@media (hover: hover) {
+    .tarjeta-paciente:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 .55rem 1.35rem rgb(31 41 51 / 16%);
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .tarjeta-paciente { transition: none; }
+    .tarjeta-paciente:hover { transform: none; }
+}
+[data-paginacion-pacientes] .paginacion { margin-top: 2rem; }
 .tarjeta-paciente a[data-abrir-ficha]::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
 .tarjeta-paciente:focus-within { outline: 2px solid var(--color-marca); }
 .panel-ficha-paciente {
@@ -232,36 +276,6 @@ body:has(.panel-ficha-paciente[open]) { overflow: hidden; }
 .formulario-paciente label, .formulario-paciente legend { font-weight: 700; }
 .formulario-paciente fieldset { border: 1px solid #bdcdda; border-radius: .75rem; margin: .6rem 0; }
 .formulario-paciente button.ficha-nueva-cita { display: inline-flex; align-items: center; gap: .5rem; cursor: pointer; }
-.confirmacion-paciente {
-    position: fixed;
-    inset: 1rem 1rem auto auto;
-    --duracion-confirmacion: 7s;
-    z-index: 5;
-    display: flex;
-    gap: .75rem;
-    max-width: calc(100vw - 2rem);
-    box-sizing: border-box;
-    padding: .9rem 1.25rem;
-    border: 1px solid #a9c7b5;
-    border-radius: .85rem;
-    overflow: hidden;
-    background: linear-gradient(120deg, #d8eafd, #d8efdf);
-    color: #205138;
-    box-shadow: 0 .35rem 1.2rem rgb(36 99 65 / 20%);
-    font-weight: 700;
-    animation: ocultar-confirmacion var(--duracion-confirmacion) step-end forwards;
-}
-.confirmacion-paciente::after {
-    content: "";
-    position: absolute;
-    inset: auto 0 0;
-    height: .25rem;
-    background: #348151;
-    transform-origin: left;
-    animation: consumir-confirmacion var(--duracion-confirmacion) linear forwards;
-}
-@keyframes consumir-confirmacion { to { transform: scaleX(0); } }
-@keyframes ocultar-confirmacion { to { visibility: hidden; } }
 .paginacion { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .75rem; }
 .paginacion button:disabled { opacity: .55; cursor: default; }
 .paginacion-resumen { display: flex; flex-direction: column; align-items: center; gap: .125rem; text-align: center; }

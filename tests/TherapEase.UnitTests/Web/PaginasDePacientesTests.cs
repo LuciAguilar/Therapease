@@ -100,6 +100,48 @@ public class PaginasDePacientesTests
         Assert.Equal(MensajesDePacientes.SolicitudInvalida, pagina.Error);
     }
 
+    [Fact]
+    public async Task AltaRechazadaPorTutorConservaElFormularioSinAnunciarGuardado()
+    {
+        const string mensaje = TherapEase.Domain.Pacientes.Constantes.MensajesDeDatosDePaciente.TutorObligatorioParaMenores;
+        var servicio = new Pacientes { Alta = RespuestaServicio<ResultadoDeAlta>.Fallida(mensaje) };
+        var entrada = new DatosDelFormularioDePaciente { Nombre = "Paciente ficticio", FechaNacimiento = Nacimiento };
+        var id = Guid.NewGuid();
+        var pagina = new CrearModel(servicio) { PageContext = Contexto(), IdSolicitud = id, Entrada = entrada };
+
+        Assert.IsType<PageResult>(await pagina.OnPostAsync());
+        Assert.Equal(mensaje, pagina.Error);
+        Assert.Null(pagina.Confirmacion);
+        Assert.Same(entrada, pagina.Entrada);
+        Assert.Equal(id, pagina.IdSolicitud);
+        Assert.Null(Assert.Single(servicio.Altas).Datos.Tutor);
+    }
+
+    [Fact]
+    public async Task AltaConFechaMalFormadaNoLlamaAlServicio()
+    {
+        var servicio = new Pacientes();
+        var pagina = new CrearModel(servicio) { PageContext = Contexto(), IdSolicitud = Guid.NewGuid() };
+        pagina.ModelState.AddModelError("Entrada.FechaNacimiento", "Fecha inválida");
+
+        Assert.IsType<PageResult>(await pagina.OnPostAsync());
+        Assert.Empty(servicio.Altas);
+        Assert.Equal(MensajesDePacientes.SolicitudInvalida, pagina.Error);
+        Assert.Null(pagina.Confirmacion);
+    }
+
+    [Fact]
+    public async Task EdicionSinVersionNoLlamaAlServicio()
+    {
+        var servicio = new Pacientes();
+        var pagina = new EditarModel(servicio) { PageContext = Contexto() };
+
+        Assert.IsType<PageResult>(await pagina.OnPostAsync(IdPaciente));
+        Assert.Null(servicio.Cambio);
+        Assert.Equal(MensajesDePacientes.SolicitudInvalida, pagina.Error);
+        Assert.Null(pagina.Confirmacion);
+    }
+
     [Theory]
     [InlineData(EstadoDeAlta.Registrado, MensajesDePacientes.PacienteRegistrado)]
     [InlineData(EstadoDeAlta.YaRegistrado, MensajesDePacientes.PacienteYaRegistrado)]

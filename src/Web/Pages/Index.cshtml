@@ -1,4 +1,7 @@
 @page
+@using Microsoft.AspNetCore.Authorization
+@using TherapEase.Web.Seguridad
+@inject IAuthorizationService Autorizacion
 @model IndexModel
 @{
     Layout = "_LayoutOperativo";
@@ -7,17 +10,25 @@
 }
 <header class="titulo-seccion fila">
     <div>
-        <h1>Hola, @Model.Nombre</h1>
+        <h1 id="saludo-inicio">Hola, @Model.Nombre</h1>
         <p>Aquí tienes el resumen de tu consulta.</p>
     </div>
     <div class="acciones">
-        <span class="accion inactiva" aria-disabled="true">Paciente</span>
+        @if ((await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.RegistrarPacientes)).Succeeded
+            && (await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.ConsultarPacientes)).Succeeded)
+        {
+            <a class="accion primaria nuevo-paciente" asp-page="/Pacientes/Crear">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+                Nuevo paciente
+            </a>
+        }
         <span class="accion inactiva" aria-disabled="true">Nueva cita</span>
     </div>
 </header>
+<script src="~/js/saludo-inicio.js" asp-append-version="true" defer></script>
 @if (Model.MensajeExito is not null)
 {
-    <p class="aviso" role="status">@Model.MensajeExito</p>
+    <partial name="_AvisoDeConfirmacion" model="Model.MensajeExito" />
 }
 <div class="indicadores">
     @foreach (var indicador in indicadores)
