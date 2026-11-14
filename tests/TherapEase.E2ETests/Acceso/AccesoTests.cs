@@ -55,9 +55,10 @@ public sealed partial class AccesoSesionesYPermisosTests
         // Assert
         Exigir(Ruta(p) == "/" && new Uri(p.Url).GetLeftPart(UriPartial.Authority) == entorno.Url);
         Exigir(await p.GetByRole(AriaRole.Link, new() { Name = "Usuarios", Exact = true }).CountAsync() == (administra ? 1 : 0));
-        foreach (var nombre in new[] { "Pacientes", "Agenda" })
-            Exigir(await p.GetByRole(AriaRole.Link, new() { Name = nombre, Exact = true }).CountAsync() == 0);
-        Exigir(await p.Locator("h1").InnerTextAsync() == "Hola, " + cuenta.Usuario);
+        Exigir(await p.GetByRole(AriaRole.Link, new() { Name = "Pacientes", Exact = true }).CountAsync() == 1);
+        Exigir(await p.GetByRole(AriaRole.Link, new() { Name = "Agenda", Exact = true }).CountAsync() == 0);
+        await Assertions.Expect(p.GetByRole(AriaRole.Heading, new() { Level = 1, Name = "Hola, " + cuenta.Usuario, Exact = true }))
+            .ToBeVisibleAsync();
     });
 
     /// Una cuenta inexistente, una contraseña incorrecta y un bloqueo muestran el mismo rechazo sin abrir sesión.

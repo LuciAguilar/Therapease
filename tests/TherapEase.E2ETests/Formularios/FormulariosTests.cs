@@ -86,8 +86,9 @@ public sealed partial class AccesoSesionesYPermisosTests
         await Abrir(p, "/Usuarios?busqueda=https-ficticio");
 
         // Assert
-        Exigir(await p.Locator(".identidad strong").InnerTextAsync() == "https-ficticio");
-        Exigir(await p.Locator(".identidad .secundario").CountAsync() == 0);
+        var identidad = p.Locator("ul.cuentas .identidad");
+        Exigir(await identidad.Locator("strong").InnerTextAsync() == "https-ficticio");
+        Exigir(await identidad.Locator(".secundario").CountAsync() == 0);
 
         // Act
         await Abrir(p, "/Usuarios?busqueda=" + Uri.EscapeDataString("<img src=x onerror=window.pruebaEjecutada=1>"));
