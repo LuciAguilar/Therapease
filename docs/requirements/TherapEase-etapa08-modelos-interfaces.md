@@ -1,5 +1,7 @@
 # TherapEase — Etapa 08C: modelos e interfaces
 
+El ajuste de la lista inicial de pacientes se sigue en el [plan B02](../planning/TherapEase-etapa09-B02.md); el visto bueno de Dulce a esta sección de pantallas sigue pendiente.
+
 > **Entrevista recibida y revisada el 14-oct-2026:** ✅ respuestas de la psicóloga registradas en [respuestas y ajustes](TherapEase-09-entrevista-requisitos.md). ⏳ Montos, simplificación a solo particular y cancelación automática requieren decisión de alcance/mecanismo de Lucía; no están implementados por esta actualización. B00/LCA/R04 abiertos, preparación documental sin Construcción ni pruebas nuevas. Los resultados y aprobaciones anteriores se conservan como historia.
 
 **Decisión de producto — Dulce, 08-oct-2026; comunicada por Lucía:** el directorio sale de CU03 y pasa a funcionalidad posterior como pantalla aparte. **La búsqueda de pacientes desde Pacientes se queda en el primer avance de diciembre**, junto con el registro. El directorio posterior mostrará la lista completa de pacientes vigentes por defecto y ofrecerá filtro de bajas solo con permiso; sus campos visibles siguen por validar. B07 conserva la referencia de backlog para esa funcionalidad posterior, sin crear un CU nuevo ni comprometerla para diciembre. Este cambio no elimina Q20 ni la consulta/recuperación autorizada de CU04, y no modifica permisos, auditoría, arquitectura ni la aprobación histórica de 08.
