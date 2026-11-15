@@ -4,7 +4,9 @@
 
 Concreta la sección 3.6 de la [propuesta aprobada](TherapEase-etapa09-B02-propuesta.md). El [contrato de B01](TherapEase-etapa09-B01-contrato-para-paginas.md) sigue siendo la referencia para llamar al servidor, usar `RespuestaServicio<T>`, mostrar el error 500, proteger formularios y evitar que se guarden páginas privadas en caché.
 
-Explica cómo llamar desde un PageModel a las cuatro funciones de pacientes, qué responden y qué debe hacer la página con cada resultado. Las páginas, los formularios, los textos en pantalla y la navegación son de Dulce. **No contiene páginas ni código de interfaz.** Solo datos ficticios; los valores de los campos son provisionales hasta que Dulce confirme los detalles de producto (sección 6).
+Explica cómo llamar desde un PageModel a las funciones de pacientes (registrar, buscar, listar, obtener y actualizar), qué responden y qué debe hacer la página con cada resultado. Las páginas, los formularios, los textos en pantalla y la navegación son de Dulce. **No contiene páginas ni código de interfaz.** Solo datos ficticios; los valores de los campos son provisionales hasta que Dulce confirme los detalles de producto (sección 6).
+
+> **Cambio posterior — listado paginado (13-nov-2026).** Se añadió `ListarAsync` para que la pantalla Pacientes muestre todos los pacientes vigentes al abrir, de seis en seis, con la página actual, el total de páginas y el total de pacientes. Está en la rama `frontend/B02`, sin commit ni PR, y **espera la decisión de Lucía**: la propuesta aprobada dejaba el listado completo para el directorio B07 (propuesta §3.3) y este cambio lo adelanta en la pantalla Pacientes. Detalle en la [sección 3.2.1](#321-listar-con-páginas--cu03-cambio-posterior). `BuscarAsync` y su contrato no cambian.
 
 | Estado | Qué significa en este documento |
 | --- | --- |
@@ -31,6 +33,7 @@ Explica cómo llamar desde un PageModel a las cuatro funciones de pacientes, qu�
 | `FichaDePaciente` | `IdPaciente`, `Version`, datos de la ficha, `Edad` (`int?`: **nula** si la ficha anterior no tiene nacimiento; nunca cero), `Ambitos` y `Tutor`. |
 | `ResumenDePaciente` | `IdPaciente`, `Nombre` y, **solo cuando hace falta distinguir homónimos**, `FechaNacimiento`; `NacimientoDesconocido` es verdadero si esa ficha anterior no tiene fecha. |
 | `ResultadoDeBusqueda` | `Pacientes` (hasta 50) y `HayMas`. |
+| `PaginaDePacientes` | Cambio posterior (3.2.1). `Pacientes` (`ResumenDePaciente`, hasta 6), `PaginaActual`, `TotalDePaginas`, `TotalDePacientes` y `TamanoDePagina` (6). Calculados: `HayAnterior`, `HaySiguiente`, `Desde` y `Hasta` (posición del primer y último paciente de la página). |
 | `ResultadoDeAlta` | `Estado`, `IdPaciente`, `Coincidencias` (hasta 10) y `HayMasCoincidencias`. |
 | `ResultadoDeEdicion` | `Estado` y `Ficha` con la versión vigente. |
 
@@ -70,7 +73,23 @@ Requiere `ConsultarPacientes`. Solo fichas **vigentes**.
 - `nacimientoExacto` filtra por esa fecha.
 - Cada fila trae el nacimiento **solo si otra ficha vigente tiene el mismo nombre**, para distinguirlas; en las demás es nulo. `NacimientoDesconocido` indica una ficha anterior sin fecha.
 - La búsqueda **no escribe nada, no registra evento y no guarda el texto buscado**. Un resultado vacío es un estado normal (`Exito = true`, lista vacía), no un error.
-- Esto no es el directorio completo: no hay forma de listar todos los pacientes con esta función.
+- Esta función no lista a todos los pacientes: exige texto de 2 caracteres o más. Para mostrar todos, paginados, existe `ListarAsync` (3.2.1). Tampoco es el directorio completo B07.
+
+### 3.2.1. Listar con páginas — CU03 (cambio posterior)
+
+`ListarAsync(string? texto, DateOnly? nacimientoExacto = null, int pagina = 1)` → `RespuestaServicio<PaginaDePacientes>`
+
+Requiere `ConsultarPacientes`, que se comprueba antes de leer nada. Solo fichas **vigentes**. Es lo que usa la pantalla Pacientes; `BuscarAsync` se conserva sin cambios.
+
+- **Sin texto** (nulo o en blanco) **ni fecha** devuelve todas las vigentes. **Con texto** rigen las reglas de `BuscarAsync`: de 2 a 100 caracteres, hasta 6 palabras, sin caracteres de control, sin distinguir acentos ni mayúsculas y con todas las palabras; una sola letra da `BusquedaInvalida`. `nacimientoExacto` filtra por esa fecha, con o sin texto.
+- **Páginas de seis** (`LimitesDeBusquedaDePacientes.TamanoDePagina`), en el orden estable de la búsqueda: nombre normalizado y, para empates, identificador. `pagina` empieza en 1; menor que 1 da `BusquedaInvalida`.
+- **Nunca se cargan todas las fichas.** Se hacen dos consultas: un conteo del total que cumple el filtro y, solo si hay fichas, las filas de la página (`LIMIT`/`OFFSET`). No hay transacción entre las dos: si una ficha se da de baja entre ellas, la página puede traer una fila menos y el siguiente cambio de página corrige los totales.
+- **Página inexistente:** pedir una posterior a la última devuelve la última, y `PaginaActual` indica la real; un número enorme no desborda. Sin fichas la página va vacía: `TotalDePaginas` y `TotalDePacientes` en 0, `PaginaActual` en 1, `Desde` y `Hasta` en 0.
+- Cada fila es un `ResumenDePaciente`, con la misma regla de nacimiento solo para homónimos. **No trae** teléfono, correo, última cita ni estado: todas son vigentes.
+- No escribe, no registra evento y no guarda el texto buscado. Rechazos: `SinPermiso` y `BusquedaInvalida`; no añade mensajes nuevos.
+- **Página (Web).** `OnGetAsync` pide la página 1 sin filtro y conserva `ficha` para abrir su panel. `OnPostAsync(numeroPagina)` pide la elegida con el texto y la fecha del formulario, y al filtrar se vuelve a la página 1. La vista muestra «Página X de Y» y «Mostrando a–b de N pacientes»; los botones Anterior y Siguiente aparecen solo con más de una página y se desactivan en los extremos. Con una sola letra, `busqueda-pacientes.js` espera a tener dos antes de filtrar; con el campo vacío ya no se bloquea y se lista todo.
+
+Queda fuera de este cambio: teléfono y fecha de la última cita en cada fila, y el resto del directorio B07 (filtro de bajas con permiso, columnas, pantalla propia). Mostrar la última cita exigiría un coordinador en Application, porque Pacientes no puede depender de Citas.
 
 ### 3.3. Obtener — CU03
 
@@ -137,6 +156,7 @@ Antes de conectar las páginas afectadas, según la sección 3.8 de la propuesta
 | ✅ | Permisos de los tres roles de operación, resultados, parecidos, reenvío, conflicto y una sola lectura | `ServicioPacientesTests` y `MatrizDePermisosTests`. |
 | ✅ | Guardado y evento en una transacción, carreras del mismo alta, conflicto de versión, ámbitos, una sola consulta y restricciones de la base | Integración con PostgreSQL desechable (`PacientesServidorTests`), como verificación de Miguel. |
 | ✅ | Migración desde datos anteriores, subir, bajar y volver a subir | `MigracionDeDatosDePacienteTests`, como verificación de Miguel. |
+| ✅ | Listado paginado (3.2.1): permisos, páginas de seis, totales, página inexistente, bajas, filtro y orden estable; el conteo aparte y `LIMIT`/`OFFSET` en la base; accesos retirados | `ServicioPacientesTests` (sección «Listar»), `PaginasDePacientesTests` y, con PostgreSQL desechable, `PacientesListadoTests`. Ejecutadas por Miguel el 13-nov-2026 sin commit; resultados en la [evidencia, sección 8](../testing/TherapEase-09-B02-evidencia-servicios.md). Falta revisión humana, CI y aprobación de Lucía. |
 | ⏳ | QA de Lucía de los mismos casos con sus ayudas, y navegador | Espera las páginas y su propia entrega. |
 
 Los resultados con número de casos, comando y entorno están en [la evidencia de B02](../testing/TherapEase-09-B02-evidencia-servicios.md) y no equivalen a la aprobación de Lucía.

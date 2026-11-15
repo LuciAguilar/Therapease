@@ -68,3 +68,33 @@ body {
     height: auto;
     object-fit: contain;
 }
+.aviso-confirmacion {
+    position: fixed;
+    inset: 1rem 1rem auto auto;
+    --duracion-confirmacion: 7s;
+    z-index: 5;
+    display: flex;
+    gap: .75rem;
+    max-width: calc(100vw - 2rem);
+    box-sizing: border-box;
+    padding: .9rem 1.25rem;
+    border: 1px solid #a9c7b5;
+    border-radius: .85rem;
+    overflow: hidden;
+    background: linear-gradient(120deg, #d8eafd, #d8efdf);
+    color: #205138;
+    box-shadow: 0 .35rem 1.2rem rgb(36 99 65 / 20%);
+    font-weight: 700;
+    animation: ocultar-confirmacion var(--duracion-confirmacion) step-end forwards;
+}
+.aviso-confirmacion::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: .25rem;
+    background: #348151;
+    transform-origin: left;
+    animation: consumir-confirmacion var(--duracion-confirmacion) linear forwards;
+}
+@keyframes consumir-confirmacion { to { transform: scaleX(0); } }
+@keyframes ocultar-confirmacion { to { visibility: hidden; } }

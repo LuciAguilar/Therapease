@@ -127,6 +127,21 @@ Lucía dio por buenos R1, los nombres y los documentos, y confirmó el orden de 
 
 ## 7. Límites de esta evidencia
 
-- Solo datos ficticios, sin nube ni gastos. No se probaron páginas, formularios ni navegador.
+- Solo datos ficticios, sin nube ni gastos. No se probaron páginas, formularios ni navegador (la sección 8 es posterior y tiene sus propios límites).
 - Las confirmaciones de producto de Dulce (propuesta 3.8) siguen pendientes; los valores son provisionales para datos de prueba.
 - Los casos de este documento no se suman a la evidencia histórica de B00/B01.
+
+## 8. Listado paginado de Pacientes — ejecución local del 13-nov-2026
+
+Cambio posterior a las secciones anteriores: la pantalla Pacientes lista a todos los pacientes vigentes, de seis en seis, con la página actual, el total de páginas y el total de pacientes (contrato en la sección 3.2.1 del [contrato para páginas](../planning/TherapEase-etapa09-B02-contrato-para-paginas.md)). Se ejecutó en la máquina de Miguel, sobre la rama `frontend/B02` **sin commit**, y **no cuenta como aprobado** hasta la decisión de Lucía, la revisión humana y una CI.
+
+| Estado | Comprobación | Resultado |
+| --- | --- | --- |
+| ✅ | Compilación Release de la solución | 0 advertencias y 0 errores. |
+| ✅ | Unitarias del proyecto | 746 correctas, 0 fallidas, 0 omitidas. Nuevas: 14 pruebas (20 casos) de «Listar» en `ServicioPacientesTests` (permiso antes de leer, página menor que 1, texto inválido, sin texto, varias páginas con totales y posición, página llena exacta, página posterior a la última sin desbordar, sin fichas, bajas, desplazamiento y límite pedidos al repositorio, filtro con fecha, nacimiento solo para homónimos, sin eventos) y en `PaginasDePacientesTests` 4 nuevas de la página (primera página al abrir, filtros y página elegida, filtro inválido, página menor que 1), la de fecha mal formada adaptada y la denegación ampliada a `OnGetAsync`. |
+| ✅ | Integración completa con dos hilos | 477 correctas, 0 fallidas, 0 omitidas, 4 min 40 s. Son 12 nuevas en `PacientesListadoTests` (tres páginas de 14 fichas en orden estable, conteo aparte y `LIMIT`/`OFFSET` en la base, bajas fuera del total, página inexistente con `int.MaxValue`, filtro, los dos roles y seis accesos retirados) más las 465 que ya había. |
+| ⏳ | Revisión humana de código y pruebas, CI, QA de Lucía, navegador | Pendientes. Las páginas se compilaron pero **no se abrieron en un navegador**. |
+
+Una incidencia, para que no se confunda con un fallo del producto: al principio las 7 pruebas nuevas estaban dentro de `PacientesServidorTests` y esa clase dio 2 fallos de PostgreSQL («remaining connection slots are reserved», conexiones agotadas del contenedor), también con un solo hilo. No eran aserciones: la clase ya estaba cerca del límite de conexiones. Se movieron a su propia clase, con su propio contenedor, y `PacientesServidorTests` quedó sin cambios.
+
+Límites: solo datos ficticios; no incluye teléfono ni fecha de la última cita en la lista, ni el resto del directorio B07; no hay comparación de tiempos con muchos pacientes (los datos de prueba son decenas de fichas).

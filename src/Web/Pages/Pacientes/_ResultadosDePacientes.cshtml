@@ -1,0 +1,18 @@
+@model IReadOnlyList<TherapEase.Application.Pacientes.Modelos.ResumenDePaciente>
+
+<ul class="lista-tarjetas cuentas">
+    @foreach (var paciente in Model)
+    {
+        <li class="tarjeta">
+            <a asp-page="Detalle" asp-route-id="@paciente.IdPaciente">@paciente.Nombre</a>
+            @if (paciente.FechaNacimiento is { } nacimiento)
+            {
+                <p class="secundario">Nacimiento: @nacimiento.ToString("dd/MM/yyyy")</p>
+            }
+            else if (paciente.NacimientoDesconocido)
+            {
+                <p class="secundario">Fecha de nacimiento desconocida.</p>
+            }
+        </li>
+    }
+</ul>

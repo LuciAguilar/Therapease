@@ -44,14 +44,14 @@ public class CrearModel(IServicioUsuarios usuarios) : PageModel
     public class DatosDeAlta
     {
         [Required(ErrorMessage = "Escribe el nombre de usuario.")]
-        [StringLength(LimitesDeIdentidad.LongitudMaximaNombreUsuario, ErrorMessage = "Usa hasta 50 caracteres.")]
+        [StringLength(LimitesDeIdentidad.LongitudMaximaNombreUsuario, ErrorMessage = "Usa hasta {1} caracteres.")]
         public string NombreUsuario { get; set; } = "";
 
         [Required(ErrorMessage = "Escribe el nombre completo.")]
-        [StringLength(LimitesDeCuenta.LongitudMaximaNombreCompleto, MinimumLength = LimitesDeCuenta.LongitudMinimaNombreCompleto, ErrorMessage = "Usa de 2 a 150 caracteres.")]
+        [StringLength(LimitesDeCuenta.LongitudMaximaNombreCompleto, MinimumLength = LimitesDeCuenta.LongitudMinimaNombreCompleto, ErrorMessage = "Usa de {2} a {1} caracteres.")]
         public string NombreCompleto { get; set; } = "";
 
-        [StringLength(LimitesDeCuenta.LongitudMaximaCorreo, ErrorMessage = "Usa hasta 254 caracteres.")]
+        [StringLength(LimitesDeCuenta.LongitudMaximaCorreo, ErrorMessage = "Usa hasta {1} caracteres.")]
         public string? Correo { get; set; }
 
         public string Rol { get; set; } = NombresDeRol.Usuaria;
