@@ -1,0 +1,21 @@
+@page "{id:guid}"
+@model DetalleModel
+@{
+    Layout = "_LayoutOperativo";
+    ViewData["Title"] = "Detalle de cita";
+}
+<header class="titulo-seccion fila">
+    <div>
+        <h1>Detalle de cita</h1>
+        <p>Hora de Hermosillo</p>
+    </div>
+    <a asp-page="Index">Volver a la agenda</a>
+</header>
+@if (Model.Cita is { } cita)
+{
+    <partial name="_DetalleDeCita" model="cita" />
+}
+@if (Model.Error is { } error)
+{
+    <p class="error-formulario" role="alert">@error</p>
+}

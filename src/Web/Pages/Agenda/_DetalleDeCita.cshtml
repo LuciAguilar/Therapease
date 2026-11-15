@@ -1,0 +1,33 @@
+@using System.Globalization
+@using TherapEase.Application.Citas.Constantes
+@using TherapEase.Application.Citas.Modelos
+@model DetalleDeCita
+@{
+    var cultura = CultureInfo.GetCultureInfo("es-MX");
+}
+<dl class="tarjeta cita-detalle">
+    @if (Model.PacienteDeBaja)
+    {
+        <dt>Paciente</dt>
+        <dd>@MensajesDeCitas.LeyendaPacienteDeBaja</dd>
+    }
+    else if (Model.NombreDelPaciente is { } nombre && Model.IdPaciente is { } id)
+    {
+        <dt>Paciente</dt>
+        <dd><a asp-page="/Pacientes/Detalle" asp-route-id="@id">@nombre</a></dd>
+    }
+    <dt>Ámbito</dt>
+    <dd>@Model.Ambito</dd>
+    <dt>Inicio</dt>
+    <dd>@Model.InicioLocal.ToString("d MMMM yyyy, HH:mm", cultura)</dd>
+    <dt>Fin</dt>
+    <dd>@Model.FinLocal.ToString("d MMMM yyyy, HH:mm", cultura)</dd>
+    <dt>Estado</dt>
+    <dd>@Model.Estado</dd>
+    <dt>Pago</dt>
+    <dd>@Model.EstadoPago</dd>
+</dl>
+@if (Model.RegistradaDespuesDeSuHorario)
+{
+    <p>@MensajesDeCitas.LeyendaRegistradaDespuesDeSuHorario</p>
+}

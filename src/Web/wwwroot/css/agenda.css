@@ -1,0 +1,79 @@
+.agenda { padding: 0; overflow: hidden; }
+.agenda-controles {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: end;
+    gap: 1rem;
+    padding: 1rem;
+}
+.agenda-filtros { align-items: end; }
+.agenda-filtros label { display: block; font-weight: 700; }
+.agenda p.agenda-aviso { margin: 0; padding: .75rem 1rem; }
+.agenda-desplazable { overflow-x: auto; }
+.agenda-calendario {
+    --alto-hora: 8rem;
+    --alto-dia: 3rem;
+    --borde-agenda: #bdcdda;
+    display: grid;
+    grid-template-columns: 4.5rem repeat(var(--dias), minmax(9rem, 1fr));
+    min-width: calc(4.5rem + 9rem * var(--dias));
+    border-top: 1px solid var(--borde-agenda);
+}
+.agenda-dia {
+    display: grid;
+    place-items: center;
+    height: var(--alto-dia);
+    border-bottom: 1px solid var(--borde-agenda);
+}
+.agenda-dia[aria-current="date"] { color: var(--color-bosque); background: var(--color-menta); }
+.agenda-horas {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--color-superficie-operativa);
+}
+.agenda-horas > div:not(.agenda-dia) {
+    height: var(--alto-hora);
+    padding: .35rem;
+    text-align: center;
+    color: var(--color-texto-suave);
+    border-bottom: 1px solid var(--borde-agenda);
+}
+.agenda-columna { border-left: 1px solid var(--borde-agenda); }
+.agenda-intervalos {
+    display: grid;
+    grid-template-rows: repeat(var(--minutos), calc(var(--alto-hora) / 60));
+    grid-auto-flow: column dense;
+    grid-auto-columns: minmax(0, 1fr);
+    background: repeating-linear-gradient(
+        to bottom,
+        transparent 0 calc(var(--alto-hora) - 1px),
+        var(--borde-agenda) calc(var(--alto-hora) - 1px) var(--alto-hora)
+    );
+}
+.agenda-cita {
+    display: block;
+    min-height: 0;
+    overflow: hidden;
+    margin: 1px 2px;
+    padding: 0 .35rem;
+    border-inline-start: .2rem solid var(--color-hoja);
+    border-radius: .4rem;
+    background: var(--color-menta);
+    color: var(--color-tinta);
+    font-size: .8rem;
+    line-height: 1.15;
+    text-decoration: none;
+}
+.agenda-cita:hover, .agenda-cita:focus-visible { text-decoration: underline; }
+.agenda-cita[data-vista="Canceladas"] {
+    background: color-mix(in srgb, var(--color-lavanda) 45%, white);
+    border-inline-start-color: var(--color-lavanda);
+}
+.agenda-cita > * { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cita-detalle { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: .5rem 1rem; }
+.cita-detalle dt { font-weight: 700; }
+.cita-detalle dd { margin: 0; overflow-wrap: anywhere; }
+.cita-resultados { display: grid; gap: .5rem; list-style: none; padding: 0; margin: 0; }
+.cita-resultados button { text-align: start; }

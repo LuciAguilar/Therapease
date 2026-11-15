@@ -22,7 +22,11 @@
                 Nuevo paciente
             </a>
         }
-        <span class="accion inactiva" aria-disabled="true">Nueva cita</span>
+        @if ((await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.AgendarCitas)).Succeeded
+            && (await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.ConsultarPacientes)).Succeeded)
+        {
+            <a class="accion primaria" asp-page="/Agenda/Crear">Nueva cita</a>
+        }
     </div>
 </header>
 <script src="~/js/saludo-inicio.js" asp-append-version="true" defer></script>
@@ -44,9 +48,13 @@
     <section>
         <div class="fila">
             <h2>Citas de hoy</h2>
-            <span class="accion inactiva" aria-disabled="true">Ver agenda</span>
+            @if ((await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.ConsultarAgenda)).Succeeded
+                && (await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.ConsultarPacientes)).Succeeded)
+            {
+                <a class="accion" asp-page="/Agenda/Index">Ver agenda</a>
+            }
         </div>
-        <p class="tarjeta">Sin citas para mostrar. Agenda aún no disponible.</p>
+        <p class="tarjeta">Sin datos disponibles.</p>
     </section>
     <div class="lista-tarjetas">
         <section class="tarjeta siguiente-cita"><h2>Siguiente cita</h2><p>Sin datos disponibles.</p></section>

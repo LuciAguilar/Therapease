@@ -1,0 +1,67 @@
+@using System.Globalization
+@using TherapEase.Application.Citas.Constantes
+@using TherapEase.Application.Citas.Modelos
+@using TherapEase.Domain.Citas.Constantes
+@model ResultadoDeAgenda
+@{
+    var cultura = CultureInfo.GetCultureInfo("es-MX");
+    var dias = Model.Hasta.DayNumber - Model.Desde.DayNumber + 1;
+    var primeraHora = HorarioDeAtencion.MinutoDeApertura / 60;
+    var ultimaHora = HorarioDeAtencion.MinutoDeCierre / 60;
+    foreach (var cita in Model.Citas)
+    {
+        var diaInicio = DateOnly.FromDateTime(cita.InicioLocal);
+        var diaFin = DateOnly.FromDateTime(cita.FinLocal);
+        primeraHora = Math.Min(primeraHora, diaInicio < Model.Desde || diaFin > diaInicio ? 0 : cita.InicioLocal.Hour);
+        ultimaHora = Math.Max(ultimaHora, diaFin > diaInicio ? 24 : (int)Math.Ceiling(cita.FinLocal.TimeOfDay.TotalHours));
+    }
+    var minutoInicial = primeraHora * 60;
+    var minutos = ultimaHora * 60 - minutoInicial;
+}
+<div class="agenda-desplazable" tabindex="0" role="region" aria-label="Calendario del periodo">
+    <div class="agenda-calendario" style="--dias:@dias;--minutos:@minutos">
+        <div class="agenda-horas" aria-hidden="true">
+            <div class="agenda-dia"></div>
+            @for (var hora = primeraHora; hora < ultimaHora; hora++)
+            {
+                <div>@hora.ToString("00"):00</div>
+            }
+        </div>
+        @for (var indice = 0; indice < dias; indice++)
+        {
+            var dia = Model.Desde.AddDays(indice);
+            var inicioDia = dia.ToDateTime(TimeOnly.MinValue);
+            var finDia = inicioDia.AddDays(1);
+            <section class="agenda-columna">
+                <h2 class="agenda-dia" aria-current="@(dia == Model.HoyEnHermosillo ? "date" : null)">
+                    <time datetime="@dia.ToString("yyyy-MM-dd")">@dia.ToString("ddd d MMM", cultura)</time>
+                </h2>
+                <div class="agenda-intervalos">
+                    @foreach (var cita in Model.Citas.Where(cita => cita.InicioLocal < finDia && cita.FinLocal > inicioDia))
+                    {
+                        var inicioVisible = cita.InicioLocal < inicioDia ? inicioDia : cita.InicioLocal;
+                        var finVisible = cita.FinLocal > finDia ? finDia : cita.FinLocal;
+                        var inicio = (int)Math.Floor((inicioVisible - inicioDia).TotalMinutes) - minutoInicial;
+                        var fin = (int)Math.Ceiling((finVisible - inicioDia).TotalMinutes) - minutoInicial;
+                        var paciente = cita.PacienteDeBaja ? MensajesDeCitas.LeyendaPacienteDeBaja : cita.NombreDelPaciente;
+                        var fechaInicio = cita.InicioLocal.Date == inicioDia ? "HH:mm" : "dd/MM HH:mm";
+                        var fechaFin = cita.FinLocal.Date == inicioDia ? "HH:mm" : "dd/MM HH:mm";
+                        <a class="agenda-cita" data-vista="@Model.Vista" asp-page="Detalle" asp-route-id="@cita.IdCita"
+                           style="grid-row:@(inicio + 1) / @(fin + 1)">
+                            <strong>@cita.InicioLocal.ToString(fechaInicio)–@cita.FinLocal.ToString(fechaFin)</strong>
+                            @if (paciente is not null)
+                            {
+                                <span>@paciente</span>
+                            }
+                            <span>@cita.Ambito · @cita.Estado</span>
+                            @if (cita.RegistradaDespuesDeSuHorario)
+                            {
+                                <span>@MensajesDeCitas.LeyendaRegistradaDespuesDeSuHorario</span>
+                            }
+                        </a>
+                    }
+                </div>
+            </section>
+        }
+    </div>
+</div>

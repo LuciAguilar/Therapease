@@ -1,0 +1,75 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@using TherapEase.Application.Citas.Modelos
+@using TherapEase.Web.Seguridad
+@inject IAuthorizationService Autorizacion
+@model IndexModel
+@{
+    Layout = "_LayoutOperativo";
+    ViewData["Title"] = "Agenda";
+}
+<header class="titulo-seccion fila">
+    <div>
+        <h1>Agenda</h1>
+        <p>Hora de Hermosillo</p>
+    </div>
+    @if ((await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.AgendarCitas)).Succeeded)
+    {
+        <a class="accion primaria" asp-page="Crear">+ Nueva cita</a>
+    }
+</header>
+
+<section class="tarjeta agenda" aria-label="Consultar agenda">
+    <div class="agenda-controles">
+        @if (Model.Agenda is { } agenda)
+        {
+            var dias = agenda.Hasta.DayNumber - agenda.Desde.DayNumber + 1;
+            <nav class="acciones" aria-label="Navegar por periodos">
+                @if (agenda.Desde.DayNumber >= dias)
+                {
+                    <a class="accion" asp-page="Index" asp-route-vista="@agenda.Vista"
+                       asp-route-desde="@agenda.Desde.AddDays(-dias).ToString("yyyy-MM-dd")"
+                       asp-route-hasta="@agenda.Hasta.AddDays(-dias).ToString("yyyy-MM-dd")">Anterior</a>
+                }
+                <a class="accion" asp-page="Index" asp-route-vista="@agenda.Vista">Hoy</a>
+                @if (agenda.Hasta.DayNumber < DateOnly.MaxValue.DayNumber - dias)
+                {
+                    <a class="accion" asp-page="Index" asp-route-vista="@agenda.Vista"
+                       asp-route-desde="@agenda.Desde.AddDays(dias).ToString("yyyy-MM-dd")"
+                       asp-route-hasta="@agenda.Hasta.AddDays(dias).ToString("yyyy-MM-dd")">Siguiente</a>
+                }
+            </nav>
+        }
+        <form method="get" class="acciones agenda-filtros">
+            <div>
+                <label asp-for="Desde"></label>
+                <input asp-for="Desde" type="date" asp-format="{0:yyyy-MM-dd}" />
+            </div>
+            <div>
+                <label asp-for="Hasta"></label>
+                <input asp-for="Hasta" type="date" asp-format="{0:yyyy-MM-dd}" />
+            </div>
+            <div>
+                <label asp-for="Vista">Citas</label>
+                <select asp-for="Vista" asp-items="Html.GetEnumSelectList<VistaDeAgenda>()"></select>
+            </div>
+            <button class="accion" type="submit">Consultar</button>
+        </form>
+    </div>
+    @if (Model.Error is { } error)
+    {
+        <p class="error-formulario agenda-aviso" role="alert">@error</p>
+    }
+    @if (Model.Agenda is { } resultado)
+    {
+        @if (resultado.HayMas)
+        {
+            <p class="agenda-aviso" role="status">Hay más citas de las que se pueden mostrar. Selecciona un periodo más corto.</p>
+        }
+        @if (resultado.Citas.Count == 0)
+        {
+            <p class="agenda-aviso" role="status">No hay citas en este periodo.</p>
+        }
+        <partial name="_Calendario" model="resultado" />
+    }
+</section>

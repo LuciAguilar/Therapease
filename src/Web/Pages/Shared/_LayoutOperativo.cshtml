@@ -8,6 +8,7 @@
     var consultaPacientes = (await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.ConsultarPacientes)).Succeeded;
     var usuarios = Context.Request.Path.StartsWithSegments("/Usuarios");
     var pacientes = Context.Request.Path.StartsWithSegments("/Pacientes");
+    var agenda = Context.Request.Path.StartsWithSegments("/Agenda");
 }
 <!DOCTYPE html>
 <html lang="es">
@@ -18,6 +19,10 @@
     <title>@ViewData["Title"] · TherapEase</title>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/operacion.css" asp-append-version="true" />
+    @if (agenda)
+    {
+        <link rel="stylesheet" href="~/css/agenda.css" asp-append-version="true" />
+    }
 </head>
 <body class="operacion">
     <aside class="barra-lateral">
@@ -29,7 +34,10 @@
             {
                 <a asp-page="/Pacientes/Index" aria-current="@(pacientes ? "page" : null)">Pacientes</a>
             }
-            <span aria-disabled="true">Agenda</span>
+            @if (consultaPacientes && (await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.ConsultarAgenda)).Succeeded)
+            {
+                <a asp-page="/Agenda/Index" aria-current="@(agenda ? "page" : null)">Agenda</a>
+            }
             @if (administra)
             {
                 <a asp-page="/Usuarios/Index" aria-current="@(usuarios ? "page" : null)">Usuarios</a>

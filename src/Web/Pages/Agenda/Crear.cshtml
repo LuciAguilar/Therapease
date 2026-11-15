@@ -1,0 +1,99 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@using TherapEase.Application.Citas.Constantes
+@using TherapEase.Web.Seguridad
+@inject IAuthorizationService Autorizacion
+@model CrearModel
+@{
+    Layout = "_LayoutOperativo";
+    ViewData["Title"] = Model.Resultado is null ? "Nueva cita" : "Detalle de cita";
+}
+<header class="titulo-seccion fila">
+    <div>
+        <h1>@ViewData["Title"]</h1>
+        <p>Hora de Hermosillo</p>
+    </div>
+    @if ((await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.ConsultarAgenda)).Succeeded)
+    {
+        <a asp-page="Index">Volver a la agenda</a>
+    }
+</header>
+@if (Model.Resultado is { } resultado)
+{
+    <partial name="_AvisoDeConfirmacion" model="Model.Confirmacion" />
+    <partial name="_DetalleDeCita" model="resultado.Cita" />
+}
+else
+{
+    <form method="post" asp-page="Crear" class="tarjeta formulario-operativo">
+        <input asp-for="IdSolicitud" type="hidden" />
+        <input asp-for="Entrada.IdPaciente" type="hidden" />
+        @if (Model.Error is { } error)
+        {
+            <p class="error-formulario" role="alert">@error</p>
+            @if (error == MensajesDeCitas.SolicitudYaUsada)
+            {
+                <a asp-page="Crear">Abrir un formulario nuevo</a>
+            }
+        }
+        <label asp-for="Texto">Buscar paciente por nombre</label>
+        <div class="acciones">
+            <input asp-for="Texto" type="search" maxlength="100" />
+            <button class="accion" type="submit" asp-page-handler="Buscar" formnovalidate>Buscar</button>
+        </div>
+        @if (Model.Busqueda is { } busqueda)
+        {
+            @if (busqueda.Pacientes.Count == 0)
+            {
+                <p role="status">No se encontraron pacientes.</p>
+            }
+            else
+            {
+                <ul class="cita-resultados" aria-label="Resultados de pacientes">
+                    @foreach (var paciente in busqueda.Pacientes)
+                    {
+                        <li>
+                            <button type="submit" class="accion" asp-page-handler="Elegir"
+                                    name="paciente" value="@paciente.IdPaciente" formnovalidate>
+                                @paciente.Nombre
+                                @if (paciente.FechaNacimiento is { } nacimiento)
+                                {
+                                    <span>· @nacimiento.ToString("dd/MM/yyyy")</span>
+                                }
+                                else if (paciente.NacimientoDesconocido)
+                                {
+                                    <span>· Nacimiento desconocido</span>
+                                }
+                            </button>
+                        </li>
+                    }
+                </ul>
+            }
+            @if (busqueda.HayMas)
+            {
+                <p role="status">Hay más pacientes. Afina la búsqueda.</p>
+            }
+        }
+        <p>Paciente seleccionado: @(Model.NombreDelPaciente ?? "Ninguno")</p>
+        <label asp-for="Entrada.Ambito">Ámbito</label>
+        <select asp-for="Entrada.Ambito" required>
+            <option value="">Selecciona un ámbito</option>
+            @foreach (var ambito in Model.Ambitos)
+            {
+                <option value="@ambito">@ambito</option>
+            }
+            @if (Model.Entrada.Ambito is { } capturado && !Model.Ambitos.Contains(capturado))
+            {
+                <option value="@capturado">@capturado (ya no disponible)</option>
+            }
+        </select>
+        <label asp-for="Entrada.Fecha">Fecha</label>
+        <input asp-for="Entrada.Fecha" type="date" asp-format="{0:yyyy-MM-dd}" required />
+        <label asp-for="Entrada.HoraInicio">Hora de inicio</label>
+        <input asp-for="Entrada.HoraInicio" type="time" asp-format="{0:HH:mm}" step="60" required />
+        <label asp-for="Entrada.HoraFin">Hora de fin</label>
+        <input asp-for="Entrada.HoraFin" type="time" asp-format="{0:HH:mm}" step="60" required />
+        <button class="accion primaria" type="submit">Agendar cita</button>
+        <p class="secundario">Si se pierde la respuesta, vuelve a enviar la misma solicitud cuando el navegador lo ofrezca, sin abrir un formulario nuevo.</p>
+    </form>
+}
