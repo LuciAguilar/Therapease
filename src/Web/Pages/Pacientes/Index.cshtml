@@ -59,6 +59,10 @@ else if (Model.Pagina is { } pagina)
                         {
                             <span class="secundario">Nacimiento: @nacimiento.ToString("dd/MM/yyyy")</span>
                         }
+                        else if (paciente.NacimientoDesconocido)
+                        {
+                            <span class="secundario">Fecha de nacimiento desconocida.</span>
+                        }
                     </div>
                 </header>
                 <footer class="fila">
