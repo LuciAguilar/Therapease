@@ -77,7 +77,7 @@ Las políticas de Web siguen el patrón existente; Dulce las aplica en sus pági
 
 ### 3.3. Búsqueda, homónimos y baja por identificador
 
-- Texto de 2 a 100 caracteres, hasta 6 palabras; sin texto o demasiado corto se rechaza. No listar todo al abrir: el directorio es B07.
+- Texto de 2 a 100 caracteres, hasta 6 palabras; sin texto o demasiado corto se rechaza. BuscarAsync conserva ese rechazo; la carga inicial usa ListarAsync, por el acuerdo posterior de listado B02 del 14-nov. B07 conserva su pantalla y funciones restantes.
 - Buscar sin distinguir mayúsculas ni acentos; tratar ñ como n. Todas las palabras deben aparecer en el nombre normalizado. Consulta parametrizada; `%` y `_` son literales escapados.
 - Solo registros vigentes. Orden estable por nombre y, para empates, identificador; máximo 50 y aviso de afinar al llegar al límite. Las coincidencias de alta tienen límite 10, sin afirmar que la lista sea completa si hay más.
 - Cada fila ordinaria muestra identificador/nombre. Nacimiento se expone para distinguir nombres iguales, incluida la lista de parecidos, o para el filtro exacto opcional; no se añade a toda fila por defecto. Si el nacimiento anterior es desconocido, indicarlo sin inventar un valor.
