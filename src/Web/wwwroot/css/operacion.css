@@ -287,6 +287,9 @@ body:has(.panel-ficha-paciente[open]) { overflow: hidden; }
 .formulario-paciente .icono-registro-paciente { width: 1.6rem; height: 1.6rem; stroke-width: 3; }
 .formulario-paciente .avatar .icono-registro-paciente { width: 2.25rem; height: 2.25rem; }
 .formulario-paciente .formulario-operativo { max-width: none; }
+.operacion .formulario-editar-paciente input:not([type="checkbox"]):not([type="hidden"]) {
+    background: var(--color-tarjeta);
+}
 .formulario-paciente-columnas {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

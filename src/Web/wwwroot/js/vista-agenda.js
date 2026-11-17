@@ -58,7 +58,8 @@
             window.location.assign(actual);
         });
     });
-    if (!actual.searchParams.has('Desde') && !actual.searchParams.has('desde')) {
+    if (!actual.searchParams.has('Desde') && !actual.searchParams.has('desde') &&
+        !document.querySelector('.aviso-confirmacion')) {
         vistas.querySelector('[data-periodo="semana"]').click();
     }
 })();

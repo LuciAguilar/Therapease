@@ -25,6 +25,9 @@ public class IndexModel(IServicioCitas citas) : PageModel
     public ResultadoDeAgenda? Agenda { get; private set; }
     public string? Error { get; private set; }
 
+    [TempData]
+    public string? Confirmacion { get; set; }
+
     public async Task<IActionResult> OnGetAsync()
     {
         if (!ModelState.IsValid)

@@ -19,6 +19,11 @@
     }
 </header>
 
+@if (Model.Confirmacion is { } confirmacion)
+{
+    <partial name="_AvisoDeConfirmacion" model="confirmacion" />
+}
+
 <section class="tarjeta agenda" aria-label="Consultar agenda">
     <div class="agenda-controles">
         @if (Model.Agenda is { } agenda)

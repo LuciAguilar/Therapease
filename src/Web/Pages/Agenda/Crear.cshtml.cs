@@ -31,7 +31,8 @@ public class CrearModel(IServicioCitas citas, IServicioPacientes pacientes) : Pa
     public string? NombreDelPaciente { get; private set; }
     public IReadOnlyList<AmbitoAtencion> Ambitos { get; private set; } = [];
     public ResultadoDeAgendar? Resultado { get; private set; }
-    public string? Confirmacion { get; private set; }
+    [TempData]
+    public string? Confirmacion { get; set; }
     public string? Error { get; private set; }
 
     public Task<IActionResult> OnGetAsync(Guid? paciente)

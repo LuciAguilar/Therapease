@@ -56,12 +56,13 @@
             const destino = reserva.formulario.closest('[data-contenido-cita]');
             const contenidoCita = contenido.querySelector('[data-contenido-cita]');
             if (!destino || !contenidoCita) throw new Error();
-            destino.replaceChildren(...contenidoCita.childNodes);
-            reservaPendiente = null;
-            if (destino.closest('#panel-nueva-cita') && destino.querySelector('.cita-detalle')) {
+            if (destino.closest('#panel-nueva-cita') && contenidoCita.querySelector('.cita-detalle')) {
+                reservaPendiente = null;
                 window.location.assign('/Agenda');
                 return;
             }
+            destino.replaceChildren(...contenidoCita.childNodes);
+            reservaPendiente = null;
             const aviso = destino.querySelector('.aviso-confirmacion, [role="alert"]');
             if (aviso) {
                 aviso.tabIndex = -1;
