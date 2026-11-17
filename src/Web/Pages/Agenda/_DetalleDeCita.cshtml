@@ -14,20 +14,20 @@
     else if (Model.NombreDelPaciente is { } nombre && Model.IdPaciente is { } id)
     {
         <dt>Paciente</dt>
-        <dd><a asp-page="/Pacientes/Detalle" asp-route-id="@id">@nombre</a></dd>
+        <dd><a class="cita-enlace-paciente" asp-page="/Pacientes/Index" asp-route-ficha="@id">@nombre <span aria-hidden="true">›</span></a></dd>
     }
     <dt>Ámbito</dt>
-    <dd>@Model.Ambito</dd>
+    <dd><span class="cita-distintivo cita-distintivo-ambito">@Model.Ambito</span></dd>
     <dt>Inicio</dt>
     <dd>@Model.InicioLocal.ToString("d MMMM yyyy, HH:mm", cultura)</dd>
     <dt>Fin</dt>
     <dd>@Model.FinLocal.ToString("d MMMM yyyy, HH:mm", cultura)</dd>
     <dt>Estado</dt>
-    <dd>@Model.Estado</dd>
+    <dd><span class="cita-distintivo cita-distintivo-estado">@Model.Estado</span></dd>
     <dt>Pago</dt>
-    <dd>@Model.EstadoPago</dd>
+    <dd><span class="cita-distintivo cita-distintivo-pago">@Model.EstadoPago</span></dd>
 </dl>
 @if (Model.RegistradaDespuesDeSuHorario)
 {
-    <p>@MensajesDeCitas.LeyendaRegistradaDespuesDeSuHorario</p>
+    <p class="cita-aviso-tardio">@MensajesDeCitas.LeyendaRegistradaDespuesDeSuHorario</p>
 }

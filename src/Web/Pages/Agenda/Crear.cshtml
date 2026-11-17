@@ -8,6 +8,7 @@
     Layout = "_LayoutOperativo";
     ViewData["Title"] = Model.Resultado is null ? "Nueva cita" : "Detalle de cita";
 }
+<div data-contenido-cita>
 <header class="titulo-seccion fila">
     <div>
         <h1>@ViewData["Title"]</h1>
@@ -25,9 +26,11 @@
 }
 else
 {
-    <form method="post" asp-page="Crear" class="tarjeta formulario-operativo">
+    <form method="post" asp-page="Crear" class="tarjeta formulario-operativo" data-formulario-cita>
+        <fieldset class="cita-captura">
         <input asp-for="IdSolicitud" type="hidden" />
         <input asp-for="Entrada.IdPaciente" type="hidden" />
+        <h3 class="cita-seccion">Paciente y atención</h3>
         @if (Model.Error is { } error)
         {
             <p class="error-formulario" role="alert">@error</p>
@@ -37,10 +40,11 @@ else
             }
         }
         <label asp-for="Texto">Buscar paciente por nombre</label>
+        <p class="cita-ayuda">Escribe al menos dos letras y elige un resultado.</p>
         <div class="acciones">
             <input asp-for="Texto" type="search" maxlength="100" />
-            <button class="accion" type="submit" asp-page-handler="Buscar" formnovalidate>Buscar</button>
         </div>
+        <div data-resultados-cita aria-live="polite">
         @if (Model.Busqueda is { } busqueda)
         {
             @if (busqueda.Pacientes.Count == 0)
@@ -74,7 +78,8 @@ else
                 <p role="status">Hay más pacientes. Afina la búsqueda.</p>
             }
         }
-        <p>Paciente seleccionado: @(Model.NombreDelPaciente ?? "Ninguno")</p>
+        </div>
+        <p class="@(Model.NombreDelPaciente is null ? null : "cita-paciente-elegido")">Paciente seleccionado: @(Model.NombreDelPaciente ?? "Ninguno")</p>
         <label asp-for="Entrada.Ambito">Ámbito</label>
         <select asp-for="Entrada.Ambito" required>
             <option value="">Selecciona un ámbito</option>
@@ -87,13 +92,32 @@ else
                 <option value="@capturado">@capturado (ya no disponible)</option>
             }
         </select>
+        <h3 class="cita-seccion">Fecha y horario</h3>
         <label asp-for="Entrada.Fecha">Fecha</label>
-        <input asp-for="Entrada.Fecha" type="date" asp-format="{0:yyyy-MM-dd}" required />
+        <input asp-for="Entrada.Fecha" class="cita-selector" type="date" asp-format="{0:yyyy-MM-dd}" required />
+        <div class="cita-horarios">
+        <div>
         <label asp-for="Entrada.HoraInicio">Hora de inicio</label>
-        <input asp-for="Entrada.HoraInicio" type="time" asp-format="{0:HH:mm}" step="60" required />
+        <input asp-for="Entrada.HoraInicio" class="cita-selector" type="time" asp-format="{0:HH:mm}" step="60" required />
+        </div>
+        <div>
         <label asp-for="Entrada.HoraFin">Hora de fin</label>
-        <input asp-for="Entrada.HoraFin" type="time" asp-format="{0:HH:mm}" step="60" required />
-        <button class="accion primaria" type="submit">Agendar cita</button>
-        <p class="secundario">Si se pierde la respuesta, vuelve a enviar la misma solicitud cuando el navegador lo ofrezca, sin abrir un formulario nuevo.</p>
+        <input asp-for="Entrada.HoraFin" class="cita-selector" type="time" asp-format="{0:HH:mm}" step="60" required />
+        </div>
+        </div>
+        <button class="accion primaria agenda-nueva" type="submit">Agendar cita</button>
+        </fieldset>
+        <section data-recuperar-cita hidden aria-label="Recuperar reserva">
+            <p role="status" aria-live="polite" data-estado-envio></p>
+            <div class="acciones" data-acciones-recuperacion hidden>
+                @if ((await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.ConsultarAgenda)).Succeeded)
+                {
+                    <a class="accion" data-comprobar-cita asp-page="Detalle" asp-route-id="@Model.IdSolicitud"
+                       target="_blank" rel="noopener">Comprobar reserva</a>
+                }
+                <button class="accion primaria" type="button" data-reenviar-cita>Reenviar la misma reserva</button>
+            </div>
+        </section>
     </form>
 }
+</div>
