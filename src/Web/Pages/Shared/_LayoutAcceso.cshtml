@@ -3,16 +3,12 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="~/img/therapease-icono.png" asp-append-version="true" />
     <title>@ViewData["Title"] - TherapEase</title>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/acceso.css" asp-append-version="true" />
 </head>
-<body>
-    <header class="encabezado">
-        <a class="marca" asp-page="/Index">TherapEase</a>
-    </header>
-    <main role="main" class="contenido">
-        @RenderBody()
-    </main>
-    @await RenderSectionAsync("Scripts", required: false)
+<body class="pagina-acceso">
+    @RenderBody()
 </body>
 </html>

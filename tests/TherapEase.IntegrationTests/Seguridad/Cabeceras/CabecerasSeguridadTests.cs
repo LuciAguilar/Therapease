@@ -22,6 +22,7 @@ public sealed class CabecerasSeguridadTests(HttpsLocalRevision entorno) : IClass
     [InlineData("auditoria", true, 200, true)]
     [InlineData("/", true, 200, true)]
     [InlineData("/Error", false, 200, true)]
+    [InlineData("/Acceso/Denegado", false, 403, true)]
     public async Task Respuestas_Conservan_Cabeceras_Y_Cache_Acordada(
         string ruta, bool conSesion, int estado, bool noStore)
     {

@@ -101,7 +101,7 @@ Cambios mecánicos por la nueva firma de `ReglasDePaciente.Registrar` y `Actuali
 | `CoordinadorDeBajaDePacienteTests`, `MatrizDePermisosTests` (unitarias) | Firma nueva de registrar; filas y casos de los permisos nuevos. |
 | `RepositorioPacientesFalso` (doble) | Implementa el contrato ampliado, con contadores de lecturas. |
 
-Nuevo: `tests/TherapEase.IntegrationTests/PacientesDePrueba.cs`, que entrega datos válidos de una persona adulta con nacimiento fijo.
+Nuevo: `tests/TherapEase.IntegrationTests/Apoyo/Pacientes/PacientesDePrueba.cs`, que entrega datos válidos de una persona adulta con nacimiento fijo.
 
 ## 6. Correcciones de Lucía del 28-oct-2026
 
@@ -130,3 +130,17 @@ Lucía dio por buenos R1, los nombres y los documentos, y confirmó el orden de 
 - Solo datos ficticios, sin nube ni gastos. No se probaron páginas, formularios ni navegador.
 - Las confirmaciones de producto de Dulce (propuesta 3.8) siguen pendientes; los valores son provisionales para datos de prueba.
 - Los casos de este documento no se suman a la evidencia histórica de B00/B01.
+
+## 10. QA propio tras fusionar #21 — 15-nov-2026
+
+| Parte | Resultado |
+| --- | --- |
+| Versión | main a1a5e46, #21 fusionado, rama revision/etapa09. |
+| Pruebas propias | 23 casos ya auditados, incorporados sin cambiar su código. |
+| Navegador | 77 correctos: 54 existentes y 23 propios, sin fallos ni omitidos; 2 min 8 s. |
+| Preparación | Compilación sin advertencias y Web publicado en carpeta local antes de probar, como en CI. PostgreSQL ficticio y HTTPS. |
+| Evidencia | TRX y registro privados conservados por Lucía. No se publican credenciales, formularios ni trazas de identidad. |
+| Entrega | Un archivo de pruebas y diez documentos. Sin commit, publicación o nuevo PR todavía. |
+| Revisión | Código y pruebas ya aprobados por Claude; la adaptación de textos se revisa de forma breve. Miguel revisa el QA publicado; Lucía autoriza y decide la fusión. |
+
+Los 89 casos del servidor siguen en #12. Las cifras anteriores de unitarias e integración conservan su fecha; no se ejecutaron de nuevo en esta preparación y no se suman a los 77 recorridos.

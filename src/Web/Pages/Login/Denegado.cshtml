@@ -1,0 +1,11 @@
+@page "/Acceso/Denegado"
+@model TherapEase.Web.Pages.Login.DenegadoModel
+@{
+    ViewData["Title"] = "Acceso denegado";
+    Layout = "_LayoutAcceso";
+}
+<main class="contenido">
+    <h1>Acceso denegado</h1>
+    <p>No tienes permiso para abrir esa página.</p>
+    <a asp-page="@(User.Identity?.IsAuthenticated == true ? "/Index" : "/Login/Index")">Continuar</a>
+</main>

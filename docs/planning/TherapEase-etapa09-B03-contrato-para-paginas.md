@@ -95,7 +95,7 @@ Requiere `AgendarCitas` **y** `ConsultarPacientes`.
 | El número ya existe pero **no es la misma reserva**: otra persona, otros datos, otro paciente o ámbito, o la cita se canceló o se dio de baja | `SolicitudYaUsada`, sin mostrar la otra cita. Abrir de nuevo el formulario con un número nuevo. |
 | No existe ninguna cita con ese número | El rechazo original: horario ocupado, texto de baja del paciente, etcétera. |
 
-Si el permiso se retira o la sesión se revoca en cualquier momento, el servidor responde `SinPermiso` también en el reenvío y en la relectura. Si se pierde la respuesta, **volver a enviar el mismo número** y leer el resultado (`Agendada` o `YaAgendada`); no abrir un número nuevo, porque eso crearía una segunda cita. No hay reintento automático.
+Si el permiso o la sesión ya no son válidos al comprobarlos, el servidor responde `SinPermiso`, también al reconocer un reenvío o releer por número. Si la cita ya se confirmó y después Pacientes niega la lectura del nombre, se conserva lo guardado y se responde `Agendada` sin nombre y con `PacienteDeBaja = false`; una reserva propia ya reconocida también puede devolverse como `YaAgendada` sin nombre. No se deshace una reserva confirmada por ese fallo de lectura. Si se pierde la respuesta, **volver a enviar el mismo número** y leer el resultado (`Agendada` o `YaAgendada`); no abrir un número nuevo, porque eso crearía una segunda cita. No hay reintento automático. La página muestra la cita sin nombre y no la presenta como paciente de baja.
 
 ## 5. Reglas del horario
 

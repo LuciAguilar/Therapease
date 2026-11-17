@@ -1,0 +1,38 @@
+@using TherapEase.Domain.Pacientes.Constantes
+@model DatosDelFormularioDePaciente
+
+<div class="formulario-paciente-columnas">
+<div class="formulario-operativo">
+<label asp-for="Nombre">Nombre completo</label>
+<input asp-for="Nombre" maxlength="@LimitesDePaciente.LongitudMaximaNombre" required />
+<label asp-for="FechaNacimiento">Fecha de nacimiento</label>
+<input asp-for="FechaNacimiento" asp-format="{0:yyyy-MM-dd}" type="date" />
+<label asp-for="Telefono">Teléfono</label>
+<input asp-for="Telefono" type="tel" maxlength="@LimitesDePaciente.LongitudMaximaTelefono" />
+<label asp-for="Correo">Correo</label>
+<input asp-for="Correo" type="email" maxlength="@LimitesDePaciente.LongitudMaximaCorreo" />
+<label asp-for="Escuela">Escuela</label>
+<input asp-for="Escuela" maxlength="@LimitesDePaciente.LongitudMaximaEscuela" />
+<label asp-for="Grupo">Grupo</label>
+<input asp-for="Grupo" maxlength="@LimitesDePaciente.LongitudMaximaGrupo" />
+
+<fieldset>
+    <legend>Ámbitos de atención</legend>
+    <label><input asp-for="Escolar" /> Escolar</label>
+    <label><input asp-for="Independiente" /> Independiente</label>
+</fieldset>
+</div>
+
+<fieldset class="formulario-operativo formulario-paciente-tutor">
+    <legend>Tutor</legend>
+    <p>Obligatorio para menores de @LimitesDePaciente.EdadDeMayoria años.</p>
+    <label asp-for="Tutor.Nombre">Nombre del tutor</label>
+    <input asp-for="Tutor.Nombre" maxlength="@LimitesDePaciente.LongitudMaximaNombreDeTutor" />
+    <label asp-for="Tutor.Parentesco">Parentesco</label>
+    <input asp-for="Tutor.Parentesco" maxlength="@LimitesDePaciente.LongitudMaximaParentesco" />
+    <label asp-for="Tutor.Telefono">Teléfono del tutor</label>
+    <input asp-for="Tutor.Telefono" type="tel" maxlength="@LimitesDePaciente.LongitudMaximaTelefono" />
+    <label asp-for="Tutor.Correo">Correo del tutor</label>
+    <input asp-for="Tutor.Correo" type="email" maxlength="@LimitesDePaciente.LongitudMaximaCorreo" />
+</fieldset>
+</div>

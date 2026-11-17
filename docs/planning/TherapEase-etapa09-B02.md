@@ -1,18 +1,20 @@
 # TherapEase — 09/B02 · Registrar, buscar, consultar y editar pacientes
 
-## Estado vigente al 31-oct-2026
+**Acuerdo de listado B02 documentado el 14-nov-2026.** A petición de Dulce y por indicación de Lucía, Pacientes muestra fichas vigentes al abrir sin escribir búsqueda, de seis en seis, con orden estable e indicador de página siguiente. Al filtrar por nombre vuelve a la primera página. Mantiene `ConsultarPacientes`, sesión válida y bajas ocultas; el nacimiento solo se entrega para distinguir homónimos, con aviso si es desconocido. La implementación recibida en #21 incluye además totales y navegación entre páginas. Las tarjetas muestran nombre, enlace y «Vigente»; teléfono y última cita no son requisitos de esta entrega. «Última cita» significa la última ya pasada si se añade después. No se implementa ahora su consulta. El directorio completo B07, su pantalla propia y el filtro autorizado de bajas siguen posteriores. Se conserva BuscarAsync con su mínimo de dos caracteres; la carga inicial usa ListarAsync. Este acuerdo de alcance no aprueba el código, la publicación ni la fusión del PR.
 
-> **Servidor y QA de Lucía fusionados.** Lucía aprobó y fusionó [#11](https://github.com/LuciAguilar/Therapease/pull/11) en `c90b3c0`. Nuestro [#12](https://github.com/LuciAguilar/Therapease/pull/12), `5e46883`, tiene CI correcta y aprobación de Miguel (`GalloNav`). Lucía fusionó #12 el 31-oct con Create a merge commit en `b53c5b7`.
+## Estado del QA propio — 15-nov-2026
 
-| Entrega | Estado actual |
+> **#21 fusionado en a1a5e46.** Incluye el listado paginado y el aviso de nacimiento desconocido. La condición de esperar su fusión ya está cumplida; el QA de Lucía se prepara en su propia rama.
+
+| Parte | Resultado y pendiente |
 | --- | --- |
-| Miguel | Registrar, buscar, consultar y editar, permisos, auditoría, conflictos y reenvío entregados. Sin correcciones obligatorias conocidas pendientes. |
-| QA de Lucía | Claude APROBADO v1, aceptado por Lucía; cinco archivos y dos documentos publicados en #12. 89 propios incluidos en 465 integraciones y 646 unitarias correctas en la rama global. No sumar grupos. |
-| CI | [41134402751](https://github.com/LuciAguilar/Therapease/actions/runs/41134402751): cuatro trabajos correctos sobre `5e46883`. |
-| Próximo paso | #12 ya está fusionado. Faltan confirmaciones de producto, páginas, navegador y uso; después Lucía decide el cierre de B02. |
-| Páginas y producto | Dulce confirma detalles, valida 08C sección 3 y entrega páginas/PageModel con sus pruebas; Lucía comprueba formularios, navegador y uso cuando estén disponibles. |
+| Páginas de Dulce y listado de Miguel | Integrados en #21, fusionado por Lucía el 14-nov a las 21:34 de Hermosillo. |
+| QA propio | 23 casos auditados, sin cambios de código, incorporados a revision/etapa09. |
+| Repetición sobre main | 77/77: 54 existentes y 23 propios; sin fallos ni omitidos. Web publicado localmente antes y compilación sin advertencias. |
+| Entrega | Un archivo de pruebas y diez documentos. Sin código nuevo de aplicación ni publicación todavía. |
+| Qué sigue | OK de Lucía para commit y PR, CI y revisión de Miguel. Después Lucía decide la fusión con Create a merge commit. |
+| Sigue pendiente | Confirmación de producto y 08C por Dulce y Q13 con participante. No se acreditan con estos 23 casos. |
 
-B02 sigue abierto. [Avance y preparación de B03](TherapEase-09-avance-y-pendientes.md). [B03](TherapEase-etapa09-B03.md) está abierto solo para preparación. Este seguimiento no acredita otra ejecución ni publica documentos nuevos.
 
 ---
 
@@ -36,9 +38,9 @@ Miguel prepara el servidor y sus unitarias. Dulce hace las páginas, formularios
 | Seguridad | Permisos y sesiones; bajas fuera de la búsqueda y, al abrirlas por identificador, solo «Está dada de baja». Sin datos privados en registros ni texto buscado guardado. |
 | Guardado y fallos | Cambio y auditoría juntos; sin cambios no se guarda ni registra nada. Qué pasa si falla el guardado o se pierde la respuesta. |
 | Cambios simultáneos | Dos ediciones no se pisan; reenviar un alta con el mismo identificador no duplica al paciente ni su evento. Una edición con versión anterior sigue dando conflicto. |
-| Páginas y uso | Formularios, homónimos, estado vacío, mensajes, navegador y aporte de B02 a la prueba con una persona ajena al desarrollo. Espera páginas conectadas; no acredita el recorrido completo posterior. |
+| Páginas y uso | Formularios, homónimos, estado vacío, mensajes, navegador y aporte de B02 a la prueba con una persona ajena al desarrollo. Páginas integradas y 23 recorridos propios comprobados; no acredita Q13 ni el recorrido completo posterior. |
 
-> **Son casos normales, validaciones, seguridad y fallos; no solo caminos alternos.** La cobertura de servidor está ejecutada y su QA publicado en #12, con auditoría y revisión humana aprobadas; el servidor de #11 ya está fusionado. La parte de páginas y navegador sigue prevista, sin ejecución acreditada. Las secciones 5 y 7 detallan casos, responsables y evidencia. No incorpora bajas/recuperaciones nuevas B06 ni el directorio B07.
+> **Son casos normales, validaciones, seguridad y fallos; no solo caminos alternos.** La cobertura de servidor está ejecutada y su QA publicado en #12, con auditoría y revisión humana aprobadas; el servidor de #11 ya está fusionado. La parte de páginas y navegador tiene 23 casos propios ejecutados, pendientes de publicación, CI y revisión humana de su QA. Las secciones 5 y 7 detallan casos, responsables y evidencia. No incorpora bajas/recuperaciones nuevas B06 ni el directorio B07.
 
 Las pruebas de funciones por separado y las de servidor/base de datos no sustituyen las de páginas y navegador. Cada resultado debe indicar qué se probó.
 
@@ -61,8 +63,8 @@ Fuentes: [AGENTS](../../AGENTS.md), [08B: historias y casos](../requirements/The
 | ✅ | Miguel | Propuesta ajustada, contrato, tratamiento de registros anteriores y nota ADR-04 aprobados para implementar. | Claude APROBADO v1; no requiere otra auditoría ni confirmación previa de viabilidad. Avisar a Lucía si aparece un problema técnico. |
 | ✅ | Miguel | Registrar, buscar, consultar y editar desde Application, con permisos, datos, auditoría, conflicto, reenvío y pruebas. | Revisado por Lucía y fusionado en #11, `c90b3c0`. No sustituye el QA de Lucía ni las páginas. |
 | ✅ | Miguel | Contrato para las páginas y migración entregados. Apoyar a Dulce si aparece una duda o fallo al conectar. | Contrato y evidencia en #11; ajuste de texto incluido en #12. PageModel siguen con Dulce. |
-| ⏳ | Dulce | Obtener con la usuaria los detalles de producto que faltan: obligatoriedad de campos, datos del tutor y finalidad de escuela/grupo, además de presentación y selección. Dar su visto bueno a 08C §3 antes de las páginas afectadas; preparar páginas, formularios, PageModel y sus unitarias. | Usar las respuestas ya recibidas y las opciones/contrato de Miguel; Lucía revisa privacidad y decide. Conectar las páginas con los servicios aprobados. |
-| ⏳ | Lucía | QA de servidor escrito, auditado y publicado en #12. Preparar los recorridos de páginas y navegador. | 89 propios correctos, incluidos en 465 integraciones; revisión de Miguel aprobada y fusión realizada en `b53c5b7`. Las páginas esperan a Dulce. |
+| ✅ páginas / ⏳ producto | Dulce | Páginas, PageModel y unitarias integrados en #21. | Confirmar obligatoriedad, datos del tutor, finalidad de escuela/grupo y visto bueno a 08C sección 3 con la usuaria; Lucía decide. |
+| ✅ QA local / ⏳ publicación y revisión | Lucía | QA del servidor #12 integrado. Revisión de #21: 923 unitarias, 574 integraciones y 77 recorridos de navegador, incluidos 23 propios. | Claude aprobó código y pruebas. Vista integrada en main por #21. QA propio incorporado y repetido: 77/77; falta autorización, CI y revisión de Miguel. |
 | ⏳ | Otra persona | Revisar código y pruebas del autor correspondiente. Miguel o Dulce revisa las de Lucía. | Entrega lista y CI correcta; aprobación final de Lucía. |
 
 Miguel y Dulce eligen sus herramientas. Cada autor escribe sus unitarias. La auditoría de IA no sustituye la revisión humana.
@@ -105,7 +107,7 @@ Fuentes de código en esa base: [ficha](https://github.com/LuciAguilar/Therapeas
 
 ## 5. Qué debe funcionar y qué pasa si algo falla
 
-Estas condiciones se concretan con las diez decisiones aprobadas de AGENTS sección 3 y la propuesta ajustada aprobada. El servidor está comprobado. La revisión humana del QA propio ya está aprobada. Su fusión ya se completó. Quedan las páginas; no se presentan como ejecutadas.
+Estas condiciones se concretan con las diez decisiones aprobadas de AGENTS sección 3 y la propuesta ajustada aprobada. El servidor está comprobado. La revisión humana del QA propio ya está aprobada. Su fusión ya se completó. Páginas recibidas y comprobadas localmente en #21; falta integrar la entrega revisada.
 
 | Estado | Situación | Resultado esperado | Referencia existente |
 | --- | --- | --- | --- |
@@ -133,7 +135,7 @@ Estas condiciones se concretan con las diez decisiones aprobadas de AGENTS secci
 | ✅ | Implementación de Miguel | Servidor B02 fusionado en #11; conserva sus pruebas originales y regresiones. | Revisión de Lucía y CI correctas; no cierra las páginas. |
 | ✅ servidor y revisión humana | Servidor independiente | Servicios de Miguel y QA de Lucía disponibles, sin esperar páginas. | #11 fusionado; #12 con CI correcta y aprobación de Miguel y fusión en `b53c5b7`. |
 | ✅ revisión y fusión | Publicación del QA de B02 | Publicado en una sola entrega, #12, con cinco archivos y dos documentos. | Miguel aprobó el 31-oct; Lucía fusionó ese día con Create a merge commit en `b53c5b7`. |
-| ⏳ | Integración web | PageModel, formularios y navegación de Dulce; pruebas directas a esos formularios y pruebas de navegador de Lucía. | Espera páginas funcionales y servicios listos. |
+| ⏳ | Integración web | PageModel, formularios y navegación de Dulce; pruebas directas a esos formularios y pruebas de navegador de Lucía. | Páginas recibidas en #21, QA local ejecutado; faltan auditoría, revisión humana y aprobación. |
 
 Antes de cada entrega se conserva la rama global y se ejecutan `git fetch` y `git merge origin/main`, sin reset ni pérdida de cambios locales. El 26-oct se incorporó main `a7c0c52` a `revision/etapa09` mediante avance directo, sin crear otro commit; modelo/PDF conservados. Si aparecen diferencias en README, plan B01 o plan de pruebas, se propone a Lucía cómo combinarlas antes de resolverlas. El servidor y contrato están entregados; el QA funcional de servidor ya está publicado, aprobado por Miguel y fusionado por Lucía en `b53c5b7`. No requiere otra auditoría de la propuesta.
 
@@ -151,7 +153,7 @@ Antes de cada entrega se conserva la rama global y se ejecutan `git fetch` y `gi
 
 Los 89 propios están incluidos en los 465; no sumar grupos ni repeticiones. Los resultados completos y las notas personales se conservan locales. El PR contiene las pruebas y los dos ajustes documentales auditados.
 
-**Estado actual:** decisiones, implementación de Miguel, ejecución del QA de servidor, auditoría y publicación realizadas. Miguel aprobó #12 y Lucía lo fusionó. Quedan páginas, navegador, uso y cierre del bloque. No se anuncian pruebas nuevas por actualizar este plan.
+**Estado actual:** decisiones, implementación de Miguel, ejecución del QA de servidor, auditoría y publicación realizadas. Miguel aprobó #12 y Lucía lo fusionó. Quedan auditoría e integración de #21, confirmación de producto, uso y cierre del bloque. No se anuncian pruebas nuevas por actualizar este plan.
 
 
 ## 8. Reglas para integrar y entregar

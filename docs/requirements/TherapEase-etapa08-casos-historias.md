@@ -136,7 +136,7 @@ Se aplican al CU indicado cuando corresponde; los alternos particulares de cada 
   - A8) Sin superusuario capaz de entrar: no hay autoservicio ni recuperación por correo aprobada; el procedimiento inicial/de recuperación queda pendiente de 09. El bloqueo por intentos del CU01 no se elimina por un restablecimiento sin una regla explícita aprobada.
 
 **CU03 — Registrar, buscar y consultar paciente (HU04–HU05).** Actor: la usuaria o superusuario; capturista futuro. Disparador: necesita localizar o incorporar un paciente. Precondición: sesión y permiso. Postcondición: ficha existente localizada o una nueva guardada y auditada con identificador.
-- **Básico:** 1) Abre Pacientes y busca por los datos disponibles. 2) Revisa las coincidencias vigentes. 3) Abre la ficha correcta o captura los campos mínimos propuestos. 4) El sistema valida y guarda; la ficha queda consultable. Esta búsqueda se conserva en el primer avance de diciembre; la pantalla aparte de directorio se realizará posteriormente.
+- **Básico:** 1) Abre Pacientes y ve seis fichas vigentes por página; puede filtrar por nombre y volver a la primera página. 2) Revisa las coincidencias vigentes. 3) Abre la ficha correcta o captura los campos mínimos propuestos. 4) El sistema valida y guarda; la ficha queda consultable. Esta búsqueda se conserva en el primer avance de diciembre; la pantalla aparte de directorio se realizará posteriormente.
 - **Alternos:**
   - A1) Coincidencia real: abrir la ficha existente y evitar el alta duplicada; un homónimo distinto puede registrarse, sin unicidad forzada del nombre.
   - A2) Falta un campo obligatorio, ámbito inválido o dato con formato inválido: señalarlo y no guardar.

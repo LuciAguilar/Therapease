@@ -132,11 +132,44 @@ public class ServicioPacientes : IServicioPacientes
         var hayMas = filas.Count > LimitesDeBusquedaDePacientes.MaximoDeResultados;
         IReadOnlyList<ResumenDePaciente> resultado = filas
             .Take(LimitesDeBusquedaDePacientes.MaximoDeResultados)
-            .Select(f => f.NombreRepetido
-                ? new ResumenDePaciente(f.IdPaciente, f.Nombre, f.FechaNacimiento, NacimientoDesconocido: f.FechaNacimiento is null)
-                : new ResumenDePaciente(f.IdPaciente, f.Nombre))
+            .Select(AResumen)
             .ToList();
         return RespuestaServicio<ResultadoDeBusqueda>.Correcta(new ResultadoDeBusqueda(resultado, hayMas));
+    }
+
+    public async Task<RespuestaServicio<PaginaDePacientes>> ListarAsync(
+        string? texto, DateOnly? nacimientoExacto = null, int pagina = 1, CancellationToken cancelacion = default)
+    {
+        if (await ObtenerActorConPermisosAsync(cancelacion, Permiso.ConsultarPacientes) is null)
+        {
+            return RespuestaServicio<PaginaDePacientes>.Fallida(MensajesDePacientes.SinPermiso);
+        }
+
+        if (pagina < 1)
+        {
+            return RespuestaServicio<PaginaDePacientes>.Fallida(MensajesDePacientes.BusquedaInvalida);
+        }
+
+        // Sin texto no hay palabras y se listan todas las vigentes; con texto rigen las mismas reglas que la búsqueda.
+        var palabras = string.IsNullOrWhiteSpace(texto) ? [] : PalabrasDeBusqueda(texto);
+        if (palabras is null)
+        {
+            return RespuestaServicio<PaginaDePacientes>.Fallida(MensajesDePacientes.BusquedaInvalida);
+        }
+
+        var tamano = LimitesDeBusquedaDePacientes.TamanoDePagina;
+        var total = await _pacientes.ContarVigentesAsync(palabras, nacimientoExacto, cancelacion);
+        var totalDePaginas = (total + tamano - 1) / tamano;
+
+        // Se ajusta antes de calcular el desplazamiento: una página que ya no existe (se dieron de baja fichas) devuelve la última y un número enorme no desborda.
+        var actual = Math.Min(pagina, Math.Max(1, totalDePaginas));
+        IReadOnlyList<ResumenDePaciente> filas = total == 0
+            ? []
+            : (await _pacientes.ListarVigentesAsync(palabras, nacimientoExacto, (actual - 1) * tamano, tamano, cancelacion))
+                .Select(AResumen)
+                .ToList();
+
+        return RespuestaServicio<PaginaDePacientes>.Correcta(new PaginaDePacientes(filas, actual, totalDePaginas, total, tamano));
     }
 
     public async Task<RespuestaServicio<FichaDePaciente>> ObtenerAsync(Guid idPaciente, CancellationToken cancelacion = default)
@@ -317,6 +350,12 @@ public class ServicioPacientes : IServicioPacientes
         var palabras = normalizado.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         return palabras.Length is >= 1 and <= LimitesDeBusquedaDePacientes.MaximoDePalabras ? palabras : null;
     }
+
+    // El nacimiento solo viaja cuando otra ficha vigente tiene el mismo nombre, para distinguirlas.
+    private static ResumenDePaciente AResumen(FilaDeBusquedaDePaciente fila) =>
+        fila.NombreRepetido
+            ? new ResumenDePaciente(fila.IdPaciente, fila.Nombre, fila.FechaNacimiento, NacimientoDesconocido: fila.FechaNacimiento is null)
+            : new ResumenDePaciente(fila.IdPaciente, fila.Nombre);
 
     private static DatosDePaciente ADominio(DatosDePacienteEntrada entrada) =>
         new(entrada.Nombre, entrada.FechaNacimiento, entrada.Telefono, entrada.Correo, entrada.Escuela, entrada.Grupo,

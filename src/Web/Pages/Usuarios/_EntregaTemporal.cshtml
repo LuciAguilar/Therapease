@@ -1,0 +1,8 @@
+@model TherapEase.Application.Identidad.Modelos.ContrasenaTemporalEntregada
+<section class="tarjeta" aria-labelledby="titulo-temporal">
+    <h2 id="titulo-temporal">Contraseña temporal de @Model.Usuario.NombreUsuario</h2>
+    <p>La operación se confirmó. Esta contraseña se muestra una sola vez.</p>
+    <p class="secreto"><code>@Model.ContrasenaTemporal</code></p>
+    <p>Entrégala por un canal distinto al de la verificación de identidad. Si se pierde, revisa el resultado y realiza un nuevo restablecimiento.</p>
+    <a class="accion" asp-page="Detalle" asp-route-id="@Model.Usuario.IdUsuario">Continuar a la cuenta</a>
+</section>

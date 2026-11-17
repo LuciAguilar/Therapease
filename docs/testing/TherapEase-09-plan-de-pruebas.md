@@ -1,6 +1,8 @@
 # TherapEase — Plan de pruebas por caso de uso
 
-## Seguimiento vigente al 01-nov-2026
+En pacientes, comprobar el regreso a página 1 al cambiar el filtro desde página 2; usar un prefijo que conserve tres páginas de resultados. Alcance en el [plan B02](../planning/TherapEase-etapa09-B02.md).
+
+## Seguimiento vigente al 15-nov-2026
 
 > **Servidor B01/B02 entregado; QA B02 aprobado por Miguel y fusionado por Lucía.** #11 fusionado en main `c90b3c0`; #12 fusionado en `b53c5b7`, desde `5e46883`, con cuatro trabajos de CI correctos. Los 89 propios están incluidos en 465 integraciones; 646 unitarias correctas en la repetición del 30-oct. No hubo otra ejecución por editar este plan.
 
@@ -8,8 +10,8 @@
 | --- | --- |
 | Unitarias de pacientes M-06/M-07/M-08/M-09/M-12 | Implementadas, comprobadas y revisadas en #11. |
 | Casos de servidor de CU03 y edición CU04 | Comprobados en el QA de 89 casos de #12, con auditoría aprobada. Miguel aprobó el QA el 31-oct. Lucía fusionó #12 el 31-oct con Create a merge commit en `b53c5b7`. |
-| Formulario, doble clic, respuesta HTTP perdida y navegador | Pendientes de páginas. Un ensayo del guardado en base no sustituye una prueba HTTP o de navegador. |
-| Agenda y alta de citas B03 | Borradores revisados localmente por Codex; diseño escrito de cambios simultáneos en el [plan B03, sección 4.1](../planning/TherapEase-etapa09-B03.md#41-cómo-prepararemos-los-cambios-simultáneos). Producto decidido el 01-nov; correcciones documentales de Claude aplicadas, sin otra auditoría de estos textos. Publicación aprobada y comprobada en main d2302f2; pendiente propuesta técnica de Miguel. Sin código, pruebas nuevas ni ejecución acreditada. |
+| Formulario y navegador de pacientes | Páginas integradas por #21; 23 casos propios comprobados dentro de 77 recorridos sobre main. El reenvío se ensaya por HTTP sin seguir la respuesta; no se acredita un corte físico de red ni Q13. Publicación y revisión propias pendientes. |
+| Agenda y alta de citas B03 | Servidor #18 y 37 casos propios incorporados por #19. Páginas con Dulce; ver plan B03 y guía publicada. No acredita navegador B03 ni Q16 completo. |
 | B00/LCA y R04 | Permanecen abiertos; el resumen separa qué se puede preparar ahora y qué espera páginas o autorización. |
 
 [Avance y pendientes por persona](../planning/TherapEase-09-avance-y-pendientes.md). El alcance de cobertura se consulta en los planes [B00](../planning/TherapEase-etapa09-B00.md), [B01](../planning/TherapEase-etapa09-B01.md), [B02](../planning/TherapEase-etapa09-B02.md) y [B03](../planning/TherapEase-etapa09-B03.md). Los registros con fecha anterior conservan su resultado histórico; no son una ejecución nueva ni un cierre del bloque.
@@ -78,7 +80,7 @@ La columna **Estado** usa solo ✅ y ⏳. ✅ identifica ejecución local con ev
 
 | Casos | Evidencia y alcance del estado |
 | --- | --- |
-| A-01 | Pruebas automáticas preparadas y ejecutadas el 08-oct: **30, 28 correctas y 2 fallidas, 0 omitidas** tras aprobar Lucía enumeraciones/constantes de Domain en Web. Hallazgos: Web llama a MatrizDePermisos y falta coordinador CU04. Controles negativos detectan infracciones; páginas funcionales y revisión de Miguel pendientes. Sigue ⏳; alcance y comando en B00 §4.3. Cambios aún locales para la actualización final del PR #4. |
+| A-01 | Pruebas automáticas preparadas y ejecutadas el 08-oct: **30, 28 correctas y 2 fallidas, 0 omitidas** tras aprobar Lucía enumeraciones/constantes de Domain en Web. Hallazgos: Web llama a MatrizDePermisos y falta coordinador CU04. Controles negativos detectan infracciones; después Miguel las revisó y ya cubren las páginas de #13; alcance y comando en B00 §4.3. Cambios aún locales para la actualización final del PR #4. |
 | A-02, A-03, A-07, S-22, S-23 | Migraciones reales, usuario separado, cruce SQL y permisos de auditoría/esquema en `RevisionDatosTests`; repetidos dentro de los 50 casos del 07-oct. |
 | L-CU02-02/03/04/06, L-CU11-01/02/03 | Duplicados, desactivación, rol, restablecimiento, cambio propio y auditoría en servicios reales de Identity. No acredita las páginas o formularios. |
 | S-01, S-02, S-04, S-05, S-08 | Bloqueo, mensaje genérico, atributos de cookie, revocación y hash en componentes reales. Expiración con reloj/fecha controlados; navegador pendiente. HTTPS local se probó aparte el 10-oct (B00 §4.5). |
@@ -148,7 +150,7 @@ Rama `b00/correcciones-pr4`, usada como rama de trabajo por indicación de Migue
 | ✅ | CI fallida del 25-oct y su corrección | [Ejecución 40217174330](https://github.com/LuciAguilar/Therapease/actions/runs/40217174330), sobre `a9bb313` (solo documentos frente a `cb7da59`): unitarias, paquetes e imagen correctos e **integración con 315 correctas y 4 fallidas**, las 3 de `Api_Offsets_Equivalentes_Devuelven_El_Mismo_Evento` y `Reinicio_Docker_Conserva_Claves_Y_Sesion_Sin_Claves_En_Disco`. **Causa:** `HorasDockerRevision` usaba el mismo identificador (`Registro`) para el usuario ficticio y para el paciente de tres eventos con fecha fija del 2026-10-25; iniciar sesión guarda un `InicioSesion` cuyo registro es el usuario, y el push cayó entre las 17:00 y las 18:00 UTC de ese día (10:00 a 11:00 en Hermosillo), la ventana que esas pruebas consultan: veían 2 eventos en lugar de 1. La ejecución #9 pasó porque se hizo fuera de esa hora. **Corrección:** el usuario tiene su propio identificador (`_usuario`) y `Registro` queda solo para el paciente; las comprobaciones no cambian. **Reproducción controlada (Miguel, local, 25-oct):** moviendo con SQL la fecha del `InicioSesion` a las 17:30 UTC, sin la corrección fallan los mismos 4 casos con «The collection contained 2 items»; con la corrección pasan los 12 de `HorasDockerTests`. Que una ejecución pase fuera de esa hora **no demuestra la corrección**; la demuestra la reproducción controlada, que según el mensaje de Lucía también comprobó Claude. **Resultados locales tras la corrección (25-oct, UTC−7):** unitarias, 422 correctas; integración completa, **318 correctas y 1 fallida**, por tiempo de espera agotado de Npgsql en `UsuariosServidorTests.Alta_Duplicada_Normalizada_No_Modifica_Usuario_Existente(inactiva: False)`, ajena a esta corrección, en una ejecución de 5 min 52 s con la máquina cargada; repetida esa clase junto con `HorasDockerTests`, pasan los 36 casos. `HorasDockerTests` pasó 12 de 12 con la corrección, con el reloj real y con el evento forzado dentro de la ventana. Archivos locales (no versionados) en `TestResults/horas/`: `horas-reproduccion.trx` (SHA-256 `f59d3e1c987d0439520c7c82f19758b1d92985e82df07f698a3d15e2829de313`, 4 fallidas), `horas-corregido-con-ventana.trx` (`1d58dc104b54bd7d6bb924c1feb0fb02698442e8b22fb4454735cc9560a7b860`, 12 correctas), `integracion-horas.trx` (`c1e6da1b94a2a0eaed46ecb8f3f5d3aaa0514b576408cfd4886035308880c452`) y `repeticion-aislada.trx` (`da532969fe52dfc0cf3989f66ceba606ab8b9a482b3eb0363f3237127e7a0d40`). |
 | ✅ | Revisión y auditoría (24-oct, según la revisión de Lucía del PR #9) | Lucía repitió en local las 422 unitarias y las 319 de integración (máximo dos hilos) y su QA adicional de 10 casos de eventos, que no forma parte del PR ni de su CI. La auditoría de Claude, según su veredicto, ejecutó 422 unitarias y 329 de integración con esos diez casos; eventos y concurrencia se repitieron cinco veces (15 de 15 en cada ejecución) y los controles con fallos intencionales detectaron los cambios incorrectos. **Código aprobado por Lucía; ningún bloqueante de funcionamiento.** |
 | ✅ | CI sobre la corrección de `HorasDockerRevision` | [Ejecución 40238140968](https://github.com/LuciAguilar/Therapease/actions/runs/40238140968), sobre `26555176f05d936eeab2cb8c08ddc037dcb80741`: cuatro trabajos correctos, 422 unitarias y 319 de integración sin fallidas ni omitidas, según los registros revisados por Lucía. El verde fuera de la franja no sustituye la reproducción controlada de la fila anterior. Auditoría v3 recibida, aprobación de Lucía y fusión completadas el 25-oct en `6526607`; las páginas siguen pendientes. |
-| ✅ / ⏳ | Ajustes documentales, fusión y páginas | ✅ Ajustes revisados en auditoría v3 y PR #9 fusionado por Lucía el 25-oct en `6526607`. ✅ Diez casos propios de Lucía revisados por Miguel y fusionados en #10 el 26-oct, `a7c0c52`; auditoría y aprobación conservadas. Páginas, PageModel y navegador siguen pendientes con Dulce y el QA posterior de Lucía. |
+| ✅ | Ajustes documentales, fusión y páginas | ✅ Ajustes revisados en auditoría v3 y PR #9 fusionado por Lucía el 25-oct en `6526607`. ✅ Diez casos propios de Lucía revisados por Miguel y fusionados en #10 el 26-oct, `a7c0c52`; auditoría y aprobación conservadas. Páginas y PageModel entregados en #13; QA de navegador de Lucía en #19. |
 
 **Ajustes a pruebas de integración de Lucía.** Se añadieron dos ayudas en `ServidorIdentidadRevision` (`SoloCambiosSql` y `SoloCambios()`) que dejan fuera `InicioSesion`, `CierreSesion` y `BloqueoAcceso`. Antes, esas pruebas contaban todos los eventos porque nunca había otros; ahora su propia preparación inicia sesión y genera entradas.
 
@@ -193,7 +195,7 @@ Rama `b01/acceso-y-usuarios`: parte de `main` `ffb2494`, incluye los documentos 
 | Parcial | Comprobaciones automáticas (A-06, S-33, S-34) | Flujo `.github/workflows/comprobaciones.yml` y `scripts/ci/`. Comprobado en local: análisis estático del flujo con actionlint; los pasos de compilación, unitarias, arquitectura, paquetes, fijaciones, archivos sensibles y migraciones, en Linux con el SDK de la imagen del `Dockerfile`; la imagen construida corre sin root y con salud definida. Controles negativos que fallan como deben: acción sin SHA, imagen sin digest, `.env` versionado, paquete con vulnerabilidad alta, prueba omitida, modelo sin migración e imagen con usuario `0:0`, `root:root`, `root`, `0` o un nombre que resuelve al uid 0. **Ejecuciones en GitHub (PR #7, runner `ubuntu-24.04`, repositorio público):** la [ejecución 1](https://github.com/LuciAguilar/Therapease/actions/runs/39076736098), del 17-oct sobre la rama `ffd2b5c` (combinación que GitHub ejecutó, según la revisión del PR: `5f9342aff5490a4910831bc88adbf43f1022f042`), duró 2 min 55 s: unitarias con arquitectura (40 s), paquetes, fijaciones, secretos y migraciones (39 s) e imagen (30 s) terminaron correctamente, y la integración (2 min 10 s) tuvo **233 correctas y 7 fallidas, todas con 401 (sesión no aceptada)**. La [ejecución 2](https://github.com/LuciAguilar/Therapease/actions/runs/39151476673), del 18-oct sobre la rama `b1aed8a`, **terminó correcta en 2 min 51 s**: unitarias con arquitectura 36 s, paquetes, fijaciones, secretos y migraciones 36 s, imagen 34 s e integración 2 min 9 s. Todos los pasos de los cuatro trabajos terminaron bien, incluido el paso que resume cada archivo de resultados y que falla ante cualquier prueba fallida, omitida o ausente. No se pudo leer el número exacto de pruebas de cada trabajo porque los registros exigen iniciar sesión; para la integración se esperan 205 casos. Se guardaron dos artefactos TRX con vencimiento el 25-oct. Los siete fallos con 401 desaparecieron después de añadir `--add-host` en `HorasDockerRevision`; la causa se infiere del resultado, no de los registros. La revisión de la imagen ahora rechaza también `0:0` y `root:root` (`scripts/ci/revisar-usuario-de-imagen.sh`). Pendiente: que Lucía compruebe el flujo y mida los minutos; S-33, S-34 y A-06 siguen pendientes hasta entonces. |
 | Parcial | Correcciones de la revisión del PR #7 (18-oct) | Retirados del PR los cuatro archivos de pruebas B01 de Lucía y su informe de evidencia. `--add-host host.docker.internal:host-gateway` en `HorasDockerRevision` (archivo de B00, ya en `main`). Revisión de la imagen: se compara solo el usuario antes de `:` y, si la imagen trae `id`, también el identificador efectivo; comprobada en local con imágenes de prueba. El script de paquetes nombra los que tienen avisos bajos o moderados. El resumen de cada trabajo registra la rama y la combinación que ejecutó GitHub. Contrato: un intento fallido de contraseña sí suma al contador de bloqueo. Comprobado en GitHub: la ejecución 2 terminó correcta con estas correcciones. Pendiente: datos propios con temporal, que decide Lucía. |
 | ✅ | Eventos de acceso, salida y bloqueo | Aprobados el 17-oct; la excepción quedó en AGENTS §2.3 el 18-oct. Programados el 22-oct y con el código aprobado por Lucía el 24-oct, ver §0.8. |
-| ⏳ | Páginas, navegador y revisión | Contrato para Dulce en [contrato para páginas](../planning/TherapEase-etapa09-B01-contrato-para-paginas.md). Falta la revisión de otra persona, la aprobación final de Lucía y la conexión con las páginas. |
+| ✅ | Páginas, navegador y revisión | Contrato para Dulce en [contrato para páginas](../planning/TherapEase-etapa09-B01-contrato-para-paginas.md). Páginas conectadas en #13 y navegador en #19, ambos revisados por otra persona y fusionados. |
 
 ## 0.6. PR #6 revisado y fusionado — 15-oct-2026
 
@@ -249,11 +251,11 @@ Los identificadores de la sección 3 conservan ⏳ si su alcance completo aún f
 
 | ID | Estado | Qué hacer → qué debe pasar | Origen |
 | --- | --- | --- | --- |
-| M-01 | ⏳ | Desactivar o degradar al único superusuario activo → rechaza. Con dos activos → permite uno. | HU02, CU02 A1 |
-| M-02 | ⏳ | Alta con nombre de usuario duplicado o rol inexistente → rechaza. Alta válida → `DebeCambiarContrasena = true`. | HU02, CU02 A2 |
-| M-03 | ⏳ | Si el registro del evento de auditoría falla → el servicio no confirma el cambio. | HU02, CU02 A6, S4 |
-| M-04 | ⏳ | Cambio propio ordinario exige la contraseña actual; primera entrada con temporal pide solo la nueva; nunca permite cambiar la de otro usuario. | HU15, CU11 |
-| M-05 | ⏳ | Los eventos de usuario, rol y contraseña no contienen contraseña ni hash. | Q03, Q04 |
+| M-01 | ✅ | Desactivar o degradar al único superusuario activo → rechaza. Con dos activos → permite uno. | HU02, CU02 A1 |
+| M-02 | ✅ | Alta con nombre de usuario duplicado o rol inexistente → rechaza. Alta válida → `DebeCambiarContrasena = true`. | HU02, CU02 A2 |
+| M-03 | ✅ | Si el registro del evento de auditoría falla → el servicio no confirma el cambio. | HU02, CU02 A6, S4 |
+| M-04 | ✅ | Cambio propio ordinario exige la contraseña actual; primera entrada con temporal pide solo la nueva; nunca permite cambiar la de otro usuario. | HU15, CU11 |
+| M-05 | ✅ | Los eventos de usuario, rol y contraseña no contienen contraseña ni hash. | Q03, Q04 |
 
 ### Pacientes: CU03, CU04 (B02) ★
 
@@ -263,30 +265,30 @@ Los identificadores de la sección 3 conservan ⏳ si su alcance completo aún f
 | M-07 | ✅ | Buscar coincidencias por nombre → devuelve las posibles; un homónimo sigue pudiendo registrarse. | HU04, CU03 A1 |
 | M-08 | ✅ | Actualizar con una versión anterior → conflicto, sin sobrescribir. | HU06, Q07 |
 | M-09 | ✅ | Actualizar por el flujo ordinario una ficha dada de baja → rechaza e informa su condición. | CU04 A4 |
-| M-10 | ⏳ | Baja → `Condicion = Baja`, `FechaBaja` e `IdUsuarioBaja` llenos. Recuperar → `Vigente` y ambos vacíos. | 08C regla 7, Q20 |
-| M-11 | ⏳ | Base B00: rechazar baja con cita activa. Entrevista solicita cancelación automática: cambiar expectativa solo tras aprobación/implementación; baja/cancelaciones/eventos atómicos y pago conservado. | HU07, CU04 A2; entrevista 1 |
+| M-10 | ✅ baja / ⏳ recuperar (B06) | Baja → `Condicion = Baja`, `FechaBaja` e `IdUsuarioBaja` llenos. Recuperar → `Vigente` y ambos vacíos. | 08C regla 7, Q20 |
+| M-11 | ✅ base B00 / ⏳ cancelación automática por decidir | Base B00: rechazar baja con cita activa. Entrevista solicita cancelación automática: cambiar expectativa solo tras aprobación/implementación; baja/cancelaciones/eventos atómicos y pago conservado. | HU07, CU04 A2; entrevista 1 |
 | M-12 | ✅ | Alta y actualización llenan fecha y usuario de `EntidadAuditable`. | 08C |
 
 ### Citas y pago: CU05–CU09 (B03–B06)
 
 | ID | Estado | Qué hacer → qué debe pasar | Origen |
 | --- | --- | --- | --- |
-| M-13 ★ | ⏳ | Cita activa solo si está agendada **y** vigente (probar las 4 combinaciones). | Q06 |
-| M-14 ★ | ⏳ | Agendar con inicio ≥ fin, paciente inexistente o de baja, o ámbito que el paciente no tiene → rechaza. | HU09, CU06 A1 |
-| M-15 ★ | ⏳ | Cruce: solapada con una activa → rechaza, aunque sea de otro ámbito. Cancelada o de baja → no bloquea. Contigua (10–11 y 11–12) → permite. ✅ Preferencia recibida: contiguas sí; ⏳ ejecución del caso restante. | HU09, CU06 A2 |
-| M-16 ★ | ⏳ | Una cita nueva queda agendada, vigente y con pago pendiente. ✅ Respuesta recibida: inicial Pendiente; ⏳ pruebas. | 08C §2 |
+| M-13 ★ | ✅ servidor / ⌛ páginas | Cita activa solo si está agendada **y** vigente (probar las 4 combinaciones). | Q06 |
+| M-14 ★ | ✅ servidor / ⌛ páginas | Agendar con inicio ≥ fin, paciente inexistente o de baja, o ámbito que el paciente no tiene → rechaza. | HU09, CU06 A1 |
+| M-15 ★ | ✅ servidor / ⌛ páginas | Cruce: solapada con una activa → rechaza, aunque sea de otro ámbito. Cancelada o de baja → no bloquea. Contigua (10–11 y 11–12) → permite. | HU09, CU06 A2 |
+| M-16 ★ | ✅ servidor / ⌛ páginas | Una cita nueva queda agendada, vigente y con pago pendiente. | 08C §2 |
 | M-17 ★ | ⏳ | El pago solo acepta Pagado o Pendiente. | HU13, CU09 A6 |
 | M-18 | ⏳ | Reprogramar conserva el pago. Cita cancelada, de baja o con paciente de baja → rechaza. | HU10, CU07 A3–A4 |
 | M-19 | ⏳ | Cancelar → cancelada, conserva pago y condición. | HU11, Q20 |
 | M-20 | ⏳ | Baja de cita → conserva estado y pago. | HU12 |
 | M-21 | ⏳ | Recuperar: agendada con paciente de baja → rechaza; agendada con cruce → rechaza; cancelada → vigente pero sigue cancelada; ya vigente → informa. | HU12, CU08 |
-| M-22 ★ | ⏳ | Si el guardado falla, el servicio devuelve error, nunca éxito. | Q08, S4 |
+| M-22 ★ | ✅ usuarios, pacientes y citas / ⏳ pago | Si el guardado falla, el servicio devuelve error, nunca éxito. | Q08, S4 |
 
 ### Transversales
 
 | ID | Estado | Qué hacer → qué debe pasar | Origen |
 | --- | --- | --- | --- |
-| M-23 ★ | ⏳ | «10:00 en Hermosillo» se convierte en el instante correcto y de vuelta. Una fecha sin hora no se convierte en instante. | Q09 |
+| M-23 ★ | ✅ | «10:00 en Hermosillo» se convierte en el instante correcto y de vuelta. Una fecha sin hora no se convierte en instante. | Q09 |
 | M-24 | ⏳ | El evento de auditoría lleva actor, momento, tipo e Id del registro, acción y campos; nunca valores de contacto. | Q03, Q04 |
 
 ## 2. Dulce — capa Web e interfaz
@@ -300,15 +302,15 @@ Los identificadores de la sección 3 conservan ⏳ si su alcance completo aún f
 | D-03 ★ | ⏳ | Rechazo conocido → «No se guardó» y motivo. Excepción inesperada → «No pudimos confirmar si se guardó; revisa el registro antes de repetir», sin reintento automático. Restablecer otra vez → avisar que la temporal anterior deja de servir. | Q08, S5 |
 | D-04 ★ | ⏳ | Éxito → confirmación solo tras respuesta correcta. | Q08 |
 | D-05 ★ | ⏳ | El PageModel solo usa servicios de Application, nunca el acceso a datos. (También lo vigila A-01.) | 07A |
-| D-06 | ⏳ | Cambio de contraseña: sin campo «actual» en la primera entrada; con él en el cambio ordinario. | HU15 |
+| D-06 | ✅ | Cambio de contraseña: sin campo «actual» en la primera entrada; con él en el cambio ordinario. | HU15 |
 
 ### Checklist visual por pantalla (según el PDF de pantallas)
 
 | ID | Estado | Qué revisar | Origen |
 | --- | --- | --- | --- |
-| D-07 ★ | ⏳ | Login: mensaje de error genérico; nunca «el usuario no existe». | CU01 A1 |
-| D-08 ★ | ⏳ | El menú muestra opciones según el rol (Usuarios solo para superusuario); no muestra Auditoría. Ocultar no protege: eso lo prueba Lucía (S-11 a S-13). | Decisión 09; 08B §1.2 |
-| D-09 ★ | ⏳ | B02: búsqueda/lista mínima de pacientes vigentes, estado vacío y acceso a ficha autorizada. | HU05, Q20 |
+| D-07 ★ | ✅ | Login: mensaje de error genérico; nunca «el usuario no existe». | CU01 A1 |
+| D-08 ★ | ✅ | El menú muestra opciones según el rol (Usuarios solo para superusuario); no muestra Auditoría. Ocultar no protege: eso lo prueba Lucía (S-11 a S-13). | Decisión 09; 08B §1.2 |
+| D-09 ★ | ✅ ejecución local / ⏳ revisión del QA | B02: búsqueda/lista mínima de pacientes vigentes, estado vacío y acceso a ficha autorizada. | HU05, Q20 |
 | D-15 | ⏳ | **B07, posterior al primer avance de diciembre:** directorio separado de CU03, lista completa de vigentes por defecto, información relevante validada, filtro por ámbito y filtro autorizado de bajas. | Q20; decisión de Dulce 08-oct |
 | D-10 ★ | ⏳ | Agenda: con la zona horaria del equipo cambiada, las horas siguen en Hermosillo. Estado vacío. Canceladas solo con su filtro. | HU08, Q09 |
 | D-11 | ⏳ | Detalle de cita: interruptor Pagado/Pendiente; confirmación antes de cancelar y de dar de baja. | HU11–HU13 |
@@ -324,7 +326,7 @@ Integración: xUnit + Testcontainers, con el esquema creado por **las migracione
 
 | ID | Estado | Qué hacer → qué debe pasar | Origen |
 | --- | --- | --- | --- |
-| A-01 | ⏳ | Prueba automática de límites: Web usa Application y solo enumeraciones/constantes sin lógica de Domain, salvo composición de Infrastructure; Domain sin dependencias de otras capas; Pacientes no depende de Citas; coordinador CU04 fuera de ambos; sin ciclos. PR #5: 30/30 correctas; Miguel corrigió Web e implementó CU04. Revisó las pruebas de PR #4; falta repetir sobre PageModel funcionales. | 07A, 07C, ADR-06; B00 §4.9 |
+| A-01 | ✅ | Prueba automática de límites: Web usa Application y solo enumeraciones/constantes sin lógica de Domain, salvo composición de Infrastructure; Domain sin dependencias de otras capas; Pacientes no depende de Citas; coordinador CU04 fuera de ambos; sin ciclos. PR #5: 30/30 correctas; Miguel corrigió Web e implementó CU04. Revisó las pruebas de PR #4. | 07A, 07C, ADR-06; B00 §4.9 |
 | A-02 | ✅ | Las migraciones crean el esquema desde cero sin errores con un usuario distinto del de la aplicación; las credenciales de migración no se usan en ejecución normal. | 07B |
 | A-03 | ✅ | Insertar por SQL directo dos citas activas solapadas → **la base** las rechaza (no solo el código). | Q06, 05C |
 | A-04 | ✅ | La imagen Docker arranca, responde la comprobación de salud y corre sin privilegios. | 05E |
@@ -336,21 +338,21 @@ Integración: xUnit + Testcontainers, con el esquema creado por **las migracione
 
 | ID | Estado | Qué hacer → qué debe pasar | Origen |
 | --- | --- | --- | --- |
-| L-CU01-01 | ⏳ | Credenciales válidas → entra con su rol (la usuaria y superusuario). | HU01 |
-| L-CU01-02 | ⏳ | Salir en el navegador A → la sesión del navegador B deja de funcionar en su siguiente solicitud. | Q02, 07B |
-| L-CU01-03 | ⏳ | Salida repetida o con sesión vencida → sin error y sin acceso. | CU01 A8 |
+| L-CU01-01 | ✅ | Credenciales válidas → entra con su rol (la usuaria y superusuario). | HU01 |
+| L-CU01-02 | ✅ | Salir en el navegador A → la sesión del navegador B deja de funcionar en su siguiente solicitud. | Q02, 07B |
+| L-CU01-03 | ✅ | Salida repetida o con sesión vencida → sin error y sin acceso. | CU01 A8 |
 
 ### CU02 — Gestionar usuarios (B01) ★
 
 | ID | Estado | Qué hacer → qué debe pasar | Origen |
 | --- | --- | --- | --- |
-| L-CU02-01 | ⏳ | Crear usuario → recibe contraseña temporal → al entrar, solo puede ir a cambiarla. | HU02 |
+| L-CU02-01 | ✅ | Crear usuario → recibe contraseña temporal → al entrar, solo puede ir a cambiarla. | HU02 |
 | L-CU02-02 | ✅ | Nombre de usuario duplicado → rechaza. | CU02 A2 |
 | L-CU02-03 | ✅ | Desactivar → sus sesiones abiertas se cierran y ya no puede entrar. | HU02, CU01 A4 |
 | L-CU02-04 | ✅ | Cambiar rol → en la siguiente solicitud ya no tiene los permisos anteriores. | CU02 A7 |
 | L-CU02-05 | ⏳ | Los dos últimos superusuarios se desactivan o degradan mutuamente al mismo tiempo → queda al menos uno activo. | HU02, CU02 A1 |
 | L-CU02-06 | ✅ | Restablecer contraseña → cierra sus sesiones y la temporal obliga a cambiarla; no levanta el bloqueo vigente, conforme a [AGENTS.md](../../AGENTS.md). | HU03; decisión de Lucía 04-oct |
-| L-CU02-07 | ⏳ | Cada acción genera su evento sin contraseña; si el evento no se guarda, el cambio tampoco. | Q03, S4 |
+| L-CU02-07 | ✅ | Cada acción genera su evento sin contraseña; si el evento no se guarda, el cambio tampoco. | Q03, S4 |
 
 ### CU11 — Cambiar contraseña propia (B01) ★
 
@@ -364,10 +366,10 @@ Integración: xUnit + Testcontainers, con el esquema creado por **las migracione
 
 | ID | Estado | Qué hacer → qué debe pasar | Origen |
 | --- | --- | --- | --- |
-| L-CU03-01 | ✅ servidor / ⏳ páginas y revisión | Registrar con uno y con dos ámbitos → consultable y auditado. | HU04 |
-| L-CU03-02 | ✅ servidor / ⏳ páginas y revisión | Nombre ya existente → muestra coincidencias; se puede abrir la existente o registrar un homónimo. | HU04, CU03 A1 |
-| L-CU03-03 | ✅ servidor / ⏳ páginas y revisión | La búsqueda ordinaria no muestra pacientes de baja. | HU05, Q20 |
-| L-CU03-04 | ✅ servidor / ⏳ páginas y revisión | Doble clic en Guardar o reenvío → no crea dos fichas. | S5 |
+| L-CU03-01 | ✅ servidor / ⏳ páginas | Registrar con uno y con dos ámbitos → consultable y auditado. | HU04 |
+| L-CU03-02 | ✅ servidor / ⏳ páginas | Nombre ya existente → muestra coincidencias; se puede abrir la existente o registrar un homónimo. | HU04, CU03 A1 |
+| L-CU03-03 | ✅ servidor y QA local / ⏳ revisión propia | La búsqueda ordinaria no muestra pacientes de baja. | HU05, Q20 |
+| L-CU03-04 | ✅ servidor / ⏳ páginas | Doble clic en Guardar o reenvío → no crea dos fichas. | S5 |
 
 ### B07 — Directorio como pantalla aparte, posterior al primer avance de diciembre
 
@@ -382,13 +384,13 @@ Integración: xUnit + Testcontainers, con el esquema creado por **las migracione
 
 | ID | Estado | Qué hacer → qué debe pasar | Origen |
 | --- | --- | --- | --- |
-| L-CU04-01 ★ | ✅ servidor / ⏳ páginas y revisión | Dos usuarios editan la misma ficha → el segundo recibe aviso de conflicto; nada se pierde en silencio. | Q07 |
-| L-CU04-02 ★ | ✅ servidor / ⏳ páginas y revisión | Cortar la respuesta después de guardar → al consultar, el dato es coherente y no se anunció éxito. | Q08 |
+| L-CU04-01 ★ | ✅ servidor / ⏳ páginas | Dos usuarios editan la misma ficha → el segundo recibe aviso de conflicto; nada se pierde en silencio. | Q07 |
+| L-CU04-02 ★ | ✅ servidor / ⏳ páginas | Cortar la respuesta después de guardar → al consultar, el dato es coherente y no se anunció éxito. | Q08 |
 | L-CU04-03 | ⏳ | Baja → sale de listas y búsquedas, aparece en «Pacientes de baja» y sigue en la base. | Q20 |
 | L-CU04-04 | ⏳ | Recuperar → vuelve a las listas; se limpian los datos de baja; el evento histórico se conserva. | Q20, 08C |
 | L-CU04-05 | ⏳ | Base B00 probada: rechazo con cita activa. La entrevista pide cancelación automática al dar de baja paciente; cambiar expectativa solo tras decisión/implementación, con baja/cancelaciones/eventos atómicos, pago y concurrencia protegidos. | CU04 A2 |
-| L-CU04-06 | ⏳ ejecución / diseño escrito | Forzar ambos órdenes entre comprobar y guardar al agendar frente a una baja; observar la espera si compiten transacciones sin confirmar. Nunca queda cita activa de paciente de baja; solo eventos de cambios confirmados. [Diseño B03](../planning/TherapEase-etapa09-B03.md#41-cómo-prepararemos-los-cambios-simultáneos). Repetir complementa esa comprobación; no la sustituye. | CU06 A3 |
-| L-CU04-07 | ⏳ | Retirar ámbito conserva el original de las citas según entrevista. Recuperar/reprogramar con ámbito retirado y el cambio a solo particular siguen pendientes; probar tras concretarlos. | CU04 A5 |
+| L-CU04-06 | ✅ | Forzar ambos órdenes entre comprobar y guardar al agendar frente a una baja; observar la espera si compiten transacciones sin confirmar. Nunca queda cita activa de paciente de baja; solo eventos de cambios confirmados. [Diseño B03](../planning/TherapEase-etapa09-B03.md#41-cómo-prepararemos-los-cambios-simultáneos). Repetir complementa esa comprobación; no la sustituye. | CU06 A3 |
+| L-CU04-07 | ✅ ámbito B03 / ⌛ B05–B06 | Retirar el ámbito mientras se agenda conserva la cita; reenvío comprobado antes y después de consultar al paciente. Recuperar/reprogramar corresponde a B05–B06. Solo particular sigue fuera del alcance aprobado. | CU04 A5 |
 
 ### CU05 — Consultar agenda (B03) ★
 
@@ -396,9 +398,9 @@ Integración: xUnit + Testcontainers, con el esquema creado por **las migracione
 
 | ID | Estado | Qué hacer → qué debe pasar | Origen |
 | --- | --- | --- | --- |
-| L-CU05-01 | ⏳ | Muestra solo las activas del periodo; canceladas con filtro; de baja nunca. | HU08 |
+| L-CU05-01 | ✅ servidor / ⌛ páginas | Muestra solo las activas del periodo; canceladas con filtro; de baja nunca. | HU08 |
 | L-CU05-02 | ⏳ | Navegador con otra zona horaria (p. ej. Ciudad de México y Madrid) → mismas horas de Hermosillo. | Q09 |
-| L-CU05-03 | ⏳ | Periodo sin citas → estado vacío. | CU05 A1 |
+| L-CU05-03 | ✅ servidor / ⌛ páginas | Periodo sin citas → estado vacío. | CU05 A1 |
 
 ### CU06 — Agendar cita (B03) ★
 
@@ -412,15 +414,15 @@ Integración: xUnit + Testcontainers, con el esquema creado por **las migracione
 
 | ID | Estado | Qué hacer → qué debe pasar | Origen |
 | --- | --- | --- | --- |
-| L-CU06-01 | ⏳ | Cita válida → guardada con pago pendiente y auditada. | HU09 |
-| L-CU06-02 | ⏳ | Solapada con una activa, aunque sea de otro ámbito → rechaza. | Q06 |
-| L-CU06-03 | ⏳ | Contigua (una termina 11:00, otra empieza 11:00) → permitida, según entrevista. Prueba del flujo B03 pendiente; no volver a pedir esa decisión. | 08B §1.1 |
-| L-CU06-04 | ⏳ | Solapada con una cancelada o de baja → permitida. | Q06 |
-| L-CU06-05 | ⏳ | 2 y 10 reservas distintas simultáneas por el mismo horario → se guarda exactamente una cita con su evento. Forzar la coincidencia antes de guardar; el reenvío de la misma reserva se sigue en L-CU06-09. | Q06, R02 |
-| L-CU06-06 | ⏳ | Agendar desde un equipo en otra zona horaria → al consultarla, la hora de Hermosillo está intacta. | HU09 CA4, Q09 |
-| L-CU06-07 | ⏳ | Servidor/imagen y persistencia probados (B00 §4.4); falta recorrido de agenda. **Extra:** citas en las fechas de cambio de horario de EE. UU. y del resto de México (Hermosillo no cambia) → la hora no se desplaza. | Q09 |
-| L-CU06-08 | ⏳ | Paciente de baja o ámbito que no tiene → rechaza. | CU06 A1 |
-| L-CU06-09 | ⏳ ejecución / diseño escrito | Respuesta interrumpida y reenvíos de la misma solicitud, en los distintos órdenes del plan B03 → no existe segunda cita ni segundo evento. Cubrir primer intento confirmado y revertido. Mecanismo pendiente de propuesta y decisión; sin reintento automático. | S5 |
+| L-CU06-01 | ✅ servidor / ⌛ páginas | Cita válida → guardada con pago pendiente y auditada. | HU09 |
+| L-CU06-02 | ✅ servidor / ⌛ páginas | Solapada con una activa, aunque sea de otro ámbito → rechaza. | Q06 |
+| L-CU06-03 | ✅ servidor / ⌛ páginas | Contigua (una termina 11:00, otra empieza 11:00) → permitida, según entrevista. Prueba del flujo B03 pendiente; no volver a pedir esa decisión. | 08B §1.1 |
+| L-CU06-04 | ✅ servidor / ⌛ páginas | Solapada con una cancelada o de baja → permitida. | Q06 |
+| L-CU06-05 | ✅ servidor / ⌛ páginas | 2 y 10 reservas distintas simultáneas por el mismo horario → se guarda exactamente una cita con su evento. Forzar la coincidencia antes de guardar; el reenvío de la misma reserva se sigue en L-CU06-09. | Q06, R02 |
+| L-CU06-06 | ✅ regla del servidor / ⌛ recorrido de páginas | Agendar desde un equipo en otra zona horaria → al consultarla, la hora de Hermosillo está intacta. | HU09 CA4, Q09 |
+| L-CU06-07 | ✅ regla del servidor / ⌛ recorrido de páginas | Servidor/imagen y persistencia probados (B00 §4.4); falta recorrido de agenda. **Extra:** citas en las fechas de cambio de horario de EE. UU. y del resto de México (Hermosillo no cambia) → la hora no se desplaza. | Q09 |
+| L-CU06-08 | ✅ servidor / ⌛ páginas | Paciente de baja o ámbito que no tiene → rechaza. | CU06 A1 |
+| L-CU06-09 | ✅ servicio / ⌛ transporte HTTP y páginas | Respuesta interrumpida y reenvíos de la misma solicitud, en los distintos órdenes del plan B03 → no existe segunda cita ni segundo evento. Cubrir primer intento confirmado y revertido. Mecanismo D2 aprobado. QA de servicios ejecutado el 12-nov; el corte HTTP y el doble clic esperan páginas. Sin reintento automático. | S5 |
 
 ### CU07 — Reprogramar o cancelar cita (B05)
 
@@ -461,9 +463,9 @@ Integración: xUnit + Testcontainers, con el esquema creado por **las migracione
 | L-Q03-01 ★ | ⏳ | Cada cambio de paciente, cita, pago y usuario genera exactamente un evento con actor, momento, registro/campo y hecho. | Q03 |
 | L-Q03-02 ★ | ⏳ | Si el evento no se puede guardar → el cambio tampoco se guarda. | Q03, S4 |
 | L-Q03-03 ★ | ✅ | El usuario de aplicación puede insertar eventos, pero `UPDATE`/`DELETE` se deniegan en PostgreSQL. La consulta técnica autorizada devuelve únicamente actor, momento, registro/campo y hecho. | Q03, 07B, B00 aprobado |
-| L-Q03-04 ★ | ⏳ | Opción A aprobada el 12-oct: Superusuario activo sin temporal entra por CU01 y abre la URL de consulta en la misma ventana, con cookie/permisos vigentes. Sin sesión, revocada o sin permiso: denegación sin eventos. Sin pantalla de auditoría ni script B. Falta recorrido real con páginas y navegador. | Q03, Q01–Q02, AGENTS §2.3 |
+| L-Q03-04 ★ | ✅ | Opción A aprobada el 12-oct: Superusuario activo sin temporal entra por CU01 y abre la URL de consulta en la misma ventana, con cookie/permisos vigentes. Sin sesión, revocada o sin permiso: denegación sin eventos. Sin pantalla de auditoría ni script B. | Q03, Q01–Q02, AGENTS §2.3 |
 
-Consulta Q03 sin pantalla: opción A de navegador autenticado aprobada el 12-oct, con cookie/permiso vigente. El filtro fue corregido en PR #5; 51/51 históricas según B00 §4.9. Falta recorrido final con acceso/cierre de sesión de Dulce y navegador; captura/atomicidad de todas las operaciones continúan con su cobertura parcial. Sin comando/script B ni ejecución nueva por esta actualización.
+Consulta Q03 sin pantalla: opción A de navegador autenticado aprobada el 12-oct, con cookie/permiso vigente. El filtro fue corregido en PR #5; 51/51 históricas según B00 §4.9. Recorrido final con acceso/cierre de sesión de Dulce y navegador comprobado en #19; captura/atomicidad de todas las operaciones continúan con su cobertura parcial. Sin comando/script B ni ejecución nueva por esta actualización.
 
 ### Recorrido completo Q16 (desde B04) ★
 
@@ -482,34 +484,34 @@ Referencia: OWASP Top 10:2025, ASVS 5.0 aplicable y 07B. «Todas las rutas» = l
 | --- | --- | --- | --- |
 | S-01 | ✅ | 5 fallos → bloqueo de 15 min; la contraseña correcta durante el bloqueo no entra; al terminar, se vuelve a evaluar. | 07B, CU01 A2–A3 |
 | S-02 | ✅ | Usuario inexistente, contraseña incorrecta y usuario bloqueado reciben exactamente el mismo mensaje. | CU01 A1 |
-| S-03 | ⏳ | Muchos intentos fallidos en paralelo no permiten más de 5 antes del bloqueo. | CU01 A3 |
+| S-03 | ✅ | Muchos intentos fallidos en paralelo no permiten más de 5 antes del bloqueo. | CU01 A3 |
 | S-04 | ✅ | La cookie de sesión tiene `HttpOnly`, `Secure` y `SameSite=Lax`. | 07B |
 | S-05 | ✅ | Copiar la cookie, salir y reutilizarla → no funciona. | Q02, 07B |
-| S-06 | ⏳ | Cookie manipulada o ausente → pide acceso sin mostrar datos. | CU01 A6 |
-| S-07 | ⏳ | Con contraseña temporal, entrar por URL directa a pacientes o citas → redirige al cambio de contraseña. | CU01 A5 |
+| S-06 | ✅ | Cookie manipulada o ausente → pide acceso sin mostrar datos. | CU01 A6 |
+| S-07 | ✅ B01 / ⏳ pacientes y citas | Con contraseña temporal, entrar por URL directa a pacientes o citas → redirige al cambio de contraseña. | CU01 A5 |
 | S-08 | ✅ | En la base, las contraseñas solo existen como hash de Identity; nunca en texto ni en SHA-256 simple. | Q19 |
-| S-09 | ⏳ | **Extra:** la redirección después del login (`returnUrl`) solo acepta rutas internas; un enlace a un sitio externo se ignora. | ASVS |
-| S-10 | ⏳ | **Extra:** después de salir, el botón «atrás» no muestra páginas protegidas (sin caché). | Q02 |
+| S-09 | ✅ | **Extra:** la redirección después del login (`returnUrl`) solo acepta rutas internas; un enlace a un sitio externo se ignora. | ASVS |
+| S-10 | ✅ | **Extra:** después de salir, el botón «atrás» no muestra páginas protegidas (sin caché). | Q02 |
 
 ### Autorización (todas las operaciones) ★
 
 | ID | Estado | Qué hacer → qué debe pasar | Origen |
 | --- | --- | --- | --- |
-| S-11 | ⏳ | Sin sesión: cada página y cada envío protegido de «todas las rutas» → denegado, también por URL directa. | Q01, S1 |
-| S-12 | ⏳ | la usuaria intenta usar Usuarios y roles por URL o envío directo → denegado. | 08B §1.2 |
+| S-11 | ✅ rutas B01 / ⏳ bloques nuevos | Sin sesión: cada página y cada envío protegido de «todas las rutas» → denegado, también por URL directa. | Q01, S1 |
+| S-12 | ✅ | la usuaria intenta usar Usuarios y roles por URL o envío directo → denegado. | 08B §1.2 |
 | S-13 | ⏳ | Un rol de prueba sin permisos (luego, el capturista) intenta pago, bajas y auditoría por URL y envío directo → denegado. | Q17, HU13 CA4 |
-| S-14 | ⏳ | **Extra:** enviar campos de más en un formulario (p. ej. `EstadoPago` al reprogramar, `IdUsuarioAlta`, `Condicion`, `Rol`) → se ignoran. | 07B |
+| S-14 | ✅ B01 / ⏳ pacientes y citas | **Extra:** enviar campos de más en un formulario (p. ej. `EstadoPago` al reprogramar, `IdUsuarioAlta`, `Condicion`, `Rol`) → se ignoran. | 07B |
 | S-15 | ⏳ | Abrir o editar por URL un Id inexistente o de baja → no revela datos. | S2 |
 
 ### Entradas y salidas
 
 | ID | Estado | Qué hacer → qué debe pasar | Origen |
 | --- | --- | --- | --- |
-| S-16 | ⏳ | Enviar un formulario sin token antifalsificación o con el de otra sesión → rechazado. | 07B |
-| S-17 | ⏳ | Nombre de paciente con `<script>` o `"><img src=x onerror=...>` → se muestra como texto en la lista, el panel y la auditoría; no se ejecuta. | 07B |
-| S-18 | ⏳ | Buscar con `' OR 1=1 --` y variantes → sin error ni resultados de más. Revisar que no haya SQL armado con texto del usuario. | 05E A05 |
-| S-19 | ⏳ | Envío directo con datos inválidos, saltando la validación del navegador → el servidor rechaza. | 07B |
-| S-20 | ⏳ | Provocar un error → mensaje genérico, sin detalles técnicos, rutas ni datos. | Q04 |
+| S-16 | ✅ B01 / ⏳ formularios nuevos | Enviar un formulario sin token antifalsificación o con el de otra sesión → rechazado. | 07B |
+| S-17 | ✅ B01 / ⏳ pacientes | Nombre de paciente con `<script>` o `"><img src=x onerror=...>` → se muestra como texto en la lista, el panel y la auditoría; no se ejecuta. | 07B |
+| S-18 | ✅ B01 / ⏳ pacientes | Buscar con `' OR 1=1 --` y variantes → sin error ni resultados de más. Revisar que no haya SQL armado con texto del usuario. | 05E A05 |
+| S-19 | ✅ B01 / ⏳ demás formularios | Envío directo con datos inválidos, saltando la validación del navegador → el servidor rechaza. | 07B |
+| S-20 | ✅ B01 / ⏳ demás páginas | Provocar un error → mensaje genérico, sin detalles técnicos, rutas ni datos. | Q04 |
 
 ### Datos, auditoría y registros
 
@@ -529,7 +531,7 @@ Referencia: OWASP Top 10:2025, ASVS 5.0 aplicable y 07B. «Todas las rutas» = l
 | S-27 | ✅ | `.env.example` solo tiene nombres y valores ficticios. | 07B |
 | S-28 | ⏳ | La conexión a Neon usa `SSL Mode=VerifyFull` (revisión de configuración, sin conectar desde CI). | 07B, 07C |
 | S-29 | ✅ | Validación local: HTTP redirige a HTTPS y HSTS se emite en modo Production con nombre .test; localhost excluido. HttpsLocalTests, B00 §4.5. Despliegue y navegador siguen pendientes; duración HSTS final por decidir al desplegar. | Q19 |
-| S-30 | ✅ / ⏳ | Cabeceras aprobadas el 11-oct, implementadas en PR #5 bce9409 y comprobadas con nueve casos HTTPS de CabecerasSeguridadTests (B00 §4.10–§4.11, PR #6). ⏳ Navegador, CSP de recursos y caso CSS con sesión; revisión humana/fusión de PR #6 completadas el 15-oct; HSTS final al despliegue autorizado. No atribuir ejecución nueva a esta corrección. | ASVS, AGENTS §2.5 |
+| S-30 | ✅ / ⏳ | Cabeceras aprobadas el 11-oct, implementadas en PR #5 bce9409 y comprobadas con nueve casos HTTPS de CabecerasSeguridadTests (B00 §4.10–§4.11, PR #6). ⏳ CSP de recursos y caso CSS con sesión; revisión humana/fusión de PR #6 completadas el 15-oct; HSTS final al despliegue autorizado. No atribuir ejecución nueva a esta corrección. | ASVS, AGENTS §2.5 |
 | S-31 | ✅ | Reiniciar el contenedor → las sesiones siguen siendo válidas (claves de Data Protection en PostgreSQL) y no hay claves en disco. | 05D, 07B |
 | S-32 | ✅ | El proceso del contenedor no corre como administrador. | 05E |
 
@@ -537,8 +539,8 @@ Referencia: OWASP Top 10:2025, ASVS 5.0 aplicable y 07B. «Todas las rutas» = l
 
 | ID | Estado | Qué hacer → qué debe pasar | Origen |
 | --- | --- | --- | --- |
-| S-33 | ⏳ | La CI audita paquetes NuGet y falla ante una vulnerabilidad alta. Preparado en `scripts/ci/revisar-paquetes-vulnerables.sh` y comprobado en local con un paquete vulnerable; ejecutado dos veces en GitHub (PR #7), con su trabajo correcto las dos veces (§0.7). | 05E A03 |
-| S-34 | ⏳ | Acciones de GitHub fijadas por SHA; imagen base fijada por digest. Preparado en `scripts/ci/revisar-fijaciones.sh` y en el flujo, con acciones oficiales fijadas; comprobado en local; ejecutado dos veces en GitHub (PR #7), con su trabajo correcto las dos veces (§0.7). | 07B |
+| S-33 | ✅ | La CI audita paquetes NuGet y falla ante una vulnerabilidad alta. Preparado en `scripts/ci/revisar-paquetes-vulnerables.sh` y comprobado en local con un paquete vulnerable; ejecutado dos veces en GitHub (PR #7), con su trabajo correcto las dos veces (§0.7). | 05E A03 |
+| S-34 | ✅ | Acciones de GitHub fijadas por SHA; imagen base fijada por digest. Preparado en `scripts/ci/revisar-fijaciones.sh` y en el flujo, con acciones oficiales fijadas; comprobado en local; ejecutado dos veces en GitHub (PR #7), con su trabajo correcto las dos veces (§0.7). | 07B |
 | S-35 | ⏳ | Revisión de vulnerabilidades con Astra sobre código y configuración; los hallazgos altos se corrigen antes de la demo. Si se revisa la app publicada, antes se necesita la autorización de Lucía para publicar. | Prompt maestro §10, §12 |
 
 ### Antes de datos reales (futuro)
@@ -597,3 +599,7 @@ Referencia: OWASP Top 10:2025, ASVS 5.0 aplicable y 07B. «Todas las rutas» = l
 Todos los estados ⏳ de ejecución se conservan. Incorporar a los casos existentes de CU01/CU02 (datos de Usuario), CU03/CU04 (campos/tutor/homónimos/baja), CU05–CU09 (horario/montos/pago) y futuros CU-F11–F13 el alcance aprobado cuando se implemente. No crear IDs ficticios ni contar respuestas de entrevista como casos correctos.
 
 Reglas B03 vigentes: [sección 3 de AGENTS](../../AGENTS.md#3-límites-vigentes), decisiones de Lucía del 01-nov-2026; sustituyen el horario del 31-oct.
+
+**B03, ejecución del 12-nov.** Las marcas de servidor se apoyan en #18/bfc78f2: 819 unitarias, 521 integraciones del PR y 37 casos propios de Lucía; 18 de concurrencia/reenvíos repetidos dos veces más. No se suman subgrupos ni repeticiones. Zonas: 20 conversiones de Domain y fecha máxima por zona, UTC y Tokio; no acredita navegador. Reauditoría, publicación del QA nuevo, revisión humana y aprobación pendientes. Los criterios permanecen en estas mismas filas; [plan B03](../planning/TherapEase-etapa09-B03.md).
+
+**Seguimiento de B03, 12-nov.** #18 integrado en 8bcc7c6; Claude APROBADO v1 sobre el QA propio de 37 casos. Se preparan sin duplicar los casos para #19, junto con la unitaria de cita agendada sin nombre. La revisión humana y las páginas permanecen pendientes.
