@@ -5,7 +5,7 @@
     <nav class="paginacion" aria-label="Paginación de resultados">
         @if (Model.TotalDePaginas > 1)
         {
-            <button class="accion" type="submit" name="numeroPagina" value="@(Model.Actual - 1)" disabled="@(Model.Actual <= 1)">Anterior</button>
+            <button class="accion" type="submit" name="numeroPagina" value="@(Model.Actual - 1)" disabled="@(Model.Actual <= 1)" aria-label="Anterior" title="Página anterior"><span aria-hidden="true">&lt;</span></button>
         }
         <div class="paginacion-resumen">
             <span aria-current="page">Página @Model.Actual de @Model.TotalDePaginas</span>
@@ -13,7 +13,7 @@
         </div>
         @if (Model.TotalDePaginas > 1)
         {
-            <button class="accion" type="submit" name="numeroPagina" value="@(Model.Actual + 1)" disabled="@(Model.Actual >= Model.TotalDePaginas)">Siguiente</button>
+            <button class="accion" type="submit" name="numeroPagina" value="@(Model.Actual + 1)" disabled="@(Model.Actual >= Model.TotalDePaginas)" aria-label="Siguiente" title="Página siguiente"><span aria-hidden="true">&gt;</span></button>
         }
     </nav>
 }

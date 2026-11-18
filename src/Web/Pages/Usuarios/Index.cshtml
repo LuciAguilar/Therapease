@@ -9,7 +9,7 @@
     <div><h1>Usuarios</h1><p>Administra los accesos y permisos de tu equipo.</p></div>
     <a class="accion primaria" asp-page="Crear">+ Crear usuario</a>
 </header>
-<form method="get" class="busqueda">
+<form method="get" class="busqueda" id="busqueda-usuarios">
     <label for="busqueda">Buscar usuarios</label>
     <input id="busqueda" name="busqueda" type="search" maxlength="@LimitesDeIdentidad.LongitudMaximaBusquedaDeUsuarios" value="@Model.Busqueda" />
     <button class="accion" type="submit">Buscar</button>
@@ -43,7 +43,7 @@ else if (Model.Cuentas.Count == 0)
         <div class="acciones">
             <span class="etiqueta rol">@cuenta.Rol</span>
             <span class="etiqueta @(cuenta.Activo ? "activa" : "")">@(cuenta.Activo ? "Activa" : "Desactivada")</span>
-            <a class="accion" asp-page="Detalle" asp-route-id="@cuenta.IdUsuario">Ver cuenta</a>
+            <a class="accion ver-cuenta" asp-page="Detalle" asp-route-id="@cuenta.IdUsuario">Ver cuenta</a>
         </div>
     </li>
 }

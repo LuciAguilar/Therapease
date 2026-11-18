@@ -23,15 +23,19 @@
 </header>
 <form method="post" class="tarjeta busqueda" id="busqueda-pacientes"
       data-minimo="@LimitesDeBusquedaDePacientes.LongitudMinimaDelTexto">
-    <div>
-        <label asp-for="Texto">Nombre del paciente</label>
-        <input asp-for="Texto" type="search" maxlength="@LimitesDeBusquedaDePacientes.LongitudMaximaDelTexto" />
+    <div class="pacientes-busqueda-campo">
+        <label class="pacientes-etiqueta-oculta" asp-for="Texto">Buscar por nombre</label>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 4 4" /></svg>
+        <input asp-for="Texto" type="search" placeholder="Buscar por nombre…" maxlength="@LimitesDeBusquedaDePacientes.LongitudMaximaDelTexto" />
     </div>
-    <div>
-        <label asp-for="NacimientoExacto">Fecha de nacimiento (opcional)</label>
-        <input asp-for="NacimientoExacto" asp-format="{0:yyyy-MM-dd}" type="date" />
-    </div>
-    <button class="accion" type="button" id="limpiar-busqueda-pacientes">Limpiar</button>
+    <details class="pacientes-filtros">
+        <summary>Filtros</summary>
+        <div class="pacientes-filtros-contenido">
+            <label asp-for="NacimientoExacto">Fecha de nacimiento (opcional)</label>
+            <input asp-for="NacimientoExacto" asp-format="{0:yyyy-MM-dd}" type="date" />
+            <button class="accion" type="button" id="limpiar-busqueda-pacientes">Limpiar filtros</button>
+        </div>
+    </details>
 </form>
 <p id="estado-busqueda-pacientes" role="status"></p>
 <div id="resultados-pacientes">
