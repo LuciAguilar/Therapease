@@ -1,6 +1,6 @@
 # TherapEase — Etapa 09 · B04 · Estado de pago y recorrido Q16
 
-**Estado al 18-nov-2026: planes auditados por Claude APROBADO v2 (16-nov); propuesta técnica de Miguel aprobada por Lucía el 17-nov con D1–D8 resueltas, y servidor implementado en la rama `b04/estado-de-pago`.** Faltan el PR, la revisión por otra persona, la aprobación final de Lucía, su QA dirigido, las páginas de Dulce y Q16. ✅ = avance comprobado en su alcance; ⏳ = pendiente. Las respuestas de producto recibidas no equivalen a implementación.
+**Estado al 18-nov-2026: planes auditados por Claude APROBADO v2 (16-nov); propuesta técnica de Miguel aprobada por Lucía el 17-nov con D1–D8 resueltas, y servidor implementado en la rama `b03/agenda-y-citas`.** Faltan el PR, la revisión por otra persona, la aprobación final de Lucía, su QA dirigido, las páginas de Dulce y Q16. ✅ = avance comprobado en su alcance; ⏳ = pendiente. Las respuestas de producto recibidas no equivalen a implementación.
 
 **En palabras simples:** después de entrar, registrar un paciente y agendar una cita, queremos ver si está pagada o pendiente y corregir ese estado. El sistema debe guardar el cambio y su evento juntos, sin perder una edición de otra persona. No se mueve dinero. B04 también une las páginas anteriores en el recorrido completo de navegador Q16.
 
@@ -24,7 +24,7 @@ Casos existentes, sin copiar sus tablas: [CU09](../testing/TherapEase-09-plan-de
 | Estado | Persona | Trabajo de pago y recorrido | Qué falta |
 | --- | --- | --- | --- |
 | ✅ | Miguel | Propuesta técnica del cambio de pago: contratos, permisos, versión, estados, reenvíos, fallos y auditoría. | Aprobada por Lucía el 17-nov-2026 (D1–D8). Reutiliza Citas, la versión y EstadoPago; la consulta del pago de citas de baja se aplaza a B06 (D2). |
-| ✅ servidor / ⏳ revisión | Miguel | Servicio `CambiarPagoAsync`, regla de Domain, permiso `CambiarPagoDeCitas`, unitarias e integración propias y contrato para Dulce (sección 4.4 del contrato de citas). | Implementado en la rama `b04/estado-de-pago`, sin migración y sin dependencias nuevas. Falta PR, revisión de otra persona y aprobación final de Lucía. |
+| ✅ servidor / ⏳ revisión | Miguel | Servicio `CambiarPagoAsync`, regla de Domain, permiso `CambiarPagoDeCitas`, unitarias e integración propias y contrato para Dulce (sección 4.4 del contrato de citas). | Implementado en la rama `b03/agenda-y-citas`, sin migración y sin dependencias nuevas. Falta PR, revisión de otra persona y aprobación final de Lucía. |
 | ✅ respuestas / ⏳ diseño de pantalla | Dulce | Conservar pago inicial Pendiente, cancelada corregible y cita de baja sin escritura. Concretar dónde se consulta/cambia y sus mensajes. | No volver a pedir respuestas ya recibidas. Resolver con Lucía los detalles de interfaz pendientes; páginas y PageModel con sus unitarias después del contrato. |
 | ✅ documentos / ⏳ diseño técnico aprobado | Lucía con Codex | Preparar estos planes, contrastar CU09 y diseñar QA dirigido de servidor, HTTP y navegador. | Revisar la propuesta con Claude; Lucía decide. Este documento no acredita pruebas ni autoriza escribirlas. |
 | ⏳ | Lucía | Revisar cambios críticos, la CI y el alcance de Q16; preparar Q13 cuando proceda. | Código y pruebas por PR, evidencia identificada y aprobación final propia. |
@@ -110,7 +110,7 @@ Antes de habilitar trazas, Lucía decide con la revisión de Claude qué evidenc
 | ✅ | Presentar una propuesta completa reutilizando lo existente | Miguel | Propuesta final aprobada por Lucía el 17-nov-2026 (D1–D8), tras la auditoría de Claude (APROBADO v1). |
 | ⏳ | Auditar propuesta y QA diseñado | Claude | Auditoría técnica pendiente de recibir la propuesta de Miguel; APROBADO v2 corresponde solo a estos planes. |
 | ⏳ | Decidir reglas pendientes y autorizar implementación | Lucía | Aprobación expresa antes de código y pruebas B04. |
-| ✅ servidor / ⏳ PR | Implementar servidor, contrato y unitarias propias | Miguel | Implementado en la rama `b04/estado-de-pago`. Falta el PR con otra persona revisora y la decisión final de Lucía. |
+| ✅ servidor / ⏳ PR | Implementar servidor, contrato y unitarias propias | Miguel | Implementado en la rama `b03/agenda-y-citas`. Falta el PR con otra persona revisora y la decisión final de Lucía. |
 | ⏳ | Implementar páginas, PageModel y unitarias propias | Dulce | Contrato disponible y páginas B03 preparadas; revisión distinta del autor. |
 | ⏳ | Preparar/ejecutar QA de servicios, HTTP y navegador | Lucía con Codex | Después de autorizar; archivo, comando, entorno, SHA y resultado reales en cada entrega. |
 | ⏳ | Decidir evidencia y trazas antes de habilitar captura Q16 | Lucía; Claude audita | §4.3; conservar excepción de identidad y TRX seguros hasta decisión y comprobación. |
