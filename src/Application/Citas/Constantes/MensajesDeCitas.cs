@@ -15,8 +15,14 @@ public static class MensajesDeCitas
     public const string CitaNoEncontrada = "No se encontró la cita.";
     public const string SolicitudYaUsada = "No fue posible agendar la cita con esa solicitud. Abre de nuevo el formulario.";
 
+    // Estado de pago: mismo texto que las reglas de Domain (una prueba lo exige) y que usa Pacientes para el conflicto y los cambios.
+    public const string PagoDeCitaDeBajaNoSeActualiza = "La cita está dada de baja y su pago no puede cambiarse.";
+    public const string ConflictoDeVersion = "El registro cambió mientras se editaba. Recarga la información antes de decidir.";
+
     public const string CitaAgendada = "Cita agendada.";
     public const string CitaYaAgendada = "Esa cita ya estaba agendada.";
+    public const string PagoActualizado = "Estado de pago actualizado.";
+    public const string SinCambios = "No hubo cambios.";
 
     // Textos para mostrar en la agenda y el detalle.
     public const string LeyendaRegistradaDespuesDeSuHorario = "Registrada después de su horario";

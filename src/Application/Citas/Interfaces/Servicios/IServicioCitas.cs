@@ -1,5 +1,6 @@
 using TherapEase.Application.Citas.Modelos;
 using TherapEase.Application.Compartido.Modelos;
+using TherapEase.Domain.Citas.Entidades.Enums;
 
 namespace TherapEase.Application.Citas.Interfaces.Servicios;
 
@@ -23,4 +24,12 @@ public interface IServicioCitas
     // La misma solicitud con otros datos, otro actor o una cita cancelada o de baja se rechaza sin revelar la otra cita.
     Task<RespuestaServicio<ResultadoDeAgendar>> AgendarAsync(
         Guid idSolicitud, DatosDeCitaEntrada datos, CancellationToken cancelacion = default);
+
+    // Requiere CambiarPagoDeCitas, ConsultarAgenda y ConsultarPacientes. La consulta del pago sigue en ObtenerCitaAsync (citas vigentes).
+    // versionEsperada es la de la cita al abrirla: una versión anterior da siempre conflicto, aunque el pago coincida. Solo Pendiente y Pagado; una cita
+    // cancelada admite la corrección y una de baja no admite ningún cambio, ni siquiera el mismo valor. El actor sale de la sesión.
+    // Con la versión vigente y el mismo pago devuelve SinCambios sin escribir, subir la versión ni registrar evento.
+    // No hay identificador de solicitud: un reenvío con la versión anterior da conflicto, sin atribuirle el éxito anterior y sin reintentarlo.
+    Task<RespuestaServicio<ResultadoDeCambioDePago>> CambiarPagoAsync(
+        Guid idCita, int versionEsperada, EstadoPago? nuevoPago, CancellationToken cancelacion = default);
 }

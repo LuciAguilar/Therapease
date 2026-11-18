@@ -72,6 +72,27 @@ public sealed record ResultadoDeAgendar(EstadoDeAgendar Estado, DetalleDeCita Ci
     public override string ToString() => nameof(ResultadoDeAgendar);
 }
 
+// El pago de una cita con la versión con la que quedó. Sin horario, ámbito, paciente, nombre, fechas ni actores: es todo lo que devuelve un cambio de pago.
+public sealed record EstadoDePagoDeCita(Guid IdCita, EstadoPago EstadoPago, EstadoCita Estado, int Version)
+{
+    public override string ToString() => nameof(EstadoDePagoDeCita);
+}
+
+public enum EstadoDeCambioDePago
+{
+    // Se guardó ahora: el pago y su evento se confirmaron.
+    Actualizado,
+
+    // La versión vigente ya tenía ese pago: sin escritura, sin versión nueva y sin evento.
+    SinCambios
+}
+
+// No decidir la navegación solo por Exito: ambos estados son correctos pero dicen cosas distintas a la usuaria.
+public sealed record ResultadoDeCambioDePago(EstadoDeCambioDePago Estado, EstadoDePagoDeCita Pago)
+{
+    public override string ToString() => nameof(ResultadoDeCambioDePago);
+}
+
 // Lectura del puerto de Citas para la agenda: solo la cita, sin datos del paciente. Los nombres los decide Pacientes.
 public sealed record FilaDeCitaDeAgenda(
     Guid IdCita,

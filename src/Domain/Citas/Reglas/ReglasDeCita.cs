@@ -58,6 +58,9 @@ public static class ReglasDeCita
         CamposDeCita.IdPaciente, CamposDeCita.Ambito, CamposDeCita.Inicio, CamposDeCita.Fin, CamposDeCita.Estado, CamposDeCita.EstadoPago
     ];
 
+    // Nombre del único campo que lleva el evento de un cambio de pago. Nunca el valor anterior ni el nuevo.
+    public static IReadOnlyList<string> CamposDePago() => [CamposDeCita.EstadoPago];
+
     // Reconoce el reenvío de una reserva ya confirmada: sigue agendada y vigente, la creó el mismo actor y coinciden paciente, ámbito, inicio y fin.
     // Los instantes se comparan en UTC. Cualquier otro caso (otro actor, otros datos, cancelada o de baja) no es la misma reserva.
     public static bool EsLaMismaReserva(Cita existente, Cita candidata) =>
@@ -71,6 +74,37 @@ public static class ReglasDeCita
     // «Registrada después de su horario» (decisión de Lucía, 01-nov-2026): la cita se guardó cuando ya había empezado. FechaAlta la pone el servidor, nunca la página.
     // Las consultas de agenda calculan la misma comparación en la base; ambas deben coincidir.
     public static bool FueRegistradaDespuesDeSuHorario(Cita cita) => cita.FechaAlta > cita.Inicio;
+
+    // Cambiar el pago no toca horario, paciente, ámbito, estado ni condición. Orden: valor definido, cita de baja (también con el mismo valor),
+    // versión (una versión anterior da conflicto siempre, aunque el pago coincida) y actor. Devuelve false, sin tocar nada, cuando el pago ya coincide
+    // con la versión vigente: sin cambios no se escribe, no se sube la versión y no se actualizan los metadatos.
+    public static bool CambiarPago(Cita cita, EstadoPago nuevoPago, int versionEsperada, Guid idActor, DateTimeOffset ahora)
+    {
+        ArgumentNullException.ThrowIfNull(cita);
+
+        if (!Enum.IsDefined(nuevoPago))
+        {
+            throw new ReglaDeNegocioException(MensajesDePagoDeCita.PagoNoValido);
+        }
+
+        if (cita.Condicion == CondicionRegistro.Baja)
+        {
+            throw new ReglaDeNegocioException(MensajesDePagoDeCita.CitaDeBajaNoSeActualiza);
+        }
+
+        ExigirVersion(cita, versionEsperada);
+        MetadatosDeAuditoria.ExigirActor(idActor);
+
+        if (cita.EstadoPago == nuevoPago)
+        {
+            return false;
+        }
+
+        MetadatosDeAuditoria.RegistrarActualizacion(cita, idActor, ahora);
+        cita.EstadoPago = nuevoPago;
+        cita.Version++;
+        return true;
+    }
 
     // Cancelar libera el horario pero no da de baja ni cambia el pago.
     public static void Cancelar(Cita cita, int versionEsperada, Guid idActor, DateTimeOffset ahora)
