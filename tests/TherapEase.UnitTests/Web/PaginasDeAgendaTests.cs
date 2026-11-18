@@ -26,6 +26,7 @@ public class PaginasDeAgendaTests
     [InlineData(VistaDeAgenda.Canceladas, true)]
     public async Task AgendaEnviaElFiltroYConservaElPeriodoDevuelto(VistaDeAgenda vista, bool hayMas)
     {
+        // Arrange
         var agenda = new ResultadoDeAgenda([], Dia, Dia.AddDays(6), Dia, vista, hayMas);
         var servicio = new Citas { Agenda = RespuestaServicio<ResultadoDeAgenda>.Correcta(agenda) };
         var pagina = new IndexModel(servicio) { PageContext = Contexto(), Vista = vista };
@@ -36,7 +37,12 @@ public class PaginasDeAgendaTests
         }
 
         var filtro = (pagina.Desde, pagina.Hasta, vista);
-        Assert.IsType<PageResult>(await pagina.OnGetAsync());
+
+        // Act
+        var resultado = await pagina.OnGetAsync();
+
+        // Assert
+        Assert.IsType<PageResult>(resultado);
 
         Assert.Equal(filtro, servicio.Filtro);
         Assert.Same(agenda, pagina.Agenda);
@@ -48,11 +54,16 @@ public class PaginasDeAgendaTests
     [Fact]
     public async Task AgendaRechazaUnFiltroMalFormadoSinConsultar()
     {
+        // Arrange
         var servicio = new Citas();
         var pagina = new IndexModel(servicio) { PageContext = Contexto() };
         pagina.ModelState.AddModelError(nameof(pagina.Desde), "Fecha inválida");
 
-        Assert.IsType<PageResult>(await pagina.OnGetAsync());
+        // Act
+        var resultado = await pagina.OnGetAsync();
+
+        // Assert
+        Assert.IsType<PageResult>(resultado);
         Assert.Null(servicio.Filtro);
         Assert.Equal(MensajesDeCitas.PeriodoInvalido, pagina.Error);
     }
@@ -60,9 +71,14 @@ public class PaginasDeAgendaTests
     [Fact]
     public async Task DetalleRespondeConElMensajeFijoY404CuandoNoEncuentraLaCita()
     {
+        // Arrange
         var pagina = new DetalleModel(new Citas()) { PageContext = Contexto() };
 
-        Assert.IsType<PageResult>(await pagina.OnGetAsync(Guid.NewGuid()));
+        // Act
+        var resultado = await pagina.OnGetAsync(Guid.NewGuid());
+
+        // Assert
+        Assert.IsType<PageResult>(resultado);
         Assert.Null(pagina.Cita);
         Assert.Equal(StatusCodes.Status404NotFound, pagina.Response.StatusCode);
         Assert.Equal(MensajesDeCitas.CitaNoEncontrada, pagina.Error);
@@ -71,6 +87,7 @@ public class PaginasDeAgendaTests
     [Fact]
     public async Task BuscarYElegirPacienteConservaElNumeroYLasHorasCapturadas()
     {
+        // Arrange
         var servicio = new Citas();
         var pacientes = new Pacientes
         {
@@ -84,10 +101,19 @@ public class PaginasDeAgendaTests
         pagina.Entrada.HoraInicio = new TimeOnly(14, 30);
         pagina.Entrada.HoraFin = new TimeOnly(15, 30);
 
-        Assert.IsType<PageResult>(await pagina.OnPostBuscarAsync());
+        // Act
+        var resultadoBusqueda = await pagina.OnPostBuscarAsync();
+
+        // Assert
+        Assert.IsType<PageResult>(resultadoBusqueda);
         Assert.Equal("Paciente", pacientes.Texto);
         Assert.Equal(IdPaciente, Assert.Single(pagina.Busqueda!.Pacientes).IdPaciente);
-        Assert.IsType<PageResult>(await pagina.OnPostElegirAsync(IdPaciente));
+
+        // Act
+        var resultado = await pagina.OnPostElegirAsync(IdPaciente);
+
+        // Assert
+        Assert.IsType<PageResult>(resultado);
         Assert.NotEqual(Guid.Empty, idSolicitud);
         Assert.Equal(idSolicitud, pagina.IdSolicitud);
         Assert.Equal(IdPaciente, pagina.Entrada.IdPaciente);
@@ -101,10 +127,15 @@ public class PaginasDeAgendaTests
     [Fact]
     public async Task SinNumeroDeSolicitudNoSeIntentaAgendar()
     {
+        // Arrange
         var servicio = new Citas();
         var pagina = new CrearModel(servicio, new Pacientes()) { PageContext = Contexto() };
 
-        Assert.IsType<PageResult>(await pagina.OnPostAsync());
+        // Act
+        var resultado = await pagina.OnPostAsync();
+
+        // Assert
+        Assert.IsType<PageResult>(resultado);
         Assert.Empty(servicio.Envios);
         Assert.Equal(MensajesDeCitas.SolicitudInvalida, pagina.Error);
         Assert.Null(pagina.Confirmacion);
@@ -113,13 +144,18 @@ public class PaginasDeAgendaTests
     [Fact]
     public async Task LosCamposObligatoriosAusentesLleganComoNulosAlServicio()
     {
+        // Arrange
         var servicio = new Citas
         {
             Alta = RespuestaServicio<ResultadoDeAgendar>.Fallida(MensajesDeCitas.SolicitudInvalida)
         };
         var pagina = new CrearModel(servicio, new Pacientes()) { PageContext = Contexto(), IdSolicitud = Guid.NewGuid() };
 
-        Assert.IsType<PageResult>(await pagina.OnPostAsync());
+        // Act
+        var resultado = await pagina.OnPostAsync();
+
+        // Assert
+        Assert.IsType<PageResult>(resultado);
         Assert.Equal(new DatosDeCitaEntrada(null, null, null, null, null), Assert.Single(servicio.Envios).Datos);
         Assert.Equal(MensajesDeCitas.SolicitudInvalida, pagina.Error);
         Assert.Null(pagina.Confirmacion);
@@ -131,11 +167,16 @@ public class PaginasDeAgendaTests
     [InlineData(MensajesDeCitas.SolicitudYaUsada)]
     public async Task UnRechazoConservaLaCapturaYElIdentificador(string mensaje)
     {
+        // Arrange
         var servicio = new Citas { Alta = RespuestaServicio<ResultadoDeAgendar>.Fallida(mensaje) };
         var pagina = PaginaDeAlta(servicio);
         var envio = (pagina.IdSolicitud, pagina.Entrada.ParaServicio());
 
-        Assert.IsType<PageResult>(await pagina.OnPostAsync());
+        // Act
+        var resultado = await pagina.OnPostAsync();
+
+        // Assert
+        Assert.IsType<PageResult>(resultado);
         Assert.Equal(envio, Assert.Single(servicio.Envios));
         Assert.Equal(envio, (pagina.IdSolicitud, pagina.Entrada.ParaServicio()));
         Assert.Equal(mensaje, pagina.Error);
@@ -145,6 +186,7 @@ public class PaginasDeAgendaTests
     [Fact]
     public async Task ReenviarLaMismaReservaConservaSusDatosYDistingueLaConfirmacion()
     {
+        // Arrange
         var servicio = new Citas();
         var primera = PaginaDeAlta(servicio);
         var cita = new DetalleDeCita(primera.IdSolicitud, Dia.ToDateTime(new TimeOnly(14, 30)),
@@ -152,15 +194,25 @@ public class PaginasDeAgendaTests
             IdPaciente, null, false, true, EstadoPago.Pendiente, 1);
         servicio.Alta = RespuestaServicio<ResultadoDeAgendar>.Correcta(new(EstadoDeAgendar.Agendada, cita));
 
-        Assert.IsType<PageResult>(await primera.OnPostAsync());
+        // Act
+        var resultadoInicial = await primera.OnPostAsync();
+
+        // Assert
+        Assert.IsType<PageResult>(resultadoInicial);
         Assert.Equal(MensajesDeCitas.CitaAgendada, primera.Confirmacion);
         Assert.Same(cita, primera.Resultado?.Cita);
 
+        // Arrange
+        // Una respuesta perdida se reenvía con la misma solicitud y captura.
         var reenvio = PaginaDeAlta(servicio);
         reenvio.IdSolicitud = primera.IdSolicitud;
         servicio.Alta = RespuestaServicio<ResultadoDeAgendar>.Correcta(new(EstadoDeAgendar.YaAgendada, cita));
 
-        Assert.IsType<PageResult>(await reenvio.OnPostAsync());
+        // Act
+        var resultadoReenvio = await reenvio.OnPostAsync();
+
+        // Assert
+        Assert.IsType<PageResult>(resultadoReenvio);
         Assert.Equal(MensajesDeCitas.CitaYaAgendada, reenvio.Confirmacion);
         Assert.Same(cita, reenvio.Resultado?.Cita);
         Assert.Equal(2, servicio.Envios.Count);
@@ -172,6 +224,7 @@ public class PaginasDeAgendaTests
     [Fact]
     public async Task UnPermisoRetiradoImpideMostrarElResultado()
     {
+        // Arrange
         var servicio = new Citas
         {
             Agenda = RespuestaServicio<ResultadoDeAgenda>.Fallida(MensajesDeCitas.SinPermiso),
@@ -182,9 +235,15 @@ public class PaginasDeAgendaTests
         var detalle = new DetalleModel(servicio) { PageContext = Contexto() };
         var alta = PaginaDeAlta(servicio);
 
-        Assert.IsType<ForbidResult>(await agenda.OnGetAsync());
-        Assert.IsType<ForbidResult>(await detalle.OnGetAsync(Guid.NewGuid()));
-        Assert.IsType<ForbidResult>(await alta.OnPostAsync());
+        // Act
+        var resultadoAgenda = await agenda.OnGetAsync();
+        var resultadoDetalle = await detalle.OnGetAsync(Guid.NewGuid());
+        var resultadoAlta = await alta.OnPostAsync();
+
+        // Assert
+        Assert.IsType<ForbidResult>(resultadoAgenda);
+        Assert.IsType<ForbidResult>(resultadoDetalle);
+        Assert.IsType<ForbidResult>(resultadoAlta);
         Assert.Null(agenda.Agenda);
         Assert.Null(detalle.Cita);
         Assert.Null(alta.Resultado);
@@ -200,13 +259,18 @@ public class PaginasDeAgendaTests
     [InlineData(nameof(DatosDelFormularioDeCita.HoraFin))]
     public async Task UnCampoMalFormadoConservaLaCapturaSinIntentarGuardar(string campo)
     {
+        // Arrange
         var servicio = new Citas();
         var pagina = PaginaDeAlta(servicio);
         var captura = pagina.Entrada.ParaServicio();
         var solicitud = pagina.IdSolicitud;
         pagina.ModelState.AddModelError("Entrada." + campo, "Valor mal formado");
 
-        Assert.IsType<PageResult>(await pagina.OnPostAsync());
+        // Act
+        var resultado = await pagina.OnPostAsync();
+
+        // Assert
+        Assert.IsType<PageResult>(resultado);
         Assert.Empty(servicio.Envios);
         Assert.Equal(captura, pagina.Entrada.ParaServicio());
         Assert.Equal(solicitud, pagina.IdSolicitud);
@@ -218,11 +282,16 @@ public class PaginasDeAgendaTests
     [Fact]
     public async Task AbrirDesdeLaFichaCargaSoloElPacienteElegidoSinAgendar()
     {
+        // Arrange
         var servicio = new Citas();
         var pacientes = new Pacientes();
         var pagina = new CrearModel(servicio, pacientes) { PageContext = Contexto() };
 
-        Assert.IsType<PageResult>(await pagina.OnGetAsync(IdPaciente));
+        // Act
+        var resultado = await pagina.OnGetAsync(IdPaciente);
+
+        // Assert
+        Assert.IsType<PageResult>(resultado);
 
         Assert.Equal(IdPaciente, Assert.Single(pacientes.Lecturas));
         Assert.Equal(IdPaciente, pagina.Entrada.IdPaciente);
@@ -238,6 +307,7 @@ public class PaginasDeAgendaTests
     [InlineData(true)]
     public async Task LaBusquedaVaciaOTruncadaConservaLaReserva(bool hayMas)
     {
+        // Arrange
         var pacientes = new Pacientes
         {
             Busqueda = RespuestaServicio<ResultadoDeBusqueda>.Correcta(new([], hayMas))
@@ -251,7 +321,11 @@ public class PaginasDeAgendaTests
         var solicitud = pagina.IdSolicitud;
         var captura = pagina.Entrada.ParaServicio();
 
-        Assert.IsType<PageResult>(await pagina.OnPostBuscarAsync());
+        // Act
+        var resultado = await pagina.OnPostBuscarAsync();
+
+        // Assert
+        Assert.IsType<PageResult>(resultado);
 
         Assert.Empty(pagina.Busqueda!.Pacientes);
         Assert.Equal(hayMas, pagina.Busqueda.HayMas);
@@ -266,12 +340,15 @@ public class PaginasDeAgendaTests
     [InlineData(MensajesDePacientes.SinPermiso)]
     public async Task LaBusquedaRechazadaNoExponeResultadosNiGuarda(string mensaje)
     {
+        // Arrange
         var servicio = new Citas();
         var pacientes = new Pacientes { Busqueda = RespuestaServicio<ResultadoDeBusqueda>.Fallida(mensaje) };
         var pagina = new CrearModel(servicio, pacientes) { PageContext = Contexto(), Texto = "Paciente" };
 
+        // Act
         var resultado = await pagina.OnPostBuscarAsync();
 
+        // Assert
         if (mensaje == MensajesDePacientes.SinPermiso) Assert.IsType<ForbidResult>(resultado);
         else
         {
@@ -285,6 +362,7 @@ public class PaginasDeAgendaTests
     [Fact]
     public async Task CambiarPacienteRetiraElAmbitoAnteriorYElValorLigadoDelFormulario()
     {
+        // Arrange
         var pagina = PaginaDeAlta(new Citas());
         var nuevo = Guid.NewGuid();
         var captura = pagina.Entrada.ParaServicio();
@@ -292,7 +370,12 @@ public class PaginasDeAgendaTests
         pagina.ModelState.SetModelValue("Entrada.IdPaciente", IdPaciente.ToString(), IdPaciente.ToString());
         pagina.ModelState.SetModelValue("Entrada.Ambito", "Escolar", "Escolar");
 
-        Assert.IsType<PageResult>(await pagina.OnPostElegirAsync(nuevo));
+        // El valor ligado anterior no debe reaparecer en el formulario.
+        // Act
+        var resultado = await pagina.OnPostElegirAsync(nuevo);
+
+        // Assert
+        Assert.IsType<PageResult>(resultado);
 
         Assert.Equal(nuevo, pagina.Entrada.IdPaciente);
         Assert.Null(pagina.Entrada.Ambito);
@@ -307,18 +390,28 @@ public class PaginasDeAgendaTests
     [Fact]
     public async Task ElegirDeNuevoAlMismoPacienteConservaElAmbito()
     {
+        // Arrange
         var pagina = PaginaDeAlta(new Citas());
-        Assert.IsType<PageResult>(await pagina.OnPostElegirAsync(IdPaciente));
+        // Act
+        var resultado = await pagina.OnPostElegirAsync(IdPaciente);
+
+        // Assert
+        Assert.IsType<PageResult>(resultado);
         Assert.Equal(AmbitoAtencion.Escolar, pagina.Entrada.Ambito);
     }
 
     [Fact]
     public async Task UnaSeleccionVaciaNoReemplazaAlPacienteCapturado()
     {
+        // Arrange
         var pagina = PaginaDeAlta(new Citas());
         var captura = pagina.Entrada.ParaServicio();
 
-        Assert.IsType<PageResult>(await pagina.OnPostElegirAsync(Guid.Empty));
+        // Act
+        var resultado = await pagina.OnPostElegirAsync(Guid.Empty);
+
+        // Assert
+        Assert.IsType<PageResult>(resultado);
 
         Assert.Equal(captura, pagina.Entrada.ParaServicio());
         Assert.Equal(MensajesDeCitas.SolicitudInvalida, pagina.Error);
@@ -330,11 +423,14 @@ public class PaginasDeAgendaTests
     [InlineData(MensajesDePacientes.SinPermiso)]
     public async Task UnaFichaNoAutorizadaOInaccesibleNoEntregaNombreNiAmbitos(string mensaje)
     {
+        // Arrange
         var pacientes = new Pacientes { Lectura = RespuestaServicio<FichaDePaciente>.Fallida(mensaje) };
         var pagina = new CrearModel(new Citas(), pacientes) { PageContext = Contexto() };
 
+        // Act
         var resultado = await pagina.OnGetAsync(IdPaciente);
 
+        // Assert
         if (mensaje == MensajesDePacientes.SinPermiso) Assert.IsType<ForbidResult>(resultado);
         else Assert.Equal(mensaje, pagina.Error);
         Assert.Null(pagina.NombreDelPaciente);
@@ -346,6 +442,7 @@ public class PaginasDeAgendaTests
     [InlineData(EstadoDeAgendar.YaAgendada)]
     public async Task UnaReservaConfirmadaSinNombreNoReconsultaAlPacienteNiInventaUnaBaja(EstadoDeAgendar estado)
     {
+        // Arrange
         var cita = new DetalleDeCita(Guid.NewGuid(), Dia.ToDateTime(new(14, 59)),
             Dia.ToDateTime(new(15, 59)), AmbitoAtencion.Escolar, EstadoCita.Agendada,
             IdPaciente, null, false, true, EstadoPago.Pendiente, 1);
@@ -357,8 +454,13 @@ public class PaginasDeAgendaTests
             Entrada = PaginaDeAlta(servicio).Entrada
         };
 
-        Assert.IsType<PageResult>(await pagina.OnPostAsync());
+        // Act
+        var resultado = await pagina.OnPostAsync();
 
+        // Assert
+        Assert.IsType<PageResult>(resultado);
+
+        // La respuesta confirmada prevalece aunque una lectura posterior se deniegue.
         Assert.Empty(pacientes.Lecturas);
         Assert.Same(cita, pagina.Resultado!.Cita);
         Assert.False(pagina.Resultado.Cita.PacienteDeBaja);
@@ -370,13 +472,18 @@ public class PaginasDeAgendaTests
     [Fact]
     public async Task UnFalloInesperadoDeGuardadoSePropagaSinReintentarNiAnunciarExito()
     {
+        // Arrange
         var fallo = new InvalidOperationException("Fallo ficticio");
         var servicio = new Citas { FalloAlta = fallo };
         var pagina = PaginaDeAlta(servicio);
         var solicitud = pagina.IdSolicitud;
         var captura = pagina.Entrada.ParaServicio();
 
-        Assert.Same(fallo, await Assert.ThrowsAsync<InvalidOperationException>(() => pagina.OnPostAsync()));
+        // Act
+        var excepcion = await Assert.ThrowsAsync<InvalidOperationException>(() => pagina.OnPostAsync());
+
+        // Assert
+        Assert.Same(fallo, excepcion);
         Assert.Single(servicio.Envios);
         Assert.Null(pagina.Confirmacion);
         Assert.Null(pagina.Resultado);
@@ -393,12 +500,17 @@ public class PaginasDeAgendaTests
     [InlineData(35)]
     public async Task ConsultarUnPeriodoConservaLasFechasLocalesYElLimiteInformado(int dias)
     {
+        // Arrange
         var hasta = Dia.AddDays(dias - 1);
         var agenda = new ResultadoDeAgenda([], Dia, hasta, Dia, VistaDeAgenda.Activas, true);
         var servicio = new Citas { Agenda = RespuestaServicio<ResultadoDeAgenda>.Correcta(agenda) };
         var pagina = new IndexModel(servicio) { PageContext = Contexto(), Desde = Dia, Hasta = hasta };
 
-        Assert.IsType<PageResult>(await pagina.OnGetAsync());
+        // Act
+        var resultado = await pagina.OnGetAsync();
+
+        // Assert
+        Assert.IsType<PageResult>(resultado);
         Assert.Equal((Dia, hasta, VistaDeAgenda.Activas), servicio.Filtro);
         Assert.Same(agenda, pagina.Agenda);
         Assert.True(pagina.Agenda!.HayMas);
@@ -407,12 +519,17 @@ public class PaginasDeAgendaTests
     [Fact]
     public async Task ElPeriodoRechazadoConservaLosFiltrosSinMostrarAgenda()
     {
+        // Arrange
         var pagina = new IndexModel(new Citas())
         {
             PageContext = Contexto(), Desde = Dia, Hasta = Dia.AddDays(40), Vista = VistaDeAgenda.Canceladas
         };
 
-        Assert.IsType<PageResult>(await pagina.OnGetAsync());
+        // Act
+        var resultado = await pagina.OnGetAsync();
+
+        // Assert
+        Assert.IsType<PageResult>(resultado);
         Assert.Equal(MensajesDeCitas.PeriodoInvalido, pagina.Error);
         Assert.Null(pagina.Agenda);
         Assert.Equal(Dia, pagina.Desde);
@@ -425,6 +542,7 @@ public class PaginasDeAgendaTests
     [InlineData(true)]
     public async Task ElDetalleConservaLasHorasYLaPrivacidadDevueltasPorElServicio(bool pacienteDeBaja)
     {
+        // Arrange
         var cita = new DetalleDeCita(Guid.NewGuid(), Dia.ToDateTime(new(14, 59)),
             Dia.ToDateTime(new(15, 59)), AmbitoAtencion.Escolar, EstadoCita.Cancelada,
             pacienteDeBaja ? null : IdPaciente, pacienteDeBaja ? null : "Paciente ficticio",
@@ -432,7 +550,11 @@ public class PaginasDeAgendaTests
         var servicio = new Citas { Detalle = RespuestaServicio<DetalleDeCita>.Correcta(cita) };
         var pagina = new DetalleModel(servicio) { PageContext = Contexto() };
 
-        Assert.IsType<PageResult>(await pagina.OnGetAsync(cita.IdCita));
+        // Act
+        var resultado = await pagina.OnGetAsync(cita.IdCita);
+
+        // Assert
+        Assert.IsType<PageResult>(resultado);
         Assert.Same(cita, pagina.Cita);
         Assert.Equal(cita.IdCita, servicio.IdConsultado);
         Assert.Null(pagina.Error);
@@ -445,12 +567,18 @@ public class PaginasDeAgendaTests
     [InlineData(typeof(CrearModel), PoliticasDeAutorizacion.AgendarCitas)]
     public void LasPaginasExigenAmbosPermisosYEvitanCachePrivada(Type pagina, string permiso)
     {
+        // Arrange
+        // La teoría proporciona la página y el permiso de la operación.
+        // Act
         var politicas = pagina.GetCustomAttributes(typeof(AuthorizeAttribute), true)
             .Cast<AuthorizeAttribute>().Select(atributo => atributo.Policy).ToArray();
+        var atributosCache = pagina.GetCustomAttributes(typeof(ResponseCacheAttribute), true)
+            .Cast<ResponseCacheAttribute>().ToArray();
+
+        // Assert
         Assert.Contains(permiso, politicas);
         Assert.Contains(PoliticasDeAutorizacion.ConsultarPacientes, politicas);
-        var cache = Assert.Single(pagina.GetCustomAttributes(typeof(ResponseCacheAttribute), true)
-            .Cast<ResponseCacheAttribute>());
+        var cache = Assert.Single(atributosCache);
         Assert.True(cache.NoStore);
         Assert.Equal(ResponseCacheLocation.None, cache.Location);
     }

@@ -93,6 +93,7 @@
 .resumen { display: grid; grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr); gap: 1.25rem; margin-top: 1.5rem; }
 .siguiente-cita { background: var(--color-tarjeta); color: var(--color-tinta); }
 .fila, .acciones, .identidad, .busqueda { display: flex; align-items: center; flex-wrap: wrap; gap: .75rem; }
+.acciones[hidden] { display: none; }
 .fila { justify-content: space-between; }
 .cuentas { padding: 0; list-style: none; }
 .avatar { border-radius: 50%; background: var(--color-niebla); color: var(--color-texto); }
