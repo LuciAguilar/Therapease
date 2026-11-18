@@ -8,6 +8,7 @@
     var consultaPacientes = (await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.ConsultarPacientes)).Succeeded;
     var usuarios = Context.Request.Path.StartsWithSegments("/Usuarios");
     var pacientes = Context.Request.Path.StartsWithSegments("/Pacientes");
+    var agenda = Context.Request.Path.StartsWithSegments("/Agenda");
 }
 <!DOCTYPE html>
 <html lang="es">
@@ -18,6 +19,7 @@
     <title>@ViewData["Title"] · TherapEase</title>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/operacion.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/agenda.css" asp-append-version="true" />
 </head>
 <body class="operacion">
     <aside class="barra-lateral">
@@ -29,7 +31,10 @@
             {
                 <a asp-page="/Pacientes/Index" aria-current="@(pacientes ? "page" : null)">Pacientes</a>
             }
-            <span aria-disabled="true">Agenda</span>
+            @if (consultaPacientes && (await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.ConsultarAgenda)).Succeeded)
+            {
+                <a asp-page="/Agenda/Index" aria-current="@(agenda ? "page" : null)">Agenda</a>
+            }
             @if (administra)
             {
                 <a asp-page="/Usuarios/Index" aria-current="@(usuarios ? "page" : null)">Usuarios</a>
@@ -56,8 +61,28 @@
         </div>
     </aside>
     <div class="zona-trabajo">
-        <header class="encabezado">@ViewData["Title"]</header>
         <main class="zona-contenido">@RenderBody()</main>
     </div>
+    <dialog id="panel-nueva-cita" class="panel-ficha-paciente" aria-labelledby="titulo-panel-cita">
+        <header class="fila">
+            <div><h2 id="titulo-panel-cita">Nueva cita</h2><p class="cita-ayuda">Reserva un horario para la atención.</p></div>
+            <form method="dialog">
+                <button class="ficha-cerrar" aria-label="Cerrar nueva cita" autofocus>×</button>
+            </form>
+        </header>
+        <div data-panel-contenido-cita aria-live="polite"></div>
+    </dialog>
+    <dialog id="panel-detalle-cita" class="panel-ficha-paciente" aria-labelledby="titulo-detalle-cita">
+        <header class="fila">
+            <div><h2 id="titulo-detalle-cita">Detalle de cita</h2><p class="cita-ayuda">Hora de Hermosillo</p></div>
+            <form method="dialog">
+                <button class="ficha-cerrar" aria-label="Cerrar detalle de cita" autofocus>×</button>
+            </form>
+        </header>
+        <div data-panel-contenido-cita aria-live="polite"></div>
+    </dialog>
+    <script src="~/js/panel-cita.js" asp-append-version="true" defer></script>
+    <script src="~/js/selectores-cita.js" asp-append-version="true" defer></script>
+    <script src="~/js/reserva-cita.js" asp-append-version="true" defer></script>
 </body>
 </html>
