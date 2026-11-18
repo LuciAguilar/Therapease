@@ -31,10 +31,13 @@
             <h2>@ficha.Nombre</h2>
         </header>
         <div class="acciones ficha-paciente-acciones">
-            <button class="accion primaria ficha-nueva-cita" type="button" disabled title="Agenda pendiente">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
-                Nueva cita
-            </button>
+            @if ((await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.AgendarCitas)).Succeeded)
+            {
+                <a class="accion primaria ficha-nueva-cita" asp-page="/Agenda/Crear" asp-route-paciente="@ficha.IdPaciente">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+                    Nueva cita
+                </a>
+            }
             @if ((await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.ActualizarPacientes)).Succeeded)
             {
                 <a class="accion ficha-editar" asp-page="Editar" asp-route-id="@ficha.IdPaciente">

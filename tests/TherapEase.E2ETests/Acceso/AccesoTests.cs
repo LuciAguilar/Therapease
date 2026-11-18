@@ -56,7 +56,10 @@ public sealed partial class AccesoSesionesYPermisosTests
         Exigir(Ruta(p) == "/" && new Uri(p.Url).GetLeftPart(UriPartial.Authority) == entorno.Url);
         Exigir(await p.GetByRole(AriaRole.Link, new() { Name = "Usuarios", Exact = true }).CountAsync() == (administra ? 1 : 0));
         Exigir(await p.GetByRole(AriaRole.Link, new() { Name = "Pacientes", Exact = true }).CountAsync() == 1);
-        Exigir(await p.GetByRole(AriaRole.Link, new() { Name = "Agenda", Exact = true }).CountAsync() == 0);
+        var agenda = p.GetByRole(AriaRole.Link, new() { Name = "Agenda", Exact = true });
+        Exigir(await agenda.CountAsync() == 1);
+        await Assertions.Expect(agenda).ToBeVisibleAsync();
+        Exigir(await agenda.GetAttributeAsync("href") == "/Agenda");
         await Assertions.Expect(p.GetByRole(AriaRole.Heading, new() { Level = 1, Name = "Hola, " + cuenta.Usuario, Exact = true }))
             .ToBeVisibleAsync();
     });
