@@ -9,6 +9,7 @@ TherapEase es una aplicación web para la gestión administrativa de un consulto
 - B01 espera las páginas, formularios y navegador; B00/LCA/R04 siguen abiertos.
 - B02: servidor y contrato disponibles; QA revisado y fusionado. Faltan confirmaciones de producto, páginas y navegador.
 - B03: propuesta técnica aprobada (D1–D13, 05-nov). Servidor y contrato para las páginas en el [PR #18](https://github.com/LuciAguilar/Therapease/pull/18): Lucía revisó `fe6b79a` (810 unitarias y 27 integraciones de citas; su QA dirigido dio 4/5) y aprobó el bloqueo de la agenda en un disparador de `Cita`, que esta corrección implementa. Detalle en la [evidencia](docs/testing/TherapEase-09-B03-evidencia-servicios.md). QA de Lucía, páginas y navegador pendientes.
+- B04: propuesta técnica del estado de pago aprobada por Lucía el 17-nov (D1–D8). El servidor del cambio de pago (permiso `CambiarPagoDeCitas`, `CambiarPagoAsync` y su contrato en la sección 4.4 del [contrato de citas](docs/planning/TherapEase-etapa09-B03-contrato-para-paginas.md)) está en la rama `b04/estado-de-pago`, sin migración. Revisión distinta, QA de Lucía, páginas y Q16 pendientes.
 - Solo datos ficticios, sin nube ni gastos; montos, «solo particular» y cancelación automática fuera.
 
 ## 2. Quién hace qué ahora

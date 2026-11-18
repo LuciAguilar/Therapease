@@ -21,7 +21,10 @@ public static class MatrizDePermisos
 
         // Agenda y citas (B03, D1): también solo con datos de prueba hasta decidir con R04.
         [Permiso.ConsultarAgenda] = true,
-        [Permiso.AgendarCitas] = true
+        [Permiso.AgendarCitas] = true,
+
+        // Estado de pago (B04, D1): también solo con datos de prueba hasta decidir con R04.
+        [Permiso.CambiarPagoDeCitas] = true
     }.ToFrozenDictionary();
 
     private static readonly FrozenDictionary<Permiso, bool> DecisionesDeLaUsuaria = new Dictionary<Permiso, bool>
@@ -33,7 +36,8 @@ public static class MatrizDePermisos
         [Permiso.ConsultarPacientes] = true,
         [Permiso.ActualizarPacientes] = true,
         [Permiso.ConsultarAgenda] = true,
-        [Permiso.AgendarCitas] = true
+        [Permiso.AgendarCitas] = true,
+        [Permiso.CambiarPagoDeCitas] = true
     }.ToFrozenDictionary();
 
     private static readonly FrozenDictionary<Permiso, bool> SinDecisiones = FrozenDictionary<Permiso, bool>.Empty;

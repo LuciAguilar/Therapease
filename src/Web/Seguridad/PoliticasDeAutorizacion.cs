@@ -15,4 +15,5 @@ public static class PoliticasDeAutorizacion
     public const string ActualizarPacientes = nameof(ActualizarPacientes);
     public const string ConsultarAgenda = nameof(ConsultarAgenda);
     public const string AgendarCitas = nameof(AgendarCitas);
+    public const string CambiarPagoDeCitas = nameof(CambiarPagoDeCitas);
 }

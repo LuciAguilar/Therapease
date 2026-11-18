@@ -1,0 +1,84 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@using TherapEase.Application.Citas.Modelos
+@using TherapEase.Web.Seguridad
+@inject IAuthorizationService Autorizacion
+@model IndexModel
+@{
+    Layout = "_LayoutOperativo";
+    ViewData["Title"] = "Agenda";
+}
+<header class="titulo-seccion fila">
+    <div>
+        <h1>Agenda</h1>
+        <p>Organiza y consulta todas tus citas.</p>
+    </div>
+    @if ((await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.AgendarCitas)).Succeeded)
+    {
+        <a class="accion primaria agenda-nueva" asp-page="Crear"><span aria-hidden="true">＋</span> Nueva cita</a>
+    }
+</header>
+
+@if (Model.Confirmacion is { } confirmacion)
+{
+    <partial name="_AvisoDeConfirmacion" model="confirmacion" />
+}
+
+<section class="tarjeta agenda" aria-label="Consultar agenda">
+    <div class="agenda-controles">
+        @if (Model.Agenda is { } agenda)
+        {
+            var dias = agenda.Hasta.DayNumber - agenda.Desde.DayNumber + 1;
+            <nav class="acciones" aria-label="Navegar por periodos">
+                @if (agenda.Desde.DayNumber >= dias)
+                {
+                    <a class="accion" asp-page="Index" asp-route-vista="@agenda.Vista"
+                       asp-route-desde="@agenda.Desde.AddDays(-dias).ToString("yyyy-MM-dd")"
+                       asp-route-hasta="@agenda.Hasta.AddDays(-dias).ToString("yyyy-MM-dd")" aria-label="Periodo anterior">‹</a>
+                }
+                <a class="accion" asp-page="Index" asp-route-vista="@agenda.Vista">Hoy</a>
+                @if (agenda.Hasta.DayNumber < DateOnly.MaxValue.DayNumber - dias)
+                {
+                    <a class="accion" asp-page="Index" asp-route-vista="@agenda.Vista"
+                       asp-route-desde="@agenda.Desde.AddDays(dias).ToString("yyyy-MM-dd")"
+                       asp-route-hasta="@agenda.Hasta.AddDays(dias).ToString("yyyy-MM-dd")" aria-label="Periodo siguiente">›</a>
+                }
+            <strong class="agenda-rango">@agenda.Desde.ToString("dd/MM/yyyy") — @agenda.Hasta.ToString("dd/MM/yyyy")</strong></nav><div class="agenda-vistas" data-desde="@agenda.Desde.ToString("yyyy-MM-dd")"><button type="button" class="accion" data-periodo="semana">Semana</button><button type="button" class="accion" data-periodo="mes">Mes</button></div>
+        }
+        <details class="agenda-avanzados"><summary>Filtros</summary><form method="get" class="acciones agenda-filtros">
+            <div>
+                <label asp-for="Desde"></label>
+                <input asp-for="Desde" type="date" asp-format="{0:yyyy-MM-dd}" />
+            </div>
+            <div>
+                <label asp-for="Hasta"></label>
+                <input asp-for="Hasta" type="date" asp-format="{0:yyyy-MM-dd}" />
+            </div>
+            <div>
+                <label asp-for="Vista">Citas</label>
+                <select asp-for="Vista" asp-items="Html.GetEnumSelectList<VistaDeAgenda>()"></select>
+            </div>
+            <button class="accion" type="submit">Consultar</button>
+        </form></details>
+    </div>
+    @if (Model.Error is { } error)
+    {
+        <p class="error-formulario agenda-aviso" role="alert">@error</p>
+    }
+    @if (Model.Agenda is { } resultado)
+    {
+        @if (resultado.HayMas)
+        {
+            <p class="agenda-aviso" role="status">Hay más citas de las que se pueden mostrar. Selecciona un periodo más corto.</p>
+        }
+        <div class="agenda-cuerpo">
+        <partial name="_Calendario" model="resultado" />
+        @if (resultado.Citas.Count == 0)
+        {
+            <div class="agenda-vacia" role="status"><h2>No hay citas en este periodo</h2><p>Elige otro periodo o agenda una cita.</p>@if ((await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.AgendarCitas)).Succeeded) { <a class="accion primaria agenda-nueva" asp-page="Crear">＋ Nueva cita</a> }</div>
+        }
+        </div>
+    }
+</section>
+
+<script src="~/js/vista-agenda.js" asp-append-version="true" defer></script>
