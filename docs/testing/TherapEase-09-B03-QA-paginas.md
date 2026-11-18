@@ -4,7 +4,7 @@
 
 ## 1. Alcance y trazabilidad
 
-Reutiliza los casos CU05/CU06 del [plan de pruebas](../planning/TherapEase-09-plan-de-pruebas.md) y el [plan B03](../planning/TherapEase-etapa09-B03.md). No duplica sus tablas.
+Reutiliza los casos CU05/CU06 del [plan de pruebas](TherapEase-09-plan-de-pruebas.md) y el [plan B03](../planning/TherapEase-etapa09-B03.md). No duplica sus tablas.
 
 | Alcance | Qué se comprueba |
 | --- | --- |
