@@ -1,6 +1,6 @@
 # TherapEase — Etapa 09 · B04 · Estado de pago y recorrido Q16
 
-**Estado al 16-nov-2026: planes auditados por Claude APROBADO v2 y publicación autorizada por Lucía.** Plan compartido: publicación autorizada, SHA por registrar después de confirmarla. No hay propuesta B04 aprobada, código B04 autorizado ni pruebas nuevas ejecutadas. ✅ = avance comprobado en su alcance; ⏳ = pendiente. Las respuestas de producto recibidas no equivalen a implementación.
+**Estado al 18-nov-2026: planes auditados por Claude APROBADO v2 (16-nov); propuesta técnica de Miguel aprobada por Lucía el 17-nov con D1–D8 resueltas, y servidor implementado en la rama `b03/agenda-y-citas`.** Faltan el PR, la revisión por otra persona, la aprobación final de Lucía, su QA dirigido, las páginas de Dulce y Q16. ✅ = avance comprobado en su alcance; ⏳ = pendiente. Las respuestas de producto recibidas no equivalen a implementación.
 
 **En palabras simples:** después de entrar, registrar un paciente y agendar una cita, queremos ver si está pagada o pendiente y corregir ese estado. El sistema debe guardar el cambio y su evento juntos, sin perder una edición de otra persona. No se mueve dinero. B04 también une las páginas anteriores en el recorrido completo de navegador Q16.
 
@@ -23,8 +23,8 @@ Casos existentes, sin copiar sus tablas: [CU09](../testing/TherapEase-09-plan-de
 
 | Estado | Persona | Trabajo de pago y recorrido | Qué falta |
 | --- | --- | --- | --- |
-| ⏳ | Miguel | Una propuesta técnica completa de consulta/cambio de pago: contratos, permisos, versión, estados, reenvíos, fallos y auditoría. | Reutilizar Citas, la versión y EstadoPago existentes; indicar qué ya existe y qué requiere cambio. Lucía decide antes de implementar. |
-| ⏳ | Miguel | Después de la autorización: servicios, persistencia, unitarias propias y apoyo a Dulce. | Si hay migración, justificar SQL, impacto y reversión; no darla por necesaria ahora. Mantener las dependencias entre capas. |
+| ✅ | Miguel | Propuesta técnica del cambio de pago: contratos, permisos, versión, estados, reenvíos, fallos y auditoría. | Aprobada por Lucía el 17-nov-2026 (D1–D8). Reutiliza Citas, la versión y EstadoPago; la consulta del pago de citas de baja se aplaza a B06 (D2). |
+| ✅ servidor / ⏳ revisión | Miguel | Servicio `CambiarPagoAsync`, regla de Domain, permiso `CambiarPagoDeCitas`, unitarias e integración propias y contrato para Dulce (sección 4.4 del contrato de citas). | Implementado en la rama `b03/agenda-y-citas`, sin migración y sin dependencias nuevas. Falta PR, revisión de otra persona y aprobación final de Lucía. |
 | ✅ respuestas / ⏳ diseño de pantalla | Dulce | Conservar pago inicial Pendiente, cancelada corregible y cita de baja sin escritura. Concretar dónde se consulta/cambia y sus mensajes. | No volver a pedir respuestas ya recibidas. Resolver con Lucía los detalles de interfaz pendientes; páginas y PageModel con sus unitarias después del contrato. |
 | ✅ documentos / ⏳ diseño técnico aprobado | Lucía con Codex | Preparar estos planes, contrastar CU09 y diseñar QA dirigido de servidor, HTTP y navegador. | Revisar la propuesta con Claude; Lucía decide. Este documento no acredita pruebas ni autoriza escribirlas. |
 | ⏳ | Lucía | Revisar cambios críticos, la CI y el alcance de Q16; preparar Q13 cuando proceda. | Código y pruebas por PR, evidencia identificada y aprobación final propia. |
@@ -52,7 +52,7 @@ Miguel reúne en una propuesta sus puntos técnicos: permisos, versión, reenví
 
 ### 3.1. Qué debe devolver la propuesta única de Miguel
 
-Una propuesta documental, con versión de referencia y rutas exactas, debe separar lo existente, los cambios recomendados y las decisiones que necesita de Lucía. Incluir entradas/salidas de consulta y cambio, campos admitidos y rechazados (también enviados de más), versión obligatoria y válida, mensajes fijos del servicio y significado de la respuesta HTTP. Dulce, con Lucía, define su presentación y los mensajes de pantalla. El actor se toma de la sesión. Precisar respuestas para cita inexistente, baja, sin permiso, temporal pendiente, valor inválido, conflicto, sin cambios, cambio confirmado y fallo técnico; ordenar las comprobaciones para no revelar datos antes de autorizar.
+Una propuesta documental, con versión de referencia y rutas exactas, debe separar lo existente, los cambios recomendados y las decisiones que necesita de Lucía. Incluir entradas/salidas de consulta y cambio, campos admitidos e ignorados (también enviados de más, decisión D6 de Lucía del 17-nov-2026), versión obligatoria y válida, mensajes fijos del servicio y significado de la respuesta HTTP. Dulce, con Lucía, define su presentación y los mensajes de pantalla. El actor se toma de la sesión. Precisar respuestas para cita inexistente, baja, sin permiso, temporal pendiente, valor inválido, conflicto, sin cambios, cambio confirmado y fallo técnico; ordenar las comprobaciones para no revelar datos antes de autorizar.
 
 Recomendación para comparar, todavía sin aprobar: ampliar Citas con la versión existente y sin identificador nuevo de solicitud. Un reenvío con versión antigua devuelve conflicto, sin atribuirle el éxito anterior; tras una respuesta perdida se ofrece consulta autorizada y recarga, sin repetir automáticamente ni volver a enviar con una versión nueva. La otra opción reconoce una solicitud guardada: Miguel debe justificar almacenamiento, actor, datos, reenvíos y costo si la considera necesaria. Elegir de nuevo el mismo pago tras una recarga es una acción nueva; ver el valor deseado no prueba que el envío anterior se guardó.
 
@@ -107,10 +107,10 @@ Antes de habilitar trazas, Lucía decide con la revisión de Claude qué evidenc
 | --- | --- | --- | --- |
 | ✅ | Leer alcance, entrevista y casos existentes | Lucía con Codex | HU13/CU09, respuestas de pago y Q16 contrastados; enlaces en sección 6. |
 | ✅ | Preparar, corregir y auditar los planes | Lucía con Codex; Claude audita | Claude APROBADO v2, 16-nov; Lucía aprobó la publicación documental. Encargo a Miguel después de publicar. |
-| ⏳ | Presentar una propuesta completa reutilizando lo existente | Miguel | Resolver las precisiones de la sección 3; apoyo a Dulce y B02/B03 conserva prioridad. |
+| ✅ | Presentar una propuesta completa reutilizando lo existente | Miguel | Propuesta final aprobada por Lucía el 17-nov-2026 (D1–D8), tras la auditoría de Claude (APROBADO v1). |
 | ⏳ | Auditar propuesta y QA diseñado | Claude | Auditoría técnica pendiente de recibir la propuesta de Miguel; APROBADO v2 corresponde solo a estos planes. |
 | ⏳ | Decidir reglas pendientes y autorizar implementación | Lucía | Aprobación expresa antes de código y pruebas B04. |
-| ⏳ | Implementar servidor, contrato y unitarias propias | Miguel | Solo después de autorización; PR con otra persona revisora y decisión final de Lucía. |
+| ✅ servidor / ⏳ PR | Implementar servidor, contrato y unitarias propias | Miguel | Implementado en la rama `b03/agenda-y-citas`. Falta el PR con otra persona revisora y la decisión final de Lucía. |
 | ⏳ | Implementar páginas, PageModel y unitarias propias | Dulce | Contrato disponible y páginas B03 preparadas; revisión distinta del autor. |
 | ⏳ | Preparar/ejecutar QA de servicios, HTTP y navegador | Lucía con Codex | Después de autorizar; archivo, comando, entorno, SHA y resultado reales en cada entrega. |
 | ⏳ | Decidir evidencia y trazas antes de habilitar captura Q16 | Lucía; Claude audita | §4.3; conservar excepción de identidad y TRX seguros hasta decisión y comprobación. |

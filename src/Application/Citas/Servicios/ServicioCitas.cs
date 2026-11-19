@@ -9,6 +9,7 @@ using TherapEase.Application.Compartido.Modelos;
 using TherapEase.Application.Pacientes.Interfaces.Servicios;
 using TherapEase.Domain.Auditoria.Entidades.Enums;
 using TherapEase.Domain.Citas.Entidades;
+using TherapEase.Domain.Citas.Entidades.Enums;
 using TherapEase.Domain.Citas.Excepciones;
 using TherapEase.Domain.Citas.Reglas;
 using TherapEase.Domain.Compartido.Entidades.Enums;
@@ -22,6 +23,9 @@ public class ServicioCitas : IServicioCitas
 {
     private const string HechoDeAlta = "Se agendó una cita.";
     private const string HechoDeAltaDespuesDeSuHorario = "Se agendó una cita registrada después de su horario.";
+
+    // Un solo hecho para ambos sentidos: el evento no revela el valor nuevo ni el anterior (decisión D7 de Lucía, 17-nov-2026).
+    private const string HechoDeCambioDePago = "Se cambió el estado de pago de una cita.";
 
     private readonly IRepositorioCitas _citas;
     private readonly IConsultaDePacientesParaCitas _pacientes;
@@ -197,6 +201,75 @@ public class ServicioCitas : IServicioCitas
             new ResultadoDeAgendar(EstadoDeAgendar.Agendada, ADetalle(candidata, nombresAlConfirmar)), MensajesDeCitas.CitaAgendada);
     }
 
+    public async Task<RespuestaServicio<ResultadoDeCambioDePago>> CambiarPagoAsync(
+        Guid idCita, int versionEsperada, EstadoPago? nuevoPago, CancellationToken cancelacion = default)
+    {
+        // Permisos antes de leer o validar nada: sin ellos no se averigua si la cita existe ni si la entrada era válida.
+        if (await ObtenerActorConPermisosAsync(cancelacion, Permiso.CambiarPagoDeCitas, Permiso.ConsultarAgenda, Permiso.ConsultarPacientes) is not { } idActor)
+        {
+            return RespuestaServicio<ResultadoDeCambioDePago>.Fallida(MensajesDeCitas.SinPermiso);
+        }
+
+        // Sin datos de la base. Un identificador vacío no puede ser una cita; un pago ausente no se toma por Pendiente.
+        if (idCita == Guid.Empty)
+        {
+            return RespuestaServicio<ResultadoDeCambioDePago>.Fallida(MensajesDeCitas.CitaNoEncontrada);
+        }
+
+        if (nuevoPago is not { } pago || !Enum.IsDefined(pago) || versionEsperada < 1)
+        {
+            return RespuestaServicio<ResultadoDeCambioDePago>.Fallida(MensajesDeCitas.SolicitudInvalida);
+        }
+
+        // Una sola lectura rastreada. De una cita de baja no se muestra nada: la regla la rechaza sin devolver su contenido.
+        var cita = await _citas.ObtenerAsync(idCita, cancelacion);
+        if (cita is null)
+        {
+            return RespuestaServicio<ResultadoDeCambioDePago>.Fallida(MensajesDeCitas.CitaNoEncontrada);
+        }
+
+        bool huboCambio;
+        try
+        {
+            huboCambio = ReglasDeCita.CambiarPago(cita, pago, versionEsperada, idActor, _tiempo.GetUtcNow());
+        }
+        catch (ConflictoDeVersionException)
+        {
+            return RespuestaServicio<ResultadoDeCambioDePago>.Fallida(MensajesDeCitas.ConflictoDeVersion);
+        }
+        catch (ReglaDeNegocioException excepcion)
+        {
+            return RespuestaServicio<ResultadoDeCambioDePago>.Fallida(excepcion.Message);
+        }
+
+        // «Sin cambios» describe la cita como estaba al leerla: no se abre transacción ni se bloquea nada para una respuesta que no escribe.
+        if (!huboCambio)
+        {
+            return RespuestaServicio<ResultadoDeCambioDePago>.Correcta(
+                new ResultadoDeCambioDePago(EstadoDeCambioDePago.SinCambios, APago(cita)), MensajesDeCitas.SinCambios);
+        }
+
+        // El cambio y su evento se guardan o se revierten juntos. La versión protege el guardado: si otra operación cambió la fila, el UPDATE no
+        // afecta ninguna fila y la unidad de trabajo lo traduce a conflicto, sin dejar ni el cambio ni el evento. Cualquier otro fallo sube como error general.
+        try
+        {
+            await _unidad.EjecutarAsync(async ct =>
+            {
+                await _auditoria.RegistrarHechoDeCambioAsync(
+                    idActor, TipoRegistroAuditoria.Cita, idCita, AccionAuditoria.Actualizacion,
+                    ReglasDeCita.CamposDePago(), HechoDeCambioDePago, ct);
+            }, cancelacion);
+        }
+        catch (ConflictoDeVersionException)
+        {
+            return RespuestaServicio<ResultadoDeCambioDePago>.Fallida(MensajesDeCitas.ConflictoDeVersion);
+        }
+
+        // Ya confirmada: la respuesta sale de la cita en memoria, sin otra lectura ni datos del paciente.
+        return RespuestaServicio<ResultadoDeCambioDePago>.Correcta(
+            new ResultadoDeCambioDePago(EstadoDeCambioDePago.Actualizado, APago(cita)), MensajesDeCitas.PagoActualizado);
+    }
+
     // El actor sale de la sesión; todos los permisos se comprueban en el servidor, en orden, antes de cualquier lectura.
     private async Task<Guid?> ObtenerActorConPermisosAsync(CancellationToken cancelacion, params Permiso[] permisos)
     {
@@ -296,6 +369,9 @@ public class ServicioCitas : IServicioCitas
             PacienteDeBaja: !tieneNombre,
             fila.RegistradaDespuesDeSuHorario);
     }
+
+    private static EstadoDePagoDeCita APago(Cita cita) =>
+        new(cita.IdCita, cita.EstadoPago, cita.Estado, cita.Version);
 
     // Con nombres nulos (permiso retirado tras confirmar) no se afirma que el paciente esté de baja: solo falta el nombre.
     private static DetalleDeCita ADetalle(Cita cita, IReadOnlyDictionary<Guid, string>? nombres)

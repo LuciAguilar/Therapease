@@ -61,7 +61,9 @@ public static class ConfiguracionDeSeguridad
             .AddPolicy(PoliticasDeAutorizacion.ConsultarAgenda, politica =>
                 politica.RequireAuthenticatedUser().AddRequirements(new RequisitoDePermiso(Permiso.ConsultarAgenda)))
             .AddPolicy(PoliticasDeAutorizacion.AgendarCitas, politica =>
-                politica.RequireAuthenticatedUser().AddRequirements(new RequisitoDePermiso(Permiso.AgendarCitas)));
+                politica.RequireAuthenticatedUser().AddRequirements(new RequisitoDePermiso(Permiso.AgendarCitas)))
+            .AddPolicy(PoliticasDeAutorizacion.CambiarPagoDeCitas, politica =>
+                politica.RequireAuthenticatedUser().AddRequirements(new RequisitoDePermiso(Permiso.CambiarPagoDeCitas)));
 
         return servicios;
     }

@@ -630,6 +630,11 @@ public class PaginasDeAgendaTests
             if (FalloAlta is not null) throw FalloAlta;
             return Task.FromResult(Alta);
         }
+
+        // Estas páginas todavía no cambian el pago (B04); el doble solo cumple el contrato y falla si algo lo llama.
+        public Task<RespuestaServicio<ResultadoDeCambioDePago>> CambiarPagoAsync(
+            Guid idCita, int versionEsperada, EstadoPago? nuevoPago, CancellationToken cancelacion) =>
+            throw new NotSupportedException("Las páginas de agenda no cambian el pago.");
     }
 
     private sealed class Pacientes : IServicioPacientes

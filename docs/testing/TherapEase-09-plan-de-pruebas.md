@@ -277,12 +277,12 @@ Los identificadores de la sección 3 conservan ⏳ si su alcance completo aún f
 | M-14 ★ | ✅ servidor / ⌛ páginas | Agendar con inicio ≥ fin, paciente inexistente o de baja, o ámbito que el paciente no tiene → rechaza. | HU09, CU06 A1 |
 | M-15 ★ | ✅ servidor / ⌛ páginas | Cruce: solapada con una activa → rechaza, aunque sea de otro ámbito. Cancelada o de baja → no bloquea. Contigua (10–11 y 11–12) → permite. | HU09, CU06 A2 |
 | M-16 ★ | ✅ servidor / ⌛ páginas | Una cita nueva queda agendada, vigente y con pago pendiente. | 08C §2 |
-| M-17 ★ | ⏳ | El pago solo acepta Pagado o Pendiente. | HU13, CU09 A6 |
+| M-17 ★ | ✅ servidor / ⌛ páginas | El pago solo acepta Pagado o Pendiente. | HU13, CU09 A6 |
 | M-18 | ⏳ | Reprogramar conserva el pago. Cita cancelada, de baja o con paciente de baja → rechaza. | HU10, CU07 A3–A4 |
 | M-19 | ⏳ | Cancelar → cancelada, conserva pago y condición. | HU11, Q20 |
 | M-20 | ⏳ | Baja de cita → conserva estado y pago. | HU12 |
 | M-21 | ⏳ | Recuperar: agendada con paciente de baja → rechaza; agendada con cruce → rechaza; cancelada → vigente pero sigue cancelada; ya vigente → informa. | HU12, CU08 |
-| M-22 ★ | ✅ usuarios, pacientes y citas / ⏳ pago | Si el guardado falla, el servicio devuelve error, nunca éxito. | Q08, S4 |
+| M-22 ★ | ✅ usuarios, pacientes, citas y pago (servidor) | Si el guardado falla, el servicio devuelve error, nunca éxito. | Q08, S4 |
 
 ### Transversales
 

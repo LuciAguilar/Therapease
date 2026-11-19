@@ -18,5 +18,9 @@ public enum Permiso
     // Propuesta B03 (D1, aprobada por Lucía el 05-nov-2026): usuaria y superusuario; los del superusuario valen solo con datos de prueba.
     // Ambas operaciones exigen además ConsultarPacientes, porque leen o devuelven datos del paciente.
     ConsultarAgenda,
-    AgendarCitas
+    AgendarCitas,
+
+    // Propuesta B04 (D1, aprobada por Lucía el 17-nov-2026): usuaria y superusuario; los del superusuario valen solo con datos de prueba.
+    // Cambiar el pago exige además ConsultarAgenda y ConsultarPacientes, igual que el detalle de la cita.
+    CambiarPagoDeCitas
 }
