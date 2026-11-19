@@ -4,27 +4,28 @@
 
 TherapEase es una aplicación web para la gestión administrativa de un consultorio psicológico.
 
-**Estado de hoy — 31-oct-2026:** servidor B02 fusionado en main `c90b3c0` mediante [#11](https://github.com/LuciAguilar/Therapease/pull/11); QA [#12](https://github.com/LuciAguilar/Therapease/pull/12), `5e46883`, con [CI correcta](https://github.com/LuciAguilar/Therapease/actions/runs/41134402751), aprobado por Miguel y fusionado por Lucía en `b53c5b7` con Create a merge commit.
+**Estado al 19-nov-2026:** B03 integrado en main 9d0f3a0 por #24; CI [44594280472](https://github.com/LuciAguilar/Therapease/actions/runs/44594280472) correcta 4/4. Revisión de Miguel y uso funcional confirmado por Lucía con Dulce. B03 listo para decisión de cierre de Lucía; capturas a su cargo.
 
-- B01 espera las páginas, formularios y navegador; B00/LCA/R04 siguen abiertos.
-- B02: servidor y contrato disponibles; QA revisado y fusionado. Faltan confirmaciones de producto, páginas y navegador.
-- B03: propuesta técnica aprobada (D1–D13, 05-nov). Servidor y contrato para las páginas en el [PR #18](https://github.com/LuciAguilar/Therapease/pull/18): Lucía revisó `fe6b79a` (810 unitarias y 27 integraciones de citas; su QA dirigido dio 4/5) y aprobó el bloqueo de la agenda en un disparador de `Cita`, que esta corrección implementa. Detalle en la [evidencia](docs/testing/TherapEase-09-B03-evidencia-servicios.md). QA de Lucía, páginas y navegador pendientes.
-- B04: propuesta técnica del estado de pago aprobada por Lucía el 17-nov (D1–D8). El servidor del cambio de pago (permiso `CambiarPagoDeCitas`, `CambiarPagoAsync` y su contrato en la sección 4.4 del [contrato de citas](docs/planning/TherapEase-etapa09-B03-contrato-para-paginas.md)) está en la rama `b03/agenda-y-citas`, sin migración. Revisión distinta, QA de Lucía, páginas y Q16 pendientes.
+- ✅ B01 cerrado por Lucía; B00/LCA cerrados. Q16 completo sigue en B04 y R04 continúa abierto.
+- B02: servidor y contrato disponibles; QA revisado y fusionado. Páginas y QA integrados; producto B02 confirmado. Q13 y decisión de cierre siguen pendientes.
+- ✅ B03: servidor, páginas y QA revisados e integrados; ⏳ capturas de Lucía y decisión expresa de cierre.
+- B04: servidor [#25](https://github.com/LuciAguilar/Therapease/pull/25) aprobado por Lucía y fusionado con squash en `e68dbbe`. CI del PR 4/4; QA propio de servidor auditado, pendiente de PR y revisión humana. Páginas de pago, Q16 y decisión de trazas pendientes. Correcciones documentales posteriores por Lucía con Codex, por decisión expresa de Lucía.
 - Solo datos ficticios, sin nube ni gastos; montos, «solo particular» y cancelación automática fuera.
 
 ## 2. Quién hace qué ahora
 
 | Persona | Trabajo actual |
 | --- | --- |
-| Lucía | Decide las propuestas y dirige QA; otra persona revisa sus pruebas. |
-| Miguel | Servidor B01/B02 y QA integrados; correcciones del servidor B03 en el PR #18 y mantener apoyo a Dulce. |
-| Dulce | Confirma producto con la usuaria y prepara páginas, PageModel y sus unitarias. |
+| Lucía | ✅ QA B03 revisado por Miguel e integrado; validó uso con Dulce. ⏳ Añade capturas y decide cierre. |
+| Miguel | ✅ Servidor B03 y revisión del QA completados. Continúa B04 y apoyo según su seguimiento. |
+| Dulce | ✅ Páginas B03 y validación funcional con Lucía. Continúa páginas posteriores según el plan. |
 
 ## 3. Documentos clave
 
 | Documento | Para qué sirve |
 | --- | --- |
 | [AGENTS](AGENTS.md) | Reglas obligatorias, alcance y límites vigentes. |
+| [Plan B04](docs/planning/TherapEase-etapa09-B04.md) | Pago Pendiente/Pagado; servidor integrado. Contrato de pago en sección 4.4 del contrato B03; páginas y Q16 pendientes. |
 | [Plan B01](docs/planning/TherapEase-etapa09-B01.md) | Acceso, identidad y páginas pendientes. |
 | [Plan B02](docs/planning/TherapEase-etapa09-B02.md) | Plan aprobado; [propuesta ajustada](docs/planning/TherapEase-etapa09-B02-propuesta.md) aprobada el 26-oct. |
 | [Plan B03](docs/planning/TherapEase-etapa09-B03.md) | Producto decidido el 01-nov; [propuesta técnica](docs/planning/TherapEase-etapa09-B03-propuesta.md) con D1–D13 aprobada el 05-nov. El código y las pruebas del servidor van en el [PR #18](https://github.com/LuciAguilar/Therapease/pull/18), con revisión distinta y aprobación final de Lucía. |
