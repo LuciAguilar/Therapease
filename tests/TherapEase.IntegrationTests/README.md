@@ -19,9 +19,11 @@ Se clasificaron los archivos de Lucía y, por autorización expresa del 11-nov, 
 | ✅ organizada | [Arquitectura](Arquitectura/) | ArquitecturaTests.cs |
 | ✅ organizada | [Auditoria](Auditoria/) | AuditoriaServidorTests.cs, ConsultaAuditoriaApiTests.cs, EventosAccesoServidorTests.cs |
 | ✅ QA propio B03 | [Citas](Citas/) | AgendaYReservasTests.cs, ConsultaDeAgendaTests.cs |
+| ✅ pruebas de Miguel | [Citas](Citas/) | BloqueoDeAgendaEnCitaActivaTests.cs, CitasServidorTests.cs |
 | ✅ QA propio B03 | [Citas/Concurrencia](Citas/Concurrencia/) | AgendaYBajaConcurrentesTests.cs, AgendaYBajaConTransaccionesTests.cs |
 | ✅ organizada | [Datos/Integridad](Datos/Integridad/) | RevisionDatosTests.cs |
 | ✅ organizada | [Datos/Recuperacion](Datos/Recuperacion/) | RecuperacionTests.cs |
+| ✅ organizada | [Entorno](Entorno/) | ArranqueSinCadenaDeConexionTests.cs |
 | ✅ organizada | [Entorno/HorasYDocker](Entorno/HorasYDocker/) | HorasDockerTests.cs |
 | ✅ organizada | [Http/Formularios](Http/Formularios/) | FallosDeFormularioTests.cs |
 | ✅ organizada | [Http/Https](Http/Https/) | HttpsLocalTests.cs |
@@ -32,6 +34,7 @@ Se clasificaron los archivos de Lucía y, por autorización expresa del 11-nov, 
 | ✅ organizada | [Identidad/Permisos](Identidad/Permisos/) | PermisosUsuariosTests.cs |
 | ✅ organizada | [Identidad/Sesiones](Identidad/Sesiones/) | SesionesHttpsTests.cs, SesionesServidorTests.cs |
 | ✅ organizada | [Identidad/Usuarios](Identidad/Usuarios/) | ConsultaYEdicionUsuariosTests.cs, UsuariosServidorTests.cs |
+| ✅ organizada | [Pacientes](Pacientes/) | PacientesListadoTests.cs |
 | ✅ organizada | [Pacientes/Baja](Pacientes/Baja/) | BajaPacienteTests.cs |
 | ✅ organizada | [Pacientes/Fichas](Pacientes/Fichas/) | PacientesFlujoTests.cs, PacientesServidorTests.cs |
 | ✅ organizada | [Pacientes/Guardado](Pacientes/Guardado/) | PacientesGuardadoTests.cs |
@@ -42,6 +45,6 @@ Se clasificaron los archivos de Lucía y, por autorización expresa del 11-nov, 
 
 ## Autoría y alcance
 
-Los tres archivos de pacientes de Miguel cambiaron únicamente de ubicación, conservando contenido y namespaces. Después de esa organización, #18 agregó ArranqueSinCadenaDeConexionTests.cs, BloqueoDeAgendaEnCitaActivaTests.cs y CitasServidorTests.cs en la raíz; esta continuación conserva su ubicación. Los cuatro archivos propios de QA B03 se incorporan dentro de Citas, sin modificar su contenido auditado. Las unitarias de Miguel y Dulce no se reorganizan.
+Los tres archivos de pacientes de Miguel cambiaron únicamente de ubicación, conservando contenido y namespaces. El 18-nov se clasificaron cuatro archivos adicionales: ArranqueSinCadenaDeConexionTests.cs en Entorno; BloqueoDeAgendaEnCitaActivaTests.cs y CitasServidorTests.cs en Citas; PacientesListadoTests.cs en Pacientes. Sus contenidos se conservaron exactamente, comprobados con SHA-256, sin cambiar clases, métodos ni namespaces. Los cuatro archivos propios de QA B03 se incorporan dentro de Citas, sin modificar su contenido auditado. Las unitarias de Miguel y Dulce no se reorganizan.
 
 Compilar o ejecutar con el mismo proyecto TherapEase.IntegrationTests.csproj. Los filtros por clase siguen funcionando. El [QA B01](../../docs/testing/TherapEase-09-B01-QA-paginas.md) contiene la preparación HTTP y de navegador.
