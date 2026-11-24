@@ -1,5 +1,7 @@
 @model string
-<div class="aviso-confirmacion" role="status">
-    <span aria-hidden="true">✓</span>
-    @Model
+<div class="aviso-confirmacion" role="status" aria-live="polite" aria-atomic="true">
+    <span class="notificacion-icono" aria-hidden="true">✓</span>
+    <div class="notificacion-contenido"><strong>@Model</strong><span>Confirmación · TherapEase</span></div>
+    <button type="button" class="notificacion-cerrar" aria-label="Cerrar notificación" hidden>×</button>
+    <span class="notificacion-tiempo" aria-hidden="true" hidden></span>
 </div>

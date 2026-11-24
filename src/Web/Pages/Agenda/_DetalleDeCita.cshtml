@@ -1,8 +1,12 @@
+@using Microsoft.AspNetCore.Authorization
+@using TherapEase.Web.Seguridad
+@inject IAuthorizationService Autorizacion
 @using System.Globalization
 @using TherapEase.Application.Citas.Constantes
 @using TherapEase.Application.Citas.Modelos
 @model DetalleDeCita
 @{
+    var pagada = Model.EstadoPago == TherapEase.Domain.Citas.Entidades.Enums.EstadoPago.Pagado;
     var cultura = CultureInfo.GetCultureInfo("es-MX");
 }
 <dl class="tarjeta cita-detalle">
@@ -24,10 +28,26 @@
     <dd>@Model.FinLocal.ToString("d MMMM yyyy, HH:mm", cultura)</dd>
     <dt>Estado</dt>
     <dd><span class="cita-distintivo cita-distintivo-estado">@Model.Estado</span></dd>
-    <dt>Pago</dt>
-    <dd><span class="cita-distintivo cita-distintivo-pago">@Model.EstadoPago</span></dd>
+
 </dl>
 @if (Model.RegistradaDespuesDeSuHorario)
 {
     <p class="cita-aviso-tardio">@MensajesDeCitas.LeyendaRegistradaDespuesDeSuHorario</p>
 }
+<section class="tarjeta cita-pago @(pagada ? "cita-pago-pagado" : "cita-pago-pendiente")" aria-label="Estado de pago">
+    <div class="pago-resumen">
+        <span class="pago-emblema" aria-hidden="true">@(pagada ? "✓" : "◷")</span>
+        <div class="pago-resumen-texto">
+            <h3>Estado de pago</h3>
+            <p>@(pagada ? "El pago de esta cita está registrado." : "Esta cita tiene el pago pendiente.")</p>
+        </div>
+        <span class="pago-estado">@Model.EstadoPago</span>
+    </div>
+    @if ((await Autorizacion.AuthorizeAsync(User, PoliticasDeAutorizacion.CambiarPagoDeCitas)).Succeeded)
+    {
+        <details class="pago-editor">
+            <summary><span aria-hidden="true">✎</span> Cambiar estado de pago <span class="pago-desplegar" aria-hidden="true">⌄</span></summary>
+            <partial name="_FormularioDePago" model="@(new TherapEase.Web.Pages.Agenda.DatosDelFormularioDePago(Model.IdCita, Model.Version, Model.EstadoPago))" />
+        </details>
+    }
+</section>

@@ -63,7 +63,7 @@
             }
             destino.replaceChildren(...contenidoCita.childNodes);
             reservaPendiente = null;
-            const aviso = destino.querySelector('.aviso-confirmacion, [role="alert"]');
+            const aviso = destino.querySelector('[role="alert"]');
             if (aviso) {
                 aviso.tabIndex = -1;
                 aviso.focus();

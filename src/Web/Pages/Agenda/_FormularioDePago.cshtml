@@ -1,0 +1,25 @@
+@model TherapEase.Web.Pages.Agenda.DatosDelFormularioDePago
+<form method="post" asp-page="/Agenda/Pago" asp-route-id="@Model.IdCita" data-formulario-pago>
+    <input type="hidden" asp-for="VersionEsperada" />
+    <fieldset class="pago-opciones">
+        <legend>¿Cómo está el pago de esta cita?</legend>
+        <label class="pago-opcion">
+            <input type="radio" asp-for="NuevoPago" id="pago-pendiente-@Model.IdCita" value="Pendiente" required />
+            <span class="pago-opcion-icono" aria-hidden="true">◷</span>
+            <span><strong>Pendiente</strong><small>Aún por pagar</small></span>
+            <span class="pago-opcion-marca" aria-hidden="true"></span>
+        </label>
+        <label class="pago-opcion">
+            <input type="radio" asp-for="NuevoPago" id="pago-pagado-@Model.IdCita" value="Pagado" required />
+            <span class="pago-opcion-icono" aria-hidden="true">✓</span>
+            <span><strong>Pagado</strong><small>Pago recibido</small></span>
+            <span class="pago-opcion-marca" aria-hidden="true"></span>
+        </label>
+    </fieldset>
+    <div class="pago-acciones">
+        <button type="submit" class="pago-guardar"><span aria-hidden="true">✓</span> Guardar cambio</button>
+        <button type="button" class="pago-cancelar" data-cancelar-pago hidden>Cancelar</button>
+    </div>
+    <p data-aviso-pago class="pago-aviso" role="alert"></p>
+    <a class="pago-recargar" asp-page="/Agenda/Detalle" asp-route-id="@Model.IdCita" data-recargar-pago hidden>Revisar estado de pago <span aria-hidden="true">↗</span></a>
+</form>

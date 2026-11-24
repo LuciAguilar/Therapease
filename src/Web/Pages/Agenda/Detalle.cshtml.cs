@@ -14,6 +14,7 @@ namespace TherapEase.Web.Pages.Agenda;
 public class DetalleModel(IServicioCitas citas) : PageModel
 {
     public DetalleDeCita? Cita { get; private set; }
+    [TempData] public string? Confirmacion { get; set; }
     public string? Error { get; private set; }
 
     public async Task<IActionResult> OnGetAsync([FromRoute] Guid id)
