@@ -81,3 +81,11 @@ body {
 @media (max-width: 440px) { .aviso-confirmacion { inset: 1rem 1rem auto auto; } }
 
 .notificacion-cerrar[hidden], .notificacion-tiempo[hidden] { display: none; }
+
+/* Sin JavaScript se conserva el aviso durante seis segundos. */
+.aviso-confirmacion:not([popover]) { animation: ocultar-aviso 6s step-end forwards; }
+.aviso-confirmacion:not([popover])::after { content: ""; position: absolute; inset: auto 0 0; height: 4px; background: #4e9468; transform-origin: left; animation: consumir-aviso 6s linear forwards; }
+.aviso-confirmacion:not([popover]):is(:hover, :focus-within),
+.aviso-confirmacion:not([popover]):is(:hover, :focus-within)::after { animation-play-state: paused; }
+@keyframes ocultar-aviso { to { visibility: hidden; } }
+@keyframes consumir-aviso { to { transform: scaleX(0); } }

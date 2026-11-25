@@ -1,4 +1,12 @@
 (() => {
+    function enfocarResultado(contenido) {
+        const destino = [...contenido.querySelectorAll('[role="alert"]')].find(aviso => aviso.textContent.trim())
+            ?? [...contenido.querySelectorAll('h1, h2')].find(titulo => titulo.getClientRects().length)
+            ?? contenido.closest('dialog')?.querySelector('h2');
+        if (!destino) return;
+        destino.tabIndex = -1;
+        destino.focus({ preventScroll: true });
+    }
     function prepararPago() {
         document.querySelectorAll('[data-cancelar-pago]').forEach(boton => boton.hidden = false);
     }
@@ -15,6 +23,9 @@
     document.addEventListener('submit', async evento => {
         const formulario = evento.target;
         if (!formulario.matches('[data-formulario-pago]')) return;
+        const contenedor = formulario.closest('[data-contenido-detalle-cita]');
+        // El detalle mostrado tras el alta conserva el POST normal y su redirección.
+        if (!contenedor) return;
         evento.preventDefault();
         if (formulario.dataset.enviando) return;
         formulario.dataset.enviando = 'true';
@@ -24,7 +35,6 @@
         boton.textContent = 'Guardando…';
         formulario.setAttribute('aria-busy', 'true');
         formulario.querySelectorAll('input, [data-cancelar-pago]').forEach(control => control.disabled = true);
-        const contenedor = formulario.closest('[data-contenido-detalle-cita]');
         try {
             const respuesta = await fetch(formulario.action, { method: 'POST', body: datos, signal: AbortSignal.timeout(30000) });
             if (!formulario.isConnected) return;
@@ -39,13 +49,14 @@
             const documento = new DOMParser().parseFromString(await respuesta.text(), 'text/html');
             const contenido = documento.querySelector('[data-contenido-detalle-cita]');
             if (!contenido) { window.location.assign(respuesta.url); return; }
-            if (contenedor && formulario.isConnected) contenedor.replaceWith(contenido);
+            if (formulario.isConnected) { contenedor.replaceWith(contenido); enfocarResultado(contenido); }
         } catch {
             if (!formulario.isConnected) return;
             formulario.removeAttribute('aria-busy');
             formulario.querySelector('[data-recargar-pago]').hidden = false;
             boton.textContent = 'Consulta el estado antes de repetir';
             formulario.querySelector('[data-aviso-pago]').textContent = 'No pudimos confirmar si se guardó; revisa el registro antes de repetir';
+            enfocarResultado(contenedor);
             // Exige consultar de nuevo antes de habilitar otro envío.
         }
     });
@@ -61,7 +72,7 @@
             const documento = new DOMParser().parseFromString(await respuesta.text(), 'text/html');
             const detalle = documento.querySelector('[data-contenido-detalle-cita]');
             if (!detalle) throw new Error();
-            if (contenedor.isConnected) contenedor.replaceWith(detalle);
+            if (contenedor.isConnected) { contenedor.replaceWith(detalle); enfocarResultado(detalle); }
         } catch { contenedor.textContent = 'No se pudo abrir la cita. Cierra el panel y vuelve a intentarlo.'; }
     });
 })();
