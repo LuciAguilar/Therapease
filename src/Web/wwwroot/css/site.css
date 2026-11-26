@@ -48,13 +48,6 @@ body {
   padding: 1.5rem;
 }
 
-.aviso {
-  padding: 0.5rem 0.75rem;
-  border-left: 4px solid var(--color-marca);
-  background: #fff;
-}
-
-
 @font-face {
     font-family: "DM Sans";
     src: url("../fonts/DMSans-Variable.ttf") format("truetype");
@@ -68,33 +61,31 @@ body {
     height: auto;
     object-fit: contain;
 }
+
 .aviso-confirmacion {
-    position: fixed;
-    inset: 1rem 1rem auto auto;
-    --duracion-confirmacion: 7s;
-    z-index: 5;
-    display: flex;
-    gap: .75rem;
-    max-width: calc(100vw - 2rem);
-    box-sizing: border-box;
-    padding: .9rem 1.25rem;
-    border: 1px solid #a9c7b5;
-    border-radius: .85rem;
-    overflow: hidden;
-    background: linear-gradient(120deg, #d8eafd, #d8efdf);
-    color: #205138;
-    box-shadow: 0 .35rem 1.2rem rgb(36 99 65 / 20%);
-    font-weight: 700;
-    animation: ocultar-confirmacion var(--duracion-confirmacion) step-end forwards;
+    position: fixed; inset: 1.25rem 1.25rem auto auto; margin: 0;
+    box-sizing: border-box; width: min(390px, calc(100vw - 2rem));
+    padding: 1.1rem 1rem 1.3rem; border: 1px solid #bcd8c7; border-radius: 1rem;
+    background: #fff; color: #285c3e; box-shadow: 0 12px 40px #173b2b26;
+    overflow: hidden; font-family: inherit;
 }
-.aviso-confirmacion::after {
-    content: "";
-    position: absolute;
-    inset: auto 0 0;
-    height: .25rem;
-    background: #348151;
-    transform-origin: left;
-    animation: consumir-confirmacion var(--duracion-confirmacion) linear forwards;
-}
-@keyframes consumir-confirmacion { to { transform: scaleX(0); } }
-@keyframes ocultar-confirmacion { to { visibility: hidden; } }
+.aviso-confirmacion:not([popover]), .aviso-confirmacion:popover-open { display: flex; align-items: center; gap: .8rem; }
+.notificacion-icono { display: grid; place-items: center; flex-shrink: 0; width: 2.5rem; height: 2.5rem; border-radius: 50%; background: #e1f2e7; font-size: 1.3rem; }
+.notificacion-contenido { flex: 1; }
+.notificacion-contenido strong { display: block; font-size: .95rem; line-height: 1.4; }
+.notificacion-contenido > span { display: block; color: #5c7164; font-size: .8rem; margin-top: .25rem; }
+.notificacion-cerrar { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; flex-shrink: 0; border: 0; border-radius: .6rem; padding: 0; color: #526c5d; background: transparent; font-size: 1.5rem; cursor: pointer; }
+.notificacion-cerrar:hover { background: #edf5f0; }
+.notificacion-cerrar:focus-visible { outline: 2px solid #397756; outline-offset: 2px; }
+.notificacion-tiempo { position: absolute; inset: auto 0 0; height: 4px; background: #4e9468; transform-origin: left; }
+@media (max-width: 440px) { .aviso-confirmacion { inset: 1rem 1rem auto auto; } }
+
+.notificacion-cerrar[hidden], .notificacion-tiempo[hidden] { display: none; }
+
+/* Sin JavaScript se conserva el aviso durante seis segundos. */
+.aviso-confirmacion:not([popover]) { animation: ocultar-aviso 6s step-end forwards; }
+.aviso-confirmacion:not([popover])::after { content: ""; position: absolute; inset: auto 0 0; height: 4px; background: #4e9468; transform-origin: left; animation: consumir-aviso 6s linear forwards; }
+.aviso-confirmacion:not([popover]):is(:hover, :focus-within),
+.aviso-confirmacion:not([popover]):is(:hover, :focus-within)::after { animation-play-state: paused; }
+@keyframes ocultar-aviso { to { visibility: hidden; } }
+@keyframes consumir-aviso { to { transform: scaleX(0); } }

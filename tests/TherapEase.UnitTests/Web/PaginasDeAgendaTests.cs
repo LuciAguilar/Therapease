@@ -597,12 +597,243 @@ public class PaginasDeAgendaTests
         }
     };
 
+
+    [Theory]
+    [InlineData(null, EstadoPago.Pagado)]
+    [InlineData(0, EstadoPago.Pagado)]
+    [InlineData(-1, EstadoPago.Pagado)]
+    [InlineData(1, null)]
+    [InlineData(1, (EstadoPago)99)]
+    [InlineData(null, null)]
+    [InlineData(1, (EstadoPago)(-1))]
+    public async Task PagoInvalidoConservaEntradaSinGuardar(int? version, EstadoPago? pago)
+    {
+        var servicio = new Citas();
+        var pagina = new PagoModel(servicio) { PageContext = Contexto(), VersionEsperada = version, NuevoPago = pago };
+        Assert.IsType<PageResult>(await pagina.OnPostAsync(Guid.NewGuid()));
+        Assert.Empty(servicio.Pagos);
+        Assert.Equal(version, pagina.VersionEsperada);
+        Assert.Equal(pago, pagina.NuevoPago);
+        Assert.Equal(MensajesDeCitas.SolicitudInvalida, pagina.Error);
+    }
+    [Theory]
+    [InlineData(EstadoDeCambioDePago.Actualizado, EstadoPago.Pagado)]
+    [InlineData(EstadoDeCambioDePago.Actualizado, EstadoPago.Pendiente)]
+    [InlineData(EstadoDeCambioDePago.SinCambios, EstadoPago.Pagado)]
+    [InlineData(EstadoDeCambioDePago.SinCambios, EstadoPago.Pendiente)]
+    public async Task PagoConfirmadoRedirigeSinReleerYConAvisoCorrespondiente(EstadoDeCambioDePago estado, EstadoPago pago)
+    {
+        var id = Guid.NewGuid();
+        var servicio = new Citas { Pago = RespuestaServicio<ResultadoDeCambioDePago>.Correcta(new(estado, new(id, pago, EstadoCita.Cancelada, 8))) };
+        var pagina = new PagoModel(servicio) { PageContext = Contexto(), VersionEsperada = 7, NuevoPago = pago };
+        var resultado = Assert.IsType<RedirectToPageResult>(await pagina.OnPostAsync(id));
+        Assert.Equal("Detalle", resultado.PageName);
+        Assert.Equal(id, resultado.RouteValues!["id"]);
+        Assert.Equal((id, 7, (EstadoPago?)pago), Assert.Single(servicio.Pagos));
+        Assert.Null(servicio.IdConsultado);
+        Assert.Single(resultado.RouteValues);
+        Assert.Null(pagina.Error);
+        Assert.Equal(7, pagina.VersionEsperada);
+        Assert.Equal(pago, pagina.NuevoPago);
+        Assert.Equal(estado == EstadoDeCambioDePago.Actualizado ? MensajesDeCitas.PagoActualizado : MensajesDeCitas.SinCambios, pagina.Confirmacion);
+    }
+    [Theory]
+    [InlineData(MensajesDeCitas.ConflictoDeVersion, true, 200)]
+    [InlineData(MensajesDeCitas.SolicitudInvalida, true, 200)]
+    [InlineData(MensajesDeCitas.PagoDeCitaDeBajaNoSeActualiza, false, 200)]
+    [InlineData(MensajesDeCitas.CitaNoEncontrada, false, 404)]
+    public async Task PagoRechazadoConservaVersionSinReconsulta(string mensaje, bool formulario, int codigo)
+    {
+        var servicio = new Citas { Pago = RespuestaServicio<ResultadoDeCambioDePago>.Fallida(mensaje) };
+        var pagina = new PagoModel(servicio) { PageContext = Contexto(), VersionEsperada = 2, NuevoPago = EstadoPago.Pagado };
+        Assert.IsType<PageResult>(await pagina.OnPostAsync(Guid.NewGuid()));
+        Assert.Equal(mensaje, pagina.Error);
+        Assert.Equal(formulario, pagina.MostrarFormulario);
+        Assert.Equal(codigo, pagina.Response.StatusCode);
+        Assert.Equal(2, pagina.VersionEsperada);
+        Assert.Equal(EstadoPago.Pagado, pagina.NuevoPago);
+        Assert.Single(servicio.Pagos);
+        Assert.Null(servicio.IdConsultado);
+        Assert.Null(pagina.Confirmacion);
+        Assert.Equal(mensaje == MensajesDeCitas.ConflictoDeVersion, pagina.HayConflicto);
+    }
+    [Fact]
+    public async Task PagoSinPermisoSeDeniegaSinEntregarDatos()
+    {
+        var servicio = new Citas { Pago = RespuestaServicio<ResultadoDeCambioDePago>.Fallida(MensajesDeCitas.SinPermiso) };
+        var pagina = new PagoModel(servicio) { PageContext = Contexto(), VersionEsperada = 1, NuevoPago = EstadoPago.Pagado };
+        Assert.IsType<ForbidResult>(await pagina.OnPostAsync(Guid.NewGuid()));
+        Assert.Null(pagina.Error);
+        Assert.Null(pagina.Confirmacion);
+        Assert.Null(servicio.IdConsultado);
+    }
+    [Fact]
+    public async Task PagoConFalloInesperadoNoReintentaNiConfirma()
+    {
+        var servicio = new Citas { FalloPago = new InvalidOperationException("Fallo ficticio") };
+        var pagina = new PagoModel(servicio) { PageContext = Contexto(), VersionEsperada = 1, NuevoPago = EstadoPago.Pagado };
+        await Assert.ThrowsAsync<InvalidOperationException>(() => pagina.OnPostAsync(Guid.NewGuid()));
+        Assert.Single(servicio.Pagos);
+        Assert.Null(pagina.Confirmacion);
+    }
+    [Fact]
+    public void PagoExigeTresPermisosYDetalleConservaSoloConsulta()
+    {
+        var politicas = typeof(PagoModel).GetCustomAttributes(typeof(AuthorizeAttribute), true).Cast<AuthorizeAttribute>().Select(a => a.Policy).ToArray();
+        Assert.Equal(3, politicas.Length);
+        Assert.Contains(PoliticasDeAutorizacion.CambiarPagoDeCitas, politicas);
+        Assert.Contains(PoliticasDeAutorizacion.ConsultarAgenda, politicas);
+        Assert.Contains(PoliticasDeAutorizacion.ConsultarPacientes, politicas);
+        var consulta = typeof(DetalleModel).GetCustomAttributes(typeof(AuthorizeAttribute), true).Cast<AuthorizeAttribute>().Select(a => a.Policy).ToArray();
+        Assert.Equal(2, consulta.Length);
+        Assert.Contains(PoliticasDeAutorizacion.ConsultarAgenda, consulta);
+        Assert.Contains(PoliticasDeAutorizacion.ConsultarPacientes, consulta);
+        Assert.DoesNotContain(PoliticasDeAutorizacion.CambiarPagoDeCitas, consulta);
+        var cache = Assert.Single(typeof(PagoModel).GetCustomAttributes(typeof(ResponseCacheAttribute), true).Cast<ResponseCacheAttribute>());
+        Assert.True(cache.NoStore);
+        Assert.Equal(ResponseCacheLocation.None, cache.Location);
+    }
+
+    [Theory]
+    [InlineData("NuevoPago")]
+    [InlineData("VersionEsperada")]
+    public async Task PagoMalFormadoNoLlamaAlServicio(string campo)
+    {
+        var servicio = new Citas();
+        var pagina = new PagoModel(servicio) { PageContext = Contexto(), VersionEsperada = 1, NuevoPago = EstadoPago.Pagado };
+        pagina.ModelState.AddModelError(campo, "Valor inválido");
+        Assert.IsType<PageResult>(await pagina.OnPostAsync(Guid.NewGuid()));
+        Assert.Empty(servicio.Pagos);
+        Assert.Equal(MensajesDeCitas.SolicitudInvalida, pagina.Error);
+    }
+    [Fact]
+    public async Task PagoConIdentificadorVacioNoConsultaNiGuarda()
+    {
+        var servicio = new Citas();
+        var pagina = new PagoModel(servicio) { PageContext = Contexto(), VersionEsperada = 1, NuevoPago = EstadoPago.Pagado };
+        Assert.IsType<PageResult>(await pagina.OnPostAsync(Guid.Empty));
+        Assert.Equal(404, pagina.Response.StatusCode);
+        Assert.False(pagina.MostrarFormulario);
+        Assert.Empty(servicio.Pagos);
+    }
+
+    [Fact]
+    public void AbrirPagoRedirigeAlDetalleSinConsultarNiGuardar()
+    {
+        var id = Guid.NewGuid();
+        var servicio = new Citas();
+        var pagina = new PagoModel(servicio) { PageContext = Contexto() };
+
+        var resultado = Assert.IsType<RedirectToPageResult>(pagina.OnGet(id));
+
+        Assert.Equal("Detalle", resultado.PageName);
+        Assert.Equal(id, resultado.RouteValues!["id"]);
+        Assert.Null(servicio.IdConsultado);
+        Assert.Empty(servicio.Pagos);
+        Assert.Null(pagina.Confirmacion);
+    }
+
+    [Theory]
+    [InlineData(EstadoPago.Pagado)]
+    [InlineData(EstadoPago.Pendiente)]
+    public async Task TrasGuardarElDetalleConsultaElPagoYLaVersionVigentes(EstadoPago pago)
+    {
+        var id = Guid.NewGuid();
+        var cita = new DetalleDeCita(id, Dia.ToDateTime(new(14, 30)), Dia.ToDateTime(new(15, 30)),
+            AmbitoAtencion.Escolar, EstadoCita.Cancelada, null, null, true, false, pago, 12);
+        var servicio = new Citas
+        {
+            Pago = RespuestaServicio<ResultadoDeCambioDePago>.Correcta(new(EstadoDeCambioDePago.Actualizado,
+                new(id, pago, EstadoCita.Cancelada, 11))),
+            Detalle = RespuestaServicio<DetalleDeCita>.Correcta(cita)
+        };
+        var edicion = new PagoModel(servicio) { PageContext = Contexto(), VersionEsperada = 10, NuevoPago = pago };
+        var redireccion = Assert.IsType<RedirectToPageResult>(await edicion.OnPostAsync(id));
+        var detalle = new DetalleModel(servicio) { PageContext = Contexto() };
+
+        Assert.IsType<PageResult>(await detalle.OnGetAsync((Guid)redireccion.RouteValues!["id"]!));
+
+        Assert.Equal(id, servicio.IdConsultado);
+        Assert.Same(cita, detalle.Cita);
+        Assert.Equal(12, detalle.Cita!.Version);
+        Assert.Equal(pago, detalle.Cita.EstadoPago);
+        Assert.Equal(EstadoCita.Cancelada, detalle.Cita.Estado);
+        Assert.Null(detalle.Cita.NombreDelPaciente);
+        Assert.Null(detalle.Cita.IdPaciente);
+        Assert.Single(servicio.Pagos);
+    }
+
+    [Fact]
+    public async Task ConflictoDePagoConservaLosValoresLigadosSinReenviar()
+    {
+        var servicio = new Citas { Pago = RespuestaServicio<ResultadoDeCambioDePago>.Fallida(MensajesDeCitas.ConflictoDeVersion) };
+        var pagina = new PagoModel(servicio) { PageContext = Contexto(), VersionEsperada = 3, NuevoPago = EstadoPago.Pendiente };
+        pagina.ModelState.SetModelValue("VersionEsperada", "3", "3");
+        pagina.ModelState.SetModelValue("NuevoPago", "Pendiente", "Pendiente");
+        pagina.ModelState.MarkFieldValid("VersionEsperada");
+        pagina.ModelState.MarkFieldValid("NuevoPago");
+
+        Assert.IsType<PageResult>(await pagina.OnPostAsync(Guid.NewGuid()));
+
+        Assert.True(pagina.HayConflicto);
+        Assert.Equal("3", pagina.ModelState["VersionEsperada"]!.AttemptedValue);
+        Assert.Equal("Pendiente", pagina.ModelState["NuevoPago"]!.AttemptedValue);
+        Assert.Equal(3, pagina.VersionEsperada);
+        Assert.Equal(EstadoPago.Pendiente, pagina.NuevoPago);
+        Assert.Single(servicio.Pagos);
+        Assert.Null(servicio.IdConsultado);
+        Assert.Null(pagina.Confirmacion);
+    }
+
+    [Fact]
+    public async Task DetalleConFalloDeLecturaSePropagaSinMostrarDatosNiReintentar()
+    {
+        var fallo = new InvalidOperationException("Fallo ficticio de lectura");
+        var servicio = new Citas { FalloDetalle = fallo };
+        var pagina = new DetalleModel(servicio) { PageContext = Contexto() };
+
+        Assert.Same(fallo, await Assert.ThrowsAsync<InvalidOperationException>(() => pagina.OnGetAsync(Guid.NewGuid())));
+
+        Assert.Null(pagina.Cita);
+        Assert.Null(pagina.Error);
+        Assert.Null(pagina.Confirmacion);
+        Assert.Equal(1, servicio.Lecturas);
+        Assert.Empty(servicio.Pagos);
+    }
+
+
+    [Theory]
+    [InlineData(EstadoDeCambioDePago.Actualizado)]
+    [InlineData(EstadoDeCambioDePago.SinCambios)]
+    public async Task PagoEsperaLaRespuestaDelServicioAntesDeConfirmar(EstadoDeCambioDePago estado)
+    {
+        var id = Guid.NewGuid();
+        var respuesta = new TaskCompletionSource<RespuestaServicio<ResultadoDeCambioDePago>>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var servicio = new Citas { PagoPendiente = respuesta.Task };
+        var pagina = new PagoModel(servicio) { PageContext = Contexto(), VersionEsperada = 1, NuevoPago = EstadoPago.Pagado };
+
+        var envio = pagina.OnPostAsync(id);
+
+        Assert.Single(servicio.Pagos);
+        Assert.False(envio.IsCompleted);
+        Assert.Null(pagina.Confirmacion);
+        Assert.Null(servicio.IdConsultado);
+        respuesta.SetResult(RespuestaServicio<ResultadoDeCambioDePago>.Correcta(new(estado,
+            new(id, EstadoPago.Pagado, EstadoCita.Agendada, 2))));
+
+        Assert.IsType<RedirectToPageResult>(await envio);
+        Assert.Equal(estado == EstadoDeCambioDePago.Actualizado ? MensajesDeCitas.PagoActualizado : MensajesDeCitas.SinCambios,
+            pagina.Confirmacion);
+    }
+
     private sealed class Citas : IServicioCitas
     {
         public (DateOnly? Desde, DateOnly? Hasta, VistaDeAgenda Vista)? Filtro { get; private set; }
         public List<(Guid Id, DatosDeCitaEntrada Datos)> Envios { get; } = [];
         public Exception? FalloAlta { get; init; }
         public Guid? IdConsultado { get; private set; }
+        public Exception? FalloDetalle { get; init; }
+        public int Lecturas { get; private set; }
         public RespuestaServicio<ResultadoDeAgenda> Agenda { get; init; } =
             RespuestaServicio<ResultadoDeAgenda>.Fallida(MensajesDeCitas.PeriodoInvalido);
         public RespuestaServicio<DetalleDeCita> Detalle { get; init; } =
@@ -620,6 +851,8 @@ public class PaginasDeAgendaTests
         public Task<RespuestaServicio<DetalleDeCita>> ObtenerCitaAsync(Guid idCita, CancellationToken cancelacion)
         {
             IdConsultado = idCita;
+            Lecturas++;
+            if (FalloDetalle is not null) throw FalloDetalle;
             return Task.FromResult(Detalle);
         }
 
@@ -631,10 +864,17 @@ public class PaginasDeAgendaTests
             return Task.FromResult(Alta);
         }
 
-        // Estas páginas todavía no cambian el pago (B04); el doble solo cumple el contrato y falla si algo lo llama.
-        public Task<RespuestaServicio<ResultadoDeCambioDePago>> CambiarPagoAsync(
-            Guid idCita, int versionEsperada, EstadoPago? nuevoPago, CancellationToken cancelacion) =>
-            throw new NotSupportedException("Las páginas de agenda no cambian el pago.");
+        public RespuestaServicio<ResultadoDeCambioDePago> Pago { get; set; } = RespuestaServicio<ResultadoDeCambioDePago>.Fallida(MensajesDeCitas.SolicitudInvalida);
+        public Exception? FalloPago { get; set; }
+        public Task<RespuestaServicio<ResultadoDeCambioDePago>>? PagoPendiente { get; init; }
+        public List<(Guid Id, int Version, EstadoPago? Pago)> Pagos { get; } = [];
+        public Task<RespuestaServicio<ResultadoDeCambioDePago>> CambiarPagoAsync(Guid idCita, int versionEsperada, EstadoPago? nuevoPago, CancellationToken cancelacion)
+        {
+            Pagos.Add((idCita, versionEsperada, nuevoPago));
+            if (FalloPago is not null) throw FalloPago;
+            return PagoPendiente ?? Task.FromResult(Pago);
+        }
+
     }
 
     private sealed class Pacientes : IServicioPacientes

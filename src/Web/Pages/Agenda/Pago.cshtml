@@ -1,0 +1,16 @@
+@page "{id:guid}"
+@model PagoModel
+@{ Layout = "_LayoutOperativo"; ViewData["Title"] = "Estado de pago"; }
+<div data-contenido-detalle-cita>
+    <h1>Estado de pago</h1>
+    <p class="error-formulario" role="alert">@Model.Error</p>
+    @if (Model.HayConflicto)
+    {
+        <p>Selección pendiente de guardar: @Model.NuevoPago. Consulta el estado vigente antes de decidir de nuevo.</p>
+    }
+    @if (Model.MostrarFormulario && !Model.HayConflicto)
+    {
+        <partial name="_FormularioDePago" model="@(new DatosDelFormularioDePago(Model.IdCita, Model.VersionEsperada, Model.NuevoPago))" />
+    }
+    <a asp-page="Detalle" asp-route-id="@Model.IdCita" data-recargar-pago>Recargar detalle de cita</a>
+</div>

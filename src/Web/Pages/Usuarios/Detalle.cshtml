@@ -13,7 +13,7 @@
 }
 @if (Model.Confirmacion is not null)
 {
-    <p class="aviso" role="status">@Model.Confirmacion</p>
+    <partial name="_AvisoDeConfirmacion" model="Model.Confirmacion" />
 }
 @if (Model.Entrega is not null)
 {
